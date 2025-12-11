@@ -13,12 +13,13 @@ export class UpdateCommand {
 
     // 1. Check openspec directory exists
     if (!await FileSystemUtils.directoryExists(openspecPath)) {
-      throw new Error(`No OpenSpec directory found. Run 'openspec init' first.`);
+      throw new Error(`未找到OpenSpec目录。请先运行 'openspec init'。`);
     }
 
     // 2. Update AGENTS.md (full replacement)
     const agentsPath = path.join(openspecPath, 'AGENTS.md');
 
+    // Use Chinese template for simplified Chinese version
     await FileSystemUtils.writeFile(agentsPath, agentsTemplate);
 
     // 3. Update existing AI tool configuration files only
@@ -46,7 +47,7 @@ export class UpdateCommand {
       try {
         if (fileExists && !await FileSystemUtils.canWriteFile(configFilePath)) {
           throw new Error(
-            `Insufficient permissions to modify ${configurator.configFileName}`
+            `权限不足，无法修改 ${configurator.configFileName}`
           );
         }
 
@@ -59,7 +60,7 @@ export class UpdateCommand {
       } catch (error) {
         failedFiles.push(configurator.configFileName);
         console.error(
-          `Failed to update ${configurator.configFileName}: ${
+          `更新 ${configurator.configFileName} 失败: ${
             error instanceof Error ? error.message : String(error)
           }`
         );
@@ -80,7 +81,7 @@ export class UpdateCommand {
       } catch (error) {
         failedSlashTools.push(slashConfigurator.toolId);
         console.error(
-          `Failed to update slash commands for ${slashConfigurator.toolId}: ${
+          `更新 ${slashConfigurator.toolId} 的斜杠命令失败: ${
             error instanceof Error ? error.message : String(error)
           }`
         );
@@ -92,23 +93,23 @@ export class UpdateCommand {
 
     if (updatedFiles.includes('AGENTS.md')) {
       instructionFiles.push(
-        createdFiles.includes('AGENTS.md') ? 'AGENTS.md (created)' : 'AGENTS.md'
+        createdFiles.includes('AGENTS.md') ? 'AGENTS.md (已创建)' : 'AGENTS.md'
       );
     }
 
     summaryParts.push(
-      `Updated OpenSpec instructions (${instructionFiles.join(', ')})`
+      `已更新OpenSpec说明 (${instructionFiles.join(', ')})`
     );
 
     const aiToolFiles = updatedFiles.filter((file) => file !== 'AGENTS.md');
     if (aiToolFiles.length > 0) {
-      summaryParts.push(`Updated AI tool files: ${aiToolFiles.join(', ')}`);
+      summaryParts.push(`已更新AI工具文件: ${aiToolFiles.join(', ')}`);
     }
 
     if (updatedSlashFiles.length > 0) {
       // Normalize to forward slashes for cross-platform log consistency
       const normalized = updatedSlashFiles.map((p) => p.replace(/\\/g, '/'));
-      summaryParts.push(`Updated slash commands: ${normalized.join(', ')}`);
+      summaryParts.push(`已更新斜杠命令: ${normalized.join(', ')}`);
     }
 
     const failedItems = [
@@ -119,7 +120,7 @@ export class UpdateCommand {
     ];
 
     if (failedItems.length > 0) {
-      summaryParts.push(`Failed to update: ${failedItems.join(', ')}`);
+      summaryParts.push(`更新失败: ${failedItems.join(', ')}`);
     }
 
     console.log(summaryParts.join(' | '));

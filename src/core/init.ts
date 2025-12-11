@@ -157,7 +157,7 @@ const toolSelectionWizard = createPrompt<string[], ToolWizardConfig>(
           ? PALETTE.midGray(` (${item.label.annotation})`)
           : '';
         const configuredNote = item.configured
-          ? PALETTE.midGray(' (already configured)')
+          ? PALETTE.midGray('（已配置）')
           : '';
         const label = `${nameColor(item.label.primary)}${annotation}${configuredNote}`;
         return `${cursorSymbol} ${indicator} ${label}`;
@@ -283,7 +283,7 @@ const toolSelectionWizard = createPrompt<string[], ToolWizardConfig>(
         ? PALETTE.midGray(` (${choice.label.annotation})`)
         : '';
       const configuredNote = choice.configured
-        ? PALETTE.midGray(' (already configured)')
+        ? PALETTE.midGray('（已配置）')
         : '';
       return `${PALETTE.white(choice.label.primary)}${annotation}${configuredNote}`;
     };
@@ -295,27 +295,27 @@ const toolSelectionWizard = createPrompt<string[], ToolWizardConfig>(
 
     if (step === 'intro') {
       const introHeadline = config.extendMode
-        ? 'Extend your OpenSpec tooling'
-        : 'Configure your OpenSpec tooling';
+        ? '扩展您的OpenSpec工具'
+        : '配置您的OpenSpec工具';
       const introBody = config.extendMode
-        ? 'We detected an existing setup. We will help you refresh or add integrations.'
-        : "Let's get your AI assistants connected so they understand OpenSpec.";
+        ? '我们检测到现有设置。我们将帮助您刷新或添加集成。'
+        : "让我们连接您的AI助手，让它们理解OpenSpec。";
 
       lines.push(PALETTE.white(introHeadline));
       lines.push(PALETTE.midGray(introBody));
       lines.push('');
-      lines.push(PALETTE.midGray('Press Enter to continue.'));
+      lines.push(PALETTE.midGray('按回车键继续。'));
     } else if (step === 'select') {
       lines.push(PALETTE.white(config.baseMessage));
       lines.push(
         PALETTE.midGray(
-          'Use ↑/↓ to move · Space to toggle · Enter selects highlighted tool and reviews.'
+          '使用 ↑/↓ 移动 · 空格切换 · 回车选择高亮工具并确认。'
         )
       );
       lines.push('');
       lines.push(page);
       lines.push('');
-      lines.push(PALETTE.midGray('Selected configuration:'));
+      lines.push(PALETTE.midGray('已选配置：'));
       if (rootStubSelected && rootStubChoice) {
         lines.push(
           `  ${PALETTE.white('-')} ${formatSummaryLabel(rootStubChoice)}`
@@ -323,7 +323,7 @@ const toolSelectionWizard = createPrompt<string[], ToolWizardConfig>(
       }
       if (selectedNativeChoices.length === 0) {
         lines.push(
-          `  ${PALETTE.midGray('- No natively supported providers selected')}`
+          `  ${PALETTE.midGray('- 未选择原生支持提供商')}`
         );
       } else {
         selectedNativeChoices.forEach((choice) => {
@@ -333,9 +333,9 @@ const toolSelectionWizard = createPrompt<string[], ToolWizardConfig>(
         });
       }
     } else {
-      lines.push(PALETTE.white('Review selections'));
+      lines.push(PALETTE.white('确认选择'));
       lines.push(
-        PALETTE.midGray('Press Enter to confirm or Backspace to adjust.')
+        PALETTE.midGray('按回车确认或退格键调整。')
       );
       lines.push('');
 
@@ -348,7 +348,7 @@ const toolSelectionWizard = createPrompt<string[], ToolWizardConfig>(
       if (selectedNativeChoices.length === 0) {
         lines.push(
           PALETTE.midGray(
-            'No natively supported providers selected. Universal instructions will still be applied.'
+            '未选择原生支持提供商。通用指令仍将应用。'
           )
         );
       } else {
@@ -417,18 +417,18 @@ export class InitCommand {
     // Step 1: Create directory structure
     if (!extendMode) {
       const structureSpinner = this.startSpinner(
-        'Creating OpenSpec structure...'
+        '正在创建OpenSpec结构...'
       );
       await this.createDirectoryStructure(openspecPath);
       await this.generateFiles(openspecPath, config);
       structureSpinner.stopAndPersist({
         symbol: PALETTE.white('▌'),
-        text: PALETTE.white('OpenSpec structure created'),
+        text: PALETTE.white('OpenSpec结构已创建'),
       });
     } else {
       ora({ stream: process.stdout }).info(
         PALETTE.midGray(
-          'ℹ OpenSpec already initialized. Checking for missing files...'
+          'ℹ OpenSpec已初始化。正在检查缺失文件...'
         )
       );
       await this.createDirectoryStructure(openspecPath);
@@ -436,7 +436,7 @@ export class InitCommand {
     }
 
     // Step 2: Configure AI tools
-    const toolSpinner = this.startSpinner('Configuring AI tools...');
+    const toolSpinner = this.startSpinner('正在配置AI工具...');
     const rootStubStatus = await this.configureAITools(
       projectPath,
       openspecDir,
@@ -444,7 +444,7 @@ export class InitCommand {
     );
     toolSpinner.stopAndPersist({
       symbol: PALETTE.white('▌'),
-      text: PALETTE.white('AI tools configured'),
+      text: PALETTE.white('AI工具已配置'),
     });
 
     // Success message
@@ -501,7 +501,7 @@ export class InitCommand {
     const raw = this.toolsArg.trim();
     if (raw.length === 0) {
       throw new Error(
-        'The --tools option requires a value. Use "all", "none", or a comma-separated list of tool IDs.'
+        '--tools 选项需要一个值。请使用 "all"、"none" 或以逗号分隔的工具 ID 列表。'
       );
     }
 
@@ -526,14 +526,14 @@ export class InitCommand {
 
     if (tokens.length === 0) {
       throw new Error(
-        'The --tools option requires at least one tool ID when not using "all" or "none".'
+        '当未使用 "all" 或 "none" 时，--tools 选项至少需要一个工具 ID。'
       );
     }
 
     const normalizedTokens = tokens.map((token) => token.toLowerCase());
 
     if (normalizedTokens.some((token) => token === 'all' || token === 'none')) {
-      throw new Error('Cannot combine reserved values "all" or "none" with specific tool IDs.');
+      throw new Error('不能同时使用保留值 "all" 或 "none" 与具体工具 ID。');
     }
 
     const invalidTokens = tokens.filter(
@@ -542,7 +542,7 @@ export class InitCommand {
 
     if (invalidTokens.length > 0) {
       throw new Error(
-        `Invalid tool(s): ${invalidTokens.join(', ')}. Available values: ${availableList}`
+        `无效工具: ${invalidTokens.join(', ')}。可用值: ${availableList}`
       );
     }
 
@@ -563,8 +563,8 @@ export class InitCommand {
     const availableTools = AI_TOOLS.filter((tool) => tool.available);
 
     const baseMessage = extendMode
-      ? 'Which natively supported AI tools would you like to add or refresh?'
-      : 'Which natively supported AI tools do you use?';
+      ? '您想要添加或刷新哪些原生支持的AI工具？'
+      : '您使用哪些原生支持的AI工具？';
     const initialNativeSelection = extendMode
       ? availableTools
           .filter((tool) => existingTools[tool.value])
@@ -579,7 +579,7 @@ export class InitCommand {
         value: '__heading-native__',
         label: {
           primary:
-            'Natively supported providers (✔ OpenSpec custom slash commands available)',
+            '原生支持提供商（✔ 提供OpenSpec自定义斜杠命令）',
         },
         selectable: false,
       },
@@ -605,7 +605,7 @@ export class InitCommand {
         value: OTHER_TOOLS_HEADING_VALUE,
         label: {
           primary:
-            'Other tools (use Universal AGENTS.md for Amp, VS Code, GitHub Copilot, …)',
+            '其他工具（使用通用AGENTS.md适用于Amp、VS Code、GitHub Copilot等）',
         },
         selectable: false,
       },
@@ -613,8 +613,8 @@ export class InitCommand {
         kind: 'option',
         value: ROOT_STUB_CHOICE_VALUE,
         label: {
-          primary: 'Universal AGENTS.md',
-          annotation: 'always available',
+          primary: '通用AGENTS.md',
+          annotation: '始终可用',
         },
         configured: extendMode,
         selectable: true,
@@ -813,41 +813,41 @@ export class InitCommand {
   ): void {
     console.log(); // Empty line for spacing
     const successHeadline = extendMode
-      ? 'OpenSpec tool configuration updated!'
-      : 'OpenSpec initialized successfully!';
+      ? 'OpenSpec工具配置已更新！'
+      : 'OpenSpec初始化成功！';
     ora().succeed(PALETTE.white(successHeadline));
 
     console.log();
-    console.log(PALETTE.lightGray('Tool summary:'));
+    console.log(PALETTE.lightGray('工具摘要：'));
     const summaryLines = [
       rootStubStatus === 'created'
         ? `${PALETTE.white('▌')} ${PALETTE.white(
-            'Root AGENTS.md stub created for other assistants'
+            '为其他助手创建根AGENTS.md存根'
           )}`
         : null,
       rootStubStatus === 'updated'
         ? `${PALETTE.lightGray('▌')} ${PALETTE.lightGray(
-            'Root AGENTS.md stub refreshed for other assistants'
+            '为其他助手刷新根AGENTS.md存根'
           )}`
         : null,
       created.length
         ? `${PALETTE.white('▌')} ${PALETTE.white(
-            'Created:'
+            '已创建：'
           )} ${this.formatToolNames(created)}`
         : null,
       refreshed.length
         ? `${PALETTE.lightGray('▌')} ${PALETTE.lightGray(
-            'Refreshed:'
+            '已刷新：'
           )} ${this.formatToolNames(refreshed)}`
         : null,
       skippedExisting.length
         ? `${PALETTE.midGray('▌')} ${PALETTE.midGray(
-            'Skipped (already configured):'
+            '已跳过（已配置）：'
           )} ${this.formatToolNames(skippedExisting)}`
         : null,
       skipped.length
         ? `${PALETTE.darkGray('▌')} ${PALETTE.darkGray(
-            'Skipped:'
+            '已跳过：'
           )} ${this.formatToolNames(skipped)}`
         : null,
     ].filter((line): line is string => Boolean(line));
@@ -858,22 +858,22 @@ export class InitCommand {
     console.log();
     console.log(
       PALETTE.midGray(
-        'Use `openspec update` to refresh shared OpenSpec instructions in the future.'
+        '使用 `openspec update` 在未来刷新共享的OpenSpec指令。'
       )
     );
 
     // Show restart instruction if any tools were configured
     if (created.length > 0 || refreshed.length > 0) {
       console.log();
-      console.log(PALETTE.white('Important: Restart your IDE'));
+      console.log(PALETTE.white('重要：重启您的IDE'));
       console.log(
         PALETTE.midGray(
-          'Slash commands are loaded at startup. Please restart your coding assistant'
+          '斜杠命令在启动时加载。请重启您的编码助手'
         )
       );
       console.log(
         PALETTE.midGray(
-          'to ensure the new /openspec commands appear in your command palette.'
+          '以确保新的/openspec命令出现在您的命令面板中。'
         )
       );
     }
@@ -882,38 +882,38 @@ export class InitCommand {
     const toolName = this.formatToolNames(selectedTools);
 
     console.log();
-    console.log(`Next steps - Copy these prompts to ${toolName}:`);
+    console.log(`后续步骤 - 复制以下提示到${toolName}：`);
     console.log(
       chalk.gray('────────────────────────────────────────────────────────────')
     );
-    console.log(PALETTE.white('1. Populate your project context:'));
+    console.log(PALETTE.white('1. 填充您的项目上下文：'));
     console.log(
       PALETTE.lightGray(
-        '   "Please read openspec/project.md and help me fill it out'
+        '   "请阅读 openspec/project.md 并帮我填写'
       )
     );
     console.log(
       PALETTE.lightGray(
-        '    with details about my project, tech stack, and conventions"\n'
+        '    我的项目详情、技术栈和约定规范"\n'
       )
     );
-    console.log(PALETTE.white('2. Create your first change proposal:'));
+    console.log(PALETTE.white('2. 创建您的第一个变更提案：'));
     console.log(
       PALETTE.lightGray(
-        '   "I want to add [YOUR FEATURE HERE]. Please create an'
+        '   "我想添加 [您的功能描述]。请创建'
       )
     );
     console.log(
-      PALETTE.lightGray('    OpenSpec change proposal for this feature"\n')
+      PALETTE.lightGray('    一个OpenSpec变更提案来处理这个功能"\n')
     );
-    console.log(PALETTE.white('3. Learn the OpenSpec workflow:'));
+    console.log(PALETTE.white('3. 学习OpenSpec工作流程：'));
     console.log(
       PALETTE.lightGray(
-        '   "Please explain the OpenSpec workflow from openspec/AGENTS.md'
+        '   "请从 openspec/AGENTS.md 解释OpenSpec工作流程'
       )
     );
     console.log(
-      PALETTE.lightGray('    and how I should work with you on this project"')
+      PALETTE.lightGray('    以及我该如何与您在这个项目上合作"')
     );
     console.log(
       PALETTE.darkGray(
@@ -924,9 +924,9 @@ export class InitCommand {
     // Codex heads-up: prompts installed globally
     const selectedToolIds = new Set(selectedTools.map((t) => t.value));
     if (selectedToolIds.has('codex')) {
-      console.log(PALETTE.white('Codex setup note'));
+      console.log(PALETTE.white('Codex设置说明'));
       console.log(
-        PALETTE.midGray('Prompts installed to ~/.codex/prompts (or $CODEX_HOME/prompts).')
+        PALETTE.midGray('提示已安装到 ~/.codex/prompts (或 $CODEX_HOME/prompts)。')
       );
       console.log();
     }
@@ -938,7 +938,7 @@ export class InitCommand {
       .filter((name): name is string => Boolean(name));
 
     if (names.length === 0)
-      return PALETTE.lightGray('your AGENTS.md-compatible assistant');
+      return PALETTE.lightGray('与你的 AGENTS.md 兼容的助手');
     if (names.length === 1) return PALETTE.white(names[0]);
 
     const base = names.slice(0, -1).map((name) => PALETTE.white(name));
@@ -971,7 +971,7 @@ export class InitCommand {
       console.log(rowStyles[index](row.replace(/\s+$/u, '')));
     });
     console.log();
-    console.log(PALETTE.white('Welcome to OpenSpec!'));
+    console.log(PALETTE.white('欢迎使用OpenSpec！'));
     console.log();
   }
 

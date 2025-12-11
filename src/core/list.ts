@@ -20,7 +20,7 @@ export class ListCommand {
       try {
         await fs.access(changesDir);
       } catch {
-        throw new Error("No OpenSpec changes directory found. Run 'openspec init' first.");
+        throw new Error("未找到OpenSpec更改目录。请先运行 'openspec init'。");
       }
 
       // Get all directories in changes (excluding archive)
@@ -30,7 +30,7 @@ export class ListCommand {
         .map(entry => entry.name);
 
       if (changeDirs.length === 0) {
-        console.log('No active changes found.');
+        console.log('未找到活动的更改。');
         return;
       }
 
@@ -50,7 +50,7 @@ export class ListCommand {
       changes.sort((a, b) => a.name.localeCompare(b.name));
 
       // Display results
-      console.log('Changes:');
+      console.log('更改：');
       const padding = '  ';
       const nameWidth = Math.max(...changes.map(c => c.name.length));
       for (const change of changes) {
@@ -66,14 +66,14 @@ export class ListCommand {
     try {
       await fs.access(specsDir);
     } catch {
-      console.log('No specs found.');
+      console.log('未找到规范。');
       return;
     }
 
     const entries = await fs.readdir(specsDir, { withFileTypes: true });
     const specDirs = entries.filter(e => e.isDirectory()).map(e => e.name);
     if (specDirs.length === 0) {
-      console.log('No specs found.');
+      console.log('未找到规范。');
       return;
     }
 
@@ -93,12 +93,12 @@ export class ListCommand {
     }
 
     specs.sort((a, b) => a.id.localeCompare(b.id));
-    console.log('Specs:');
+    console.log('规范：');
     const padding = '  ';
     const nameWidth = Math.max(...specs.map(s => s.id.length));
     for (const spec of specs) {
       const padded = spec.id.padEnd(nameWidth);
-      console.log(`${padding}${padded}     requirements ${spec.requirementCount}`);
+      console.log(`${padding}${padded}     需求 ${spec.requirementCount}`);
     }
   }
 }
