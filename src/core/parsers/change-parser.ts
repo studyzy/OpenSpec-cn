@@ -19,15 +19,15 @@ export class ChangeParser extends MarkdownParser {
 
   async parseChangeWithDeltas(name: string): Promise<Change> {
     const sections = this.parseSections();
-    const why = this.findSection(sections, 'Why')?.content || '';
-    const whatChanges = this.findSection(sections, 'What Changes')?.content || '';
+    const why = this.findSection(sections, 'Why')?.content || this.findSection(sections, '为什么')?.content || '';
+    const whatChanges = this.findSection(sections, 'What Changes')?.content || this.findSection(sections, '变更内容')?.content || '';
     
     if (!why) {
-      throw new Error('Change must have a Why section');
+      throw new Error('变更必须有为什么部分');
     }
     
     if (!whatChanges) {
-      throw new Error('Change must have a What Changes section');
+      throw new Error('变更必须有变更内容部分');
     }
 
     // Parse deltas from the What Changes section (simple format)
@@ -85,8 +85,8 @@ export class ChangeParser extends MarkdownParser {
     const deltas: Delta[] = [];
     const sections = this.parseSectionsFromContent(content);
     
-    // Parse ADDED requirements
-    const addedSection = this.findSection(sections, 'ADDED Requirements');
+    // 解析新增需求
+    const addedSection = this.findSection(sections, '新增需求') || this.findSection(sections, 'ADDED Requirements');
     if (addedSection) {
       const requirements = this.parseRequirements(addedSection);
       requirements.forEach(req => {
@@ -101,8 +101,8 @@ export class ChangeParser extends MarkdownParser {
       });
     }
     
-    // Parse MODIFIED requirements
-    const modifiedSection = this.findSection(sections, 'MODIFIED Requirements');
+    // 解析修改需求
+    const modifiedSection = this.findSection(sections, '修改需求') || this.findSection(sections, 'MODIFIED Requirements');
     if (modifiedSection) {
       const requirements = this.parseRequirements(modifiedSection);
       requirements.forEach(req => {
@@ -116,8 +116,8 @@ export class ChangeParser extends MarkdownParser {
       });
     }
     
-    // Parse REMOVED requirements
-    const removedSection = this.findSection(sections, 'REMOVED Requirements');
+    // 解析移除需求
+    const removedSection = this.findSection(sections, '移除需求') || this.findSection(sections, 'REMOVED Requirements');
     if (removedSection) {
       const requirements = this.parseRequirements(removedSection);
       requirements.forEach(req => {
@@ -131,8 +131,8 @@ export class ChangeParser extends MarkdownParser {
       });
     }
     
-    // Parse RENAMED requirements
-    const renamedSection = this.findSection(sections, 'RENAMED Requirements');
+    // 解析重命名需求
+    const renamedSection = this.findSection(sections, '重命名需求') || this.findSection(sections, 'RENAMED Requirements');
     if (renamedSection) {
       const renames = this.parseRenames(renamedSection.content);
       renames.forEach(rename => {

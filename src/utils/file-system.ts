@@ -145,7 +145,7 @@ export class FileSystemUtils {
       if (startIndex !== -1 && endIndex !== -1) {
         if (endIndex < startIndex) {
           throw new Error(
-            `Invalid marker state in ${filePath}. End marker appears before start marker.`
+            `${filePath} 中的标记状态无效。结束标记出现在开始标记之前。`
           );
         }
 
@@ -155,7 +155,7 @@ export class FileSystemUtils {
       } else if (startIndex === -1 && endIndex === -1) {
         existingContent = startMarker + '\n' + content + '\n' + endMarker + '\n\n' + existingContent;
       } else {
-        throw new Error(`Invalid marker state in ${filePath}. Found start: ${startIndex !== -1}, Found end: ${endIndex !== -1}`);
+        throw new Error(`${filePath} 中的标记状态无效。找到开始标记: ${startIndex !== -1}, 找到结束标记: ${endIndex !== -1}`);
       }
     } else {
       existingContent = startMarker + '\n' + content + '\n' + endMarker;

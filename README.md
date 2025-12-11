@@ -10,9 +10,9 @@
 </p>
 <p align="center">面向AI编程助手的规范驱动开发框架</p>
 <p align="center">
-  <a href="https://github.com/Fission-AI/OpenSpec/actions/workflows/ci.yml"><img alt="CI" src="https://github.com/Fission-AI/OpenSpec/actions/workflows/ci.yml/badge.svg" /></a>
-  <a href="https://www.npmjs.com/package/@fission-ai/openspec"><img alt="npm version" src="https://img.shields.io/npm/v/@fission-ai/openspec?style=flat-square" /></a>
-  <a href="https://nodejs.org/"><img alt="node version" src="https://img.shields.io/node/v/@fission-ai/openspec?style=flat-square" /></a>
+  <a href="https://github.com/studyzy/OpenSpec-cn/actions/workflows/ci.yml"><img alt="CI" src="https://github.com/studyzy/OpenSpec-cn/actions/workflows/ci.yml/badge.svg" /></a>
+  <a href="https://www.npmjs.com/package/@studyzy/openspec-cn"><img alt="npm version" src="https://img.shields.io/npm/v/@studyzy/openspec-cn?style=flat-square" /></a>
+  <a href="https://nodejs.org/"><img alt="node version" src="https://img.shields.io/node/v/@studyzy/openspec-cn?style=flat-square" /></a>
   <a href="./LICENSE"><img alt="License: MIT" src="https://img.shields.io/badge/License-MIT-blue.svg?style=flat-square" /></a>
   <a href="https://conventionalcommits.org"><img alt="Conventional Commits" src="https://img.shields.io/badge/Conventional%20Commits-1.0.0-yellow.svg?style=flat-square" /></a>
   <a href="https://discord.gg/YctCnvvshC"><img alt="Discord" src="https://img.shields.io/badge/Discord-Join%20the%20community-5865F2?logo=discord&logoColor=white&style=flat-square" /></a>
@@ -60,15 +60,15 @@ AI编程助手虽然功能强大，但当需求仅存在于聊天记录中时，
 
 ```
 ┌────────────────────────┐
-│ 起草变更提案            │
+│ 起草变更提案             │
 └────────────┬───────────┘
              │ 与AI共享意图
              ▼
 ┌────────────────────────┐
-│ 审查与对齐              │
-│ (编辑规范/任务)         │◀──── 反馈循环 ──────┐
+│ 审查与对齐               │
+│ (编辑规范/任务)          │◀──── 反馈循环 ────────────┐
 └────────────┬───────────┘                          │
-             │ 批准计划                            │
+             │ 批准计划                              │
              ▼                                      │
 ┌────────────────────────┐                          │
 │ 实施任务                │──────────────────────────┘
@@ -77,8 +77,8 @@ AI编程助手虽然功能强大，但当需求仅存在于聊天记录中时，
              │ 交付变更
              ▼
 ┌────────────────────────┐
-│ 归档与更新              │
-│ 规范（真实来源）        │
+│ 归档与更新               │
+│ 规范（真实来源）          │
 └────────────────────────┘
 ```
 
@@ -143,6 +143,12 @@ Kilo Code会自动发现团队工作流。将生成的文件保存在 `.kilocode
 
 ```bash
 npm install -g @studyzy/openspec-cn@latest
+```
+或者通过源码安装
+```bash
+git clone https://github.com/studyzy/OpenSpec-cn.git
+cd OpenSpec-cn
+make install
 ```
 
 验证安装：
@@ -392,7 +398,7 @@ OpenSpec将每个功能的变更分组到一个文件夹中（`openspec/changes/
 
 1. **升级包**
    ```bash
-   npm install -g @fission-ai/openspec@latest
+   npm install -g @studyzy/openspec-cn@latest
    ```
 2. **刷新代理指令**
    - 在每个项目中运行 `openspec-cn update`，重新生成AI指导并确保最新的斜杠命令处于活动状态。

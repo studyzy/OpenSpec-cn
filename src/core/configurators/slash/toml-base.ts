@@ -54,7 +54,7 @@ ${OPENSPEC_MARKERS.end}
     const endIndex = content.indexOf(OPENSPEC_MARKERS.end);
 
     if (startIndex === -1 || endIndex === -1 || endIndex <= startIndex) {
-      throw new Error(`Missing OpenSpec markers in ${filePath}`);
+      throw new Error(`${filePath} 中缺少 OpenSpec 标记`);
     }
 
     const before = content.slice(0, startIndex + OPENSPEC_MARKERS.start.length);

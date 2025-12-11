@@ -197,7 +197,7 @@ describe('Validator', () => {
 ## Purpose
 This specification defines the requirements for user authentication in the system.
 
-## Requirements
+## 需求
 
 ### The system SHALL provide secure user authentication
 The system SHALL provide secure user authentication mechanisms.
@@ -228,7 +228,7 @@ Then they see an error message`;
     it('should detect missing overview section', async () => {
       const specContent = `# User Authentication Spec
 
-## Requirements
+## 需求
 
 ### The system SHALL provide secure user authentication
 
@@ -245,7 +245,7 @@ Then authenticated`;
       
       expect(report.valid).toBe(false);
       expect(report.summary.errors).toBeGreaterThan(0);
-      expect(report.issues.some(i => i.message.includes('Purpose'))).toBe(true);
+      expect(report.issues.some(i => i.message.includes('目的'))).toBe(true);
     });
   });
 
@@ -284,7 +284,7 @@ We need to implement user authentication to secure the application and protect u
       
       expect(report.valid).toBe(false);
       expect(report.summary.errors).toBeGreaterThan(0);
-      expect(report.issues.some(i => i.message.includes('Why'))).toBe(true);
+      expect(report.issues.some(i => i.message.includes('为什么'))).toBe(true);
     });
   });
 
@@ -295,7 +295,7 @@ We need to implement user authentication to secure the application and protect u
 ## Purpose
 Brief overview
 
-## Requirements
+## 需求
 
 ### The system SHALL do something
 
@@ -319,7 +319,7 @@ Then result`;
 ## Purpose
 Brief overview
 
-## Requirements
+## 需求
 
 ### The system SHALL do something
 
@@ -347,9 +347,9 @@ Then result`;
 
       const deltaSpec = `# Test Spec
 
-## ADDED Requirements
+## 新增需求
 
-### Requirement: Circuit Breaker State Management SHALL be implemented
+### 需求: Circuit Breaker State Management SHALL be implemented
 **ID**: REQ-CB-001
 **Priority**: P1 (High)
 
@@ -377,9 +377,9 @@ The system MUST implement a circuit breaker with three states.
 
       const deltaSpec = `# Test Spec
 
-## ADDED Requirements
+## 新增需求
 
-### Requirement: Error Handling
+### 需求: Error Handling
 **ID**: REQ-ERR-001
 **Priority**: P2
 
@@ -407,9 +407,9 @@ The system SHALL handle all errors gracefully.
 
       const deltaSpec = `# Test Spec
 
-## ADDED Requirements
+## 新增需求
 
-### Requirement: Logging Feature
+### 需求: Logging Feature
 **ID**: REQ-LOG-001
 
 The system will log all events.
@@ -427,7 +427,7 @@ The system will log all events.
 
       expect(report.valid).toBe(false);
       expect(report.summary.errors).toBeGreaterThan(0);
-      expect(report.issues.some(i => i.message.includes('must contain SHALL, MUST, 必须, or 禁止'))).toBe(true);
+      expect(report.issues.some(i => i.message.includes('必须包含 SHALL、MUST、必须 或 禁止'))).toBe(true);
     });
 
     it('should handle requirements without metadata fields', async () => {
@@ -437,9 +437,9 @@ The system will log all events.
 
       const deltaSpec = `# Test Spec
 
-## ADDED Requirements
+## 新增需求
 
-### Requirement: Simple Feature
+### 需求: Simple Feature
 The system SHALL implement this feature.
 
 #### Scenario: Basic usage
@@ -464,9 +464,9 @@ The system SHALL implement this feature.
 
       const deltaSpec = `# Test Spec
 
-## Added Requirements
+## 新增需求
 
-### Requirement: Mixed Case Handling
+### 需求: Mixed Case Handling
 The system MUST support mixed case delta headers.
 
 #### Scenario: Case insensitive parsing

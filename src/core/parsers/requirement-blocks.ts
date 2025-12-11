@@ -26,12 +26,12 @@ const REQUIREMENT_HEADER_PREFIX = new RegExp(`^###\\s+${REQUIREMENT_KEYWORD_PATT
 export function extractRequirementsSection(content: string): RequirementsSectionParts {
   const normalized = normalizeLineEndings(content);
   const lines = normalized.split('\n');
-  const reqHeaderIndex = lines.findIndex(l => /^##\s+Requirements\s*$/i.test(l));
+  const reqHeaderIndex = lines.findIndex(l => /^##\s+需求\s*$/i.test(l));
 
   if (reqHeaderIndex === -1) {
     // No requirements section; create an empty one at the end
     const before = content.trimEnd();
-    const headerLine = '## Requirements';
+    const headerLine = '## 需求';
     return {
       before: before ? before + '\n\n' : '',
       headerLine,
@@ -121,10 +121,10 @@ function normalizeLineEndings(content: string): string {
 export function parseDeltaSpec(content: string): DeltaPlan {
   const normalized = normalizeLineEndings(content);
   const sections = splitTopLevelSections(normalized);
-  const addedLookup = getSectionCaseInsensitive(sections, 'ADDED Requirements');
-  const modifiedLookup = getSectionCaseInsensitive(sections, 'MODIFIED Requirements');
-  const removedLookup = getSectionCaseInsensitive(sections, 'REMOVED Requirements');
-  const renamedLookup = getSectionCaseInsensitive(sections, 'RENAMED Requirements');
+  const addedLookup = getSectionCaseInsensitive(sections, '新增需求');
+  const modifiedLookup = getSectionCaseInsensitive(sections, '修改需求');
+  const removedLookup = getSectionCaseInsensitive(sections, '移除需求');
+  const renamedLookup = getSectionCaseInsensitive(sections, '重命名需求');
   const added = parseRequirementBlocksFromSection(addedLookup.body);
   const modified = parseRequirementBlocksFromSection(modifiedLookup.body);
   const removedNames = parseRemovedNames(removedLookup.body);
@@ -165,8 +165,20 @@ function splitTopLevelSections(content: string): Record<string, string> {
 
 function getSectionCaseInsensitive(sections: Record<string, string>, desired: string): { body: string; found: boolean } {
   const target = desired.toLowerCase();
+  // Map Chinese to English equivalents
+  const alternates: Record<string, string> = {
+    '新增需求': 'added requirements',
+    '修改需求': 'modified requirements',
+    '移除需求': 'removed requirements',
+    '重命名需求': 'renamed requirements',
+  };
+  const altTarget = alternates[desired]?.toLowerCase();
+  
   for (const [title, body] of Object.entries(sections)) {
-    if (title.toLowerCase() === target) return { body, found: true };
+    const lowerTitle = title.toLowerCase();
+    if (lowerTitle === target || (altTarget && lowerTitle === altTarget)) {
+      return { body, found: true };
+    }
   }
   return { body: '', found: false };
 }
