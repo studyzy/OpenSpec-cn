@@ -29,7 +29,7 @@ describe('Validation Schemas', () => {
       const result = ScenarioSchema.safeParse(scenario);
       expect(result.success).toBe(false);
       if (!result.success) {
-        expect(result.error.issues[0].message).toBe('Scenario text cannot be empty');
+        expect(result.error.issues[0].message).toBe('场景文本不能为空');
       }
     });
   });
@@ -62,7 +62,7 @@ describe('Validation Schemas', () => {
       const result = RequirementSchema.safeParse(requirement);
       expect(result.success).toBe(false);
       if (!result.success) {
-        expect(result.error.issues[0].message).toBe('Requirement must contain SHALL or MUST keyword');
+        expect(result.error.issues[0].message).toBe('需求必须包含 SHALL、MUST、必须或禁止关键字');
       }
     });
 
@@ -75,7 +75,7 @@ describe('Validation Schemas', () => {
       const result = RequirementSchema.safeParse(requirement);
       expect(result.success).toBe(false);
       if (!result.success) {
-        expect(result.error.issues[0].message).toBe('Requirement must have at least one scenario');
+        expect(result.error.issues[0].message).toBe('需求必须至少有一个场景');
       }
     });
   });
@@ -111,7 +111,7 @@ describe('Validation Schemas', () => {
       const result = SpecSchema.safeParse(spec);
       expect(result.success).toBe(false);
       if (!result.success) {
-        expect(result.error.issues[0].message).toBe('Spec must have at least one requirement');
+        expect(result.error.issues[0].message).toBe('规范必须至少有一个需求');
       }
     });
   });
@@ -152,7 +152,7 @@ describe('Validation Schemas', () => {
       const result = ChangeSchema.safeParse(change);
       expect(result.success).toBe(false);
       if (!result.success) {
-        expect(result.error.issues[0].message).toBe('Why section must be at least 50 characters');
+        expect(result.error.issues[0].message).toBe('为什么部分必须至少50个字符');
       }
     });
 
@@ -173,7 +173,7 @@ describe('Validation Schemas', () => {
       const result = ChangeSchema.safeParse(change);
       expect(result.success).toBe(false);
       if (!result.success) {
-        expect(result.error.issues[0].message).toBe('Consider splitting changes with more than 10 deltas');
+        expect(result.error.issues[0].message).toBe('考虑拆分包含超过10个增量的变更');
       }
     });
   });
@@ -427,7 +427,7 @@ The system will log all events.
 
       expect(report.valid).toBe(false);
       expect(report.summary.errors).toBeGreaterThan(0);
-      expect(report.issues.some(i => i.message.includes('must contain SHALL or MUST'))).toBe(true);
+      expect(report.issues.some(i => i.message.includes('must contain SHALL, MUST, 必须, or 禁止'))).toBe(true);
     });
 
     it('should handle requirements without metadata fields', async () => {

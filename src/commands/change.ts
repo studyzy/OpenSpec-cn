@@ -34,17 +34,17 @@ export class ChangeCommand {
       const changes = await this.getActiveChanges(changesPath);
       if (canPrompt && changes.length > 0) {
         const selected = await select({
-          message: 'Select a change to show',
+          message: '选择一个变更以显示',
           choices: changes.map(id => ({ name: id, value: id })),
         });
         changeName = selected;
       } else {
         if (changes.length === 0) {
-          console.error('No change specified. No active changes found.');
+          console.error('未指定变更。未找到活动变更。');
         } else {
-          console.error(`No change specified. Available IDs: ${changes.join(', ')}`);
+          console.error(`未指定变更。可用ID：${changes.join(', ')}`);
         }
-        console.error('Hint: use "openspec change list" to view available changes.');
+        console.error('提示：使用 "openspec-cn change list" 查看可用变更。');
         process.exitCode = 1;
         return;
       }
@@ -55,14 +55,14 @@ export class ChangeCommand {
     try {
       await fs.access(proposalPath);
     } catch {
-      throw new Error(`Change "${changeName}" not found at ${proposalPath}`);
+      throw new Error(`在 ${proposalPath} 未找到变更 "${changeName}"`);
     }
 
     if (options?.json) {
       const jsonOutput = await this.converter.convertChangeToJson(proposalPath);
 
       if (options.requirementsOnly) {
-        console.error('Flag --requirements-only is deprecated; use --deltas-only instead.');
+        console.error('标志 --requirements-only 已弃用；请改用 --deltas-only。');
       }
 
       const parsed: Change = JSON.parse(jsonOutput);
@@ -143,7 +143,7 @@ export class ChangeCommand {
       console.log(JSON.stringify(sorted, null, 2));
     } else {
       if (changes.length === 0) {
-        console.log('No items found');
+        console.log('未找到项目');
         return;
       }
       const sorted = [...changes].sort();
@@ -164,7 +164,7 @@ export class ChangeCommand {
           try {
             const tasksContent = await fs.readFile(tasksPath, 'utf-8');
             const { total, completed } = this.countTasks(tasksContent);
-            taskStatusText = ` [tasks ${completed}/${total}]`;
+            taskStatusText = ` [任务 ${completed}/${total}]`;
           } catch (error) {
             if (process.env.DEBUG) {
               console.error(`Failed to read tasks file at ${tasksPath}:`, error);
@@ -173,10 +173,10 @@ export class ChangeCommand {
           const changeDir = path.join(changesPath, changeName);
           const parser = new ChangeParser(await fs.readFile(proposalPath, 'utf-8'), changeDir);
           const change = await parser.parseChangeWithDeltas(changeName);
-          const deltaCountText = ` [deltas ${change.deltas.length}]`;
+          const deltaCountText = ` [增量 ${change.deltas.length}]`;
           console.log(`${changeName}: ${title}${deltaCountText}${taskStatusText}`);
         } catch {
-          console.log(`${changeName}: (unable to read)`);
+          console.log(`${changeName}: (无法读取)`);
         }
       }
     }
@@ -190,17 +190,17 @@ export class ChangeCommand {
       const changes = await getActiveChangeIds();
       if (canPrompt && changes.length > 0) {
         const selected = await select({
-          message: 'Select a change to validate',
+          message: '选择一个变更以验证',
           choices: changes.map(id => ({ name: id, value: id })),
         });
         changeName = selected;
       } else {
         if (changes.length === 0) {
-          console.error('No change specified. No active changes found.');
+          console.error('未指定变更。未找到活动变更。');
         } else {
-          console.error(`No change specified. Available IDs: ${changes.join(', ')}`);
+          console.error(`未指定变更。可用ID：${changes.join(', ')}`);
         }
-        console.error('Hint: use "openspec change list" to view available changes.');
+        console.error('提示：使用 "openspec-cn change list" 查看可用变更。');
         process.exitCode = 1;
         return;
       }
@@ -211,7 +211,7 @@ export class ChangeCommand {
     try {
       await fs.access(changeDir);
     } catch {
-      throw new Error(`Change "${changeName}" not found at ${changeDir}`);
+      throw new Error(`在 ${changeDir} 未找到变更 "${changeName}"`);
     }
     
     const validator = new Validator(options?.strict || false);
@@ -221,9 +221,9 @@ export class ChangeCommand {
       console.log(JSON.stringify(report, null, 2));
     } else {
       if (report.valid) {
-        console.log(`Change "${changeName}" is valid`);
+        console.log(`变更 "${changeName}" 有效`);
       } else {
-        console.error(`Change "${changeName}" has issues`);
+        console.error(`变更 "${changeName}" 存在问题`);
         report.issues.forEach(issue => {
           const label = issue.level === 'ERROR' ? 'ERROR' : 'WARNING';
           const prefix = issue.level === 'ERROR' ? '✗' : '⚠';
@@ -259,7 +259,7 @@ export class ChangeCommand {
   }
 
   private extractTitle(content: string, changeName: string): string {
-    const match = content.match(/^#\s+(?:Change:\s+)?(.+)$/im);
+    const match = content.match(/^#\s+(?:Change:|变更：|变更:)\s*(.+)$/im);
     return match ? match[1].trim() : changeName;
   }
 

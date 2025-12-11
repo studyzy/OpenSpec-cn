@@ -93,7 +93,7 @@ export class ChangeParser extends MarkdownParser {
         deltas.push({
           spec: specName,
           operation: 'ADDED' as DeltaOperation,
-          description: `Add requirement: ${req.text}`,
+          description: `添加需求: ${req.text}`,
           // Provide both single and plural forms for compatibility
           requirement: req,
           requirements: [req],
@@ -109,7 +109,7 @@ export class ChangeParser extends MarkdownParser {
         deltas.push({
           spec: specName,
           operation: 'MODIFIED' as DeltaOperation,
-          description: `Modify requirement: ${req.text}`,
+          description: `修改需求: ${req.text}`,
           requirement: req,
           requirements: [req],
         });
@@ -124,7 +124,7 @@ export class ChangeParser extends MarkdownParser {
         deltas.push({
           spec: specName,
           operation: 'REMOVED' as DeltaOperation,
-          description: `Remove requirement: ${req.text}`,
+          description: `移除需求: ${req.text}`,
           requirement: req,
           requirements: [req],
         });
@@ -139,7 +139,7 @@ export class ChangeParser extends MarkdownParser {
         deltas.push({
           spec: specName,
           operation: 'RENAMED' as DeltaOperation,
-          description: `Rename requirement from "${rename.from}" to "${rename.to}"`,
+          description: `将需求 "${rename.from}" 重命名为 "${rename.to}"`,
           rename,
         });
       });
@@ -153,10 +153,11 @@ export class ChangeParser extends MarkdownParser {
     const lines = ChangeParser.normalizeContent(content).split('\n');
     
     let currentRename: { from?: string; to?: string } = {};
+    const REQUIREMENT_KEYWORD_PATTERN = '(?:Requirement|需求)';
     
     for (const line of lines) {
-      const fromMatch = line.match(/^\s*-?\s*FROM:\s*`?###\s*Requirement:\s*(.+?)`?\s*$/);
-      const toMatch = line.match(/^\s*-?\s*TO:\s*`?###\s*Requirement:\s*(.+?)`?\s*$/);
+      const fromMatch = line.match(new RegExp(`^\\s*-?\\s*FROM:\\s*\`?###\\s*${REQUIREMENT_KEYWORD_PATTERN}:\\s*(.+?)\`?\\s*$`));
+      const toMatch = line.match(new RegExp(`^\\s*-?\\s*TO:\\s*\`?###\\s*${REQUIREMENT_KEYWORD_PATTERN}:\\s*(.+?)\`?\\s*$`));
       
       if (fromMatch) {
         currentRename.from = fromMatch[1].trim();

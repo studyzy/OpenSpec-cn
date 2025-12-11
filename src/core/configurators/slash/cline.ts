@@ -17,9 +17,9 @@ export class ClineSlashCommandConfigurator extends SlashCommandConfigurator {
 
   protected getFrontmatter(id: SlashCommandId): string | undefined {
     const descriptions: Record<SlashCommandId, string> = {
-      proposal: 'Scaffold a new OpenSpec change and validate strictly.',
-      apply: 'Implement an approved OpenSpec change and keep tasks in sync.',
-      archive: 'Archive a deployed OpenSpec change and update specs.'
+      proposal: '搭建新的OpenSpec变更提案并进行严格验证。',
+      apply: '实施已批准的OpenSpec变更并保持任务同步。',
+      archive: '归档已部署的OpenSpec变更并更新规范。'
     };
     const description = descriptions[id];
     return `# OpenSpec: ${id.charAt(0).toUpperCase() + id.slice(1)}\n\n${description}`;

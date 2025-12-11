@@ -20,7 +20,7 @@ export class ListCommand {
       try {
         await fs.access(changesDir);
       } catch {
-        throw new Error("未找到OpenSpec更改目录。请先运行 'openspec init'。");
+        throw new Error("未找到OpenSpec更改目录。请先运行 'openspec-cn init'。");
       }
 
       // Get all directories in changes (excluding archive)

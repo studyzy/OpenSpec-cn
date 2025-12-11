@@ -163,7 +163,7 @@ export class Validator {
           if (!requirementText) {
             issues.push({ level: 'ERROR', path: entryPath, message: `ADDED "${block.name}" is missing requirement text` });
           } else if (!this.containsShallOrMust(requirementText)) {
-            issues.push({ level: 'ERROR', path: entryPath, message: `ADDED "${block.name}" must contain SHALL or MUST` });
+            issues.push({ level: 'ERROR', path: entryPath, message: `ADDED "${block.name}" must contain SHALL, MUST, 必须, or 禁止` });
           }
           const scenarioCount = this.countScenarios(block.raw);
           if (scenarioCount < 1) {
@@ -184,7 +184,7 @@ export class Validator {
           if (!requirementText) {
             issues.push({ level: 'ERROR', path: entryPath, message: `MODIFIED "${block.name}" is missing requirement text` });
           } else if (!this.containsShallOrMust(requirementText)) {
-            issues.push({ level: 'ERROR', path: entryPath, message: `MODIFIED "${block.name}" must contain SHALL or MUST` });
+            issues.push({ level: 'ERROR', path: entryPath, message: `MODIFIED "${block.name}" must contain SHALL, MUST, 必须, or 禁止` });
           }
           const scenarioCount = this.countScenarios(block.raw);
           if (scenarioCount < 1) {
@@ -253,7 +253,7 @@ export class Validator {
       issues.push({
         level: 'ERROR',
         path: specPath,
-        message: `Delta sections ${this.formatSectionList(sections)} were found, but no requirement entries parsed. Ensure each section includes at least one "### Requirement:" block (REMOVED may use bullet list syntax).`,
+        message: `Delta sections ${this.formatSectionList(sections)} were found, but no requirement entries parsed. Ensure each section includes at least one "### Requirement:" or "### 需求:" block (REMOVED may use bullet list syntax).`,
       });
     }
     for (const path of missingHeaderSpecs) {
@@ -430,7 +430,7 @@ export class Validator {
   }
 
   private containsShallOrMust(text: string): boolean {
-    return /\b(SHALL|MUST)\b/.test(text);
+    return /\b(SHALL|MUST|必须|禁止)\b/.test(text) || /(?:必须|禁止)/.test(text);
   }
 
   private countScenarios(blockRaw: string): number {

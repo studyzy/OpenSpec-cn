@@ -33,7 +33,7 @@ describe('spec validate (interactive behavior)', () => {
       } catch (e) { err = e; }
       expect(err).toBeDefined();
       expect(err.status).not.toBe(0);
-      expect(err.stderr.toString()).toContain('Missing required argument <spec-id>');
+      expect(err.stderr.toString()).toContain('缺少必需参数 <spec-id>');
     } finally {
       process.chdir(originalCwd);
       process.env = originalEnv;

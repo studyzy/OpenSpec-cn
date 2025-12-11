@@ -9,7 +9,7 @@ const FILE_PATHS: Record<SlashCommandId, string> = {
 
 const FRONTMATTER: Record<SlashCommandId, string> = {
   proposal: `---
-description: Scaffold a new OpenSpec change and validate strictly.
+description: 搭建新的OpenSpec变更提案并进行严格验证。
 ---
 
 The user has requested the following change proposal. Use the openspec instructions to create their change proposal.
@@ -18,7 +18,7 @@ The user has requested the following change proposal. Use the openspec instructi
   $ARGUMENTS
 </UserRequest>`,
   apply: `---
-description: Implement an approved OpenSpec change and keep tasks in sync.
+description: 实施已批准的OpenSpec变更并保持任务同步。
 ---
 
 The user wants to apply the following change. Use the openspec instructions to implement the approved change.
@@ -27,7 +27,7 @@ The user wants to apply the following change. Use the openspec instructions to i
   $ARGUMENTS
 </ChangeId>`,
   archive: `---
-description: Archive a deployed OpenSpec change and update specs.
+description: 归档已部署的OpenSpec变更并更新规范。
 ---
 
 The user wants to archive the following deployed change. Use the openspec instructions to archive the change and update specs.

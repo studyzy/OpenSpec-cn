@@ -94,13 +94,13 @@ describe('InitCommand', () => {
         path.join(openspecPath, 'AGENTS.md'),
         'utf-8'
       );
-      expect(agentsContent).toContain('OpenSpec Instructions');
+      expect(agentsContent).toContain('OpenSpec 使用说明');
 
       const projectContent = await fs.readFile(
         path.join(openspecPath, 'project.md'),
         'utf-8'
       );
-      expect(projectContent).toContain('Project Context');
+      expect(projectContent).toContain('项目 上下文');
     });
 
     it('should create CLAUDE.md when Claude Code is selected', async () => {
@@ -114,7 +114,7 @@ describe('InitCommand', () => {
       const content = await fs.readFile(claudePath, 'utf-8');
       expect(content).toContain('<!-- OPENSPEC:START -->');
       expect(content).toContain("@/openspec/AGENTS.md");
-      expect(content).toContain('openspec update');
+      expect(content).toContain('openspec-cn update');
       expect(content).toContain('<!-- OPENSPEC:END -->');
     });
 
@@ -131,7 +131,7 @@ describe('InitCommand', () => {
       const updatedContent = await fs.readFile(claudePath, 'utf-8');
       expect(updatedContent).toContain('<!-- OPENSPEC:START -->');
       expect(updatedContent).toContain("@/openspec/AGENTS.md");
-      expect(updatedContent).toContain('openspec update');
+      expect(updatedContent).toContain('openspec-cn update');
       expect(updatedContent).toContain('<!-- OPENSPEC:END -->');
       expect(updatedContent).toContain('Custom instructions here');
     });
@@ -147,7 +147,7 @@ describe('InitCommand', () => {
       const content = await fs.readFile(clinePath, 'utf-8');
       expect(content).toContain('<!-- OPENSPEC:START -->');
       expect(content).toContain("@/openspec/AGENTS.md");
-      expect(content).toContain('openspec update');
+      expect(content).toContain('openspec-cn update');
       expect(content).toContain('<!-- OPENSPEC:END -->');
     });
 
@@ -164,7 +164,7 @@ describe('InitCommand', () => {
       const updatedContent = await fs.readFile(clinePath, 'utf-8');
       expect(updatedContent).toContain('<!-- OPENSPEC:START -->');
       expect(updatedContent).toContain("@/openspec/AGENTS.md");
-      expect(updatedContent).toContain('openspec update');
+      expect(updatedContent).toContain('openspec-cn update');
       expect(updatedContent).toContain('<!-- OPENSPEC:END -->');
       expect(updatedContent).toContain('Custom Cline instructions here');
     });
@@ -193,24 +193,24 @@ describe('InitCommand', () => {
 
       const proposalContent = await fs.readFile(wsProposal, 'utf-8');
       expect(proposalContent).toContain('---');
-      expect(proposalContent).toContain('description: Scaffold a new OpenSpec change and validate strictly.');
+      expect(proposalContent).toContain('description: 搭建新的OpenSpec变更提案并进行严格验证。');
       expect(proposalContent).toContain('auto_execution_mode: 3');
       expect(proposalContent).toContain('<!-- OPENSPEC:START -->');
-      expect(proposalContent).toContain('**Guardrails**');
+      expect(proposalContent).toContain('**护栏规则**');
 
       const applyContent = await fs.readFile(wsApply, 'utf-8');
       expect(applyContent).toContain('---');
-      expect(applyContent).toContain('description: Implement an approved OpenSpec change and keep tasks in sync.');
+      expect(applyContent).toContain('description: 实施已批准的OpenSpec变更并保持任务同步。');
       expect(applyContent).toContain('auto_execution_mode: 3');
       expect(applyContent).toContain('<!-- OPENSPEC:START -->');
-      expect(applyContent).toContain('Work through tasks sequentially');
+      expect(applyContent).toContain('按顺序完成任务');
 
       const archiveContent = await fs.readFile(wsArchive, 'utf-8');
       expect(archiveContent).toContain('---');
-      expect(archiveContent).toContain('description: Archive a deployed OpenSpec change and update specs.');
+      expect(archiveContent).toContain('description: 归档已部署的OpenSpec变更并更新规范。');
       expect(archiveContent).toContain('auto_execution_mode: 3');
       expect(archiveContent).toContain('<!-- OPENSPEC:START -->');
-      expect(archiveContent).toContain('Run `openspec archive <id> --yes`');
+      expect(archiveContent).toContain('openspec-cn archive <id> --yes');
     });
 
     it('should create Antigravity workflows when Antigravity is selected', async () => {
@@ -237,23 +237,23 @@ describe('InitCommand', () => {
 
       const proposalContent = await fs.readFile(agProposal, 'utf-8');
       expect(proposalContent).toContain('---');
-      expect(proposalContent).toContain('description: Scaffold a new OpenSpec change and validate strictly.');
+      expect(proposalContent).toContain('description: 搭建新的OpenSpec变更提案并进行严格验证。');
       expect(proposalContent).toContain('<!-- OPENSPEC:START -->');
-      expect(proposalContent).toContain('**Guardrails**');
+      expect(proposalContent).toContain('**护栏规则**');
       expect(proposalContent).not.toContain('auto_execution_mode');
 
       const applyContent = await fs.readFile(agApply, 'utf-8');
       expect(applyContent).toContain('---');
-      expect(applyContent).toContain('description: Implement an approved OpenSpec change and keep tasks in sync.');
+      expect(applyContent).toContain('description: 实施已批准的OpenSpec变更并保持任务同步。');
       expect(applyContent).toContain('<!-- OPENSPEC:START -->');
-      expect(applyContent).toContain('Work through tasks sequentially');
+      expect(applyContent).toContain('按顺序完成任务');
       expect(applyContent).not.toContain('auto_execution_mode');
 
       const archiveContent = await fs.readFile(agArchive, 'utf-8');
       expect(archiveContent).toContain('---');
-      expect(archiveContent).toContain('description: Archive a deployed OpenSpec change and update specs.');
+      expect(archiveContent).toContain('description: 归档已部署的OpenSpec变更并更新规范。');
       expect(archiveContent).toContain('<!-- OPENSPEC:START -->');
-      expect(archiveContent).toContain('Run `openspec archive <id> --yes`');
+      expect(archiveContent).toContain('openspec-cn archive <id> --yes');
       expect(archiveContent).not.toContain('auto_execution_mode');
     });
 
@@ -268,7 +268,7 @@ describe('InitCommand', () => {
       const content = await fs.readFile(rootAgentsPath, 'utf-8');
       expect(content).toContain('<!-- OPENSPEC:START -->');
       expect(content).toContain("@/openspec/AGENTS.md");
-      expect(content).toContain('openspec update');
+      expect(content).toContain('openspec-cn update');
       expect(content).toContain('<!-- OPENSPEC:END -->');
 
       const claudeExists = await fileExists(path.join(testDir, 'CLAUDE.md'));
@@ -298,19 +298,19 @@ describe('InitCommand', () => {
       expect(await fileExists(claudeArchive)).toBe(true);
 
       const proposalContent = await fs.readFile(claudeProposal, 'utf-8');
-      expect(proposalContent).toContain('name: OpenSpec: Proposal');
+      expect(proposalContent).toContain('name: OpenSpec: 提案');
       expect(proposalContent).toContain('<!-- OPENSPEC:START -->');
-      expect(proposalContent).toContain('**Guardrails**');
+      expect(proposalContent).toContain('**护栏规则**');
 
       const applyContent = await fs.readFile(claudeApply, 'utf-8');
-      expect(applyContent).toContain('name: OpenSpec: Apply');
-      expect(applyContent).toContain('Work through tasks sequentially');
+      expect(applyContent).toContain('name: OpenSpec: 实施');
+      expect(applyContent).toContain('按顺序完成任务');
 
       const archiveContent = await fs.readFile(claudeArchive, 'utf-8');
-      expect(archiveContent).toContain('name: OpenSpec: Archive');
-      expect(archiveContent).toContain('openspec archive <id>');
+      expect(archiveContent).toContain('name: OpenSpec: 归档');
+      expect(archiveContent).toContain('openspec-cn archive <id>');
       expect(archiveContent).toContain(
-        '`--skip-specs` only for tooling-only work'
+        '仅对仅工具工作使用`--skip-specs`'
       );
     });
 
@@ -342,11 +342,11 @@ describe('InitCommand', () => {
 
       const applyContent = await fs.readFile(cursorApply, 'utf-8');
       expect(applyContent).toContain('id: openspec-apply');
-      expect(applyContent).toContain('Work through tasks sequentially');
+      expect(applyContent).toContain('按顺序完成任务');
 
       const archiveContent = await fs.readFile(cursorArchive, 'utf-8');
       expect(archiveContent).toContain('name: /openspec-archive');
-      expect(archiveContent).toContain('openspec list --specs');
+      expect(archiveContent).toContain('openspec-cn list --specs');
     });
 
     it('should create Gemini CLI TOML files when selected', async () => {
@@ -372,19 +372,19 @@ describe('InitCommand', () => {
       expect(await fileExists(geminiArchive)).toBe(true);
 
       const proposalContent = await fs.readFile(geminiProposal, 'utf-8');
-      expect(proposalContent).toContain('description = "Scaffold a new OpenSpec change and validate strictly."');
+      expect(proposalContent).toContain('description = "搭建新的OpenSpec变更提案并进行严格验证。"');
       expect(proposalContent).toContain('prompt = """');
       expect(proposalContent).toContain('<!-- OPENSPEC:START -->');
-      expect(proposalContent).toContain('**Guardrails**');
+      expect(proposalContent).toContain('**护栏规则**');
       expect(proposalContent).toContain('<!-- OPENSPEC:END -->');
 
       const applyContent = await fs.readFile(geminiApply, 'utf-8');
-      expect(applyContent).toContain('description = "Implement an approved OpenSpec change and keep tasks in sync."');
-      expect(applyContent).toContain('Work through tasks sequentially');
+      expect(applyContent).toContain('description = "实施已批准的OpenSpec变更并保持任务同步。"');
+      expect(applyContent).toContain('按顺序完成任务');
 
       const archiveContent = await fs.readFile(geminiArchive, 'utf-8');
-      expect(archiveContent).toContain('description = "Archive a deployed OpenSpec change and update specs."');
-      expect(archiveContent).toContain('openspec archive <id>');
+      expect(archiveContent).toContain('description = "归档已部署的OpenSpec变更并更新规范。"');
+      expect(archiveContent).toContain('openspec-cn archive <id>');
     });
 
     it('should update existing Gemini CLI TOML files with refreshed content', async () => {
@@ -411,7 +411,7 @@ describe('InitCommand', () => {
 
       const updatedContent = await fs.readFile(geminiProposal, 'utf-8');
       expect(updatedContent).toContain('<!-- OPENSPEC:START -->');
-      expect(updatedContent).toContain('**Guardrails**');
+      expect(updatedContent).toContain('**护栏规则**');
       expect(updatedContent).toContain('<!-- OPENSPEC:END -->');
       expect(updatedContent).not.toContain('Custom instruction added by user');
     });
@@ -438,18 +438,18 @@ describe('InitCommand', () => {
       expect(await fileExists(iflowArchive)).toBe(true);
 
       const proposalContent = await fs.readFile(iflowProposal, 'utf-8');
-      expect(proposalContent).toContain('description: Scaffold a new OpenSpec change and validate strictly.');
+      expect(proposalContent).toContain('description: 搭建新的OpenSpec变更提案并进行严格验证。');
       expect(proposalContent).toContain('<!-- OPENSPEC:START -->');
-      expect(proposalContent).toContain('**Guardrails**');
+      expect(proposalContent).toContain('**护栏规则**');
       expect(proposalContent).toContain('<!-- OPENSPEC:END -->');
 
       const applyContent = await fs.readFile(iflowApply, 'utf-8');
-      expect(applyContent).toContain('description: Implement an approved OpenSpec change and keep tasks in sync.');
-      expect(applyContent).toContain('Work through tasks sequentially');
+      expect(applyContent).toContain('description: 实施已批准的OpenSpec变更并保持任务同步。');
+      expect(applyContent).toContain('按顺序完成任务');
 
       const archiveContent = await fs.readFile(iflowArchive, 'utf-8');
-      expect(archiveContent).toContain('description: Archive a deployed OpenSpec change and update specs.');
-      expect(archiveContent).toContain('openspec archive <id>');
+      expect(archiveContent).toContain('description: 归档已部署的OpenSpec变更并更新规范。');
+      expect(archiveContent).toContain('openspec-cn archive <id>');
     });
 
     it('should update existing IFLOW.md with markers', async () => {
@@ -464,7 +464,7 @@ describe('InitCommand', () => {
       const updatedContent = await fs.readFile(iflowPath, 'utf-8');
       expect(updatedContent).toContain('<!-- OPENSPEC:START -->');
       expect(updatedContent).toContain("@/openspec/AGENTS.md");
-      expect(updatedContent).toContain('openspec update');
+      expect(updatedContent).toContain('openspec-cn update');
       expect(updatedContent).toContain('<!-- OPENSPEC:END -->');
       expect(updatedContent).toContain('Custom instructions here');
     });
@@ -494,23 +494,23 @@ describe('InitCommand', () => {
       const proposalContent = await fs.readFile(openCodeProposal, 'utf-8');
       expect(proposalContent).not.toContain('agent:');
       expect(proposalContent).toContain(
-        'description: Scaffold a new OpenSpec change and validate strictly.'
+        'description: 搭建新的OpenSpec变更提案并进行严格验证。'
       );
       expect(proposalContent).toContain('<!-- OPENSPEC:START -->');
 
       const applyContent = await fs.readFile(openCodeApply, 'utf-8');
       expect(applyContent).not.toContain('agent:');
       expect(applyContent).toContain(
-        'description: Implement an approved OpenSpec change and keep tasks in sync.'
+        'description: 实施已批准的OpenSpec变更并保持任务同步。'
       );
-      expect(applyContent).toContain('Work through tasks sequentially');
+      expect(applyContent).toContain('按顺序完成任务');
 
       const archiveContent = await fs.readFile(openCodeArchive, 'utf-8');
       expect(archiveContent).not.toContain('agent:');
       expect(archiveContent).toContain(
-        'description: Archive a deployed OpenSpec change and update specs.'
+        'description: 归档已部署的OpenSpec变更并更新规范。'
       );
-      expect(archiveContent).toContain('openspec list --specs');
+      expect(archiveContent).toContain('openspec-cn list --specs');
     });
 
     it('should create Qwen configuration and slash command files with templates', async () => {
@@ -543,17 +543,17 @@ describe('InitCommand', () => {
       expect(qwenConfigContent).toContain('<!-- OPENSPEC:END -->');
 
       const proposalContent = await fs.readFile(proposalPath, 'utf-8');
-      expect(proposalContent).toContain('description = "Scaffold a new OpenSpec change and validate strictly."');
+      expect(proposalContent).toContain('description = "搭建新的OpenSpec变更提案并进行严格验证。"');
       expect(proposalContent).toContain('prompt = """');
       expect(proposalContent).toContain('<!-- OPENSPEC:START -->');
 
       const applyContent = await fs.readFile(applyPath, 'utf-8');
-      expect(applyContent).toContain('description = "Implement an approved OpenSpec change and keep tasks in sync."');
-      expect(applyContent).toContain('Work through tasks sequentially');
+      expect(applyContent).toContain('description = "实施已批准的OpenSpec变更并保持任务同步。"');
+      expect(applyContent).toContain('按顺序完成任务');
 
       const archiveContent = await fs.readFile(archivePath, 'utf-8');
-      expect(archiveContent).toContain('description = "Archive a deployed OpenSpec change and update specs."');
-      expect(archiveContent).toContain('openspec archive <id>');
+      expect(archiveContent).toContain('description = "归档已部署的OpenSpec变更并更新规范。"');
+      expect(archiveContent).toContain('openspec-cn archive <id>');
     });
 
     it('should update existing QWEN.md with markers', async () => {
@@ -568,7 +568,7 @@ describe('InitCommand', () => {
       const updatedContent = await fs.readFile(qwenPath, 'utf-8');
       expect(updatedContent).toContain('<!-- OPENSPEC:START -->');
       expect(updatedContent).toContain("@/openspec/AGENTS.md");
-      expect(updatedContent).toContain('openspec update');
+      expect(updatedContent).toContain('openspec-cn update');
       expect(updatedContent).toContain('<!-- OPENSPEC:END -->');
       expect(updatedContent).toContain('Custom instructions here');
     });
@@ -597,19 +597,19 @@ describe('InitCommand', () => {
 
       const proposalContent = await fs.readFile(clineProposal, 'utf-8');
       expect(proposalContent).toContain('# OpenSpec: Proposal');
-      expect(proposalContent).toContain('Scaffold a new OpenSpec change and validate strictly.');
+      expect(proposalContent).toContain('搭建新的OpenSpec变更提案并进行严格验证。');
       expect(proposalContent).toContain('<!-- OPENSPEC:START -->');
-      expect(proposalContent).toContain('**Guardrails**');
+      expect(proposalContent).toContain('**护栏规则**');
 
       const applyContent = await fs.readFile(clineApply, 'utf-8');
       expect(applyContent).toContain('# OpenSpec: Apply');
-      expect(applyContent).toContain('Implement an approved OpenSpec change and keep tasks in sync.');
-      expect(applyContent).toContain('Work through tasks sequentially');
+      expect(applyContent).toContain('实施已批准的OpenSpec变更并保持任务同步。');
+      expect(applyContent).toContain('按顺序完成任务');
 
       const archiveContent = await fs.readFile(clineArchive, 'utf-8');
       expect(archiveContent).toContain('# OpenSpec: Archive');
-      expect(archiveContent).toContain('Archive a deployed OpenSpec change and update specs.');
-      expect(archiveContent).toContain('openspec archive <id>');
+      expect(archiveContent).toContain('归档已部署的OpenSpec变更并更新规范。');
+      expect(archiveContent).toContain('openspec-cn archive <id>');
     });
 
     it('should create Factory slash command files with templates', async () => {
@@ -635,8 +635,8 @@ describe('InitCommand', () => {
       expect(await fileExists(factoryArchive)).toBe(true);
 
       const proposalContent = await fs.readFile(factoryProposal, 'utf-8');
-      expect(proposalContent).toContain('description: Scaffold a new OpenSpec change and validate strictly.');
-      expect(proposalContent).toContain('argument-hint: request or feature description');
+      expect(proposalContent).toContain('description: 搭建新的OpenSpec变更提案并进行严格验证。');
+      expect(proposalContent).toContain('argument-hint: 请求或功能描述');
       expect(proposalContent).toContain('<!-- OPENSPEC:START -->');
       expect(
         /<!-- OPENSPEC:START -->([\s\S]*?)<!-- OPENSPEC:END -->/u.exec(
@@ -645,9 +645,9 @@ describe('InitCommand', () => {
       ).toContain('$ARGUMENTS');
 
       const applyContent = await fs.readFile(factoryApply, 'utf-8');
-      expect(applyContent).toContain('description: Implement an approved OpenSpec change and keep tasks in sync.');
-      expect(applyContent).toContain('argument-hint: change-id');
-      expect(applyContent).toContain('Work through tasks sequentially');
+      expect(applyContent).toContain('description: 实施已批准的OpenSpec变更并保持任务同步。');
+      expect(applyContent).toContain('argument-hint: 变更ID');
+      expect(applyContent).toContain('按顺序完成任务');
       expect(
         /<!-- OPENSPEC:START -->([\s\S]*?)<!-- OPENSPEC:END -->/u.exec(
           applyContent
@@ -655,9 +655,9 @@ describe('InitCommand', () => {
       ).toContain('$ARGUMENTS');
 
       const archiveContent = await fs.readFile(factoryArchive, 'utf-8');
-      expect(archiveContent).toContain('description: Archive a deployed OpenSpec change and update specs.');
-      expect(archiveContent).toContain('argument-hint: change-id');
-      expect(archiveContent).toContain('openspec archive <id> --yes');
+      expect(archiveContent).toContain('description: 归档已部署的OpenSpec变更并更新规范。');
+      expect(archiveContent).toContain('argument-hint: 变更ID');
+      expect(archiveContent).toContain('openspec-cn archive <id> --yes');
       expect(
         /<!-- OPENSPEC:START -->([\s\S]*?)<!-- OPENSPEC:END -->/u.exec(
           archiveContent
@@ -688,23 +688,23 @@ describe('InitCommand', () => {
       expect(await fileExists(archivePath)).toBe(true);
 
       const proposalContent = await fs.readFile(proposalPath, 'utf-8');
-      expect(proposalContent).toContain('description: Scaffold a new OpenSpec change and validate strictly.');
-      expect(proposalContent).toContain('argument-hint: request or feature description');
+      expect(proposalContent).toContain('description: 搭建新的OpenSpec变更提案并进行严格验证。');
+      expect(proposalContent).toContain('argument-hint: 请求或功能描述');
       expect(proposalContent).toContain('$ARGUMENTS');
       expect(proposalContent).toContain('<!-- OPENSPEC:START -->');
-      expect(proposalContent).toContain('**Guardrails**');
+      expect(proposalContent).toContain('**护栏规则**');
 
       const applyContent = await fs.readFile(applyPath, 'utf-8');
-      expect(applyContent).toContain('description: Implement an approved OpenSpec change and keep tasks in sync.');
-      expect(applyContent).toContain('argument-hint: change-id');
+      expect(applyContent).toContain('description: 实施已批准的OpenSpec变更并保持任务同步。');
+      expect(applyContent).toContain('argument-hint: 变更ID');
       expect(applyContent).toContain('$ARGUMENTS');
-      expect(applyContent).toContain('Work through tasks sequentially');
+      expect(applyContent).toContain('按顺序完成任务');
 
       const archiveContent = await fs.readFile(archivePath, 'utf-8');
-      expect(archiveContent).toContain('description: Archive a deployed OpenSpec change and update specs.');
-      expect(archiveContent).toContain('argument-hint: change-id');
+      expect(archiveContent).toContain('description: 归档已部署的OpenSpec变更并更新规范。');
+      expect(archiveContent).toContain('argument-hint: 变更ID');
       expect(archiveContent).toContain('$ARGUMENTS');
-      expect(archiveContent).toContain('openspec archive <id> --yes');
+      expect(archiveContent).toContain('openspec-cn archive <id> --yes');
     });
 
     it('should create Kilo Code workflows with templates', async () => {
@@ -731,15 +731,15 @@ describe('InitCommand', () => {
 
       const proposalContent = await fs.readFile(proposalPath, 'utf-8');
       expect(proposalContent).toContain('<!-- OPENSPEC:START -->');
-      expect(proposalContent).toContain('**Guardrails**');
+      expect(proposalContent).toContain('**护栏规则**');
       expect(proposalContent).not.toContain('---\n');
 
       const applyContent = await fs.readFile(applyPath, 'utf-8');
-      expect(applyContent).toContain('Work through tasks sequentially');
+      expect(applyContent).toContain('按顺序完成任务');
       expect(applyContent).not.toContain('---\n');
 
       const archiveContent = await fs.readFile(archivePath, 'utf-8');
-      expect(archiveContent).toContain('openspec list --specs');
+      expect(archiveContent).toContain('openspec-cn list --specs');
       expect(archiveContent).not.toContain('---\n');
     });
 
@@ -767,22 +767,22 @@ describe('InitCommand', () => {
 
       const proposalContent = await fs.readFile(proposalPath, 'utf-8');
       expect(proposalContent).toContain('---');
-      expect(proposalContent).toContain('description: Scaffold a new OpenSpec change and validate strictly.');
+      expect(proposalContent).toContain('description: 搭建新的OpenSpec变更提案并进行严格验证。');
       expect(proposalContent).toContain('$ARGUMENTS');
       expect(proposalContent).toContain('<!-- OPENSPEC:START -->');
-      expect(proposalContent).toContain('**Guardrails**');
+      expect(proposalContent).toContain('**护栏规则**');
 
       const applyContent = await fs.readFile(applyPath, 'utf-8');
       expect(applyContent).toContain('---');
-      expect(applyContent).toContain('description: Implement an approved OpenSpec change and keep tasks in sync.');
+      expect(applyContent).toContain('description: 实施已批准的OpenSpec变更并保持任务同步。');
       expect(applyContent).toContain('$ARGUMENTS');
-      expect(applyContent).toContain('Work through tasks sequentially');
+      expect(applyContent).toContain('按顺序完成任务');
 
       const archiveContent = await fs.readFile(archivePath, 'utf-8');
       expect(archiveContent).toContain('---');
-      expect(archiveContent).toContain('description: Archive a deployed OpenSpec change and update specs.');
+      expect(archiveContent).toContain('description: 归档已部署的OpenSpec变更并更新规范。');
       expect(archiveContent).toContain('$ARGUMENTS');
-      expect(archiveContent).toContain('openspec archive <id> --yes');
+      expect(archiveContent).toContain('openspec-cn archive <id> --yes');
     });
 
     it('should add new tool when OpenSpec already exists', async () => {
@@ -808,7 +808,7 @@ describe('InitCommand', () => {
         testDir,
         initCommand,
         'openspec/AGENTS.md',
-        'OpenSpec Instructions'
+        'OpenSpec 使用说明'
       );
     });
 
@@ -817,7 +817,7 @@ describe('InitCommand', () => {
         testDir,
         initCommand,
         'openspec/project.md',
-        'Project Context'
+        '项目 上下文'
       );
     });
 
@@ -838,7 +838,7 @@ describe('InitCommand', () => {
 
       const content = await fs.readFile(agentsPath, 'utf-8');
       expect(content).toBe(customContent);
-      expect(content).not.toContain('OpenSpec Instructions');
+      expect(content).not.toContain('OpenSpec 使用说明');
     });
 
     it('should handle non-existent target directory', async () => {
@@ -858,7 +858,7 @@ describe('InitCommand', () => {
       await initCommand.execute(testDir);
 
       const calls = logSpy.mock.calls.flat().join('\n');
-      expect(calls).toContain('Copy these prompts to Claude Code');
+      expect(calls).toContain('已创建： Claude Code');
     });
 
     it('should reference AGENTS compatible assistants in success message', async () => {
@@ -869,7 +869,7 @@ describe('InitCommand', () => {
 
       const calls = logSpy.mock.calls.flat().join('\n');
       expect(calls).toContain(
-        'Copy these prompts to your AGENTS.md-compatible assistant'
+        '为其他助手创建根AGENTS.md存根'
       );
     });
   });
@@ -883,7 +883,7 @@ describe('InitCommand', () => {
       expect(mockPrompt).toHaveBeenCalledWith(
         expect.objectContaining({
           baseMessage: expect.stringContaining(
-            'Which natively supported AI tools do you use?'
+            '您使用哪些原生支持的AI工具？'
           ),
         })
       );
@@ -1018,14 +1018,14 @@ describe('InitCommand', () => {
 
       const proposalContent = await fs.readFile(proposalPath, 'utf-8');
       expect(proposalContent).toContain('---');
-      expect(proposalContent).toContain('description: Scaffold a new OpenSpec change and validate strictly.');
+      expect(proposalContent).toContain('description: 搭建新的OpenSpec变更提案并进行严格验证。');
       expect(proposalContent).toContain('$ARGUMENTS');
       expect(proposalContent).toContain('<!-- OPENSPEC:START -->');
-      expect(proposalContent).toContain('**Guardrails**');
+      expect(proposalContent).toContain('**护栏规则**');
 
       const applyContent = await fs.readFile(applyPath, 'utf-8');
       expect(applyContent).toContain('---');
-      expect(applyContent).toContain('description: Implement an approved OpenSpec change and keep tasks in sync.');
+      expect(applyContent).toContain('description: 实施已批准的OpenSpec变更并保持任务同步。');
       expect(applyContent).toContain('$ARGUMENTS');
       expect(applyContent).toContain('<!-- OPENSPEC:START -->');
     });
@@ -1066,22 +1066,22 @@ describe('InitCommand', () => {
 
       const proposalContent = await fs.readFile(auggieProposal, 'utf-8');
       expect(proposalContent).toContain('---');
-      expect(proposalContent).toContain('description: Scaffold a new OpenSpec change and validate strictly.');
-      expect(proposalContent).toContain('argument-hint: feature description or request');
+      expect(proposalContent).toContain('description: 搭建新的OpenSpec变更提案并进行严格验证。');
+      expect(proposalContent).toContain('argument-hint: 功能描述或请求');
       expect(proposalContent).toContain('<!-- OPENSPEC:START -->');
-      expect(proposalContent).toContain('**Guardrails**');
+      expect(proposalContent).toContain('**护栏规则**');
 
       const applyContent = await fs.readFile(auggieApply, 'utf-8');
       expect(applyContent).toContain('---');
-      expect(applyContent).toContain('description: Implement an approved OpenSpec change and keep tasks in sync.');
-      expect(applyContent).toContain('argument-hint: change-id');
-      expect(applyContent).toContain('Work through tasks sequentially');
+      expect(applyContent).toContain('description: 实施已批准的OpenSpec变更并保持任务同步。');
+      expect(applyContent).toContain('argument-hint: 变更ID');
+      expect(applyContent).toContain('按顺序完成任务');
 
       const archiveContent = await fs.readFile(auggieArchive, 'utf-8');
       expect(archiveContent).toContain('---');
-      expect(archiveContent).toContain('description: Archive a deployed OpenSpec change and update specs.');
-      expect(archiveContent).toContain('argument-hint: change-id');
-      expect(archiveContent).toContain('openspec archive <id> --yes');
+      expect(archiveContent).toContain('description: 归档已部署的OpenSpec变更并更新规范。');
+      expect(archiveContent).toContain('argument-hint: 变更ID');
+      expect(archiveContent).toContain('openspec-cn archive <id> --yes');
     });
 
     it('should mark Auggie as already configured during extend mode', async () => {
@@ -1120,23 +1120,23 @@ describe('InitCommand', () => {
 
       const proposalContent = await fs.readFile(codeBuddyProposal, 'utf-8');
       expect(proposalContent).toContain('---');
-      expect(proposalContent).toContain('name: OpenSpec: Proposal');
-      expect(proposalContent).toContain('description: Scaffold a new OpenSpec change and validate strictly.');
+      expect(proposalContent).toContain('name: OpenSpec: 提案');
+      expect(proposalContent).toContain('description: 搭建新的OpenSpec变更提案并进行严格验证。');
       expect(proposalContent).toContain('category: OpenSpec');
       expect(proposalContent).toContain('<!-- OPENSPEC:START -->');
-      expect(proposalContent).toContain('**Guardrails**');
+      expect(proposalContent).toContain('**护栏规则**');
 
       const applyContent = await fs.readFile(codeBuddyApply, 'utf-8');
       expect(applyContent).toContain('---');
-      expect(applyContent).toContain('name: OpenSpec: Apply');
-      expect(applyContent).toContain('description: Implement an approved OpenSpec change and keep tasks in sync.');
-      expect(applyContent).toContain('Work through tasks sequentially');
+      expect(applyContent).toContain('name: OpenSpec: 实施');
+      expect(applyContent).toContain('description: 实施已批准的OpenSpec变更并保持任务同步。');
+      expect(applyContent).toContain('按顺序完成任务');
 
       const archiveContent = await fs.readFile(codeBuddyArchive, 'utf-8');
       expect(archiveContent).toContain('---');
-      expect(archiveContent).toContain('name: OpenSpec: Archive');
-      expect(archiveContent).toContain('description: Archive a deployed OpenSpec change and update specs.');
-      expect(archiveContent).toContain('openspec archive <id> --yes');
+      expect(archiveContent).toContain('name: OpenSpec: 归档');
+      expect(archiveContent).toContain('description: 归档已部署的OpenSpec变更并更新规范。');
+      expect(archiveContent).toContain('openspec-cn archive <id> --yes');
     });
 
     it('should mark CodeBuddy as already configured during extend mode', async () => {
@@ -1162,7 +1162,7 @@ describe('InitCommand', () => {
       const content = await fs.readFile(codeBuddyPath, 'utf-8');
       expect(content).toContain('<!-- OPENSPEC:START -->');
       expect(content).toContain("@/openspec/AGENTS.md");
-      expect(content).toContain('openspec update');
+      expect(content).toContain('openspec-cn update');
       expect(content).toContain('<!-- OPENSPEC:END -->');
     });
 
@@ -1179,7 +1179,7 @@ describe('InitCommand', () => {
       const updatedContent = await fs.readFile(codeBuddyPath, 'utf-8');
       expect(updatedContent).toContain('<!-- OPENSPEC:START -->');
       expect(updatedContent).toContain("@/openspec/AGENTS.md");
-      expect(updatedContent).toContain('openspec update');
+      expect(updatedContent).toContain('openspec-cn update');
       expect(updatedContent).toContain('<!-- OPENSPEC:END -->');
       expect(updatedContent).toContain('Custom instructions here');
     });
@@ -1208,28 +1208,28 @@ describe('InitCommand', () => {
 
       const proposalContent = await fs.readFile(crushProposal, 'utf-8');
       expect(proposalContent).toContain('---');
-      expect(proposalContent).toContain('name: OpenSpec: Proposal');
-      expect(proposalContent).toContain('description: Scaffold a new OpenSpec change and validate strictly.');
+      expect(proposalContent).toContain('name: OpenSpec: 提案');
+      expect(proposalContent).toContain('description: 搭建新的OpenSpec变更提案并进行严格验证。');
       expect(proposalContent).toContain('category: OpenSpec');
       expect(proposalContent).toContain('tags: [openspec, change]');
       expect(proposalContent).toContain('<!-- OPENSPEC:START -->');
-      expect(proposalContent).toContain('**Guardrails**');
+      expect(proposalContent).toContain('**护栏规则**');
 
       const applyContent = await fs.readFile(crushApply, 'utf-8');
       expect(applyContent).toContain('---');
-      expect(applyContent).toContain('name: OpenSpec: Apply');
-      expect(applyContent).toContain('description: Implement an approved OpenSpec change and keep tasks in sync.');
+      expect(applyContent).toContain('name: OpenSpec: 实施');
+      expect(applyContent).toContain('description: 实施已批准的OpenSpec变更并保持任务同步。');
       expect(applyContent).toContain('category: OpenSpec');
       expect(applyContent).toContain('tags: [openspec, apply]');
-      expect(applyContent).toContain('Work through tasks sequentially');
+      expect(applyContent).toContain('按顺序完成任务');
 
       const archiveContent = await fs.readFile(crushArchive, 'utf-8');
       expect(archiveContent).toContain('---');
-      expect(archiveContent).toContain('name: OpenSpec: Archive');
-      expect(archiveContent).toContain('description: Archive a deployed OpenSpec change and update specs.');
+      expect(archiveContent).toContain('name: OpenSpec: 归档');
+      expect(archiveContent).toContain('description: 归档已部署的OpenSpec变更并更新规范。');
       expect(archiveContent).toContain('category: OpenSpec');
       expect(archiveContent).toContain('tags: [openspec, archive]');
-      expect(archiveContent).toContain('openspec archive <id> --yes');
+      expect(archiveContent).toContain('openspec-cn archive <id> --yes');
     });
 
     it('should mark Crush as already configured during extend mode', async () => {
@@ -1268,22 +1268,22 @@ describe('InitCommand', () => {
 
       const proposalContent = await fs.readFile(costrictProposal, 'utf-8');
       expect(proposalContent).toContain('---');
-      expect(proposalContent).toContain('description: "Scaffold a new OpenSpec change and validate strictly."');
-      expect(proposalContent).toContain('argument-hint: feature description or request');
+      expect(proposalContent).toContain('description: "搭建新的OpenSpec变更提案并进行严格验证。"');
+      expect(proposalContent).toContain('argument-hint: 功能描述或请求');
       expect(proposalContent).toContain('<!-- OPENSPEC:START -->');
-      expect(proposalContent).toContain('**Guardrails**');
+      expect(proposalContent).toContain('**护栏规则**');
 
       const applyContent = await fs.readFile(costrictApply, 'utf-8');
       expect(applyContent).toContain('---');
-      expect(applyContent).toContain('description: "Implement an approved OpenSpec change and keep tasks in sync."');
-      expect(applyContent).toContain('argument-hint: change-id');
-      expect(applyContent).toContain('Work through tasks sequentially');
+      expect(applyContent).toContain('description: "实施已批准的OpenSpec变更并保持任务同步。"');
+      expect(applyContent).toContain('argument-hint: 变更ID');
+      expect(applyContent).toContain('按顺序完成任务');
 
       const archiveContent = await fs.readFile(costrictArchive, 'utf-8');
       expect(archiveContent).toContain('---');
-      expect(archiveContent).toContain('description: "Archive a deployed OpenSpec change and update specs."');
-      expect(archiveContent).toContain('argument-hint: change-id');
-      expect(archiveContent).toContain('openspec archive <id> --yes');
+      expect(archiveContent).toContain('description: "归档已部署的OpenSpec变更并更新规范。"');
+      expect(archiveContent).toContain('argument-hint: 变更ID');
+      expect(archiveContent).toContain('openspec-cn archive <id> --yes');
     });
 
     it('should mark CoStrict as already configured during extend mode', async () => {
@@ -1322,15 +1322,15 @@ describe('InitCommand', () => {
 
       const proposalContent = await fs.readFile(rooProposal, 'utf-8');
       expect(proposalContent).toContain('# OpenSpec: Proposal');
-      expect(proposalContent).toContain('**Guardrails**');
+      expect(proposalContent).toContain('**护栏规则**');
 
       const applyContent = await fs.readFile(rooApply, 'utf-8');
       expect(applyContent).toContain('# OpenSpec: Apply');
-      expect(applyContent).toContain('Work through tasks sequentially');
+      expect(applyContent).toContain('按顺序完成任务');
 
       const archiveContent = await fs.readFile(rooArchive, 'utf-8');
       expect(archiveContent).toContain('# OpenSpec: Archive');
-      expect(archiveContent).toContain('openspec archive <id> --yes');
+      expect(archiveContent).toContain('openspec-cn archive <id> --yes');
     });
 
     it('should mark RooCode as already configured during extend mode', async () => {
@@ -1369,23 +1369,23 @@ describe('InitCommand', () => {
 
       const proposalContent = await fs.readFile(qoderProposal, 'utf-8');
       expect(proposalContent).toContain('---');
-      expect(proposalContent).toContain('name: OpenSpec: Proposal');
-      expect(proposalContent).toContain('description: Scaffold a new OpenSpec change and validate strictly.');
+      expect(proposalContent).toContain('name: OpenSpec: 提案');
+      expect(proposalContent).toContain('description: 搭建新的OpenSpec变更提案并进行严格验证。');
       expect(proposalContent).toContain('category: OpenSpec');
       expect(proposalContent).toContain('<!-- OPENSPEC:START -->');
-      expect(proposalContent).toContain('**Guardrails**');
+      expect(proposalContent).toContain('**护栏规则**');
 
       const applyContent = await fs.readFile(qoderApply, 'utf-8');
       expect(applyContent).toContain('---');
-      expect(applyContent).toContain('name: OpenSpec: Apply');
-      expect(applyContent).toContain('description: Implement an approved OpenSpec change and keep tasks in sync.');
-      expect(applyContent).toContain('Work through tasks sequentially');
+      expect(applyContent).toContain('name: OpenSpec: 实施');
+      expect(applyContent).toContain('description: 实施已批准的OpenSpec变更并保持任务同步。');
+      expect(applyContent).toContain('按顺序完成任务');
 
       const archiveContent = await fs.readFile(qoderArchive, 'utf-8');
       expect(archiveContent).toContain('---');
-      expect(archiveContent).toContain('name: OpenSpec: Archive');
-      expect(archiveContent).toContain('description: Archive a deployed OpenSpec change and update specs.');
-      expect(archiveContent).toContain('openspec archive <id> --yes');
+      expect(archiveContent).toContain('name: OpenSpec: 归档');
+      expect(archiveContent).toContain('description: 归档已部署的OpenSpec变更并更新规范。');
+      expect(archiveContent).toContain('openspec-cn archive <id> --yes');
     });
 
     it('should mark Qoder as already configured during extend mode', async () => {
@@ -1411,7 +1411,7 @@ describe('InitCommand', () => {
       const content = await fs.readFile(costrictPath, 'utf-8');
       expect(content).toContain('<!-- OPENSPEC:START -->');
       expect(content).toContain("@/openspec/AGENTS.md");
-      expect(content).toContain('openspec update');
+      expect(content).toContain('openspec-cn update');
       expect(content).toContain('<!-- OPENSPEC:END -->');
     });
 
@@ -1426,7 +1426,7 @@ describe('InitCommand', () => {
       const content = await fs.readFile(qoderPath, 'utf-8');
       expect(content).toContain('<!-- OPENSPEC:START -->');
       expect(content).toContain("@/openspec/AGENTS.md");
-      expect(content).toContain('openspec update');
+      expect(content).toContain('openspec-cn update');
       expect(content).toContain('<!-- OPENSPEC:END -->');
     });
     it('should update existing COSTRICT.md with markers', async () => {
@@ -1458,7 +1458,7 @@ describe('InitCommand', () => {
       const updatedContent = await fs.readFile(qoderPath, 'utf-8');
       expect(updatedContent).toContain('<!-- OPENSPEC:START -->');
       expect(updatedContent).toContain("@/openspec/AGENTS.md");
-      expect(updatedContent).toContain('openspec update');
+      expect(updatedContent).toContain('openspec-cn update');
       expect(updatedContent).toContain('<!-- OPENSPEC:END -->');
       expect(updatedContent).toContain('Custom instructions here');
     });
@@ -1528,7 +1528,7 @@ describe('InitCommand', () => {
       const nonInteractiveCommand = new InitCommand({ tools: 'invalid-tool' });
 
       await expect(nonInteractiveCommand.execute(testDir)).rejects.toThrow(
-        /Invalid tool\(s\): invalid-tool\. Available values: /
+        /无效工具: invalid-tool。可用值: /
       );
     });
 
@@ -1551,7 +1551,7 @@ describe('InitCommand', () => {
       const nonInteractiveCommand = new InitCommand({ tools: 'all,claude' });
 
       await expect(nonInteractiveCommand.execute(testDir)).rejects.toThrow(
-        /Cannot combine reserved values "all" or "none" with specific tool IDs/
+        /不能同时使用保留值 "all" 或 "none" 与具体工具 ID/
       );
     });
   });

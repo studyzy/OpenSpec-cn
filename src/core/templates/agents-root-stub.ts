@@ -12,5 +12,5 @@ export const agentsRootStubTemplate = `# OpenSpec 使用说明
 - 规范格式和约定
 - 项目结构和指南
 
-保持此托管块，以便'openspec update'可以刷新说明。
+保持此托管块，以便'openspec-cn update'可以刷新说明。
 `;

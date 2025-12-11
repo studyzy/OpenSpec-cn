@@ -29,8 +29,8 @@ There are changes proposed, but no delta specs provided yet.`;
     const report = await validator.validateChange(changePath);
     expect(report.valid).toBe(false);
     const msg = report.issues.map(i => i.message).join('\n');
-    expect(msg).toContain('Change must have at least one delta');
-    expect(msg).toContain('Ensure your change has a specs/ directory');
+    expect(msg).toContain('变更必须至少有一个增量');
+    expect(msg).toContain('确保您的变更在specs/目录下有功能文件夹');
     expect(msg).toContain('## ADDED/MODIFIED/REMOVED/RENAMED Requirements');
   });
 
@@ -44,7 +44,7 @@ There are changes proposed, but no delta specs provided yet.`;
     expect(report.valid).toBe(false);
     const msg = report.issues.map(i => i.message).join('\n');
     expect(msg).toContain('Spec must have a Purpose section');
-    expect(msg).toContain('Expected headers: "## Purpose" and "## Requirements"');
+    expect(msg).toContain('预期标题："## 目的"和"## 需求"');
   });
 
   it('warns with scenario conversion template when missing scenarios', async () => {
@@ -65,9 +65,9 @@ Text of requirement
     const report = await validator.validateSpec(specPath);
     expect(report.valid).toBe(false);
     const warn = report.issues.find(i => i.path.includes('requirements[0].scenarios'));
-    expect(warn?.message).toContain('Requirement must have at least one scenario');
-    expect(warn?.message).toContain('Scenarios must use level-4 headers');
-    expect(warn?.message).toContain('#### Scenario:');
+    expect(warn?.message).toContain('需求必须至少有一个场景');
+    expect(warn?.message).toContain('场景必须使用四级标题');
+    expect(warn?.message).toContain('#### 场景：');
   });
 });
 
