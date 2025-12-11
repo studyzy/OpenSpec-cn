@@ -239,7 +239,7 @@ export class ArchiveCommand {
     // Check if archive already exists
     try {
       await fs.access(archivePath);
-      throw new Error(`Archive '${archiveName}' already exists.`);
+      throw new Error(`归档 '${archiveName}' 已经存在。`);
     } catch (error: any) {
       if (error.code !== 'ENOENT') {
         throw error;
@@ -359,7 +359,7 @@ export class ArchiveCommand {
       const name = normalizeRequirementName(add.name);
       if (addedNames.has(name)) {
         throw new Error(
-          `${specName} validation failed - duplicate requirement in ADDED for header "### Requirement: ${add.name}"`
+          `${specName} 验证失败 - ADDED 中的重复需求，标题为 "███ Requirement: ${add.name}"`
         );
       }
       addedNames.add(name);
@@ -369,7 +369,7 @@ export class ArchiveCommand {
       const name = normalizeRequirementName(mod.name);
       if (modifiedNames.has(name)) {
         throw new Error(
-          `${specName} validation failed - duplicate requirement in MODIFIED for header "### Requirement: ${mod.name}"`
+          `${specName} 验证失败 - MODIFIED 中的重复需求，标题为 "### Requirement: ${mod.name}"`
         );
       }
       modifiedNames.add(name);
@@ -379,7 +379,7 @@ export class ArchiveCommand {
       const name = normalizeRequirementName(rem);
       if (removedNamesSet.has(name)) {
         throw new Error(
-          `${specName} validation failed - duplicate requirement in REMOVED for header "### Requirement: ${rem}"`
+          `${specName} 验证失败 - REMOVED 中的重复需求，标题为 "### Requirement: ${rem}"`
         );
       }
       removedNamesSet.add(name);
@@ -391,12 +391,12 @@ export class ArchiveCommand {
       const toNorm = normalizeRequirementName(to);
       if (renamedFromSet.has(fromNorm)) {
         throw new Error(
-          `${specName} validation failed - duplicate FROM in RENAMED for header "### Requirement: ${from}"`
+          `${specName} 验证失败 - RENAMED 中的重复 FROM，标题为 "### Requirement: ${from}"`
         );
       }
       if (renamedToSet.has(toNorm)) {
         throw new Error(
-          `${specName} validation failed - duplicate TO in RENAMED for header "### Requirement: ${to}"`
+          `${specName} 验证失败 - RENAMED 中的重复 TO，标题为 "### Requirement: ${to}"`
         );
       }
       renamedFromSet.add(fromNorm);
@@ -418,27 +418,27 @@ export class ArchiveCommand {
       const toNorm = normalizeRequirementName(to);
       if (modifiedNames.has(fromNorm)) {
         throw new Error(
-          `${specName} validation failed - when a rename exists, MODIFIED must reference the NEW header "### Requirement: ${to}"`
+          `${specName} 验证失败 - 当存在重命名时，MODIFIED 必须引用新标题 "### Requirement: ${to}"`
         );
       }
       // Detect ADDED colliding with a RENAMED TO
       if (addedNames.has(toNorm)) {
         throw new Error(
-          `${specName} validation failed - RENAMED TO header collides with ADDED for "### Requirement: ${to}"`
+          `${specName} 验证失败 - RENAMED TO 标题与 ADDED 冲突，标题为 "### Requirement: ${to}"`
         );
       }
     }
     if (conflicts.length > 0) {
       const c = conflicts[0];
       throw new Error(
-        `${specName} validation failed - requirement present in multiple sections (${c.a} and ${c.b}) for header "### Requirement: ${c.name}"`
+        `${specName} 验证失败 - 需求出现在多个部分中（${c.a} 和 ${c.b}），标题为 "### Requirement: ${c.name}"`
       );
     }
     const hasAnyDelta = (plan.added.length + plan.modified.length + plan.removed.length + plan.renamed.length) > 0;
     if (!hasAnyDelta) {
       throw new Error(
-        `Delta parsing found no operations for ${path.basename(path.dirname(update.source))}. ` +
-        `Provide ADDED/MODIFIED/REMOVED/RENAMED sections in change spec.`
+        `未找到 ${path.basename(path.dirname(update.source))} 的任何操作。` +
+        `请在变更规范中提供 ADDED/MODIFIED/REMOVED/RENAMED 部分。`
       );
     }
 
@@ -450,7 +450,7 @@ export class ArchiveCommand {
       // Target spec does not exist; only ADDED operations are permitted
       if (plan.modified.length > 0 || plan.removed.length > 0 || plan.renamed.length > 0) {
         throw new Error(
-          `${specName}: target spec does not exist; only ADDED requirements are allowed for new specs.`
+          `${specName}: 目标规范不存在；新规范仅允许 ADDED 需求。`
         );
       }
       targetContent = this.buildSpecSkeleton(specName, changeName);
@@ -470,12 +470,12 @@ export class ArchiveCommand {
       const to = normalizeRequirementName(r.to);
       if (!nameToBlock.has(from)) {
         throw new Error(
-          `${specName} RENAMED failed for header "### Requirement: ${r.from}" - source not found`
+          `${specName} RENAMED 失败，标题 "### Requirement: ${r.from}" - 未找到源`
         );
       }
       if (nameToBlock.has(to)) {
         throw new Error(
-          `${specName} RENAMED failed for header "### Requirement: ${r.to}" - target already exists`
+          `${specName} RENAMED 失败，标题 "### Requirement: ${r.to}" - 目标已经存在`
         );
       }
       const block = nameToBlock.get(from)!;
@@ -497,7 +497,7 @@ export class ArchiveCommand {
       const key = normalizeRequirementName(name);
       if (!nameToBlock.has(key)) {
         throw new Error(
-          `${specName} REMOVED failed for header "### Requirement: ${name}" - not found`
+          `${specName} REMOVED 失败，标题 "### Requirement: ${name}" - 未找到`
         );
       }
       nameToBlock.delete(key);
@@ -508,7 +508,7 @@ export class ArchiveCommand {
       const key = normalizeRequirementName(mod.name);
       if (!nameToBlock.has(key)) {
         throw new Error(
-          `${specName} MODIFIED failed for header "### Requirement: ${mod.name}" - not found`
+          `${specName} MODIFIED 失败，标题 "### Requirement: ${mod.name}" - 未找到`
         );
       }
       // Replace block with provided raw (ensure header line matches key)
@@ -516,7 +516,7 @@ export class ArchiveCommand {
       const modHeaderMatch = mod.raw.split('\n')[0].match(new RegExp(`^###\\s*${REQUIREMENT_KEYWORD_PATTERN}:\\s*(.+)\\s*$`));
       if (!modHeaderMatch || normalizeRequirementName(modHeaderMatch[1]) !== key) {
         throw new Error(
-          `${specName} MODIFIED failed for header "### Requirement: ${mod.name}" - header mismatch in content`
+          `${specName} MODIFIED 失败，标题 "### Requirement: ${mod.name}" - 内容中的标题不匹配`
         );
       }
       nameToBlock.set(key, mod);

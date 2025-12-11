@@ -103,9 +103,9 @@ describe('ArchiveCommand', () => {
       // Create delta-based change spec (ADDED requirement)
       const specContent = `# Test Capability Spec - Changes
 
-## ADDED Requirements
+## 新增需求
 
-### Requirement: The system SHALL provide test capability
+### 需求: The system SHALL provide test capability
 
 #### Scenario: Basic test
 Given a test condition
@@ -122,8 +122,8 @@ Then expected result happens`;
       expect(updatedContent).toContain('# test-capability Specification');
       expect(updatedContent).toContain('## Purpose');
       expect(updatedContent).toContain(`created by archiving change ${changeName}`);
-      expect(updatedContent).toContain('## Requirements');
-      expect(updatedContent).toContain('### Requirement: The system SHALL provide test capability');
+      expect(updatedContent).toContain('## 需求');
+      expect(updatedContent).toContain('### 需求: The system SHALL provide test capability');
       expect(updatedContent).toContain('#### Scenario: Basic test');
     });
 
@@ -146,7 +146,7 @@ Then expected result happens`;
       // Try to archive
       await expect(
         archiveCommand.execute(changeName, { yes: true })
-      ).rejects.toThrow(`Archive '${date}-${changeName}' already exists.`);
+      ).rejects.toThrow(`归档 '${date}-${changeName}' 已经存在。`);
     });
 
     it('should handle changes without tasks.md', async () => {
@@ -224,9 +224,9 @@ Then expected result happens`;
 
       const deltaSpec = `# Unstable Capability
 
-## ADDED Requirements
+## 新增需求
 
-### Requirement: Logging Feature
+### 需求: Logging Feature
 **ID**: REQ-LOG-001
 
 The system will log all events.
@@ -271,7 +271,7 @@ The system will log all events.
 ## Purpose
 This is a test capability specification.
 
-## Requirements
+## 需求
 
 ### The system SHALL provide test capability
 
@@ -323,25 +323,25 @@ Then expected result happens`;
 ## Purpose
 Alpha purpose.
 
-## Requirements
+## 需求
 
-### Requirement: Important Rule
+### 需求: Important Rule
 Some details.`;
       await fs.writeFile(path.join(mainSpecDir, 'spec.md'), mainContent);
 
       // Change attempts to modify the same requirement but with trailing spaces after the name
       const deltaContent = `# Alpha - Changes
 
-## MODIFIED Requirements
+## 修改需求
 
-### Requirement: Important Rule   
+### 需求: Important Rule   
 Updated details.`;
       await fs.writeFile(path.join(changeSpecDir, 'spec.md'), deltaContent);
 
       await archiveCommand.execute(changeName, { yes: true, noValidate: true });
 
       const updated = await fs.readFile(path.join(mainSpecDir, 'spec.md'), 'utf-8');
-      expect(updated).toContain('### Requirement: Important Rule');
+      expect(updated).toContain('### 需求: Important Rule');
       expect(updated).toContain('Updated details.');
     });
 
@@ -359,42 +359,42 @@ Updated details.`;
 ## Purpose
 Beta purpose.
 
-## Requirements
+## 需求
 
-### Requirement: A
+### 需求: A
 content A
 
-### Requirement: B
+### 需求: B
 content B`;
       await fs.writeFile(path.join(mainSpecDir, 'spec.md'), mainContent);
 
       // Rename A->C, Remove B, Modify C, Add D
       const deltaContent = `# Beta - Changes
 
-## RENAMED Requirements
-- FROM: \`### Requirement: A\`
-- TO: \`### Requirement: C\`
+## 重命名需求
+- FROM: \`### 需求: A\`
+- TO: \`### 需求: C\`
 
-## REMOVED Requirements
-### Requirement: B
+## 移除需求
+### 需求: B
 
-## MODIFIED Requirements
-### Requirement: C
+## 修改需求
+### 需求: C
 updated C
 
-## ADDED Requirements
-### Requirement: D
+## 新增需求
+### 需求: D
 content D`;
       await fs.writeFile(path.join(changeSpecDir, 'spec.md'), deltaContent);
 
       await archiveCommand.execute(changeName, { yes: true, noValidate: true });
 
       const updated = await fs.readFile(path.join(mainSpecDir, 'spec.md'), 'utf-8');
-      expect(updated).toContain('### Requirement: C');
+      expect(updated).toContain('### 需求: C');
       expect(updated).toContain('updated C');
-      expect(updated).toContain('### Requirement: D');
-      expect(updated).not.toContain('### Requirement: A');
-      expect(updated).not.toContain('### Requirement: B');
+      expect(updated).toContain('### 需求: D');
+      expect(updated).not.toContain('### 需求: A');
+      expect(updated).not.toContain('### 需求: B');
     });
 
     it('should abort with error when MODIFIED/REMOVED reference non-existent requirements', async () => {
@@ -411,18 +411,18 @@ content D`;
 ## Purpose
 Gamma purpose.
 
-## Requirements`;
+## 需求`;
       await fs.writeFile(path.join(mainSpecDir, 'spec.md'), mainContent);
 
       // Delta tries to modify and remove non-existent requirement
       const deltaContent = `# Gamma - Changes
 
-## MODIFIED Requirements
-### Requirement: Missing
+## 修改需求
+### 需求: Missing
 new text
 
-## REMOVED Requirements
-### Requirement: Another Missing`;
+## 移除需求
+### 需求: Another Missing`;
       await fs.writeFile(path.join(changeSpecDir, 'spec.md'), deltaContent);
 
       await archiveCommand.execute(changeName, { yes: true, noValidate: true });
@@ -448,21 +448,21 @@ new text
 ## Purpose
 Delta purpose.
 
-## Requirements
+## 需求
 
-### Requirement: Old
+### 需求: Old
 old body`;
       await fs.writeFile(path.join(mainSpecDir, 'spec.md'), mainContent);
 
       // Delta: rename Old->New, but MODIFIED references Old (should abort)
       const badDelta = `# Delta - Changes
 
-## RENAMED Requirements
-- FROM: \`### Requirement: Old\`
-- TO: \`### Requirement: New\`
+## 重命名需求
+- FROM: \`### 需求: Old\`
+- TO: \`### 需求: New\`
 
-## MODIFIED Requirements
-### Requirement: Old
+## 修改需求
+### 需求: Old
 new body`;
       await fs.writeFile(path.join(changeSpecDir, 'spec.md'), badDelta);
 
@@ -471,7 +471,7 @@ new body`;
       expect(unchanged).toBe(mainContent);
       // Assert error message format and abort notice
       expect(console.log).toHaveBeenCalledWith(
-        expect.stringContaining('validation failed - when a rename exists, MODIFIED must reference the NEW header')
+        expect.stringContaining('验证失败 - 当存在重命名时，MODIFIED 必须引用新标题')
       );
       expect(console.log).toHaveBeenCalledWith(
         expect.stringContaining('已中止。未更改任何文件。')
@@ -480,20 +480,20 @@ new body`;
       // Fix MODIFIED to reference New (should succeed)
       const goodDelta = `# Delta - Changes
 
-## RENAMED Requirements
-- FROM: \`### Requirement: Old\`
-- TO: \`### Requirement: New\`
+## 重命名需求
+- FROM: \`### 需求: Old\`
+- TO: \`### 需求: New\`
 
-## MODIFIED Requirements
-### Requirement: New
+## 修改需求
+### 需求: New
 new body`;
       await fs.writeFile(path.join(changeSpecDir, 'spec.md'), goodDelta);
 
       await archiveCommand.execute(changeName, { yes: true, noValidate: true });
       const updated = await fs.readFile(path.join(mainSpecDir, 'spec.md'), 'utf-8');
-      expect(updated).toContain('### Requirement: New');
+      expect(updated).toContain('### 需求: New');
       expect(updated).toContain('new body');
-      expect(updated).not.toContain('### Requirement: Old');
+      expect(updated).not.toContain('### 需求: Old');
     });
 
     it('should process multiple specs atomically (any failure aborts all)', async () => {
@@ -512,9 +512,9 @@ new body`;
 ## Purpose
 Epsilon purpose.
 
-## Requirements
+## 需求
 
-### Requirement: E1
+### 需求: E1
 e1`);
 
       const zetaMain = path.join(tempDir, 'openspec', 'specs', 'zeta', 'spec.md');
@@ -524,30 +524,30 @@ e1`);
 ## Purpose
 Zeta purpose.
 
-## Requirements
+## 需求
 
-### Requirement: Z1
+### 需求: Z1
 z1`);
 
       // Delta: epsilon is valid modification; zeta tries to remove non-existent -> should abort both
       await fs.writeFile(path.join(spec1Dir, 'spec.md'), `# Epsilon - Changes
 
-## MODIFIED Requirements
-### Requirement: E1
+## 修改需求
+### 需求: E1
 E1 updated`);
 
       await fs.writeFile(path.join(spec2Dir, 'spec.md'), `# Zeta - Changes
 
-## REMOVED Requirements
-### Requirement: Missing`);
+## 移除需求
+### 需求: Missing`);
 
       await archiveCommand.execute(changeName, { yes: true, noValidate: true });
 
       const e1 = await fs.readFile(epsilonMain, 'utf-8');
       const z1 = await fs.readFile(zetaMain, 'utf-8');
-      expect(e1).toContain('### Requirement: E1');
+      expect(e1).toContain('### 需求: E1');
       expect(e1).not.toContain('E1 updated');
-      expect(z1).toContain('### Requirement: Z1');
+      expect(z1).toContain('### 需求: Z1');
       // changeDir should still exist
       await expect(fs.access(changeDir)).resolves.not.toThrow();
     });
@@ -563,15 +563,15 @@ E1 updated`);
       // Existing main specs
       const omegaMain = path.join(tempDir, 'openspec', 'specs', 'omega', 'spec.md');
       await fs.mkdir(path.dirname(omegaMain), { recursive: true });
-      await fs.writeFile(omegaMain, `# omega Specification\n\n## Purpose\nOmega purpose.\n\n## Requirements\n\n### Requirement: O1\no1`);
+      await fs.writeFile(omegaMain, `# omega Specification\n\n## Purpose\nOmega purpose.\n\n## 需求\n\n### 需求: O1\no1`);
 
       const psiMain = path.join(tempDir, 'openspec', 'specs', 'psi', 'spec.md');
       await fs.mkdir(path.dirname(psiMain), { recursive: true });
-      await fs.writeFile(psiMain, `# psi Specification\n\n## Purpose\nPsi purpose.\n\n## Requirements\n\n### Requirement: P1\np1`);
+      await fs.writeFile(psiMain, `# psi Specification\n\n## Purpose\nPsi purpose.\n\n## 需求\n\n### 需求: P1\np1`);
 
       // Deltas: omega add one, psi rename and modify -> totals: +1, ~1, -0, →1
-      await fs.writeFile(path.join(spec1Dir, 'spec.md'), `# Omega - Changes\n\n## ADDED Requirements\n\n### Requirement: O2\nnew`);
-      await fs.writeFile(path.join(spec2Dir, 'spec.md'), `# Psi - Changes\n\n## RENAMED Requirements\n- FROM: \`### Requirement: P1\`\n- TO: \`### Requirement: P2\`\n\n## MODIFIED Requirements\n### Requirement: P2\nupdated`);
+      await fs.writeFile(path.join(spec1Dir, 'spec.md'), `# Omega - Changes\n\n## 新增需求\n\n### 需求: O2\nnew`);
+      await fs.writeFile(path.join(spec2Dir, 'spec.md'), `# Psi - Changes\n\n## 重命名需求\n- FROM: \`### 需求: P1\`\n- TO: \`### 需求: P2\`\n\n## 修改需求\n### 需求: P2\nupdated`);
 
       await archiveCommand.execute(changeName, { yes: true, noValidate: true });
 

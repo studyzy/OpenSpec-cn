@@ -31,7 +31,7 @@ There are changes proposed, but no delta specs provided yet.`;
     const msg = report.issues.map(i => i.message).join('\n');
     expect(msg).toContain('变更必须至少有一个增量');
     expect(msg).toContain('确保您的变更在specs/目录下有功能文件夹');
-    expect(msg).toContain('## ADDED/MODIFIED/REMOVED/RENAMED Requirements');
+    expect(msg).toContain('## 新增需求/修改需求/移除需求/重命名需求');
   });
 
   it('adds guidance when spec missing Purpose/Requirements', async () => {
@@ -43,7 +43,7 @@ There are changes proposed, but no delta specs provided yet.`;
     const report = await validator.validateSpec(specPath);
     expect(report.valid).toBe(false);
     const msg = report.issues.map(i => i.message).join('\n');
-    expect(msg).toContain('Spec must have a Purpose section');
+    expect(msg).toContain('规范必须有目的部分');
     expect(msg).toContain('预期标题："## 目的"和"## 需求"');
   });
 

@@ -23,16 +23,16 @@ export class MarkdownParser {
 
   parseSpec(name: string): Spec {
     const sections = this.parseSections();
-    const purpose = this.findSection(sections, 'Purpose')?.content || '';
+    const purpose = this.findSection(sections, 'Purpose')?.content || this.findSection(sections, '目的')?.content || '';
     
-    const requirementsSection = this.findSection(sections, 'Requirements');
+    const requirementsSection = this.findSection(sections, 'Requirements') || this.findSection(sections, '需求');
     
     if (!purpose) {
-      throw new Error('Spec must have a Purpose section');
+      throw new Error('规范必须有目的部分');
     }
     
     if (!requirementsSection) {
-      throw new Error('Spec must have a Requirements section');
+      throw new Error('规范必须有需求部分');
     }
 
     const requirements = this.parseRequirements(requirementsSection);
@@ -50,15 +50,15 @@ export class MarkdownParser {
 
   parseChange(name: string): Change {
     const sections = this.parseSections();
-    const why = this.findSection(sections, 'Why')?.content || '';
-    const whatChanges = this.findSection(sections, 'What Changes')?.content || '';
+    const why = this.findSection(sections, 'Why')?.content || this.findSection(sections, '为什么')?.content || '';
+    const whatChanges = this.findSection(sections, 'What Changes')?.content || this.findSection(sections, '变更内容')?.content || '';
     
     if (!why) {
-      throw new Error('Change must have a Why section');
+      throw new Error('变更必须有为什么部分');
     }
     
     if (!whatChanges) {
-      throw new Error('Change must have a What Changes section');
+      throw new Error('变更必须有变更内容部分');
     }
 
     const deltas = this.parseDeltas(whatChanges);

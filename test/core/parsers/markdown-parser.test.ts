@@ -90,7 +90,7 @@ When action
 Then result`;
 
       const parser = new MarkdownParser(content);
-      expect(() => parser.parseSpec('test')).toThrow('must have a Purpose section');
+      expect(() => parser.parseSpec('test')).toThrow('规范必须有目的部分');
     });
 
     it('should throw error for missing requirements', () => {
@@ -100,7 +100,7 @@ Then result`;
 This is a test spec`;
 
       const parser = new MarkdownParser(content);
-      expect(() => parser.parseSpec('test')).toThrow('must have a Requirements section');
+      expect(() => parser.parseSpec('test')).toThrow('规范必须有需求部分');
     });
   });
 
@@ -142,7 +142,7 @@ We need to implement user authentication to secure the application and protect u
 - **test:** Add test`;
 
       const parser = new MarkdownParser(content);
-      expect(() => parser.parseChange('test')).toThrow('must have a Why section');
+      expect(() => parser.parseChange('test')).toThrow('变更必须有为什么部分');
     });
 
     it('should throw error for missing what changes section', () => {
@@ -152,7 +152,7 @@ We need to implement user authentication to secure the application and protect u
 Because we need it`;
 
       const parser = new MarkdownParser(content);
-      expect(() => parser.parseChange('test')).toThrow('must have a What Changes section');
+      expect(() => parser.parseChange('test')).toThrow('变更必须有变更内容部分');
     });
 
     it('should handle changes without deltas', () => {

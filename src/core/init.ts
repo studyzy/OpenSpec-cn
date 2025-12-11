@@ -467,7 +467,7 @@ export class InitCommand {
 
     // Check write permissions
     if (!(await FileSystemUtils.ensureWritePermissions(projectPath))) {
-      throw new Error(`Insufficient permissions to write to ${projectPath}`);
+      throw new Error(`没有权限写入 ${projectPath}`);
     }
     return extendMode;
   }

@@ -8,7 +8,7 @@ AI编程助手使用OpenSpec进行规范驱动开发的说明文档。
 - 确定范围：新功能 vs 修改现有功能
 - 选择唯一\`change-id\`：短横线命名法，动词开头（\`add-\`，\`update-\`，\`remove-\`，\`refactor-\`）
 - 创建骨架：\`proposal.md\`，\`tasks.md\`，\`design.md\`（仅当需要时），以及受影响功能的增量规范
-- 编写增量：使用\`## ADDED|MODIFIED|REMOVED|RENAMED Requirements\`；每个需求至少包含一个\`#### 场景：\`
+- 编写增量：使用\`## 新增|修改|移除|重命名需求\`；每个需求至少包含一个\`#### 场景：\`
 - 验证：\`openspec-cn validate [change-id] --strict\`并修复问题
 - 请求批准：在提案获得批准前不要开始实施
 
@@ -43,7 +43,7 @@ AI编程助手使用OpenSpec进行规范驱动开发的说明文档。
 **工作流**
 1. 查看\`openspec/project.md\`，\`openspec-cn list\`和\`openspec-cn list --specs\`以了解当前上下文。
 2. 选择唯一的动词开头\`change-id\`并在\`openspec/changes/<id>/\`下创建\`proposal.md\`、\`tasks.md\`、可选的\`design.md\`，以及在\`openspec/changes/<id>/\`下的规范增量。
-3. 使用\`## ADDED|MODIFIED|REMOVED Requirements\`编写规范增量，每个需求至少包含一个\`#### 场景：\`。
+3. 使用\`## 新增|修改|移除需求\`编写规范增量，每个需求至少包含一个\`#### 场景：\`。
 4. 运行\`openspec-cn validate <id> --strict\`并在分享提案前解决任何问题。
 
 ### 阶段 2：实施变更
@@ -176,7 +176,7 @@ openspec/
 
 3. **创建规范增量：** \`specs/[capability]/spec.md\`
 \`\`\`markdown
-## ADDED Requirements
+## 新增需求
 ### 需求：新功能
 系统应提供...
 
@@ -184,11 +184,11 @@ openspec/
 - **当** 用户执行操作
 - **则** 预期结果
 
-## MODIFIED Requirements
+## 修改需求
 ### 需求：现有功能
 [完整的修改后需求]
 
-## REMOVED Requirements
+## 移除需求
 ### 需求：旧功能
 **原因**：[为什么移除]
 **迁移**：[如何处理]
@@ -259,29 +259,29 @@ openspec/
 
 ### 增量操作
 
-- \`## ADDED Requirements\` - 新功能
-- \`## MODIFIED Requirements\` - 变更行为
-- \`## REMOVED Requirements\` - 弃用功能
-- \`## RENAMED Requirements\` - 名称变更
+- \`## 新增需求\` - 新功能
+- \`## 修改需求\` - 变更行为
+- \`## 移除需求\` - 弃用功能
+- \`## 重命名需求\` - 名称变更
 
 使用\`trim(header)\`匹配标题 - 忽略空格。
 
-#### 何时使用ADDED vs MODIFIED
-- ADDED：引入可以独立作为需求的新功能或子功能。当变更正交时（例如添加"斜杠命令配置"）而不是改变现有需求的语义时，优先使用ADDED。
-- MODIFIED：更改现有需求的行为、范围或接受标准。始终粘贴完整、更新的需求内容（标题 + 所有场景）。归档器将用您在此提供的内容替换整个需求；部分增量将丢失以前的详细信息。
-- RENAMED：仅当名称更改时使用。如果同时更改行为，请使用RENAMED（名称）加上MODIFIED（内容）引用新名称。
+#### 何时使用新增 vs 修改
+- 新增：引入可以独立作为需求的新功能或子功能。当变更正交时（例如添加"斜杠命令配置"）而不是改变现有需求的语义时，优先使用新增。
+- 修改：更改现有需求的行为、范围或接受标准。始终粘贴完整、更新的需求内容（标题 + 所有场景）。归档器将用您在此提供的内容替换整个需求；部分增量将丢失以前的详细信息。
+- 重命名：仅当名称更改时使用。如果同时更改行为，请使用重命名（名称）加上修改（内容）引用新名称。
 
-常见陷阱：使用MODIFIED添加新关注点而不包含先前文本。这会导致归档时丢失详细信息。如果您没有明确更改现有需求，请在ADDED下添加新需求。
+常见陷阱：使用修改添加新关注点而不包含先前文本。这会导致归档时丢失详细信息。如果您没有明确更改现有需求，请在新增下添加新需求。
 
-正确编写MODIFIED需求：
+正确编写修改需求：
 1) 在\`openspec/specs/<capability>/spec.md\`中找到现有需求。
 2) 复制整个需求块（从\`### 需求：...\`到其场景）。
-3) 粘贴到\`## MODIFIED Requirements\`下并编辑以反映新行为。
+3) 粘贴到\`## 修改需求\`下并编辑以反映新行为。
 4) 确保标题文本完全匹配（空格不敏感）并保持至少一个\`#### 场景：\`。
 
-RENAMED示例：
+重命名示例：
 \`\`\`markdown
-## RENAMED Requirements
+## 重命名需求
 - FROM: \`### 需求：登录\`
 - TO: \`### 需求：用户认证\`
 \`\`\`
@@ -292,7 +292,7 @@ RENAMED示例：
 
 **"变更必须至少有一个增量"**
 - 检查\`changes/[name]/specs/\`是否存在.md文件
-- 验证文件具有操作前缀（## ADDED Requirements）
+- 验证文件具有操作前缀（## 新增需求）
 
 **"需求必须至少有一个场景"**
 - 检查场景使用\`#### 场景：\`格式（4个井号）
@@ -333,7 +333,7 @@ printf "## 1. 实施\\n- [ ] 1.1 ...\\n" > openspec/changes/$CHANGE/tasks.md
 
 # 3) 添加增量（示例）
 cat > openspec/changes/$CHANGE/specs/auth/spec.md << 'EOF'
-## ADDED Requirements
+## 新增需求
 ### 需求：双因素认证
 用户必须在登录时提供第二个因素。
 
@@ -354,21 +354,21 @@ openspec/changes/add-2fa-notify/
 ├── tasks.md
 └── specs/
     ├── auth/
-    │   └── spec.md   # ADDED: 双因素认证
+    │   └── spec.md   # 新增：双因素认证
     └── notifications/
-        └── spec.md   # ADDED: OTP邮件通知
+        └── spec.md   # 新增：OTP邮件通知
 \`\`\`
 
 auth/spec.md
 \`\`\`markdown
-## ADDED Requirements
+## 新增需求
 ### 需求：双因素认证
 ...
 \`\`\`
 
 notifications/spec.md
 \`\`\`markdown
-## ADDED Requirements
+## 新增需求
 ### 需求：OTP邮件通知
 ...
 \`\`\`

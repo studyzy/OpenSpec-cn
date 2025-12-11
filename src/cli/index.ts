@@ -51,7 +51,7 @@ program
       try {
         const stats = await fs.stat(resolvedPath);
         if (!stats.isDirectory()) {
-          throw new Error(`Path "${targetPath}" is not a directory`);
+          throw new Error(`路径 "${targetPath}" 不是一个目录`);
         }
       } catch (error: any) {
         if (error.code === 'ENOENT') {
@@ -60,7 +60,7 @@ program
         } else if (error.message && error.message.includes('not a directory')) {
           throw error;
         } else {
-          throw new Error(`Cannot access path "${targetPath}": ${error.message}`);
+          throw new Error(`无法访问路径 "${targetPath}": ${error.message}`);
         }
       }
       
