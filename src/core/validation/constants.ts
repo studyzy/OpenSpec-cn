@@ -16,7 +16,7 @@ export const VALIDATION_MESSAGES = {
   // Required content
   SCENARIO_EMPTY: '场景文本不能为空',
   REQUIREMENT_EMPTY: '需求文本不能为空',
-  REQUIREMENT_NO_SHALL: '需求必须包含SHALL或MUST关键字',
+  REQUIREMENT_NO_SHALL: '需求必须包含 SHALL、MUST、必须或禁止关键字',
   REQUIREMENT_NO_SCENARIOS: '需求必须至少有一个场景',
   SPEC_NAME_EMPTY: '规范名称不能为空',
   SPEC_PURPOSE_EMPTY: '目的部分不能为空',

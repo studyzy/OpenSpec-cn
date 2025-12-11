@@ -9,7 +9,7 @@ export const RequirementSchema = z.object({
   text: z.string()
     .min(1, VALIDATION_MESSAGES.REQUIREMENT_EMPTY)
     .refine(
-      (text) => text.includes('SHALL') || text.includes('MUST'),
+      (text) => /\b(SHALL|MUST|必须|禁止)\b/.test(text) || /(?:必须|禁止)/.test(text),
       VALIDATION_MESSAGES.REQUIREMENT_NO_SHALL
     ),
   scenarios: z.array(ScenarioSchema)

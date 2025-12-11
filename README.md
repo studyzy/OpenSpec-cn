@@ -26,7 +26,14 @@
   关注 <a href="https://x.com/0xTab">X平台上的@0xTab</a> 获取最新动态 · 加入 <a href="https://discord.gg/YctCnvvshC">OpenSpec Discord社区</a> 获取帮助和解答疑问
 </p>
 
-# OpenSpec
+# OpenSpec 简体中文版
+
+> **注意：** 这是 OpenSpec 的简体中文本地化版本。所有命令输出、错误信息、模板和提示均已翻译为简体中文。
+> 
+> - 📦 包名：`@studyzy/openspec-cn`
+> - 🔧 命令：`openspec-cn` (取代原版的 `openspec`)
+> - 🌐 原版英文项目：[Fission-AI/OpenSpec](https://github.com/Fission-AI/OpenSpec)
+> - 📝 本项目地址：[studyzy/OpenSpec-cn](https://github.com/studyzy/OpenSpec-cn)
 
 OpenSpec 通过规范驱动开发，让人工智能编程助手与人类开发者在对需求达成共识后再开始编码工作。**无需API密钥即可使用。**
 
@@ -40,7 +47,7 @@ AI编程助手虽然功能强大，但当需求仅存在于聊天记录中时，
 - 共享可见性，清晰了解哪些内容处于提案、活跃或归档状态
 - 兼容您已使用的AI工具：支持自定义斜杠命令，其他场景使用上下文规则
 
-## OpenSpec 与其他方案对比（概览）
+## OpenSpec 与其他方案对比 (概览)
 
 - **轻量级**：简单的工作流程，无需API密钥，最小化设置
 - **面向存量项目优先**：在0→1之外同样表现优异。OpenSpec将真实来源与提案分离：`openspec/specs/`（当前真实状态）和 `openspec/changes/`（提案更新）。这使得跨功能的差异明确且可管理
@@ -52,27 +59,28 @@ AI编程助手虽然功能强大，但当需求仅存在于聊天记录中时，
 ## 工作原理
 
 ```
-┌────────────────────┐
-│ 起草变更提案        │
-└────────┬───────────┘
-         │ 与AI共享意图
-         ▼
-┌────────────────────┐
-│ 审查与对齐          │
-│ (编辑规范/任务)     │◀──── 反馈循环 ──────┐
-└────────┬───────────┘                          │
-         │ 批准计划                            │
-         ▼                                      │
-┌────────────────────┐                          │
-│ 实施任务            │──────────────────────────┘
-│ (AI编写代码)        │
-└────────┬───────────┘
-         │ 交付变更
-         ▼
-┌────────────────────┐
-│ 归档与更新          │
-│ 规范（真实来源）    │
-└────────────────────┘
+┌────────────────────────┐
+│ 起草变更提案            │
+└────────────┬───────────┘
+             │ 与AI共享意图
+             ▼
+┌────────────────────────┐
+│ 审查与对齐              │
+│ (编辑规范/任务)         │◀──── 反馈循环 ──────┐
+└────────────┬───────────┘                          │
+             │ 批准计划                            │
+             ▼                                      │
+┌────────────────────────┐                          │
+│ 实施任务                │──────────────────────────┘
+│ (AI编写代码)            │
+└────────────┬───────────┘
+             │ 交付变更
+             ▼
+┌────────────────────────┐
+│ 归档与更新              │
+│ 规范（真实来源）        │
+└────────────────────────┘
+```
 
 1. 起草包含所需规范更新的变更提案
 2. 与AI助手一起审查提案，直到各方达成共识
@@ -134,12 +142,12 @@ Kilo Code会自动发现团队工作流。将生成的文件保存在 `.kilocode
 #### 步骤1：全局安装CLI
 
 ```bash
-npm install -g @fission-ai/openspec@latest
+npm install -g @studyzy/openspec-cn@latest
 ```
 
 验证安装：
 ```bash
-openspec --version
+openspec-cn --version
 ```
 
 #### 步骤2：在项目中初始化OpenSpec
@@ -151,7 +159,7 @@ cd my-project
 
 运行初始化：
 ```bash
-openspec init
+openspec-cn init
 ```
 
 **初始化过程中会发生什么：**
@@ -161,12 +169,12 @@ openspec init
 
 **设置完成后：**
 - 主要AI工具可以触发 `/openspec` 工作流，无需额外配置
-- 运行 `openspec list` 来验证设置并查看任何活跃的变更
+- 运行 `openspec-cn list` 来验证设置并查看任何活跃的变更
 - 如果您的编程助手没有立即显示新的斜杠命令，请重新启动它。斜杠命令在启动时加载，因此重新启动可确保它们出现
 
 ### 可选：填充项目上下文
 
-`openspec init` 完成后，您将收到一个建议提示，帮助填充项目上下文：
+`openspec-cn init` 完成后，您将收到一个建议提示，帮助填充项目上下文：
 
 ```text
 填充您的项目上下文：
@@ -174,6 +182,30 @@ openspec init
 ```
 
 使用 `openspec/project.md` 来定义项目级别的约定、标准、架构模式以及其他应在所有变更中遵循的指南。
+
+### 简体中文版特点
+
+本中文版提供完整的简体中文体验：
+
+**已汉化内容：**
+- ✅ 所有CLI命令的输出和提示信息
+- ✅ 错误消息和警告
+- ✅ 所有AI工具的斜杠命令模板（proposal、apply、archive）
+- ✅ AGENTS.md 和 project.md 模板
+- ✅ 交互式提示和确认消息
+- ✅ 帮助文档和使用说明
+
+**命令对比：**
+| 功能 | 英文版 | 中文版 |
+|------|--------|--------|
+| 包名 | `@fission-ai/openspec` | `@studyzy/openspec-cn` |
+| 命令 | `openspec` | `openspec-cn` |
+| 列出变更 | `openspec list` | `openspec-cn list` |
+| 初始化 | `openspec init` | `openspec-cn init` |
+| 验证 | `openspec validate` | `openspec-cn validate` |
+
+**兼容性：**
+所有生成的文件结构、规范格式和工作流程与英文版完全兼容。您可以在团队中混合使用两个版本，只需根据个人偏好选择命令即可。
 
 ### 创建您的第一个变更
 
@@ -194,9 +226,9 @@ AI: 我将为配置文件筛选器创建OpenSpec变更提案。
 检查变更是否正确创建并审查提案：
 
 ```bash
-$ openspec list                             # 确认变更文件夹存在
-$ openspec validate add-profile-filters     # 验证规范格式
-$ openspec show add-profile-filters         # 审查提案、任务和规范增量
+$ openspec-cn list                             # 确认变更文件夹存在
+$ openspec-cn validate add-profile-filters     # 验证规范格式
+$ openspec-cn show add-profile-filters         # 审查提案、任务和规范增量
 ```
 
 #### 3. 完善规范
@@ -231,13 +263,13 @@ AI:  所有任务已完成。实施已准备就绪。
      (斜杠命令工具的快捷方式: /openspec:archive add-profile-filters)
 
 AI: 我将归档 add-profile-filters 变更。
-    *运行: openspec archive add-profile-filters --yes*
+    *运行: openspec-cn archive add-profile-filters --yes*
      ✓ 变更成功归档。规范已更新。准备下一个功能！
 ```
 
 或者在终端中自己运行命令：
 ```bash
-$ openspec archive add-profile-filters --yes  # 无提示归档已完成的变更
+$ openspec-cn archive add-profile-filters --yes  # 无提示归档已完成的变更
 ```
 
 **注意：** 具有原生斜杠命令的工具（Claude Code、CodeBuddy、Cursor、Codex、Qoder、RooCode）可以使用显示的快捷方式。所有其他工具都通过自然语言请求工作，如"创建OpenSpec提案"、"应用OpenSpec变更"或"归档变更"。
@@ -245,11 +277,11 @@ $ openspec archive add-profile-filters --yes  # 无提示归档已完成的变�
 ## 命令参考
 
 ```bash
-openspec list               # 查看活跃的变更文件夹
-openspec view               # 规范和变更的交互式仪表板
-openspec show <变更名称>     # 显示变更详情（提案、任务、规范更新）
-openspec validate <变更名称> # 检查规范格式和结构
-openspec archive <变更名称> [--yes|-y]   # 将完成的变更移动到archive/（使用--yes为非交互式）
+openspec-cn list               # 查看活跃的变更文件夹
+openspec-cn view               # 规范和变更的交互式仪表板
+openspec-cn show <变更名称>     # 显示变更详情（提案、任务、规范更新）
+openspec-cn validate <变更名称> # 检查规范格式和结构
+openspec-cn archive <变更名称> [--yes|-y]   # 将完成的变更移动到archive/（使用--yes为非交互式）
 ```
 
 ## 示例：AI如何创建OpenSpec文件
@@ -280,10 +312,10 @@ openspec/
 认证和会话管理。
 
 ## 需求
-### 需求：用户认证
+### 需求: 用户认证
 系统应在成功登录时签发JWT。
 
-#### 场景：有效凭据
+#### 场景: 有效凭据
 - 当用户提交有效凭据时
 - 则应返回JWT
 ```
@@ -294,10 +326,10 @@ openspec/
 # 认证增量
 
 ## 新增需求
-### 需求：双因素认证
+### 需求: 双因素认证
 系统必须在登录期间要求第二个因素。
 
-#### 场景：需要OTP
+#### 场景: 需要OTP
 - 当用户提交有效凭据时
 - 则需要OTP挑战
 ```
@@ -332,11 +364,11 @@ openspec/
 - **`## 移除的需求`** - 弃用的功能
 
 **格式要求：**
-- 使用 `### 需求：<名称>` 作为标题
-- 每个需求至少需要一个 `#### 场景：` 块
+- 使用 `### 需求: <名称>` 作为标题
+- 每个需求至少需要一个 `#### 场景:` 块
 - 在需求文本中使用SHALL/MUST
 
-## OpenSpec与其他方案对比
+## How OpenSpec Compares（OpenSpec与其他方案对比）
 
 ### 对比 spec-kit
 OpenSpec的双文件夹模型（`openspec/specs/` 用于当前真实状态，`openspec/changes/` 用于提案更新）将状态和差异分开。当您修改现有功能或涉及多个规范时，这种模型具有良好的扩展性。spec-kit在全新项目/0→1方面表现出色，但在跨规范更新和演进功能方面提供的结构较少。
@@ -349,12 +381,12 @@ OpenSpec将每个功能的变更分组到一个文件夹中（`openspec/changes/
 
 ## 团队采用
 
-1. **初始化OpenSpec** – 在您的仓库中运行 `openspec init`。
+1. **初始化OpenSpec** – 在您的仓库中运行 `openspec-cn init`。
 2. **从新功能开始** – 要求您的AI将即将进行的工作捕获为变更提案。
 3. **逐步增长** – 每个变更都会归档到记录您系统的活跃规范中。
 4. **保持灵活性** – 不同的团队成员可以使用Claude Code、CodeBuddy、Cursor或任何AGENTS.md兼容的工具，同时共享相同的规范。
 
-每当有人切换工具时，运行 `openspec update`，以便您的代理获取最新的指令和斜杠命令绑定。
+每当有人切换工具时，运行 `openspec-cn update`，以便您的代理获取最新的指令和斜杠命令绑定。
 
 ## 更新OpenSpec
 
@@ -363,7 +395,7 @@ OpenSpec将每个功能的变更分组到一个文件夹中（`openspec/changes/
    npm install -g @fission-ai/openspec@latest
    ```
 2. **刷新代理指令**
-   - 在每个项目中运行 `openspec update`，重新生成AI指导并确保最新的斜杠命令处于活动状态。
+   - 在每个项目中运行 `openspec-cn update`，重新生成AI指导并确保最新的斜杠命令处于活动状态。
 
 ## 贡献
 

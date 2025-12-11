@@ -13,7 +13,7 @@ export class UpdateCommand {
 
     // 1. Check openspec directory exists
     if (!await FileSystemUtils.directoryExists(openspecPath)) {
-      throw new Error(`未找到OpenSpec目录。请先运行 'openspec init'。`);
+      throw new Error(`未找到OpenSpec目录。请先运行 'openspec-cn init'。`);
     }
 
     // 2. Update AGENTS.md (full replacement)

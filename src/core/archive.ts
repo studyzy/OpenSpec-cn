@@ -32,7 +32,7 @@ export class ArchiveCommand {
     try {
       await fs.access(changesDir);
     } catch {
-      throw new Error("未找到OpenSpec更改目录。请先运行 'openspec init'。");
+      throw new Error("未找到OpenSpec更改目录。请先运行 'openspec-cn init'。");
     }
 
     // Get change name interactively if not provided
@@ -479,7 +479,8 @@ export class ArchiveCommand {
         );
       }
       const block = nameToBlock.get(from)!;
-      const newHeader = `### Requirement: ${to}`;
+      // Preserve the original header style (Requirement vs 需求) if possible, but default to consistent new header
+      const newHeader = block.headerLine.includes('需求') ? `### 需求: ${to}` : `### Requirement: ${to}`;
       const rawLines = block.raw.split('\n');
       rawLines[0] = newHeader;
       const renamedBlock: RequirementBlock = {
@@ -511,7 +512,8 @@ export class ArchiveCommand {
         );
       }
       // Replace block with provided raw (ensure header line matches key)
-      const modHeaderMatch = mod.raw.split('\n')[0].match(/^###\s*Requirement:\s*(.+)\s*$/);
+      const REQUIREMENT_KEYWORD_PATTERN = '(?:Requirement|需求)';
+      const modHeaderMatch = mod.raw.split('\n')[0].match(new RegExp(`^###\\s*${REQUIREMENT_KEYWORD_PATTERN}:\\s*(.+)\\s*$`));
       if (!modHeaderMatch || normalizeRequirementName(modHeaderMatch[1]) !== key) {
         throw new Error(
           `${specName} MODIFIED failed for header "### Requirement: ${mod.name}" - header mismatch in content`

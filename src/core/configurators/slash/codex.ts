@@ -25,20 +25,20 @@ export class CodexSlashCommandConfigurator extends SlashCommandConfigurator {
     // plus $ARGUMENTS to capture all arguments as a single string.
     const frontmatter: Record<SlashCommandId, string> = {
       proposal: `---
-description: Scaffold a new OpenSpec change and validate strictly.
-argument-hint: request or feature description
+description: 搭建新的OpenSpec变更提案并进行严格验证。
+argument-hint: 请求或功能描述
 ---
 
 $ARGUMENTS`,
       apply: `---
-description: Implement an approved OpenSpec change and keep tasks in sync.
-argument-hint: change-id
+description: 实施已批准的OpenSpec变更并保持任务同步。
+argument-hint: 变更ID
 ---
 
 $ARGUMENTS`,
       archive: `---
-description: Archive a deployed OpenSpec change and update specs.
-argument-hint: change-id
+description: 归档已部署的OpenSpec变更并更新规范。
+argument-hint: 变更ID
 ---
 
 $ARGUMENTS`,

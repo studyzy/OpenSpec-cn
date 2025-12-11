@@ -12,19 +12,19 @@ const FRONTMATTER: Record<SlashCommandId, string> = {
 name: /openspec-proposal
 id: openspec-proposal
 category: OpenSpec
-description: Scaffold a new OpenSpec change and validate strictly.
+description: 搭建新的OpenSpec变更提案并进行严格验证。
 ---`,
   apply: `---
 name: /openspec-apply
 id: openspec-apply
 category: OpenSpec
-description: Implement an approved OpenSpec change and keep tasks in sync.
+description: 实施已批准的OpenSpec变更并保持任务同步。
 ---`,
   archive: `---
 name: /openspec-archive
 id: openspec-archive
 category: OpenSpec
-description: Archive a deployed OpenSpec change and update specs.
+description: 归档已部署的OpenSpec变更并更新规范。
 ---`
 };
 

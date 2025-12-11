@@ -68,7 +68,7 @@ describe('ChangeCommand.list', () => {
       await cmd.list({ long: true });
       const longOut = logs.join('\n');
       expect(longOut).toMatch(/:\s/);
-      expect(longOut).toMatch(/\[deltas\s\d+\]/);
+      expect(longOut).toMatch(/\[增量\s\d+\]/);
     } finally {
       console.log = origLog;
     }

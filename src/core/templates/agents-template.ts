@@ -8,7 +8,7 @@ AI编程助手使用OpenSpec进行规范驱动开发的说明文档。
 - 确定范围：新功能 vs 修改现有功能
 - 选择唯一\`change-id\`：短横线命名法，动词开头（\`add-\`，\`update-\`，\`remove-\`，\`refactor-\`）
 - 创建骨架：\`proposal.md\`，\`tasks.md\`，\`design.md\`（仅当需要时），以及受影响功能的增量规范
-- 编写增量：使用\`## ADDED|MODIFIED|REMOVED|RENAMED Requirements\`；每个需求至少包含一个\`#### Scenario:\`
+- 编写增量：使用\`## ADDED|MODIFIED|REMOVED|RENAMED Requirements\`；每个需求至少包含一个\`#### 场景：\`
 - 验证：\`openspec-cn validate [change-id] --strict\`并修复问题
 - 请求批准：在提案获得批准前不要开始实施
 
@@ -43,7 +43,7 @@ AI编程助手使用OpenSpec进行规范驱动开发的说明文档。
 **工作流**
 1. 查看\`openspec/project.md\`，\`openspec-cn list\`和\`openspec-cn list --specs\`以了解当前上下文。
 2. 选择唯一的动词开头\`change-id\`并在\`openspec/changes/<id>/\`下创建\`proposal.md\`、\`tasks.md\`、可选的\`design.md\`，以及在\`openspec/changes/<id>/\`下的规范增量。
-3. 使用\`## ADDED|MODIFIED|REMOVED Requirements\`编写规范增量，每个需求至少包含一个\`#### Scenario:\`。
+3. 使用\`## ADDED|MODIFIED|REMOVED Requirements\`编写规范增量，每个需求至少包含一个\`#### 场景：\`。
 4. 运行\`openspec-cn validate <id> --strict\`并在分享提案前解决任何问题。
 
 ### 阶段 2：实施变更
@@ -84,7 +84,7 @@ AI编程助手使用OpenSpec进行规范驱动开发的说明文档。
 - 显示详情：
   - 规范：\`openspec-cn show <spec-id> --type spec\`（使用\`--json\`进行过滤）
   - 变更：\`openspec-cn show <change-id> --json --deltas-only\`
-- 全文搜索（使用ripgrep）：\`rg -n "Requirement:|Scenario:" openspec/specs\`
+- 全文搜索（使用ripgrep）：\`rg -n "Requirement:|Scenario:|需求:|场景:" openspec/specs\`
 
 ## 快速开始
 
@@ -255,7 +255,7 @@ openspec/
 每个需求必须至少有一个场景。
 
 ### 需求措辞
-- 使用SHALL/MUST表示规范要求（除非有意为非规范，避免使用should/may）
+- 使用必须/禁止（或SHALL/MUST）表示规范要求（除非有意为非规范，避免使用should/may）
 
 ### 增量操作
 
@@ -322,8 +322,8 @@ openspec-cn show [spec] --json -r 1
 openspec-cn spec list --long
 openspec-cn list
 # 可选全文搜索：
-# rg -n "Requirement:|Scenario:" openspec/specs
-# rg -n "^#|Requirement:" openspec/changes
+# rg -n "Requirement:|Scenario:|需求:|场景:" openspec/specs
+# rg -n "^#|Requirement:|需求:" openspec/changes
 
 # 2) 选择变更id并创建骨架
 CHANGE=add-two-factor-auth

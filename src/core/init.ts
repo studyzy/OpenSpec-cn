@@ -290,7 +290,7 @@ const toolSelectionWizard = createPrompt<string[], ToolWizardConfig>(
 
     const stepIndex = step === 'intro' ? 1 : step === 'select' ? 2 : 3;
     const lines: string[] = [];
-    lines.push(PALETTE.midGray(`Step ${stepIndex}/${totalSteps}`));
+    lines.push(PALETTE.midGray(`步骤 ${stepIndex}/${totalSteps}`));
     lines.push('');
 
     if (step === 'intro') {
@@ -858,7 +858,7 @@ export class InitCommand {
     console.log();
     console.log(
       PALETTE.midGray(
-        '使用 `openspec update` 在未来刷新共享的OpenSpec指令。'
+        '使用 `openspec-cn update` 在未来刷新共享的OpenSpec指令。'
       )
     );
 

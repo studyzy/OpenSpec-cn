@@ -19,9 +19,11 @@ const require = createRequire(import.meta.url);
 const { version } = require('../../package.json');
 
 program
-  .name('openspec')
+  .name('openspec-cn')
   .description('基于规范驱动开发的AI原生系统')
-  .version(version);
+  .version(version, '-V, --version', '输出版本号')
+  .helpOption('-h, --help', '显示命令帮助')
+  .addHelpCommand('help [command]', '显示命令帮助');
 
 // Global options
 program.option('--no-color', '禁用彩色输出');
@@ -126,16 +128,16 @@ const changeCmd = program
 
 // Deprecation notice for noun-based commands
 changeCmd.hook('preAction', () => {
-  console.error('警告："openspec change ..." 命令已弃用。请优先使用动词开头的命令（例如 "openspec list", "openspec validate --changes"）。');
+  console.error('警告："openspec-cn change ..." 命令已弃用。请优先使用动词开头的命令（例如 "openspec-cn list", "openspec-cn validate --changes"）。');
 });
 
 changeCmd
   .command('show [change-name]')
   .description('以JSON或markdown格式显示变更提案')
-  .option('--json', 'Output as JSON')
-  .option('--deltas-only', 'Show only deltas (JSON only)')
-  .option('--requirements-only', 'Alias for --deltas-only (deprecated)')
-  .option('--no-interactive', 'Disable interactive prompts')
+  .option('--json', '以JSON格式输出')
+  .option('--deltas-only', '仅显示增量 (仅JSON)')
+  .option('--requirements-only', 'deltas-only 的别名 (已弃用)')
+  .option('--no-interactive', '禁用交互式提示')
   .action(async (changeName?: string, options?: { json?: boolean; requirementsOnly?: boolean; deltasOnly?: boolean; noInteractive?: boolean }) => {
     try {
       const changeCommand = new ChangeCommand();
@@ -148,12 +150,12 @@ changeCmd
 
 changeCmd
   .command('list')
-  .description('列出所有活动更改（已弃用：请使用 "openspec list"）')
-  .option('--json', 'Output as JSON')
-  .option('--long', 'Show id and title with counts')
+  .description('列出所有活动更改（已弃用：请使用 "openspec-cn list"）')
+  .option('--json', '以JSON格式输出')
+  .option('--long', '显示ID、标题和计数')
   .action(async (options?: { json?: boolean; long?: boolean }) => {
     try {
-      console.error('警告："openspec change list" 已弃用。请使用 "openspec list"。');
+      console.error('警告："openspec change list" 已弃用。请使用 "openspec-cn list"。');
       const changeCommand = new ChangeCommand();
       await changeCommand.list(options);
     } catch (error) {
@@ -165,9 +167,9 @@ changeCmd
 changeCmd
   .command('validate [change-name]')
   .description('验证变更提案')
-  .option('--strict', 'Enable strict validation mode')
-  .option('--json', 'Output validation report as JSON')
-  .option('--no-interactive', 'Disable interactive prompts')
+  .option('--strict', '启用严格验证模式')
+  .option('--json', '以JSON格式输出验证报告')
+  .option('--no-interactive', '禁用交互式提示')
   .action(async (changeName?: string, options?: { strict?: boolean; json?: boolean; noInteractive?: boolean }) => {
     try {
       const changeCommand = new ChangeCommand();
@@ -208,10 +210,10 @@ program
   .option('--changes', '验证所有更改')
   .option('--specs', '验证所有规范')
   .option('--type <type>', '当项目类型不明确时指定类型：change|spec')
-  .option('--strict', 'Enable strict validation mode')
-  .option('--json', 'Output validation results as JSON')
-  .option('--concurrency <n>', 'Max concurrent validations (defaults to env OPENSPEC_CONCURRENCY or 6)')
-  .option('--no-interactive', 'Disable interactive prompts')
+  .option('--strict', '启用严格验证模式')
+  .option('--json', '以JSON格式输出验证报告')
+  .option('--concurrency <n>', '最大并发验证数 (默认为环境变量 OPENSPEC_CONCURRENCY 或 6)')
+  .option('--no-interactive', '禁用交互式提示')
   .action(async (itemName?: string, options?: { all?: boolean; changes?: boolean; specs?: boolean; type?: string; strict?: boolean; json?: boolean; noInteractive?: boolean; concurrency?: string }) => {
     try {
       const validateCommand = new ValidateCommand();
@@ -227,16 +229,16 @@ program
 program
   .command('show [item-name]')
   .description('显示更改或规范')
-  .option('--json', 'Output as JSON')
+  .option('--json', '以JSON格式输出')
   .option('--type <type>', '当项目类型不明确时指定类型：change|spec')
-  .option('--no-interactive', 'Disable interactive prompts')
+  .option('--no-interactive', '禁用交互式提示')
   // change-only flags
-  .option('--deltas-only', 'Show only deltas (JSON only, change)')
-  .option('--requirements-only', 'Alias for --deltas-only (deprecated, change)')
+  .option('--deltas-only', '仅显示增量 (仅JSON, 更改)')
+  .option('--requirements-only', 'deltas-only 的别名 (已弃用, 更改)')
   // spec-only flags
-  .option('--requirements', 'JSON only: Show only requirements (exclude scenarios)')
-  .option('--no-scenarios', 'JSON only: Exclude scenario content')
-  .option('-r, --requirement <id>', 'JSON only: Show specific requirement by ID (1-based)')
+  .option('--requirements', '仅JSON: 仅显示需求 (排除场景)')
+  .option('--no-scenarios', '仅JSON: 排除场景内容')
+  .option('-r, --requirement <id>', '仅JSON: 按ID显示特定需求 (从1开始)')
   // allow unknown options to pass-through to underlying command implementation
   .allowUnknownOption(true)
   .action(async (itemName?: string, options?: { json?: boolean; type?: string; noInteractive?: boolean; [k: string]: any }) => {
