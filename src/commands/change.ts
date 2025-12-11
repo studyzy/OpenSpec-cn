@@ -282,10 +282,10 @@ export class ChangeCommand {
 
   private printNextSteps(): void {
     const bullets: string[] = [];
-    bullets.push('- Ensure change has deltas in specs/: use headers ## ADDED/MODIFIED/REMOVED/RENAMED Requirements');
-    bullets.push('- Each requirement MUST include at least one #### Scenario: block');
-    bullets.push('- Debug parsed deltas: openspec change show <id> --json --deltas-only');
-    console.error('Next steps:');
+    bullets.push('- 确保变更在specs/中有增量：使用标题## ADDED/MODIFIED/REMOVED/RENAMED Requirements');
+    bullets.push('- 每个需求必须至少包含一个#### 场景：块');
+    bullets.push('- 调试解析的增量：openspec-cn change show <id> --json --deltas-only');
+    console.error('后续步骤：');
     bullets.forEach(b => console.error(`  ${b}`));
   }
 }
