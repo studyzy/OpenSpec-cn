@@ -1,10 +1,12 @@
 {
   "name": "@studyzy/openspec-cn",
   "version": "0.16.0",
-  "description": "AI-native system for spec-driven development",
+  "description": "面向AI编程助手的规范驱动开发框架OpenSpec的简体中文汉化版本",
   "keywords": [
     "openspec",
+    "openspec-cn",
     "specs",
+    "sdd",
     "cli",
     "ai",
     "development"
