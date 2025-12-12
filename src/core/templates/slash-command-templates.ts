@@ -14,7 +14,7 @@ const proposalSteps = `**步骤**
 2. 选择唯一的动词开头\`change-id\`并在\`openspec/changes/<id>/\`下创建\`proposal.md\`、\`tasks.md\`和\`design.md\`（需要时）。
 3. 将变更映射为具体功能或需求，将多范围工作分解为具有明确关系和顺序的独立规范增量。
 4. 当解决方案跨越多个系统、引入新模式或在提交规范前需要权衡讨论时，在\`design.md\`中记录架构推理。
-5. 在\`changes/<id>/specs/<capability>/spec.md\`中起草规范增量（每个功能一个文件夹），使用\`## 新增需求|修改需求|移除需求|重命名需求\`，每个需求至少有一个\`#### 场景：\`，并在相关时交叉引用相关功能。
+5. 在\`openspec/changes/<id>/specs/<capability>/spec.md\`中起草规范增量（每个功能一个文件夹），使用\`## 新增需求|修改需求|移除需求|重命名需求\`，每个需求至少有一个\`#### 场景：\`，并在相关时交叉引用相关功能。
 6. 将\`tasks.md\`起草为有序的小型可验证工作项列表，这些项提供用户可见的进展，包括验证（测试、工具），并突出显示依赖关系或可并行工作。
 7. 使用\`openspec-cn validate <id> --strict\`验证并在分享提案前解决每个问题。`;
 
@@ -25,7 +25,7 @@ const proposalReferences = `**参考**
 
 const applySteps = `**步骤**
 将这些步骤作为TODO跟踪并逐一完成。
-1. 阅读\`changes/<id>/proposal.md\`、\`design.md\`（如果存在）和\`tasks.md\`以确认范围和验收标准。
+1. 阅读\`openspec/changes/<id>/proposal.md\`、\`design.md\`（如果存在）和\`tasks.md\`以确认范围和验收标准。
 2. 按顺序完成任务，保持编辑最小化并专注于请求的变更。
 3. 在更新状态前确认完成—确保\`tasks.md\`中的每个项目都已完成。
 4. 所有工作完成后更新清单，使每个任务标记为\`- [x]\`并反映实际情况。
@@ -42,7 +42,7 @@ const archiveSteps = `**步骤**
    - 如果仍然无法识别单个变更ID，停止并告诉用户您还无法归档任何内容。
 2. 通过运行\`openspec-cn list\`（或\`openspec-cn show <id>\`）验证变更ID，如果变更缺失、已归档或尚未准备好归档，则停止。
 3. 运行\`openspec-cn archive <id> --yes\`，以便CLI在没有提示的情况下移动变更并应用规范更新（仅对仅工具工作使用\`--skip-specs\`）。
-4. 查看命令输出以确认目标规范已更新且变更已放入\`changes/archive/\`。
+4. 查看命令输出以确认目标规范已更新且变更已放入\`openspec/changes/archive/\`。
 5. 使用\`openspec-cn validate --strict\`验证，如果出现异常，使用\`openspec-cn show <id>\`检查。`;
 
 const archiveReferences = `**参考**
