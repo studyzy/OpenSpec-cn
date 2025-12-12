@@ -64,12 +64,12 @@ export class ArchiveCommand {
       const validator = new Validator();
       let hasValidationErrors = false;
 
-      // Validate proposal.md (non-blocking unless strict mode desired in future)
+      // Validate proposal.md (非严格，仅供参考)
       const changeFile = path.join(changeDir, 'proposal.md');
       try {
         await fs.access(changeFile);
         const changeReport = await validator.validateChange(changeFile);
-        // Proposal validation is informative only (do not block archive)
+        // Proposal 校验仅提供信息，不阻塞归档
         if (!changeReport.valid) {
           console.log(chalk.yellow(`\nproposal.md中的提案警告（非阻塞）：`));
           for (const issue of changeReport.issues) {
@@ -92,10 +92,11 @@ export class ArchiveCommand {
               const candidatePath = path.join(changeSpecsDir, c.name, 'spec.md');
               await fs.access(candidatePath);
               const content = await fs.readFile(candidatePath, 'utf-8');
-              if (/^##\s+(ADDED|MODIFIED|REMOVED|RENAMED)\s+Requirements/m.test(content)) {
+              if (/^##\s+(新增需求|修改需求|移除需求|重命名需求)\s*$/m.test(content)) {
                 hasDeltaSpecs = true;
                 break;
               }
+
             } catch {}
           }
         }
@@ -359,7 +360,7 @@ export class ArchiveCommand {
       const name = normalizeRequirementName(add.name);
       if (addedNames.has(name)) {
         throw new Error(
-          `${specName} 验证失败 - ADDED 中的重复需求，标题为 "███ Requirement: ${add.name}"`
+          `${specName} 验证失败 - 新增需求中存在重复，标题为 "### 需求： ${add.name}"`
         );
       }
       addedNames.add(name);
@@ -369,7 +370,7 @@ export class ArchiveCommand {
       const name = normalizeRequirementName(mod.name);
       if (modifiedNames.has(name)) {
         throw new Error(
-          `${specName} 验证失败 - MODIFIED 中的重复需求，标题为 "### Requirement: ${mod.name}"`
+          `${specName} 验证失败 - 修改需求中存在重复，标题为 "### 需求： ${mod.name}"`
         );
       }
       modifiedNames.add(name);
@@ -379,7 +380,7 @@ export class ArchiveCommand {
       const name = normalizeRequirementName(rem);
       if (removedNamesSet.has(name)) {
         throw new Error(
-          `${specName} 验证失败 - REMOVED 中的重复需求，标题为 "### Requirement: ${rem}"`
+          `${specName} 验证失败 - 移除需求中存在重复，标题为 "### 需求： ${rem}"`
         );
       }
       removedNamesSet.add(name);
@@ -391,12 +392,12 @@ export class ArchiveCommand {
       const toNorm = normalizeRequirementName(to);
       if (renamedFromSet.has(fromNorm)) {
         throw new Error(
-          `${specName} 验证失败 - RENAMED 中的重复 FROM，标题为 "### Requirement: ${from}"`
+          `${specName} 验证失败 - 重命名需求中 FROM 存在重复，标题为 "### 需求： ${from}"`
         );
       }
       if (renamedToSet.has(toNorm)) {
         throw new Error(
-          `${specName} 验证失败 - RENAMED 中的重复 TO，标题为 "### Requirement: ${to}"`
+          `${specName} 验证失败 - 重命名需求中 TO 存在重复，标题为 "### 需求： ${to}"`
         );
       }
       renamedFromSet.add(fromNorm);
@@ -406,11 +407,11 @@ export class ArchiveCommand {
     // Pre-validate cross-section conflicts
     const conflicts: Array<{ name: string; a: string; b: string }> = [];
     for (const n of modifiedNames) {
-      if (removedNamesSet.has(n)) conflicts.push({ name: n, a: 'MODIFIED', b: 'REMOVED' });
-      if (addedNames.has(n)) conflicts.push({ name: n, a: 'MODIFIED', b: 'ADDED' });
+      if (removedNamesSet.has(n)) conflicts.push({ name: n, a: '修改需求', b: '移除需求' });
+      if (addedNames.has(n)) conflicts.push({ name: n, a: '修改需求', b: '新增需求' });
     }
     for (const n of addedNames) {
-      if (removedNamesSet.has(n)) conflicts.push({ name: n, a: 'ADDED', b: 'REMOVED' });
+      if (removedNamesSet.has(n)) conflicts.push({ name: n, a: '新增需求', b: '移除需求' });
     }
     // Renamed interplay: MODIFIED must reference the NEW header, not FROM
     for (const { from, to } of plan.renamed) {
@@ -418,20 +419,20 @@ export class ArchiveCommand {
       const toNorm = normalizeRequirementName(to);
       if (modifiedNames.has(fromNorm)) {
         throw new Error(
-          `${specName} 验证失败 - 当存在重命名时，MODIFIED 必须引用新标题 "### Requirement: ${to}"`
+          `${specName} 验证失败 - 当存在重命名时，MODIFIED 必须引用新标题 "### 需求： ${to}"`
         );
       }
       // Detect ADDED colliding with a RENAMED TO
       if (addedNames.has(toNorm)) {
         throw new Error(
-          `${specName} 验证失败 - RENAMED TO 标题与 ADDED 冲突，标题为 "### Requirement: ${to}"`
+          `${specName} 验证失败 - 重命名需求的 TO 与新增需求冲突，标题为 "### 需求： ${to}"`
         );
       }
     }
     if (conflicts.length > 0) {
       const c = conflicts[0];
       throw new Error(
-        `${specName} 验证失败 - 需求出现在多个部分中（${c.a} 和 ${c.b}），标题为 "### Requirement: ${c.name}"`
+        `${specName} 验证失败 - 需求出现在多个部分中（${c.a} 和 ${c.b}），标题为 "### 需求： ${c.name}"`
       );
     }
     const hasAnyDelta = (plan.added.length + plan.modified.length + plan.removed.length + plan.renamed.length) > 0;
@@ -470,17 +471,17 @@ export class ArchiveCommand {
       const to = normalizeRequirementName(r.to);
       if (!nameToBlock.has(from)) {
         throw new Error(
-          `${specName} RENAMED 失败，标题 "### Requirement: ${r.from}" - 未找到源`
+          `${specName} 重命名失败，标题 "### 需求： ${r.from}" - 未找到源`
         );
       }
       if (nameToBlock.has(to)) {
         throw new Error(
-          `${specName} RENAMED 失败，标题 "### Requirement: ${r.to}" - 目标已经存在`
+          `${specName} 重命名失败，标题 "### 需求： ${r.to}" - 目标已经存在`
         );
       }
       const block = nameToBlock.get(from)!;
       // Preserve the original header style (Requirement vs 需求) if possible, but default to consistent new header
-      const newHeader = block.headerLine.includes('需求') ? `### 需求: ${to}` : `### Requirement: ${to}`;
+      const newHeader = block.headerLine.includes('需求') ? `### 需求： ${to}` : `### 需求： ${to}`;
       const rawLines = block.raw.split('\n');
       rawLines[0] = newHeader;
       const renamedBlock: RequirementBlock = {
@@ -497,7 +498,7 @@ export class ArchiveCommand {
       const key = normalizeRequirementName(name);
       if (!nameToBlock.has(key)) {
         throw new Error(
-          `${specName} REMOVED 失败，标题 "### Requirement: ${name}" - 未找到`
+          `${specName} 移除失败，标题 "### 需求： ${name}" - 未找到`
         );
       }
       nameToBlock.delete(key);
@@ -508,18 +509,20 @@ export class ArchiveCommand {
       const key = normalizeRequirementName(mod.name);
       if (!nameToBlock.has(key)) {
         throw new Error(
-          `${specName} MODIFIED 失败，标题 "### Requirement: ${mod.name}" - 未找到`
+          `${specName} 修改失败，标题 "### 需求： ${mod.name}" - 未找到`
         );
       }
       // Replace block with provided raw (ensure header line matches key)
       const REQUIREMENT_KEYWORD_PATTERN = '(?:Requirement|需求)';
-      const modHeaderMatch = mod.raw.split('\n')[0].match(new RegExp(`^###\\s*${REQUIREMENT_KEYWORD_PATTERN}:\\s*(.+)\\s*$`));
+      const REQUIREMENT_COLON_PATTERN = '[:：]';
+      const modHeaderMatch = mod.raw.split('\n')[0].match(new RegExp(`^###\\s*${REQUIREMENT_KEYWORD_PATTERN}${REQUIREMENT_COLON_PATTERN}\\s*(.+)\\s*$`));
       if (!modHeaderMatch || normalizeRequirementName(modHeaderMatch[1]) !== key) {
         throw new Error(
-          `${specName} MODIFIED 失败，标题 "### Requirement: ${mod.name}" - 内容中的标题不匹配`
+          `${specName} 修改失败，标题 "### 需求： ${mod.name}" - 内容中的标题不匹配`
         );
       }
       nameToBlock.set(key, mod);
+
     }
 
     // ADDED
@@ -527,7 +530,7 @@ export class ArchiveCommand {
       const key = normalizeRequirementName(add.name);
       if (nameToBlock.has(key)) {
         throw new Error(
-          `${specName} ADDED failed for header "### Requirement: ${add.name}" - already exists`
+          `${specName} 新增失败，标题 "### 需求： ${add.name}" - 已经存在`
         );
       }
       nameToBlock.set(key, add);
@@ -598,7 +601,7 @@ export class ArchiveCommand {
 
   private buildSpecSkeleton(specFolderName: string, changeName: string): string {
     const titleBase = specFolderName;
-    return `# ${titleBase} Specification\n\n## Purpose\nTBD - created by archiving change ${changeName}. Update Purpose after archive.\n\n## Requirements\n`;
+    return `# ${titleBase} Specification\n\n## Purpose\nTBD - created by archiving change ${changeName}. Update Purpose after archive.\n\n## 需求\n`;
   }
 
   private getArchiveDate(): string {

@@ -84,7 +84,7 @@ AI编程助手使用OpenSpec进行规范驱动开发的说明文档。
 - 显示详情：
   - 规范：\`openspec-cn show <spec-id> --type spec\`（使用\`--json\`进行过滤）
   - 变更：\`openspec-cn show <change-id> --json --deltas-only\`
-- 全文搜索（使用ripgrep）：\`rg -n "Requirement:|Scenario:|需求:|场景:" openspec/specs\`
+- 全文搜索（使用ripgrep）：\`rg -n "Requirement:|Scenario:|需求：|场景：" openspec/specs\`
 
 ## 快速开始
 
@@ -322,8 +322,8 @@ openspec-cn show [spec] --json -r 1
 openspec-cn spec list --long
 openspec-cn list
 # 可选全文搜索：
-# rg -n "Requirement:|Scenario:|需求:|场景:" openspec/specs
-# rg -n "^#|Requirement:|需求:" openspec/changes
+# rg -n "Requirement:|Scenario:|需求：|场景：" openspec/specs
+# rg -n "^#|Requirement:|需求：" openspec/changes
 
 # 2) 选择变更id并创建骨架
 CHANGE=add-two-factor-auth

@@ -20,7 +20,7 @@ const proposalSteps = `**步骤**
 
 const proposalReferences = `**参考**
 - 当验证失败时，使用\`openspec-cn show <id> --json --deltas-only\`或\`openspec-cn show <spec> --type spec\`检查详情。
-- 在编写新需求前，使用\`rg -n "需求:|场景:" openspec/specs\`搜索现有需求。
+- 在编写新需求前，使用\`rg -n "需求：|场景：" openspec/specs\`搜索现有需求。
 - 使用\`rg <keyword>\`、\`ls\`或直接文件读取探索代码库，以便提案与当前实现现实保持一致。`;
 
 const applySteps = `**步骤**

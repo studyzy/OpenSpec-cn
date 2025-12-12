@@ -349,7 +349,7 @@ Then result`;
 
 ## 新增需求
 
-### 需求: Circuit Breaker State Management SHALL be implemented
+### 需求： Circuit Breaker State Management SHALL be implemented
 **ID**: REQ-CB-001
 **Priority**: P1 (High)
 
@@ -379,7 +379,7 @@ The system MUST implement a circuit breaker with three states.
 
 ## 新增需求
 
-### 需求: Error Handling
+### 需求： Error Handling
 **ID**: REQ-ERR-001
 **Priority**: P2
 
@@ -409,7 +409,7 @@ The system SHALL handle all errors gracefully.
 
 ## 新增需求
 
-### 需求: Logging Feature
+### 需求： Logging Feature
 **ID**: REQ-LOG-001
 
 The system will log all events.
@@ -439,7 +439,7 @@ The system will log all events.
 
 ## 新增需求
 
-### 需求: Simple Feature
+### 需求： Simple Feature
 The system SHALL implement this feature.
 
 #### Scenario: Basic usage
@@ -466,7 +466,7 @@ The system SHALL implement this feature.
 
 ## 新增需求
 
-### 需求: Mixed Case Handling
+### 需求： Mixed Case Handling
 The system MUST support mixed case delta headers.
 
 #### Scenario: Case insensitive parsing

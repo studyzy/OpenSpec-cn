@@ -1,5 +1,5 @@
 export interface RequirementBlock {
-  headerLine: string; // e.g., '### Requirement: Something' or '### 需求: Something'
+  headerLine: string; // e.g., '### Requirement: Something' or '### 需求： Something'
   name: string; // e.g., 'Something'
   raw: string; // full block including headerLine and following content
 }
@@ -17,13 +17,15 @@ export function normalizeRequirementName(name: string): string {
 }
 
 const REQUIREMENT_KEYWORD_PATTERN = '(?:Requirement|需求)';
-const REQUIREMENT_HEADER_REGEX = new RegExp(`^###\\s*${REQUIREMENT_KEYWORD_PATTERN}:\\s*(.+)\\s*$`);
-const REQUIREMENT_HEADER_PREFIX = new RegExp(`^###\\s+${REQUIREMENT_KEYWORD_PATTERN}:`);
+const REQUIREMENT_COLON_PATTERN = '[:：]';
+const REQUIREMENT_HEADER_REGEX = new RegExp(`^###\\s*${REQUIREMENT_KEYWORD_PATTERN}${REQUIREMENT_COLON_PATTERN}\\s*(.+)\\s*$`);
+const REQUIREMENT_HEADER_PREFIX = new RegExp(`^###\\s+${REQUIREMENT_KEYWORD_PATTERN}${REQUIREMENT_COLON_PATTERN}`);
 
 /**
  * Extracts the Requirements section from a spec file and parses requirement blocks.
  */
 export function extractRequirementsSection(content: string): RequirementsSectionParts {
+
   const normalized = normalizeLineEndings(content);
   const lines = normalized.split('\n');
   const reqHeaderIndex = lines.findIndex(l => /^##\s+需求\s*$/i.test(l));
@@ -218,10 +220,12 @@ function parseRemovedNames(sectionBody: string): string[] {
       continue;
     }
     // Also support bullet list of headers
-    const bullet = line.match(new RegExp(`^\\s*-\\s*\`?###\\s*${REQUIREMENT_KEYWORD_PATTERN}:\\s*(.+?)\`?\\s*$`));
+    const bullet = line.match(new RegExp(`^\\s*-\\s*` +
+      '`?###\\s*' + REQUIREMENT_KEYWORD_PATTERN + REQUIREMENT_COLON_PATTERN + '\\s*(.+?)`?\\s*$'));
     if (bullet) {
       names.push(normalizeRequirementName(bullet[1]));
     }
+
   }
   return names;
 }
@@ -231,9 +235,23 @@ function parseRenamedPairs(sectionBody: string): Array<{ from: string; to: strin
   const pairs: Array<{ from: string; to: string }> = [];
   const lines = normalizeLineEndings(sectionBody).split('\n');
   let current: { from?: string; to?: string } = {};
+
+  const fromRegex = new RegExp(
+    '^\\s*-?\\s*FROM:\\s*`?###\\s*' +
+      REQUIREMENT_KEYWORD_PATTERN +
+      REQUIREMENT_COLON_PATTERN +
+      '\\s*(.+?)`?\\s*$'
+  );
+  const toRegex = new RegExp(
+    '^\\s*-?\\s*TO:\\s*`?###\\s*' +
+      REQUIREMENT_KEYWORD_PATTERN +
+      REQUIREMENT_COLON_PATTERN +
+      '\\s*(.+?)`?\\s*$'
+  );
+
   for (const line of lines) {
-    const fromMatch = line.match(new RegExp(`^\\s*-?\\s*FROM:\\s*\`?###\\s*${REQUIREMENT_KEYWORD_PATTERN}:\\s*(.+?)\`?\\s*$`));
-    const toMatch = line.match(new RegExp(`^\\s*-?\\s*TO:\\s*\`?###\\s*${REQUIREMENT_KEYWORD_PATTERN}:\\s*(.+?)\`?\\s*$`));
+    const fromMatch = line.match(fromRegex);
+    const toMatch = !fromMatch && line.match(toRegex);
     if (fromMatch) {
       current.from = normalizeRequirementName(fromMatch[1]);
     } else if (toMatch) {
@@ -244,5 +262,6 @@ function parseRenamedPairs(sectionBody: string): Array<{ from: string; to: strin
       }
     }
   }
+
   return pairs;
 }

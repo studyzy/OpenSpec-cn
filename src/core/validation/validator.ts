@@ -253,7 +253,7 @@ export class Validator {
       issues.push({
         level: 'ERROR',
         path: specPath,
-        message: `找到了增量部分 ${this.formatSectionList(sections)}，但未解析到任何需求条目。请确保每个部分至少包含一个 "### 需求:" 块（移除需求部分可以使用项目符号列表语法）。`,
+        message: `找到了增量部分 ${this.formatSectionList(sections)}，但未解析到任何需求条目。请确保每个部分至少包含一个 "### 需求：" 块（移除需求部分可以使用项目符号列表语法）。`,
       });
     }
     for (const path of missingHeaderSpecs) {
@@ -444,6 +444,6 @@ export class Validator {
     if (sections.length === 1) return sections[0];
     const head = sections.slice(0, -1);
     const last = sections[sections.length - 1];
-    return `${head.join(', ')} and ${last}`;
+    return `${head.join('、')} 和 ${last}`;
   }
 }
