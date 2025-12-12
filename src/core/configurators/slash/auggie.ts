@@ -10,7 +10,7 @@ const FILE_PATHS: Record<SlashCommandId, string> = {
 const FRONTMATTER: Record<SlashCommandId, string> = {
   proposal: `---
 description: 搭建新的OpenSpec变更提案并进行严格验证。
-argument-hint: 功能描述或请求
+argument-hint: 请求或功能描述
 ---`,
   apply: `---
 description: 实施已批准的OpenSpec变更并保持任务同步。

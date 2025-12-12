@@ -1067,7 +1067,7 @@ describe('InitCommand', () => {
       const proposalContent = await fs.readFile(auggieProposal, 'utf-8');
       expect(proposalContent).toContain('---');
       expect(proposalContent).toContain('description: 搭建新的OpenSpec变更提案并进行严格验证。');
-      expect(proposalContent).toContain('argument-hint: 功能描述或请求');
+      expect(proposalContent).toContain('argument-hint: 请求或功能描述');
       expect(proposalContent).toContain('<!-- OPENSPEC:START -->');
       expect(proposalContent).toContain('**护栏规则**');
 
@@ -1269,7 +1269,7 @@ describe('InitCommand', () => {
       const proposalContent = await fs.readFile(costrictProposal, 'utf-8');
       expect(proposalContent).toContain('---');
       expect(proposalContent).toContain('description: "搭建新的OpenSpec变更提案并进行严格验证。"');
-      expect(proposalContent).toContain('argument-hint: 功能描述或请求');
+      expect(proposalContent).toContain('argument-hint: 请求或功能描述');
       expect(proposalContent).toContain('<!-- OPENSPEC:START -->');
       expect(proposalContent).toContain('**护栏规则**');
 
