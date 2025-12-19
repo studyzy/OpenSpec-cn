@@ -168,7 +168,7 @@ export class ValidateCommand {
   private printNextSteps(type: ItemType): void {
     const bullets: string[] = [];
     if (type === 'change') {
-      bullets.push('- 确保变更在specs/中有增量：使用标题## ADDED/MODIFIED/REMOVED/RENAMED Requirements');
+      bullets.push('- 确保变更在specs/中有增量：使用标题## 新增|修改|移除|重命名需求');
       bullets.push('- 每个需求必须至少包含一个#### 场景：块');
       bullets.push('- 调试解析的增量：openspec-cn change show <id> --json --deltas-only');
     } else {
