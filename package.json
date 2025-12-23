@@ -1,6 +1,6 @@
 {
   "name": "@studyzy/openspec-cn",
-  "version": "0.16.0-1",
+  "version": "0.17.2",
   "description": "面向AI编程助手的规范驱动开发框架OpenSpec的简体中文汉化版本",
   "keywords": [
     "openspec",
@@ -34,11 +34,13 @@
   "files": [
     "dist",
     "bin",
+    "scripts/postinstall.js",
     "!dist/**/*.test.js",
     "!dist/**/__tests__",
     "!dist/**/*.map"
   ],
   "scripts": {
+    "lint": "eslint src/",
     "build": "node build.js",
     "dev": "tsc --watch",
     "dev:cli": "pnpm build && node bin/openspec.js",
@@ -46,8 +48,10 @@
     "test:watch": "vitest",
     "test:ui": "vitest --ui",
     "test:coverage": "vitest --coverage",
+    "test:postinstall": "node scripts/postinstall.js",
     "prepare": "pnpm run build",
     "prepublishOnly": "pnpm run build",
+    "postinstall": "node scripts/postinstall.js",
     "check:pack-version": "node scripts/pack-version-check.mjs",
     "release": "pnpm run release:ci",
     "release:ci": "pnpm run check:pack-version && pnpm exec changeset publish",
@@ -61,7 +65,9 @@
     "@changesets/cli": "^2.27.7",
     "@types/node": "^24.2.0",
     "@vitest/ui": "^3.2.4",
+    "eslint": "^9.39.2",
     "typescript": "^5.9.3",
+    "typescript-eslint": "^8.50.1",
     "vitest": "^3.2.4"
   },
   "dependencies": {

@@ -1,6 +1,5 @@
 import { promises as fs } from 'fs';
 import path from 'path';
-import { select, confirm } from '@inquirer/prompts';
 import { FileSystemUtils } from '../utils/file-system.js';
 import { getTaskProgressForChange, formatTaskStatus } from '../utils/task-progress.js';
 import { Validator } from './validation/validator.js';
@@ -126,6 +125,7 @@ export class ArchiveCommand {
       const timestamp = new Date().toISOString();
       
       if (!options.yes) {
+        const { confirm } = await import('@inquirer/prompts');
         const proceed = await confirm({
           message: chalk.yellow('⚠️  警告：跳过验证可能会归档无效规范。继续吗？(y/N)'),
           default: false
@@ -150,6 +150,7 @@ export class ArchiveCommand {
     const incompleteTasks = Math.max(progress.total - progress.completed, 0);
     if (incompleteTasks > 0) {
       if (!options.yes) {
+        const { confirm } = await import('@inquirer/prompts');
         const proceed = await confirm({
           message: `警告：发现 ${incompleteTasks} 个未完成任务。继续吗？`,
           default: false
@@ -180,6 +181,7 @@ export class ArchiveCommand {
 
         let shouldUpdateSpecs = true;
         if (!options.yes) {
+          const { confirm } = await import('@inquirer/prompts');
           shouldUpdateSpecs = await confirm({
             message: '继续执行规范更新吗？',
             default: true
@@ -257,6 +259,7 @@ export class ArchiveCommand {
   }
 
   private async selectChange(changesDir: string): Promise<string | null> {
+    const { select } = await import('@inquirer/prompts');
     // Get all directories in changes (excluding archive)
     const entries = await fs.readdir(changesDir, { withFileTypes: true });
     const changeDirs = entries
