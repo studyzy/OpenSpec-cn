@@ -38,3 +38,6 @@ release:
 
 test:
 	$(PNPM) test
+
+lint:
+	$(PNPM) lint
