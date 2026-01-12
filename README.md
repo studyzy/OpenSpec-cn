@@ -408,50 +408,50 @@ OpenSpec将每个功能的变更分组到一个文件夹中（`openspec/changes/
 2. **刷新代理指令**
    - 在每个项目中运行 `openspec-cn update`，重新生成AI指导并确保最新的斜杠命令处于活动状态。
 
-## Experimental Features
+## 实验性功能
 
 <details>
-<summary><strong>🧪 OPSX: Fluid, Iterative Workflow</strong> (Claude Code only)</summary>
+<summary><strong>🧪 OPSX: 流畅的迭代式工作流</strong> (仅限 Claude Code)</summary>
 
-**Why this exists:**
-- Standard workflow is locked down — you can't tweak instructions or customize
-- When AI output is bad, you can't improve the prompts yourself
-- Same workflow for everyone, no way to match how your team works
+**为什么需要这个功能：**
+- 标准工作流是固定的——你无法调整指令或自定义
+- 当AI输出不理想时，你无法自己改进提示词
+- 所有人使用相同的工作流，无法匹配你团队的工作方式
 
-**What's different:**
-- **Hackable** — edit templates and schemas yourself, test immediately, no rebuild
-- **Granular** — each artifact has its own instructions, test and tweak individually
-- **Customizable** — define your own workflows, artifacts, and dependencies
-- **Fluid** — no phase gates, update any artifact anytime
+**有什么不同：**
+- **可定制** — 自己编辑模板和架构，立即测试，无需重新构建
+- **细粒度** — 每个工件都有自己的指令，可以单独测试和调整
+- **可自定义** — 定义你自己的工作流、工件和依赖关系
+- **流畅** — 没有阶段门槛，随时更新任何工件
 
 ```
-You can always go back:
+你可以随时回退：
 
   proposal ──→ specs ──→ design ──→ tasks ──→ implement
      ▲           ▲          ▲                    │
      └───────────┴──────────┴────────────────────┘
 ```
 
-| Command | What it does |
-|---------|--------------|
-| `/opsx:new` | Start a new change |
-| `/opsx:continue` | Create the next artifact (based on what's ready) |
-| `/opsx:ff` | Fast-forward (all planning artifacts at once) |
-| `/opsx:apply` | Implement tasks, updating artifacts as needed |
-| `/opsx:archive` | Archive when done |
+| 命令 | 功能说明 |
+|------|----------|
+| `/opsx:new` | 开始一个新变更 |
+| `/opsx:continue` | 创建下一个工件（基于已准备好的内容） |
+| `/opsx:ff` | 快进（一次性完成所有规划工件） |
+| `/opsx:apply` | 实施任务，根据需要更新工件 |
+| `/opsx:archive` | 完成后归档 |
 
-**Setup:** `openspec artifact-experimental-setup`
+**设置：** `openspec artifact-experimental-setup`
 
-[Full documentation →](docs/experimental-workflow.md)
+[完整文档 →](docs/experimental-workflow.md)
 
 </details>
 
 <details>
-<summary><strong>Telemetry</strong> – OpenSpec collects anonymous usage stats (opt-out: <code>OPENSPEC_TELEMETRY=0</code>)</summary>
+<summary><strong>遥测</strong> – OpenSpec收集匿名使用统计（退出：<code>OPENSPEC_TELEMETRY=0</code>）</summary>
 
-We collect only command names and version to understand usage patterns. No arguments, paths, content, or PII. Automatically disabled in CI.
+我们仅收集命令名称和版本以了解使用模式。不收集参数、路径、内容或个人身份信息。在CI环境中自动禁用。
 
-**Opt-out:** `export OPENSPEC_TELEMETRY=0` or `export DO_NOT_TRACK=1`
+**退出方式：** `export OPENSPEC_TELEMETRY=0` 或 `export DO_NOT_TRACK=1`
 
 </details>
 
