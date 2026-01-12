@@ -11,20 +11,17 @@ const FRONTMATTER: Record<SlashCommandId, string> = {
   proposal: `---
 name: OpenSpec: 提案
 description: 搭建新的OpenSpec变更提案并进行严格验证。
-category: OpenSpec
-tags: [openspec, change]
+argument-hint: "[feature description or request]"
 ---`,
   apply: `---
 name: OpenSpec: 实施
 description: 实施已批准的OpenSpec变更并保持任务同步。
-category: OpenSpec
-tags: [openspec, apply]
+argument-hint: "[change-id]"
 ---`,
   archive: `---
 name: OpenSpec: 归档
 description: 归档已部署的OpenSpec变更并更新规范。
-category: OpenSpec
-tags: [openspec, archive]
+argument-hint: "[change-id]"
 ---`
 };
 

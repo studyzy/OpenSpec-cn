@@ -26,6 +26,10 @@
   关注 <a href="https://x.com/0xTab">X平台上的@0xTab</a> 获取最新动态 · 加入 <a href="https://discord.gg/YctCnvvshC">OpenSpec Discord社区</a> 获取帮助和解答疑问
 </p>
 
+<p align="center">
+  <sub>🧪 <strong>New:</strong> <a href="docs/experimental-workflow.md">Experimental Workflow (OPSX)</a> — schema-driven, hackable, fluid. Iterate on workflows without code changes.</sub>
+</p>
+
 # OpenSpec 简体中文版
 
 > **注意：** 这是 OpenSpec 的简体中文本地化版本。所有命令输出、错误信息、模板和提示均已翻译为简体中文。
@@ -105,6 +109,7 @@ AI编程助手虽然功能强大，但当需求仅存在于聊天记录中时，
 | **Cline** | `.clinerules/workflows/` 目录中的工作流 (`.clinerules/workflows/openspec-*.md`) |
 | **CodeBuddy Code (CLI)** | `/openspec:proposal`, `/openspec:apply`, `/openspec:archive` (`.codebuddy/commands/`) — 详见 [文档](https://www.codebuddy.ai/cli) |
 | **Codex** | `/openspec-proposal`, `/openspec-apply`, `/openspec-archive` (全局: `~/.codex/prompts`, 自动安装) |
+| **Continue** | `/openspec-proposal`, `/openspec-apply`, `/openspec-archive` (`.continue/prompts/`) |
 | **CoStrict** | `/openspec-proposal`, `/openspec-apply`, `/openspec-archive` (`.cospec/openspec/commands/`) — 详见 [文档](https://costrict.ai)|
 | **Crush** | `/openspec-proposal`, `/openspec-apply`, `/openspec-archive` (`.crush/commands/openspec/`) |
 | **Cursor** | `/openspec-proposal`, `/openspec-apply`, `/openspec-archive` |
@@ -402,6 +407,53 @@ OpenSpec将每个功能的变更分组到一个文件夹中（`openspec/changes/
    ```
 2. **刷新代理指令**
    - 在每个项目中运行 `openspec-cn update`，重新生成AI指导并确保最新的斜杠命令处于活动状态。
+
+## Experimental Features
+
+<details>
+<summary><strong>🧪 OPSX: Fluid, Iterative Workflow</strong> (Claude Code only)</summary>
+
+**Why this exists:**
+- Standard workflow is locked down — you can't tweak instructions or customize
+- When AI output is bad, you can't improve the prompts yourself
+- Same workflow for everyone, no way to match how your team works
+
+**What's different:**
+- **Hackable** — edit templates and schemas yourself, test immediately, no rebuild
+- **Granular** — each artifact has its own instructions, test and tweak individually
+- **Customizable** — define your own workflows, artifacts, and dependencies
+- **Fluid** — no phase gates, update any artifact anytime
+
+```
+You can always go back:
+
+  proposal ──→ specs ──→ design ──→ tasks ──→ implement
+     ▲           ▲          ▲                    │
+     └───────────┴──────────┴────────────────────┘
+```
+
+| Command | What it does |
+|---------|--------------|
+| `/opsx:new` | Start a new change |
+| `/opsx:continue` | Create the next artifact (based on what's ready) |
+| `/opsx:ff` | Fast-forward (all planning artifacts at once) |
+| `/opsx:apply` | Implement tasks, updating artifacts as needed |
+| `/opsx:archive` | Archive when done |
+
+**Setup:** `openspec artifact-experimental-setup`
+
+[Full documentation →](docs/experimental-workflow.md)
+
+</details>
+
+<details>
+<summary><strong>Telemetry</strong> – OpenSpec collects anonymous usage stats (opt-out: <code>OPENSPEC_TELEMETRY=0</code>)</summary>
+
+We collect only command names and version to understand usage patterns. No arguments, paths, content, or PII. Automatically disabled in CI.
+
+**Opt-out:** `export OPENSPEC_TELEMETRY=0` or `export DO_NOT_TRACK=1`
+
+</details>
 
 ## 贡献
 
