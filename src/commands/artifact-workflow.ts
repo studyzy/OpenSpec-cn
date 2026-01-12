@@ -123,17 +123,17 @@ async function validateChangeExists(
   if (!changeName) {
     const available = await getAvailableChanges();
     if (available.length === 0) {
-      throw new Error('No changes found. Create one with: openspec new change <name>');
+      throw new Error('未找到变更。请使用 openspec-cn new change <name> 创建一个。');
     }
     throw new Error(
-      `Missing required option --change. Available changes:\n  ${available.join('\n  ')}`
+      `缺少必需的选项 --change。可用的变更如下：\n  ${available.join('\n  ')}`
     );
   }
 
   // Validate change name format to prevent path traversal
   const nameValidation = validateChangeName(changeName);
   if (!nameValidation.valid) {
-    throw new Error(`Invalid change name '${changeName}': ${nameValidation.error}`);
+    throw new Error(`无效的变更名称 '${changeName}'：${nameValidation.error}`);
   }
 
   // Check directory existence directly
@@ -144,11 +144,11 @@ async function validateChangeExists(
     const available = await getAvailableChanges();
     if (available.length === 0) {
       throw new Error(
-        `Change '${changeName}' not found. No changes exist. Create one with: openspec new change <name>`
+        `未找到变更 '${changeName}'。不存在任何变更。请使用 openspec-cn new change <name> 创建一个。`
       );
     }
     throw new Error(
-      `Change '${changeName}' not found. Available changes:\n  ${available.join('\n  ')}`
+      `未找到变更 '${changeName}'。可用的变更如下：\n  ${available.join('\n  ')}`
     );
   }
 
@@ -163,7 +163,7 @@ function validateSchemaExists(schemaName: string): string {
   if (!schemaDir) {
     const availableSchemas = listSchemas();
     throw new Error(
-      `Schema '${schemaName}' not found. Available schemas:\n  ${availableSchemas.join('\n  ')}`
+      `未找到 Schema '${schemaName}'。可用的 Schema 如下：\n  ${availableSchemas.join('\n  ')}`
     );
   }
   return schemaName;
@@ -180,7 +180,7 @@ interface StatusOptions {
 }
 
 async function statusCommand(options: StatusOptions): Promise<void> {
-  const spinner = ora('Loading change status...').start();
+  const spinner = ora('正在加载变更状态...').start();
 
   try {
     const projectRoot = process.cwd();
@@ -213,9 +213,9 @@ function printStatusText(status: ChangeStatus): void {
   const doneCount = status.artifacts.filter((a) => a.status === 'done').length;
   const total = status.artifacts.length;
 
-  console.log(`Change: ${status.changeName}`);
-  console.log(`Schema: ${status.schemaName}`);
-  console.log(`Progress: ${doneCount}/${total} artifacts complete`);
+  console.log(`变更：${status.changeName}`);
+  console.log(`Schema：${status.schemaName}`);
+  console.log(`进度：${doneCount}/${total} 个产出物已完成`);
   console.log();
 
   for (const artifact of status.artifacts) {
@@ -224,7 +224,7 @@ function printStatusText(status: ChangeStatus): void {
     let line = `${indicator} ${artifact.id}`;
 
     if (artifact.status === 'blocked' && artifact.missingDeps && artifact.missingDeps.length > 0) {
-      line += color(` (blocked by: ${artifact.missingDeps.join(', ')})`);
+      line += color(`（阻塞于：${artifact.missingDeps.join(', ')}）`);
     }
 
     console.log(line);
@@ -232,7 +232,7 @@ function printStatusText(status: ChangeStatus): void {
 
   if (status.isComplete) {
     console.log();
-    console.log(chalk.green('All artifacts complete!'));
+    console.log(chalk.green('所有产出物均已完成！'));
   }
 }
 
@@ -250,7 +250,7 @@ async function instructionsCommand(
   artifactId: string | undefined,
   options: InstructionsOptions
 ): Promise<void> {
-  const spinner = ora('Generating instructions...').start();
+  const spinner = ora('正在生成指令...').start();
 
   try {
     const projectRoot = process.cwd();
@@ -268,7 +268,7 @@ async function instructionsCommand(
       spinner.stop();
       const validIds = context.graph.getAllArtifacts().map((a) => a.id);
       throw new Error(
-        `Missing required argument <artifact>. Valid artifacts:\n  ${validIds.join('\n  ')}`
+        `缺少必需的参数 <artifact>。有效的产出物如下：\n  ${validIds.join('\n  ')}`
       );
     }
 
@@ -278,7 +278,7 @@ async function instructionsCommand(
       spinner.stop();
       const validIds = context.graph.getAllArtifacts().map((a) => a.id);
       throw new Error(
-        `Artifact '${artifactId}' not found in schema '${context.schemaName}'. Valid artifacts:\n  ${validIds.join('\n  ')}`
+        `在 Schema '${context.schemaName}' 中未找到产出物 '${artifactId}'。有效的产出物如下：\n  ${validIds.join('\n  ')}`
       );
     }
 
@@ -321,15 +321,15 @@ function printInstructionsText(instructions: ArtifactInstructions, isBlocked: bo
   if (isBlocked) {
     const missing = dependencies.filter((d) => !d.done).map((d) => d.id);
     console.log('<warning>');
-    console.log('This artifact has unmet dependencies. Complete them first or proceed with caution.');
-    console.log(`Missing: ${missing.join(', ')}`);
+    console.log('此产出物有未满足的依赖。请先完成它们或谨慎操作。');
+    console.log(`缺失：${missing.join(', ')}`);
     console.log('</warning>');
     console.log();
   }
 
   // Task directive
   console.log('<task>');
-  console.log(`Create the ${artifactId} artifact for change "${changeName}".`);
+  console.log(`为变更 "${changeName}" 创建 ${artifactId} 产出物。`);
   console.log(description);
   console.log('</task>');
   console.log();
@@ -337,10 +337,10 @@ function printInstructionsText(instructions: ArtifactInstructions, isBlocked: bo
   // Context (dependencies)
   if (dependencies.length > 0) {
     console.log('<context>');
-    console.log('Read these files for context before creating this artifact:');
+    console.log('在创建此产出物之前，请阅读这些文件以获取上下文：');
     console.log();
     for (const dep of dependencies) {
-      const status = dep.done ? 'done' : 'missing';
+      const status = dep.done ? '已完成' : '缺失';
       const fullPath = path.join(changeDir, dep.path);
       console.log(`<dependency id="${dep.id}" status="${status}">`);
       console.log(`  <path>${fullPath}</path>`);
@@ -353,7 +353,7 @@ function printInstructionsText(instructions: ArtifactInstructions, isBlocked: bo
 
   // Output location
   console.log('<output>');
-  console.log(`Write to: ${path.join(changeDir, outputPath)}`);
+  console.log(`写入至：${path.join(changeDir, outputPath)}`);
   console.log('</output>');
   console.log();
 
@@ -373,14 +373,14 @@ function printInstructionsText(instructions: ArtifactInstructions, isBlocked: bo
 
   // Success criteria placeholder
   console.log('<success_criteria>');
-  console.log('<!-- To be defined in schema validation rules -->');
+  console.log('<!-- 将在 Schema 验证规则中定义 -->');
   console.log('</success_criteria>');
   console.log();
 
   // Unlocks
   if (unlocks.length > 0) {
     console.log('<unlocks>');
-    console.log(`Completing this artifact enables: ${unlocks.join(', ')}`);
+    console.log(`完成此产出物后将启用：${unlocks.join(', ')}`);
     console.log('</unlocks>');
     console.log();
   }
@@ -551,27 +551,27 @@ async function generateApplyInstructions(
 
   if (missingArtifacts.length > 0) {
     state = 'blocked';
-    instruction = `Cannot apply this change yet. Missing artifacts: ${missingArtifacts.join(', ')}.\nUse the openspec-continue-change skill to create the missing artifacts first.`;
+    instruction = `暂无法应用此变更。缺失产出物：${missingArtifacts.join(', ')}。\n请先使用 openspec-continue-change Skill 创建缺失的产出物。`;
   } else if (tracksFile && !tracksFileExists) {
     // Tracking file configured but doesn't exist yet
     const tracksFilename = path.basename(tracksFile);
     state = 'blocked';
-    instruction = `The ${tracksFilename} file is missing and must be created.\nUse openspec-continue-change to generate the tracking file.`;
+    instruction = `文件 ${tracksFilename} 缺失，必须创建。\n请使用 openspec-continue-change 生成追踪文件。`;
   } else if (tracksFile && tracksFileExists && total === 0) {
     // Tracking file exists but contains no tasks
     const tracksFilename = path.basename(tracksFile);
     state = 'blocked';
-    instruction = `The ${tracksFilename} file exists but contains no tasks.\nAdd tasks to ${tracksFilename} or regenerate it with openspec-continue-change.`;
+    instruction = `文件 ${tracksFilename} 已存在但未包含任何任务。\n请向 ${tracksFilename} 添加任务，或使用 openspec-continue-change 重新生成它。`;
   } else if (tracksFile && remaining === 0 && total > 0) {
     state = 'all_done';
-    instruction = 'All tasks are complete! This change is ready to be archived.\nConsider running tests and reviewing the changes before archiving.';
+    instruction = '所有任务均已完成！此变更已准备好进行归档。\n在归档之前，请考虑运行测试并审查更改。';
   } else if (!tracksFile) {
     // No tracking file (e.g., TDD schema) - ready to apply
     state = 'ready';
-    instruction = schemaInstruction?.trim() ?? 'All required artifacts complete. Proceed with implementation.';
+    instruction = schemaInstruction?.trim() ?? '所有必需的产出物均已完成。请继续进行实现。';
   } else {
     state = 'ready';
-    instruction = schemaInstruction?.trim() ?? 'Read context files, work through pending tasks, mark complete as you go.\nPause if you hit blockers or need clarification.';
+    instruction = schemaInstruction?.trim() ?? '阅读上下文文件，逐个处理待办任务，并在完成后标记。如果遇到阻碍或需要澄清，请暂停。';
   }
 
   return {
@@ -588,7 +588,7 @@ async function generateApplyInstructions(
 }
 
 async function applyInstructionsCommand(options: ApplyInstructionsOptions): Promise<void> {
-  const spinner = ora('Generating apply instructions...').start();
+  const spinner = ora('正在生成应用指令...').start();
 
   try {
     const projectRoot = process.cwd();
@@ -619,43 +619,43 @@ async function applyInstructionsCommand(options: ApplyInstructionsOptions): Prom
 function printApplyInstructionsText(instructions: ApplyInstructions): void {
   const { changeName, schemaName, contextFiles, progress, tasks, state, missingArtifacts, instruction } = instructions;
 
-  console.log(`## Apply: ${changeName}`);
-  console.log(`Schema: ${schemaName}`);
+  console.log(`## 应用：${changeName}`);
+  console.log(`Schema：${schemaName}`);
   console.log();
 
   // Warning for blocked state
   if (state === 'blocked' && missingArtifacts) {
-    console.log('### ⚠️ Blocked');
+    console.log('### ⚠️ 已阻塞');
     console.log();
-    console.log(`Missing artifacts: ${missingArtifacts.join(', ')}`);
-    console.log('Use the openspec-continue-change skill to create these first.');
+    console.log(`缺失产出物：${missingArtifacts.join(', ')}`);
+    console.log('请先使用 openspec-continue-change Skill 创建这些内容。');
     console.log();
   }
 
   // Context files (dynamically from schema)
   const contextFileEntries = Object.entries(contextFiles);
   if (contextFileEntries.length > 0) {
-    console.log('### Context Files');
+    console.log('### 上下文文件');
     for (const [artifactId, filePath] of contextFileEntries) {
-      console.log(`- ${artifactId}: ${filePath}`);
+      console.log(`- ${artifactId}：${filePath}`);
     }
     console.log();
   }
 
   // Progress (only show if we have tracking)
   if (progress.total > 0 || tasks.length > 0) {
-    console.log('### Progress');
+    console.log('### 进度');
     if (state === 'all_done') {
-      console.log(`${progress.complete}/${progress.total} complete ✓`);
+      console.log(`${progress.complete}/${progress.total} 已完成 ✓`);
     } else {
-      console.log(`${progress.complete}/${progress.total} complete`);
+      console.log(`${progress.complete}/${progress.total} 已完成`);
     }
     console.log();
   }
 
   // Tasks
   if (tasks.length > 0) {
-    console.log('### Tasks');
+    console.log('### 任务');
     for (const task of tasks) {
       const checkbox = task.done ? '[x]' : '[ ]';
       console.log(`- ${checkbox} ${task.description}`);
@@ -664,7 +664,7 @@ function printApplyInstructionsText(instructions: ApplyInstructions): void {
   }
 
   // Instruction
-  console.log('### Instruction');
+  console.log('### 指令');
   console.log(instruction);
 }
 
@@ -684,7 +684,7 @@ interface TemplateInfo {
 }
 
 async function templatesCommand(options: TemplatesOptions): Promise<void> {
-  const spinner = ora('Loading templates...').start();
+  const spinner = ora('正在加载模板...').start();
 
   try {
     const schemaName = validateSchemaExists(options.schema ?? DEFAULT_SCHEMA);
@@ -714,12 +714,12 @@ async function templatesCommand(options: TemplatesOptions): Promise<void> {
       return;
     }
 
-    console.log(`Schema: ${schemaName}`);
-    console.log(`Source: ${isUserOverride ? 'user override' : 'package built-in'}`);
+    console.log(`Schema：${schemaName}`);
+    console.log(`来源：${isUserOverride ? '用户覆盖' : '包内置'}`);
     console.log();
 
     for (const t of templates) {
-      console.log(`${t.artifactId}:`);
+      console.log(`${t.artifactId}：`);
       console.log(`  ${t.templatePath}`);
     }
   } catch (error) {
@@ -739,7 +739,7 @@ interface NewChangeOptions {
 
 async function newChangeCommand(name: string | undefined, options: NewChangeOptions): Promise<void> {
   if (!name) {
-    throw new Error('Missing required argument <name>');
+    throw new Error('缺少必需的参数 <name>');
   }
 
   const validation = validateChangeName(name);
@@ -752,8 +752,8 @@ async function newChangeCommand(name: string | undefined, options: NewChangeOpti
     validateSchemaExists(options.schema);
   }
 
-  const schemaDisplay = options.schema ? ` with schema '${options.schema}'` : '';
-  const spinner = ora(`Creating change '${name}'${schemaDisplay}...`).start();
+  const schemaDisplay = options.schema ? `（使用 Schema '${options.schema}'）` : '';
+  const spinner = ora(`正在创建变更 '${name}'${schemaDisplay}...`).start();
 
   try {
     const projectRoot = process.cwd();
@@ -768,9 +768,9 @@ async function newChangeCommand(name: string | undefined, options: NewChangeOpti
     }
 
     const schemaUsed = options.schema ?? DEFAULT_SCHEMA;
-    spinner.succeed(`Created change '${name}' at openspec/changes/${name}/ (schema: ${schemaUsed})`);
+    spinner.succeed(`已在 openspec/changes/${name}/ 创建变更 '${name}'（Schema：${schemaUsed}）`);
   } catch (error) {
-    spinner.fail(`Failed to create change '${name}'`);
+    spinner.fail(`创建变更 '${name}' 失败`);
     throw error;
   }
 }
@@ -785,7 +785,7 @@ async function newChangeCommand(name: string | undefined, options: NewChangeOpti
  * Creates .claude/commands/opsx/ directory with slash command files.
  */
 async function artifactExperimentalSetupCommand(): Promise<void> {
-  const spinner = ora('Setting up experimental artifact workflow...').start();
+  const spinner = ora('正在设置实验性产出物工作流...').start();
 
   try {
     const projectRoot = process.cwd();
@@ -873,48 +873,48 @@ ${template.content}
       createdCommandFiles.push(path.relative(projectRoot, commandFile));
     }
 
-    spinner.succeed('Experimental artifact workflow setup complete!');
+    spinner.succeed('实验性产出物工作流设置完成！');
 
     // Print success message
     console.log();
-    console.log(chalk.bold('🧪 Experimental Artifact Workflow Setup Complete'));
+    console.log(chalk.bold('🧪 实验性产出物工作流设置完成'));
     console.log();
-    console.log(chalk.bold('Skills Created:'));
+    console.log(chalk.bold('已创建 Skill：'));
     for (const file of createdSkillFiles) {
       console.log(chalk.green('  ✓ ' + file));
     }
     console.log();
-    console.log(chalk.bold('Slash Commands Created:'));
+    console.log(chalk.bold('已创建斜杠命令 (Slash Command)：'));
     for (const file of createdCommandFiles) {
       console.log(chalk.green('  ✓ ' + file));
     }
     console.log();
-    console.log(chalk.bold('📖 Usage:'));
+    console.log(chalk.bold('📖 用法：'));
     console.log();
-    console.log('  ' + chalk.cyan('Skills') + ' work automatically in compatible editors:');
-    console.log('  • Claude Code - Auto-detected, ready to use');
-    console.log('  • Cursor - Enable in Settings → Rules → Import Settings');
-    console.log('  • Windsurf - Auto-imports from .claude directory');
+    console.log('  ' + chalk.cyan('Skill') + ' 会在兼容的编辑器中自动生效：');
+    console.log('  • Claude Code - 自动检测，准备就绪');
+    console.log('  • Cursor - 在设置 → Rules → Import Settings 中启用');
+    console.log('  • Windsurf - 从 .claude 目录自动导入');
     console.log();
-    console.log('  Ask Claude naturally:');
-    console.log('  • "I want to start a new OpenSpec change to add <feature>"');
-    console.log('  • "Continue working on this change"');
-    console.log('  • "Implement the tasks for this change"');
+    console.log('  自然地向 AI 提问：');
+    console.log('  • "我想开始一个新的 OpenSpec 变更来添加 <功能>"');
+    console.log('  • "继续处理此变更"');
+    console.log('  • "为该变更实现任务"');
     console.log();
-    console.log('  ' + chalk.cyan('Slash Commands') + ' for explicit invocation:');
-    console.log('  • /opsx:explore - Think through ideas, investigate problems');
-    console.log('  • /opsx:new - Start a new change');
-    console.log('  • /opsx:continue - Create the next artifact');
-    console.log('  • /opsx:apply - Implement tasks');
-    console.log('  • /opsx:ff - Fast-forward: create all artifacts at once');
-    console.log('  • /opsx:sync - Sync delta specs to main specs');
-    console.log('  • /opsx:archive - Archive a completed change');
+    console.log('  ' + chalk.cyan('斜杠命令') + ' 用于显式调用：');
+    console.log('  • /opsx:explore - 构思想法，调查问题');
+    console.log('  • /opsx:new - 启动新变更');
+    console.log('  • /opsx:continue - 创建下一个产出物');
+    console.log('  • /opsx:apply - 实现任务');
+    console.log('  • /opsx:ff - 一键创建所有产出物');
+    console.log('  • /opsx:sync - 将增量规范同步到主规范');
+    console.log('  • /opsx:archive - 归档已完成的变更');
     console.log();
-    console.log(chalk.yellow('💡 This is an experimental feature.'));
-    console.log('   Feedback welcome at: https://github.com/Fission-AI/OpenSpec/issues');
+    console.log(chalk.yellow('💡 这是一个实验性功能。'));
+    console.log('   欢迎提供反馈：https://github.com/Fission-AI/OpenSpec/issues');
     console.log();
   } catch (error) {
-    spinner.fail('Failed to setup experimental artifact workflow');
+    spinner.fail('设置实验性产出物工作流失败');
     throw error;
   }
 }
@@ -935,14 +935,14 @@ async function schemasCommand(options: SchemasOptions): Promise<void> {
     return;
   }
 
-  console.log('Available schemas:');
+  console.log('可用 Schema：');
   console.log();
 
   for (const schema of schemas) {
-    const sourceLabel = schema.source === 'user' ? chalk.dim(' (user override)') : '';
+    const sourceLabel = schema.source === 'user' ? chalk.dim('（用户覆盖）') : '';
     console.log(`  ${chalk.bold(schema.name)}${sourceLabel}`);
     console.log(`    ${schema.description}`);
-    console.log(`    Artifacts: ${schema.artifacts.join(' → ')}`);
+    console.log(`    产出物：${schema.artifacts.join(' → ')}`);
     console.log();
   }
 }
@@ -959,16 +959,16 @@ export function registerArtifactWorkflowCommands(program: Command): void {
   // Status command
   program
     .command('status')
-    .description('[Experimental] Display artifact completion status for a change')
-    .option('--change <id>', 'Change name to show status for')
-    .option('--schema <name>', 'Schema override (auto-detected from .openspec.yaml)')
-    .option('--json', 'Output as JSON')
+    .description('[实验性] 显示变更的产出物完成状态')
+    .option('--change <id>', '要显示状态的变更名称')
+    .option('--schema <name>', '覆盖 Schema（默认从 .openspec.yaml 自动检测）')
+    .option('--json', '以 JSON 格式输出')
     .action(async (options: StatusOptions) => {
       try {
         await statusCommand(options);
       } catch (error) {
         console.log();
-        ora().fail(`Error: ${(error as Error).message}`);
+        ora().fail(`错误：${(error as Error).message}`);
         process.exit(1);
       }
     });
@@ -976,10 +976,10 @@ export function registerArtifactWorkflowCommands(program: Command): void {
   // Instructions command
   program
     .command('instructions [artifact]')
-    .description('[Experimental] Output enriched instructions for creating an artifact or applying tasks')
-    .option('--change <id>', 'Change name')
-    .option('--schema <name>', 'Schema override (auto-detected from .openspec.yaml)')
-    .option('--json', 'Output as JSON')
+    .description('[实验性] 输出用于创建产出物或实现任务的详细指令')
+    .option('--change <id>', '变更名称')
+    .option('--schema <name>', '覆盖 Schema（默认从 .openspec.yaml 自动检测）')
+    .option('--json', '以 JSON 格式输出')
     .action(async (artifactId: string | undefined, options: InstructionsOptions) => {
       try {
         // Special case: "apply" is not an artifact, but a command to get apply instructions
@@ -990,7 +990,7 @@ export function registerArtifactWorkflowCommands(program: Command): void {
         }
       } catch (error) {
         console.log();
-        ora().fail(`Error: ${(error as Error).message}`);
+        ora().fail(`错误：${(error as Error).message}`);
         process.exit(1);
       }
     });
@@ -998,15 +998,15 @@ export function registerArtifactWorkflowCommands(program: Command): void {
   // Templates command
   program
     .command('templates')
-    .description('[Experimental] Show resolved template paths for all artifacts in a schema')
-    .option('--schema <name>', `Schema to use (default: ${DEFAULT_SCHEMA})`)
-    .option('--json', 'Output as JSON mapping artifact IDs to template paths')
+    .description('[实验性] 显示 Schema 中所有产出物的解析模板路径')
+    .option('--schema <name>', `要使用的 Schema（默认：${DEFAULT_SCHEMA}）`)
+    .option('--json', '以 JSON 格式输出产出物 ID 到模板路径的映射')
     .action(async (options: TemplatesOptions) => {
       try {
         await templatesCommand(options);
       } catch (error) {
         console.log();
-        ora().fail(`Error: ${(error as Error).message}`);
+        ora().fail(`错误：${(error as Error).message}`);
         process.exit(1);
       }
     });
@@ -1014,32 +1014,32 @@ export function registerArtifactWorkflowCommands(program: Command): void {
   // Schemas command
   program
     .command('schemas')
-    .description('[Experimental] List available workflow schemas with descriptions')
-    .option('--json', 'Output as JSON (for agent use)')
+    .description('[实验性] 列出可用的工作流 Schema 及其说明')
+    .option('--json', '以 JSON 格式输出（供 Agent 使用）')
     .action(async (options: SchemasOptions) => {
       try {
         await schemasCommand(options);
       } catch (error) {
         console.log();
-        ora().fail(`Error: ${(error as Error).message}`);
+        ora().fail(`错误：${(error as Error).message}`);
         process.exit(1);
       }
     });
 
   // New command group with change subcommand
-  const newCmd = program.command('new').description('[Experimental] Create new items');
+  const newCmd = program.command('new').description('[实验性] 创建新项目');
 
   newCmd
     .command('change <name>')
-    .description('[Experimental] Create a new change directory')
-    .option('--description <text>', 'Description to add to README.md')
-    .option('--schema <name>', `Workflow schema to use (default: ${DEFAULT_SCHEMA})`)
+    .description('[实验性] 创建新的变更目录')
+    .option('--description <text>', '添加到 README.md 的描述')
+    .option('--schema <name>', `要使用的工作流 Schema（默认：${DEFAULT_SCHEMA}）`)
     .action(async (name: string, options: NewChangeOptions) => {
       try {
         await newChangeCommand(name, options);
       } catch (error) {
         console.log();
-        ora().fail(`Error: ${(error as Error).message}`);
+        ora().fail(`错误：${(error as Error).message}`);
         process.exit(1);
       }
     });
@@ -1047,13 +1047,13 @@ export function registerArtifactWorkflowCommands(program: Command): void {
   // Artifact experimental setup command
   program
     .command('artifact-experimental-setup')
-    .description('[Experimental] Setup Agent Skills for the experimental artifact workflow')
+    .description('[实验性] 为实验性产出物工作流设置 Agent Skill')
     .action(async () => {
       try {
         await artifactExperimentalSetupCommand();
       } catch (error) {
         console.log();
-        ora().fail(`Error: ${(error as Error).message}`);
+        ora().fail(`错误：${(error as Error).message}`);
         process.exit(1);
       }
     });

@@ -228,7 +228,7 @@ export class ValidateCommand {
         const out = { items: [] as BulkItemResult[], summary, version: '1.0' };
         console.log(JSON.stringify(out, null, 2));
       } else {
-        console.log('No items found to validate.');
+        console.log('未找到要验证的项目。');
       }
 
       process.exitCode = 0;
@@ -285,8 +285,9 @@ export class ValidateCommand {
       console.log(JSON.stringify(out, null, 2));
     } else {
       for (const res of results) {
-        if (res.valid) console.log(`✓ ${res.type}/${res.id}`);
-        else console.error(`✗ ${res.type}/${res.id}`);
+        const typeLabel = res.type === 'change' ? '变更' : '规范';
+        if (res.valid) console.log(`✓ ${typeLabel}/${res.id}`);
+        else console.error(`✗ ${typeLabel}/${res.id}`);
       }
       console.log(`汇总：通过 ${summary.totals.passed} 项，失败 ${summary.totals.failed} 项（共 ${summary.totals.items} 项）`);
     }

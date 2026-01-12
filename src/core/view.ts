@@ -25,7 +25,7 @@ export class ViewCommand {
 
     // Display draft changes
     if (changesData.draft.length > 0) {
-      console.log(chalk.bold.gray('\nDraft Changes'));
+      console.log(chalk.bold.gray('\n草稿变更'));
       console.log('─'.repeat(60));
       changesData.draft.forEach((change) => {
         console.log(`  ${chalk.gray('○')} ${change.name}`);
@@ -189,7 +189,7 @@ export class ViewCommand {
       `  ${chalk.cyan('●')} 规范: ${chalk.bold(totalSpecs)} 个规范, ${chalk.bold(totalRequirements)} 个需求`
     );
     if (changesData.draft.length > 0) {
-      console.log(`  ${chalk.gray('●')} Draft Changes: ${chalk.bold(changesData.draft.length)}`);
+      console.log(`  ${chalk.gray('●')} 草稿变更: ${chalk.bold(changesData.draft.length)}`);
     }
     console.log(
       `  ${chalk.yellow('●')} 活动变更: ${chalk.bold(changesData.active.length)} 个进行中`

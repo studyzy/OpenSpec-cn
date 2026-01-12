@@ -105,7 +105,7 @@ export class ZshInstaller {
    */
   private generateZshrcConfig(completionsDir: string): string {
     return [
-      '# OpenSpec shell completions configuration',
+      '# OpenSpec shell 补全配置',
       `fpath=("${completionsDir}" $fpath)`,
       'autoload -Uz compinit',
       'compinit',
@@ -263,10 +263,10 @@ export class ZshInstaller {
             success: true,
             installedPath: targetPath,
             isOhMyZsh,
-            message: 'Completion script is already installed (up to date)',
+            message: '补全脚本已安装（已是最新版本）',
             instructions: [
-              'The completion script is already installed and up to date.',
-              'If completions are not working, try: exec zsh',
+              '补全脚本已安装，且已是最新版本。',
+              '如果补全未生效，请尝试运行：exec zsh',
             ],
           };
         }
@@ -316,14 +316,14 @@ export class ZshInstaller {
       let message: string;
       if (isUpdate) {
         message = backupPath
-          ? 'Completion script updated successfully (previous version backed up)'
-          : 'Completion script updated successfully';
+          ? '补全脚本更新成功（已备份旧版本）'
+          : '补全脚本更新成功';
       } else {
         message = isOhMyZsh
-          ? 'Completion script installed successfully for Oh My Zsh'
+          ? '已成功为 Oh My Zsh 安装补全脚本'
           : zshrcConfigured
-            ? 'Completion script installed and .zshrc configured successfully'
-            : 'Completion script installed successfully for Zsh';
+            ? '补全脚本安装成功，并已自动配置 .zshrc'
+            : '已成功为 Zsh 安装补全脚本';
       }
 
       return {
@@ -352,11 +352,11 @@ export class ZshInstaller {
    */
   private generateOhMyZshFpathGuidance(completionsDir: string): string[] | undefined {
     return [
-      'Note: Oh My Zsh typically auto-loads completions from custom/completions.',
-      `Verify that ${completionsDir} is in your fpath by running:`,
+      '注意：Oh My Zsh 通常会自动加载 custom/completions 中的补全脚本。',
+      `请通过运行以下命令确认 ${completionsDir} 位于您的 fpath 中：`,
       '  echo $fpath | grep "custom/completions"',
       '',
-      'If not found, completions may not work. Restart your shell to ensure changes take effect.',
+      '如果未找到，补全功能可能无法工作。请重启 Shell 以确保更改生效。',
     ];
   }
 
@@ -370,29 +370,29 @@ export class ZshInstaller {
   private generateInstructions(isOhMyZsh: boolean, installedPath: string): string[] {
     if (isOhMyZsh) {
       return [
-        'Completion script installed to Oh My Zsh completions directory.',
-        'Restart your shell or run: exec zsh',
-        'Completions should activate automatically.',
+        '补全脚本已安装至 Oh My Zsh 的补全目录。',
+        '请重启 Shell 或运行：exec zsh',
+        '补全功能应当会自动激活。',
       ];
     } else {
       const completionsDir = path.dirname(installedPath);
       const zshrcPath = path.join(this.homeDir, '.zshrc');
 
       return [
-        'Completion script installed to ~/.zsh/completions/',
+        '补全脚本已安装至 ~/.zsh/completions/',
         '',
-        'To enable completions, add the following to your ~/.zshrc file:',
+        '如需启用补全，请在您的 ~/.zshrc 文件中添加以下内容：',
         '',
-        `  # Add completions directory to fpath`,
+        `  # 将补全目录添加至 fpath`,
         `  fpath=(${completionsDir} $fpath)`,
         '',
-        '  # Initialize completion system',
+        '  # 初始化补全系统',
         '  autoload -Uz compinit',
         '  compinit',
         '',
-        'Then restart your shell or run: exec zsh',
+        '然后重启 Shell 或运行：exec zsh',
         '',
-        `Check if these lines already exist in ${zshrcPath} before adding.`,
+        `添加前请检查 ${zshrcPath} 中是否已存在这些行。`,
       ];
     }
   }
@@ -429,26 +429,26 @@ export class ZshInstaller {
       if (!scriptRemoved && !zshrcWasPresent) {
         return {
           success: false,
-          message: 'Completion script is not installed',
+          message: '补全脚本未安装',
         };
       }
 
       const messages: string[] = [];
       if (scriptRemoved) {
-        messages.push(`Completion script removed from ${targetPath}`);
+        messages.push(`已从 ${targetPath} 移除补全脚本`);
       }
       if (zshrcCleaned && !isOhMyZsh) {
-        messages.push('Removed OpenSpec configuration from ~/.zshrc');
+        messages.push('已从 ~/.zshrc 移除 OpenSpec 配置');
       }
 
       return {
         success: true,
-        message: messages.join('. '),
+        message: messages.join('。'),
       };
     } catch (error) {
       return {
         success: false,
-        message: `Failed to uninstall completion script: ${error instanceof Error ? error.message : String(error)}`,
+        message: `卸载补全脚本失败：${error instanceof Error ? error.message : String(error)}`,
       };
     }
   }

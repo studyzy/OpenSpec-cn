@@ -64,13 +64,13 @@ function formatRelativeTime(date: Date): string {
   if (diffDays > 30) {
     return date.toLocaleDateString();
   } else if (diffDays > 0) {
-    return `${diffDays}d ago`;
+    return `${diffDays}天前`;
   } else if (diffHours > 0) {
-    return `${diffHours}h ago`;
+    return `${diffHours}小时前`;
   } else if (diffMins > 0) {
-    return `${diffMins}m ago`;
+    return `${diffMins}分钟前`;
   } else {
-    return 'just now';
+    return '刚刚';
   }
 }
 
