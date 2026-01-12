@@ -1182,16 +1182,16 @@ describe('InitCommand', () => {
       const applyContent = await fs.readFile(continueApply, 'utf-8');
       expect(applyContent).toContain('---');
       expect(applyContent).toContain('name: openspec-apply');
-      expect(applyContent).toContain('description: Implement an approved OpenSpec change and keep tasks in sync.');
+      expect(applyContent).toContain('description: 实施已批准的 OpenSpec 变更并保持任务同步。');
       expect(applyContent).toContain('invokable: true');
-      expect(applyContent).toContain('Work through tasks sequentially');
+      expect(applyContent).toContain('按顺序完成任务');
 
       const archiveContent = await fs.readFile(continueArchive, 'utf-8');
       expect(archiveContent).toContain('---');
       expect(archiveContent).toContain('name: openspec-archive');
-      expect(archiveContent).toContain('description: Archive a deployed OpenSpec change and update specs.');
+      expect(archiveContent).toContain('description: 归档已部署的 OpenSpec 变更并更新规范。');
       expect(archiveContent).toContain('invokable: true');
-      expect(archiveContent).toContain('openspec archive <id> --yes');
+      expect(archiveContent).toContain('openspec-cn archive <id> --yes');
     });
 
     it('should mark Continue as already configured during extend mode', async () => {

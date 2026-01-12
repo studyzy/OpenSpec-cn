@@ -119,9 +119,9 @@ Then expected result happens`;
       // Verify spec was created from skeleton and ADDED requirement applied
       const mainSpecPath = path.join(tempDir, 'openspec', 'specs', 'test-capability', 'spec.md');
       const updatedContent = await fs.readFile(mainSpecPath, 'utf-8');
-      expect(updatedContent).toContain('# test-capability Specification');
-      expect(updatedContent).toContain('## Purpose');
-      expect(updatedContent).toContain(`created by archiving change ${changeName}`);
+      expect(updatedContent).toContain('# test-capability 规范');
+      expect(updatedContent).toContain('## 目的');
+      expect(updatedContent).toContain(`由归档变更 ${changeName} 创建`);
       expect(updatedContent).toContain('## 需求');
       expect(updatedContent).toContain('### 需求： The system SHALL provide test capability');
       expect(updatedContent).toContain('#### Scenario: Basic test');
@@ -157,13 +157,13 @@ The system SHALL support logo and backgroundColor fields for gift cards.
       
       // Verify warning was logged about REMOVED requirements being ignored
       expect(console.log).toHaveBeenCalledWith(
-        expect.stringContaining('Warning: gift-card - 2 REMOVED requirement(s) ignored for new spec (nothing to remove).')
+        expect.stringContaining('警告：gift-card - 2 条“移除需求”操作已被忽略（无内容可删除）。')
       );
       
       // Verify spec was created with only ADDED requirements
       const mainSpecPath = path.join(tempDir, 'openspec', 'specs', 'gift-card', 'spec.md');
       const updatedContent = await fs.readFile(mainSpecPath, 'utf-8');
-      expect(updatedContent).toContain('# gift-card Specification');
+      expect(updatedContent).toContain('# gift-card 规范');
       expect(updatedContent).toContain('### Requirement: Logo and Background Color');
       expect(updatedContent).toContain('#### Scenario: Display gift card with logo');
       // REMOVED requirements should not be in the final spec
@@ -202,9 +202,9 @@ Modified content.`;
       
       // Verify error message mentions MODIFIED not allowed for new specs
       expect(console.log).toHaveBeenCalledWith(
-        expect.stringContaining('new-capability: target spec does not exist; only ADDED requirements are allowed for new specs. MODIFIED and RENAMED operations require an existing spec.')
+        expect.stringContaining('new-capability：目标规范不存在；新规范仅允许“新增需求”操作。“修改需求”和“重命名需求”操作需要现有规范。')
       );
-      expect(console.log).toHaveBeenCalledWith('Aborted. No files were changed.');
+      expect(console.log).toHaveBeenCalledWith('已中止。未更改任何文件。');
       
       // Verify spec was NOT created
       const mainSpecPath = path.join(tempDir, 'openspec', 'specs', 'new-capability', 'spec.md');
@@ -240,9 +240,9 @@ New feature description.
       
       // Verify error message mentions RENAMED not allowed for new specs
       expect(console.log).toHaveBeenCalledWith(
-        expect.stringContaining('another-capability: target spec does not exist; only ADDED requirements are allowed for new specs. MODIFIED and RENAMED operations require an existing spec.')
+        expect.stringContaining('another-capability：目标规范不存在；新规范仅允许“新增需求”操作。“修改需求”和“重命名需求”操作需要现有规范。')
       );
-      expect(console.log).toHaveBeenCalledWith('Aborted. No files were changed.');
+      expect(console.log).toHaveBeenCalledWith('已中止。未更改任何文件。');
       
       // Verify spec was NOT created
       const mainSpecPath = path.join(tempDir, 'openspec', 'specs', 'another-capability', 'spec.md');
@@ -273,7 +273,7 @@ New feature description.
       // Try to archive
       await expect(
         archiveCommand.execute(changeName, { yes: true })
-      ).rejects.toThrow(`归档 '${date}-${changeName}' 已经存在。`);
+      ).rejects.toThrow(`归档 '${date}-${changeName}' 已存在。`);
     });
 
     it('should handle changes without tasks.md', async () => {
@@ -598,7 +598,7 @@ new body`;
       expect(unchanged).toBe(mainContent);
       // Assert error message format and abort notice
       expect(console.log).toHaveBeenCalledWith(
-        expect.stringContaining('验证失败 - 当存在重命名时，MODIFIED 必须引用新标题')
+        expect.stringContaining('验证失败 - 当存在重命名时，"修改需求"必须引用新标题')
       );
       expect(console.log).toHaveBeenCalledWith(
         expect.stringContaining('已中止。未更改任何文件。')

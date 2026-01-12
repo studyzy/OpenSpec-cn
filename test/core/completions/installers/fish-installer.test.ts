@@ -87,12 +87,12 @@ complete -c openspec -a 'init' -d 'Initialize OpenSpec'
       const result = await installer.install(mockCompletionScript);
 
       expect(result.success).toBe(true);
-      expect(result.message).toBe('Completion script installed successfully for Fish');
+      expect(result.message).toBe('已成功为 Fish 安装补全脚本');
       expect(result.installedPath).toBe(path.join(testHomeDir, '.config', 'fish', 'completions', 'openspec.fish'));
       expect(result.backupPath).toBeUndefined();
       expect(result.instructions).toHaveLength(2);
-      expect(result.instructions![0]).toContain('Fish automatically loads completions');
-      expect(result.instructions![1]).toContain('Completions are available immediately');
+      expect(result.instructions![0]).toContain('Fish 会从 ~/.config/fish/completions/ 自动加载补全脚本');
+      expect(result.instructions![1]).toContain('补全脚本立即可用 —— 无需重启 Shell');
     });
 
     it('should create parent directories if they do not exist', async () => {
@@ -120,8 +120,8 @@ complete -c openspec -a 'init' -d 'Initialize OpenSpec'
       const result = await installer.install(mockCompletionScript);
 
       expect(result.success).toBe(true);
-      expect(result.message).toBe('Completion script is already installed (up to date)');
-      expect(result.instructions![0]).toContain('already installed and up to date');
+      expect(result.message).toBe('补全脚本已安装（已是最新版本）');
+      expect(result.instructions![0]).toContain('补全脚本已安装，且已是最新版本');
       expect(result.backupPath).toBeUndefined();
     });
 
@@ -142,7 +142,7 @@ complete -c openspec -a 'validate' -d 'Validate specs'
       const result = await installer.install(updatedScript);
 
       expect(result.success).toBe(true);
-      expect(result.message).toContain('updated successfully');
+      expect(result.message).toContain('补全脚本更新成功');
       expect(result.backupPath).toBeDefined();
       expect(result.backupPath).toMatch(/\.backup-\d{4}-\d{2}-\d{2}T\d{2}-\d{2}-\d{2}/);
     });
@@ -174,7 +174,7 @@ complete -c openspec -a 'validate' -d 'Validate specs'
       const result = await installer.install(updatedScript);
 
       expect(result.success).toBe(true);
-      expect(result.message).toBe('Completion script updated successfully (previous version backed up)');
+      expect(result.message).toBe('补全脚本更新成功（已备份旧版本）');
       expect(result.backupPath).toBeDefined();
     });
 
@@ -216,7 +216,7 @@ complete -c openspec -a 'validate' -d 'Validate specs'
       expect(result.instructions).toBeDefined();
       expect(result.instructions).toHaveLength(2);
       expect(result.instructions![0]).toContain('~/.config/fish/completions/');
-      expect(result.instructions![1]).toContain('no shell restart needed');
+      expect(result.instructions![1]).toContain('无需重启 Shell');
     });
 
     it('should handle empty completion script', async () => {
@@ -257,7 +257,7 @@ complete -c openspec -a 'init'
       const result = await installer.uninstall();
 
       expect(result.success).toBe(true);
-      expect(result.message).toBe('Completion script uninstalled successfully');
+      expect(result.message).toBe('补全脚本已成功卸载');
     });
 
     it('should remove the completion file', async () => {
@@ -274,7 +274,7 @@ complete -c openspec -a 'init'
       const result = await installer.uninstall();
 
       expect(result.success).toBe(false);
-      expect(result.message).toBe('Completion script is not installed');
+      expect(result.message).toBe('补全脚本未安装');
     });
 
     it('should accept yes option parameter', async () => {
@@ -283,7 +283,7 @@ complete -c openspec -a 'init'
       const result = await installer.uninstall({ yes: true });
 
       expect(result.success).toBe(true);
-      expect(result.message).toBe('Completion script uninstalled successfully');
+      expect(result.message).toBe('补全脚本已成功卸载');
     });
 
     // Skip on Windows: fs.chmod() on directories doesn't restrict write access on Windows
@@ -304,8 +304,8 @@ complete -c openspec -a 'init'
       // which returns "not installed" rather than "failed to uninstall"
       expect(result.success).toBe(false);
       expect(
-        result.message === 'Completion script is not installed' ||
-        result.message.includes('Failed to uninstall completion script')
+        result.message === '补全脚本未安装' ||
+        result.message.includes('卸载补全脚本失败')
       ).toBe(true);
     });
 
@@ -314,7 +314,7 @@ complete -c openspec -a 'init'
       const result = await installer.uninstall();
 
       expect(result.success).toBe(false);
-      expect(result.message).toBe('Completion script is not installed');
+      expect(result.message).toBe('补全脚本未安装');
     });
   });
 

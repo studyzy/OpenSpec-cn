@@ -179,7 +179,7 @@ describe('PowerShellInstaller', () => {
       await fs.mkdir(path.dirname(profilePath), { recursive: true });
 
       const initialContent = [
-        '# OPENSPEC:START - OpenSpec completion (managed block, do not edit manually)',
+        '# OPENSPEC:START - OpenSpec 补全（管理块，请勿手动编辑）',
         `. "${mockScriptPath}"`,
         '# OPENSPEC:END',
         '',
@@ -380,7 +380,7 @@ Register-ArgumentCompleter -CommandName openspec -ScriptBlock $openspecCompleter
       const result = await installer.install(mockCompletionScript);
 
       expect(result.success).toBe(true);
-      expect(result.message).toContain('installed');
+      expect(result.message).toContain('补全脚本安装成功');
       expect(result.installedPath).toContain('OpenSpecCompletion.ps1');
       expect(result.backupPath).toBeUndefined();
     });
@@ -411,7 +411,7 @@ Register-ArgumentCompleter -CommandName openspec -ScriptBlock $openspecCompleter
       const result = await installer.install(mockCompletionScript);
 
       expect(result.success).toBe(true);
-      expect(result.message).toBe('Completion script is already installed (up to date)');
+      expect(result.message).toBe('补全脚本已安装（已是最新版本）');
       expect(result.backupPath).toBeUndefined();
     });
 
@@ -423,7 +423,7 @@ Register-ArgumentCompleter -CommandName openspec -ScriptBlock $openspecCompleter
       const result = await installer.install(updatedScript);
 
       expect(result.success).toBe(true);
-      expect(result.message).toContain('updated successfully');
+      expect(result.message).toContain('补全脚本更新成功');
       expect(result.backupPath).toBeDefined();
     });
 
@@ -448,7 +448,7 @@ Register-ArgumentCompleter -CommandName openspec -ScriptBlock $openspecCompleter
 
       expect(result.success).toBe(true);
       expect(result.profileConfigured).toBe(true);
-      expect(result.message).toContain('profile configured');
+      expect(result.message).toContain('已自动配置 PowerShell 配置文件');
       expect(result.instructions).toBeUndefined();
     });
 
@@ -484,7 +484,7 @@ Register-ArgumentCompleter -CommandName openspec -ScriptBlock $openspecCompleter
       const result = await installer.install(updatedScript);
 
       expect(result.success).toBe(true);
-      expect(result.message).toContain('backed up');
+      expect(result.message).toContain('已备份');
       expect(result.backupPath).toBeDefined();
     });
 
@@ -557,7 +557,7 @@ Register-ArgumentCompleter -CommandName openspec -ScriptBlock $openspecCompleter
       const result = await installer.uninstall();
 
       expect(result.success).toBe(true);
-      expect(result.message).toBe('Completion script uninstalled successfully');
+      expect(result.message).toBe('补全脚本已成功卸载');
     });
 
     it('should remove the completion file', async () => {
@@ -587,7 +587,7 @@ Register-ArgumentCompleter -CommandName openspec -ScriptBlock $openspecCompleter
       const result = await installer.uninstall();
 
       expect(result.success).toBe(false);
-      expect(result.message).toBe('Completion script is not installed');
+      expect(result.message).toBe('补全脚本未安装');
     });
 
     it('should accept yes option parameter', async () => {
@@ -597,7 +597,7 @@ Register-ArgumentCompleter -CommandName openspec -ScriptBlock $openspecCompleter
       const result = await installer.uninstall({ yes: true });
 
       expect(result.success).toBe(true);
-      expect(result.message).toBe('Completion script uninstalled successfully');
+      expect(result.message).toBe('补全脚本已成功卸载');
     });
 
     it('should handle both script and config removal', async () => {
@@ -641,8 +641,8 @@ Register-ArgumentCompleter -CommandName openspec -ScriptBlock $openspecCompleter
       // On others, the unlink fails which returns "Failed to uninstall"
       expect(result.success).toBe(false);
       expect(
-        result.message === 'Completion script is not installed' ||
-        result.message.includes('Failed to uninstall completion script')
+        result.message === '补全脚本未安装' ||
+        result.message.includes('卸载补全脚本失败')
       ).toBe(true);
     });
 
@@ -650,7 +650,7 @@ Register-ArgumentCompleter -CommandName openspec -ScriptBlock $openspecCompleter
       const result = await installer.uninstall();
 
       expect(result.success).toBe(false);
-      expect(result.message).toBe('Completion script is not installed');
+      expect(result.message).toBe('补全脚本未安装');
     });
   });
 

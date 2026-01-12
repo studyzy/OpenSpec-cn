@@ -228,11 +228,11 @@ describe('ZshInstaller', () => {
       const secondResult = await installer.install(testScript);
 
       expect(secondResult.success).toBe(true);
-      expect(secondResult.message).toContain('already installed');
-      expect(secondResult.message).toContain('up to date');
+      expect(secondResult.message).toContain('补全脚本已安装');
+      expect(secondResult.message).toContain('最新版本');
       expect(secondResult.backupPath).toBeUndefined();
       expect(secondResult.instructions).toBeDefined();
-      expect(secondResult.instructions!.join(' ')).toContain('already installed');
+      expect(secondResult.instructions!.join(' ')).toContain('补全脚本已安装');
     });
 
     it('should update completion when content differs', async () => {
@@ -246,8 +246,8 @@ describe('ZshInstaller', () => {
       const secondResult = await installer.install(secondScript);
 
       expect(secondResult.success).toBe(true);
-      expect(secondResult.message).toContain('updated successfully');
-      expect(secondResult.message).toContain('backed up');
+      expect(secondResult.message).toContain('补全脚本更新成功');
+      expect(secondResult.message).toContain('已备份');
       expect(secondResult.backupPath).toBeDefined();
 
       // Verify new content was written
@@ -300,7 +300,7 @@ describe('ZshInstaller', () => {
       const result = await installer.uninstall();
 
       expect(result.success).toBe(true);
-      expect(result.message).toContain('removed');
+      expect(result.message).toContain('移除补全脚本');
 
       // Verify it's gone
       const afterUninstall = await installer.isInstalled();
@@ -312,7 +312,7 @@ describe('ZshInstaller', () => {
       const result = await installer.uninstall();
 
       expect(result.success).toBe(false);
-      expect(result.message).toContain('not installed');
+      expect(result.message).toContain('未安装');
     });
 
     it('should remove from correct location for Oh My Zsh', async () => {
@@ -415,7 +415,7 @@ describe('ZshInstaller', () => {
 
       expect(content).toContain('# OPENSPEC:START');
       expect(content).toContain('# OPENSPEC:END');
-      expect(content).toContain('# OpenSpec shell completions configuration');
+      expect(content).toContain('# OpenSpec shell 补全配置');
       expect(content).toContain(`fpath=("${completionsDir}" $fpath)`);
       expect(content).toContain('autoload -Uz compinit');
       expect(content).toContain('compinit');
@@ -575,7 +575,7 @@ describe('ZshInstaller', () => {
 
       expect(newContent).not.toContain('# OPENSPEC:START');
       expect(newContent).not.toContain('# OPENSPEC:END');
-      expect(newContent).not.toContain('OpenSpec shell completions');
+      expect(newContent).not.toContain('OpenSpec shell 补全配置');
       expect(newContent).toContain('# My config');
       expect(newContent).toContain('alias ll="ls -la"');
     });
@@ -697,7 +697,7 @@ describe('ZshInstaller', () => {
       const result = await installer.install(testScript);
 
       expect(result.success).toBe(true);
-      expect(result.message).toContain('.zshrc configured');
+      expect(result.message).toContain('自动配置 .zshrc');
     });
   });
 
@@ -717,7 +717,7 @@ describe('ZshInstaller', () => {
       const result = await installer.uninstall();
 
       expect(result.success).toBe(true);
-      expect(result.message).toContain('Removed OpenSpec configuration from ~/.zshrc');
+      expect(result.message).toContain('已从 ~/.zshrc 移除 OpenSpec 配置');
 
       // Verify .zshrc config was removed
       content = await fs.readFile(zshrcPath, 'utf-8');
@@ -744,7 +744,7 @@ describe('ZshInstaller', () => {
       const result = await installer.uninstall();
 
       expect(result.success).toBe(true);
-      expect(result.message).toContain('Removed OpenSpec configuration from ~/.zshrc');
+      expect(result.message).toContain('已从 ~/.zshrc 移除 OpenSpec 配置');
     });
 
     it('should include both messages when removing script and .zshrc', async () => {
@@ -753,8 +753,8 @@ describe('ZshInstaller', () => {
       const result = await installer.uninstall();
 
       expect(result.success).toBe(true);
-      expect(result.message).toContain('Completion script removed');
-      expect(result.message).toContain('Removed OpenSpec configuration from ~/.zshrc');
+      expect(result.message).toContain('移除补全脚本');
+      expect(result.message).toContain('已从 ~/.zshrc 移除 OpenSpec 配置');
     });
   });
 });

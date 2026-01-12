@@ -113,7 +113,7 @@ export function getGlobalConfig(): GlobalConfig {
   } catch (error) {
     // Log warning for parse errors, but not for missing files
     if (error instanceof SyntaxError) {
-      console.error(`Warning: Invalid JSON in ${configPath}, using defaults`);
+      console.error(`警告：${configPath} 中的 JSON 无效，将使用默认配置`);
     }
     return { ...DEFAULT_CONFIG };
   }

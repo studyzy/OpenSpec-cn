@@ -387,16 +387,16 @@ Old body
     const updated = await fs.readFile(continuePath, 'utf-8');
     expect(updated).toContain('name: openspec-apply');
     expect(updated).toContain('invokable: true');
-    expect(updated).toContain('Work through tasks sequentially');
+    expect(updated).toContain('按顺序完成任务');
     expect(updated).not.toContain('Old body');
 
     const [logMessage] = consoleSpy.mock.calls[0];
     expect(logMessage).toContain(
-      'Updated OpenSpec instructions (openspec/AGENTS.md'
+      '已更新OpenSpec说明 (openspec/AGENTS.md'
     );
-    expect(logMessage).toContain('AGENTS.md (created)');
+    expect(logMessage).toContain('AGENTS.md (已创建)');
     expect(logMessage).toContain(
-      'Updated slash commands: .continue/prompts/openspec-apply.prompt'
+      '已更新斜杠命令: .continue/prompts/openspec-apply.prompt'
     );
 
     consoleSpy.mockRestore();

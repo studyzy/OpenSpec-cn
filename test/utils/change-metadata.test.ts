@@ -104,7 +104,7 @@ describe('writeChangeMetadata', () => {
         schema: 'unknown-schema',
         created: '2025-01-05',
       })
-    ).toThrow(/Unknown schema 'unknown-schema'/);
+    ).toThrow(/未知 Schema 'unknown-schema'/);
   });
 });
 
@@ -160,7 +160,7 @@ describe('readChangeMetadata', () => {
     const metaPath = path.join(changeDir, '.openspec.yaml');
     await fs.writeFile(metaPath, 'schema: unknown-schema\n', 'utf-8');
 
-    expect(() => readChangeMetadata(changeDir)).toThrow(/Unknown schema/);
+    expect(() => readChangeMetadata(changeDir)).toThrow(/未知 Schema/);
   });
 });
 
@@ -218,7 +218,7 @@ describe('validateSchemaName', () => {
 
   it('should throw for unknown schema', () => {
     expect(() => validateSchemaName('unknown-schema')).toThrow(
-      /Unknown schema 'unknown-schema'/
+      /未知 Schema 'unknown-schema'/
     );
   });
 });

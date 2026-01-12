@@ -87,7 +87,7 @@ describe('config command integration', () => {
     const config = getGlobalConfig();
     // Should return defaults
     expect(config.featureFlags).toEqual({});
-    expect(consoleErrorSpy).toHaveBeenCalledWith(expect.stringContaining('Invalid JSON'));
+    expect(consoleErrorSpy).toHaveBeenCalledWith(expect.stringContaining('JSON 无效'));
   });
 });
 
@@ -97,7 +97,7 @@ describe('config command shell completion registry', () => {
 
     const configCmd = COMMAND_REGISTRY.find((cmd) => cmd.name === 'config');
     expect(configCmd).toBeDefined();
-    expect(configCmd?.description).toBe('View and modify global OpenSpec configuration');
+    expect(configCmd?.description).toBe('查看并修改全局 OpenSpec 配置');
   });
 
   it('should have all config subcommands in registry', async () => {
