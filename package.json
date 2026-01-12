@@ -1,6 +1,6 @@
 {
   "name": "@studyzy/openspec-cn",
-  "version": "0.17.2",
+  "version": "0.19.0",
   "description": "面向AI编程助手的规范驱动开发框架OpenSpec的简体中文汉化版本",
   "keywords": [
     "openspec",
@@ -34,6 +34,7 @@
   "files": [
     "dist",
     "bin",
+    "schemas",
     "scripts/postinstall.js",
     "!dist/**/*.test.js",
     "!dist/**/__tests__",
@@ -75,7 +76,10 @@
     "@inquirer/prompts": "^7.8.0",
     "chalk": "^5.5.0",
     "commander": "^14.0.0",
+    "fast-glob": "^3.3.3",
     "ora": "^8.2.0",
+    "posthog-node": "^5.20.0",
+    "yaml": "^2.8.2",
     "zod": "^4.0.17"
   }
 }
