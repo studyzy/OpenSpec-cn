@@ -350,11 +350,11 @@ export async function writeUpdatedSpec(
   await fs.writeFile(update.target, rebuilt);
 
   const specName = path.basename(path.dirname(update.target));
-  console.log(`Applying changes to openspec/specs/${specName}/spec.md:`);
-  if (counts.added) console.log(`  + ${counts.added} added`);
-  if (counts.modified) console.log(`  ~ ${counts.modified} modified`);
-  if (counts.removed) console.log(`  - ${counts.removed} removed`);
-  if (counts.renamed) console.log(`  → ${counts.renamed} renamed`);
+  console.log(`应用变更到 openspec/specs/${specName}/spec.md:`);
+  if (counts.added) console.log(`  + 新增 ${counts.added} 条`);
+  if (counts.modified) console.log(`  ~ 修改 ${counts.modified} 条`);
+  if (counts.removed) console.log(`  - 删除 ${counts.removed} 条`);
+  if (counts.renamed) console.log(`  → 重命名 ${counts.renamed} 条`);
 }
 
 /**
@@ -449,18 +449,18 @@ export async function applySpecs(
       await fs.writeFile(p.update.target, p.rebuilt);
 
       if (!options.silent) {
-        console.log(`Applying changes to openspec/specs/${capability}/spec.md:`);
-        if (p.counts.added) console.log(`  + ${p.counts.added} added`);
-        if (p.counts.modified) console.log(`  ~ ${p.counts.modified} modified`);
-        if (p.counts.removed) console.log(`  - ${p.counts.removed} removed`);
-        if (p.counts.renamed) console.log(`  → ${p.counts.renamed} renamed`);
+        console.log(`应用变更到 openspec/specs/${capability}/spec.md:`);
+        if (p.counts.added) console.log(`  + 新增 ${p.counts.added} 条`);
+        if (p.counts.modified) console.log(`  ~ 修改 ${p.counts.modified} 条`);
+        if (p.counts.removed) console.log(`  - 删除 ${p.counts.removed} 条`);
+        if (p.counts.renamed) console.log(`  → 重命名 ${p.counts.renamed} 条`);
       }
     } else if (!options.silent) {
-      console.log(`Would apply changes to openspec/specs/${capability}/spec.md:`);
-      if (p.counts.added) console.log(`  + ${p.counts.added} added`);
-      if (p.counts.modified) console.log(`  ~ ${p.counts.modified} modified`);
-      if (p.counts.removed) console.log(`  - ${p.counts.removed} removed`);
-      if (p.counts.renamed) console.log(`  → ${p.counts.renamed} renamed`);
+      console.log(`将应用变更到 openspec/specs/${capability}/spec.md:`);
+      if (p.counts.added) console.log(`  + 新增 ${p.counts.added} 条`);
+      if (p.counts.modified) console.log(`  ~ 修改 ${p.counts.modified} 条`);
+      if (p.counts.removed) console.log(`  - 删除 ${p.counts.removed} 条`);
+      if (p.counts.renamed) console.log(`  → 重命名 ${p.counts.renamed} 条`);
     }
 
     capabilities.push({
