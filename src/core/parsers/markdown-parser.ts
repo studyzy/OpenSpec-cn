@@ -216,11 +216,11 @@ export class MarkdownParser {
         
         // Use word boundaries to avoid false matches (e.g., "address" matching "add")
         // Check RENAMED first since it's more specific than patterns containing "new"
-        if (/\brename(s|d|ing)?\b/.test(lowerDesc) || /\brenamed\s+(to|from)\b/.test(lowerDesc)) {
+        if (/\brename(s|d|ing)?\b/.test(lowerDesc) || /\brenamed\s+(to|from)\b/.test(lowerDesc) || /重命名/.test(description)) {
           operation = 'RENAMED';
-        } else if (/\badd(s|ed|ing)?\b/.test(lowerDesc) || /\bcreate(s|d|ing)?\b/.test(lowerDesc) || /\bnew\b/.test(lowerDesc)) {
+        } else if (/\badd(s|ed|ing)?\b/.test(lowerDesc) || /\bcreate(s|d|ing)?\b/.test(lowerDesc) || /\bnew\b/.test(lowerDesc) || /新增|添加|创建|新/.test(description)) {
           operation = 'ADDED';
-        } else if (/\bremove(s|d|ing)?\b/.test(lowerDesc) || /\bdelete(s|d|ing)?\b/.test(lowerDesc)) {
+        } else if (/\bremove(s|d|ing)?\b/.test(lowerDesc) || /\bdelete(s|d|ing)?\b/.test(lowerDesc) || /移除|删除/.test(description)) {
           operation = 'REMOVED';
         }
         

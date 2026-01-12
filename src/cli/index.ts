@@ -134,8 +134,8 @@ program
   .description('列出项目（默认显示更改）。使用 --specs 列出规范。')
   .option('--specs', '列出规范而非更改')
   .option('--changes', '明确列出更改（默认）')
-  .option('--sort <order>', 'Sort order: "recent" (default) or "name"', 'recent')
-  .option('--json', 'Output as JSON (for programmatic use)')
+  .option('--sort <order>', '排序方式："recent"（默认）或 "name"', 'recent')
+  .option('--json', '以 JSON 格式输出（供程序使用）')
   .action(async (options?: { specs?: boolean; changes?: boolean; sort?: string; json?: boolean }) => {
     try {
       const listCommand = new ListCommand();
@@ -298,48 +298,48 @@ program
 // Completion command with subcommands
 const completionCmd = program
   .command('completion')
-  .description('Manage shell completions for OpenSpec CLI');
+  .description('管理 OpenSpec CLI 的 Shell 补全');
 
 completionCmd
   .command('generate [shell]')
-  .description('Generate completion script for a shell (outputs to stdout)')
+  .description('为指定的 Shell 生成补全脚本（输出到 stdout）')
   .action(async (shell?: string) => {
     try {
       const completionCommand = new CompletionCommand();
       await completionCommand.generate({ shell });
     } catch (error) {
       console.log();
-      ora().fail(`Error: ${(error as Error).message}`);
+      ora().fail(`错误：${(error as Error).message}`);
       process.exit(1);
     }
   });
 
 completionCmd
   .command('install [shell]')
-  .description('Install completion script for a shell')
-  .option('--verbose', 'Show detailed installation output')
+  .description('安装指定 Shell 的补全脚本')
+  .option('--verbose', '显示详细安装输出')
   .action(async (shell?: string, options?: { verbose?: boolean }) => {
     try {
       const completionCommand = new CompletionCommand();
       await completionCommand.install({ shell, verbose: options?.verbose });
     } catch (error) {
       console.log();
-      ora().fail(`Error: ${(error as Error).message}`);
+      ora().fail(`错误：${(error as Error).message}`);
       process.exit(1);
     }
   });
 
 completionCmd
   .command('uninstall [shell]')
-  .description('Uninstall completion script for a shell')
-  .option('-y, --yes', 'Skip confirmation prompts')
+  .description('卸载指定 Shell 的补全脚本')
+  .option('-y, --yes', '跳过确认提示')
   .action(async (shell?: string, options?: { yes?: boolean }) => {
     try {
       const completionCommand = new CompletionCommand();
       await completionCommand.uninstall({ shell, yes: options?.yes });
     } catch (error) {
       console.log();
-      ora().fail(`Error: ${(error as Error).message}`);
+      ora().fail(`错误：${(error as Error).message}`);
       process.exit(1);
     }
   });

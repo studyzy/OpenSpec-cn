@@ -132,7 +132,7 @@ export async function maybeShowTelemetryNotice(): Promise<void> {
 
     // Display notice
     console.log(
-      'Note: OpenSpec collects anonymous usage stats. Opt out: OPENSPEC_TELEMETRY=0'
+      '提示：OpenSpec 会收集匿名使用统计数据。如需退出，请设置环境变量：OPENSPEC_TELEMETRY=0'
     );
 
     // Mark as seen

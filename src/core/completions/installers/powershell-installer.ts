@@ -108,7 +108,7 @@ export class PowerShellInstaller {
    */
   private generateProfileConfig(scriptPath: string): string {
     return [
-      '# OpenSpec shell completions configuration',
+      '# OpenSpec shell 补全配置',
       `if (Test-Path "${scriptPath}") {`,
       `    . "${scriptPath}"`,
       '}',
@@ -147,7 +147,7 @@ export class PowerShellInstaller {
         // Add OpenSpec completion configuration with markers
         const openspecBlock = [
           '',
-          '# OPENSPEC:START - OpenSpec completion (managed block, do not edit manually)',
+          '# OPENSPEC:START - OpenSpec 补全（管理块，请勿手动编辑）',
           scriptLine,
           '# OPENSPEC:END',
           '',
@@ -236,10 +236,10 @@ export class PowerShellInstaller {
           return {
             success: true,
             installedPath: targetPath,
-            message: 'Completion script is already installed (up to date)',
+            message: '补全脚本已安装（已是最新版本）',
             instructions: [
-              'The completion script is already installed and up to date.',
-              'If completions are not working, try restarting PowerShell or run: . $PROFILE',
+              '补全脚本已安装，且已是最新版本。',
+              '如果补全未生效，请尝试重启 PowerShell 或运行：. $PROFILE',
             ],
           };
         }
@@ -270,12 +270,12 @@ export class PowerShellInstaller {
       let message: string;
       if (isUpdate) {
         message = backupPath
-          ? 'Completion script updated successfully (previous version backed up)'
-          : 'Completion script updated successfully';
+          ? '补全脚本更新成功（已备份旧版本）'
+          : '补全脚本更新成功';
       } else {
         message = profileConfigured
-          ? 'Completion script installed and PowerShell profile configured successfully'
-          : 'Completion script installed successfully for PowerShell';
+          ? '补全脚本安装成功，并已自动配置 PowerShell 配置文件'
+          : '已成功为 PowerShell 安装补全脚本';
       }
 
       return {
@@ -304,16 +304,16 @@ export class PowerShellInstaller {
     const profilePath = this.getProfilePath();
 
     return [
-      'Completion script installed successfully.',
+      '补全脚本安装成功。',
       '',
-      `To enable completions, add the following to your PowerShell profile (${profilePath}):`,
+      `如需启用补全，请在您的 PowerShell 配置文件 (${profilePath}) 中添加以下内容：`,
       '',
-      '  # Source OpenSpec completions',
+      '  # 加载 OpenSpec 补全',
       `  if (Test-Path "${installedPath}") {`,
       `      . "${installedPath}"`,
       '  }',
       '',
-      'Then restart PowerShell or run: . $PROFILE',
+      '然后重启 PowerShell 或运行：. $PROFILE',
     ];
   }
 
@@ -334,7 +334,7 @@ export class PowerShellInstaller {
       } catch {
         return {
           success: false,
-          message: 'Completion script is not installed',
+          message: '补全脚本未安装',
         };
       }
 
@@ -346,12 +346,12 @@ export class PowerShellInstaller {
 
       return {
         success: true,
-        message: 'Completion script uninstalled successfully',
+        message: '补全脚本已成功卸载',
       };
     } catch (error) {
       return {
         success: false,
-        message: `Failed to uninstall completion script: ${error instanceof Error ? error.message : String(error)}`,
+        message: `卸载补全脚本失败：${error instanceof Error ? error.message : String(error)}`,
       };
     }
   }

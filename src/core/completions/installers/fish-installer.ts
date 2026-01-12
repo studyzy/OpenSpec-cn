@@ -62,10 +62,10 @@ export class FishInstaller {
           return {
             success: true,
             installedPath: targetPath,
-            message: 'Completion script is already installed (up to date)',
+            message: '补全脚本已安装（已是最新版本）',
             instructions: [
-              'The completion script is already installed and up to date.',
-              'Fish automatically loads completions - they should be available immediately.',
+              '补全脚本已安装，且已是最新版本。',
+              'Fish 会自动加载补全脚本 —— 它们应当立即可用。',
             ],
           };
         }
@@ -90,10 +90,10 @@ export class FishInstaller {
       let message: string;
       if (isUpdate) {
         message = backupPath
-          ? 'Completion script updated successfully (previous version backed up)'
-          : 'Completion script updated successfully';
+          ? '补全脚本更新成功（已备份旧版本）'
+          : '补全脚本更新成功';
       } else {
-        message = 'Completion script installed successfully for Fish';
+        message = '已成功为 Fish 安装补全脚本';
       }
 
       return {
@@ -102,8 +102,8 @@ export class FishInstaller {
         backupPath,
         message,
         instructions: [
-          'Fish automatically loads completions from ~/.config/fish/completions/',
-          'Completions are available immediately - no shell restart needed.',
+          'Fish 会从 ~/.config/fish/completions/ 自动加载补全脚本',
+          '补全脚本立即可用 —— 无需重启 Shell。',
         ],
       };
     } catch (error) {
@@ -131,7 +131,7 @@ export class FishInstaller {
       } catch {
         return {
           success: false,
-          message: 'Completion script is not installed',
+          message: '补全脚本未安装',
         };
       }
 
@@ -140,12 +140,12 @@ export class FishInstaller {
 
       return {
         success: true,
-        message: 'Completion script uninstalled successfully',
+        message: '补全脚本已成功卸载',
       };
     } catch (error) {
       return {
         success: false,
-        message: `Failed to uninstall completion script: ${error instanceof Error ? error.message : String(error)}`,
+        message: `卸载补全脚本失败：${error instanceof Error ? error.message : String(error)}`,
       };
     }
   }

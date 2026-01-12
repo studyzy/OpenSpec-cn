@@ -101,7 +101,7 @@ export class BashInstaller {
    */
   private generateBashrcConfig(completionsDir: string): string {
     return [
-      '# OpenSpec shell completions configuration',
+      '# OpenSpec shell 补全配置',
       `if [ -d "${completionsDir}" ]; then`,
       `  for f in "${completionsDir}"/*; do`,
       '    [ -f "$f" ] && . "$f"',
@@ -226,10 +226,10 @@ export class BashInstaller {
           return {
             success: true,
             installedPath: targetPath,
-            message: 'Completion script is already installed (up to date)',
+            message: '补全脚本已安装（已是最新版本）',
             instructions: [
-              'The completion script is already installed and up to date.',
-              'If completions are not working, try: exec bash',
+              '补全脚本已安装，且已是最新版本。',
+              '如果补全未生效，请尝试运行：exec bash',
             ],
           };
         }
@@ -260,13 +260,13 @@ export class BashInstaller {
       const warnings: string[] = [];
       if (!hasBashCompletion) {
         warnings.push(
-          '⚠️  Warning: bash-completion package not detected',
+          '⚠️  警告：未检测到 bash-completion 包',
           '',
-          'The completion script requires bash-completion to function.',
-          'Install it with:',
+          '补全脚本需要 bash-completion 才能运行。',
+          '请使用以下命令安装：',
           '  brew install bash-completion@2',
           '',
-          'Then add to your ~/.bash_profile:',
+          '然后添加以下内容到您的 ~/.bash_profile：',
           '  [[ -r "/opt/homebrew/etc/profile.d/bash_completion.sh" ]] && . "/opt/homebrew/etc/profile.d/bash_completion.sh"'
         );
       }
@@ -275,12 +275,12 @@ export class BashInstaller {
       let message: string;
       if (isUpdate) {
         message = backupPath
-          ? 'Completion script updated successfully (previous version backed up)'
-          : 'Completion script updated successfully';
+          ? '补全脚本更新成功（已备份旧版本）'
+          : '补全脚本更新成功';
       } else {
         message = bashrcConfigured
-          ? 'Completion script installed and .bashrc configured successfully'
-          : 'Completion script installed successfully for Bash';
+          ? '补全脚本安装成功，并已自动配置 .bashrc'
+          : '已成功为 Bash 安装补全脚本';
       }
 
       return {
@@ -310,18 +310,18 @@ export class BashInstaller {
     const completionsDir = path.dirname(installedPath);
 
     return [
-      'Completion script installed successfully.',
+      '补全脚本安装成功。',
       '',
-      'To enable completions, add the following to your ~/.bashrc file:',
+      '如需启用补全，请在您的 ~/.bashrc 文件中添加以下内容：',
       '',
-      `  # Source OpenSpec completions`,
+      `  # 加载 OpenSpec 补全`,
       `  if [ -d "${completionsDir}" ]; then`,
       `    for f in "${completionsDir}"/*; do`,
       '      [ -f "$f" ] && . "$f"',
       '    done',
       '  fi',
       '',
-      'Then restart your shell or run: exec bash',
+      '然后重启 Shell 或运行：exec bash',
     ];
   }
 
@@ -342,7 +342,7 @@ export class BashInstaller {
       } catch {
         return {
           success: false,
-          message: 'Completion script is not installed',
+          message: '补全脚本未安装',
         };
       }
 
@@ -354,12 +354,12 @@ export class BashInstaller {
 
       return {
         success: true,
-        message: 'Completion script uninstalled successfully',
+        message: '补全脚本已成功卸载',
       };
     } catch (error) {
       return {
         success: false,
-        message: `Failed to uninstall completion script: ${error instanceof Error ? error.message : String(error)}`,
+        message: `卸载补全脚本失败：${error instanceof Error ? error.message : String(error)}`,
       };
     }
   }

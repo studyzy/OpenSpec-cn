@@ -38,5 +38,5 @@ export const AI_TOOLS: AIToolOption[] = [
   { name: 'Qwen Code', value: 'qwen', available: true, successLabel: 'Qwen Code' },
   { name: 'RooCode', value: 'roocode', available: true, successLabel: 'RooCode' },
   { name: 'Windsurf', value: 'windsurf', available: true, successLabel: 'Windsurf' },
-  { name: 'AGENTS.md (works with Amp, VS Code, …)', value: 'agents', available: false, successLabel: 'your AGENTS.md-compatible assistant' }
+  { name: 'AGENTS.md (适用于 Amp, VS Code, …)', value: 'agents', available: false, successLabel: '您的兼容 AGENTS.md 的助手' }
 ];
