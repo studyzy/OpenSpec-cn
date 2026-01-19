@@ -132,7 +132,7 @@ Old slash content
     const updated = await fs.readFile(proposalPath, 'utf-8');
     expect(updated).toContain('name: OpenSpec: 提案');
     expect(updated).toContain('**护栏规则**');
-    expect(updated).toContain('`openspec-cn validate <id> --strict`');
+    expect(updated).toContain('`openspec-cn validate <id> --strict --no-interactive`');
     expect(updated).not.toContain('Old slash content');
 
     const [logMessage] = consoleSpy.mock.calls[0];
@@ -314,7 +314,7 @@ Old slash content
     const updated = await fs.readFile(proposalPath, 'utf-8');
     expect(updated).toContain('# OpenSpec: 提案');
     expect(updated).toContain('**护栏规则**');
-    expect(updated).toContain('`openspec-cn validate <id> --strict`');
+    expect(updated).toContain('`openspec-cn validate <id> --strict --no-interactive`');
     expect(updated).not.toContain('Old slash content');
 
     const [logMessage] = consoleSpy.mock.calls[0];
@@ -1001,7 +1001,7 @@ Old slash content
     const updated = await fs.readFile(codeBuddyPath, 'utf-8');
     expect(updated).toContain('name: OpenSpec: 提案');
     expect(updated).toContain('**护栏规则**');
-    expect(updated).toContain('`openspec-cn validate <id> --strict`');
+    expect(updated).toContain('`openspec-cn validate <id> --strict --no-interactive`');
     expect(updated).not.toContain('Old slash content');
 
     const [logMessage] = consoleSpy.mock.calls[0];
@@ -1077,7 +1077,7 @@ Old slash content
     const updated = await fs.readFile(crushPath, 'utf-8');
     expect(updated).toContain('name: OpenSpec: 提案');
     expect(updated).toContain('**护栏规则**');
-    expect(updated).toContain('`openspec-cn validate <id> --strict`');
+    expect(updated).toContain('`openspec-cn validate <id> --strict --no-interactive`');
     expect(updated).not.toContain('Old slash content');
 
     const [logMessage] = consoleSpy.mock.calls[0];
@@ -1153,7 +1153,7 @@ Old body
     expect(updated).toContain('description: "Old description"');
     expect(updated).toContain('argument-hint: old-hint');
     expect(updated).toContain('**护栏规则**');
-    expect(updated).toContain('`openspec-cn validate <id> --strict`');
+    expect(updated).toContain('`openspec-cn validate <id> --strict --no-interactive`');
     expect(updated).not.toContain('Old body');
 
     const [logMessage] = consoleSpy.mock.calls[0];
@@ -1192,7 +1192,7 @@ Old slash content
     const updated = await fs.readFile(qoderPath, 'utf-8');
     expect(updated).toContain('name: OpenSpec: 提案');
     expect(updated).toContain('**护栏规则**');
-    expect(updated).toContain('`openspec-cn validate <id> --strict`');
+    expect(updated).toContain('`openspec-cn validate <id> --strict --no-interactive`');
     expect(updated).not.toContain('Old slash content');
 
     const [logMessage] = consoleSpy.mock.calls[0];
@@ -1230,7 +1230,7 @@ Old body
     // For RooCode, the header is Markdown, preserve it and update only managed block
     expect(updated).toContain('# OpenSpec: 提案');
     expect(updated).toContain('**护栏规则**');
-    expect(updated).toContain('`openspec-cn validate <id> --strict`');
+    expect(updated).toContain('`openspec-cn validate <id> --strict --no-interactive`');
     expect(updated).not.toContain('Old body');
 
     const [logMessage] = consoleSpy.mock.calls[0];
@@ -1416,7 +1416,7 @@ More instructions after.`;
     expect(updated).toContain('## Custom Intro Title');
     expect(updated).toContain('Footer stays');
     expect(updated).not.toContain('Old body');
-    expect(updated).toContain('`openspec-cn validate <id> --strict`');
+    expect(updated).toContain('`openspec-cn validate <id> --strict --no-interactive`');
   });
 
   it('should handle configurator errors gracefully for CoStrict', async () => {
@@ -1472,7 +1472,7 @@ More instructions after.`;
     expect(updated).toContain('## Custom Intro Title');
     expect(updated).toContain('Footer stays');
     expect(updated).not.toContain('Old body');
-    expect(updated).toContain('`openspec-cn validate <id> --strict`');
+    expect(updated).toContain('`openspec-cn validate <id> --strict --no-interactive`');
   });
 
   it('should not create missing Windsurf workflows on update', async () => {

@@ -9,7 +9,7 @@ AI编程助手使用OpenSpec进行规范驱动开发的说明文档。
 - 选择唯一\`change-id\`：短横线命名法，动词开头（\`add-\`，\`update-\`，\`remove-\`，\`refactor-\`）
 - 创建骨架：\`proposal.md\`，\`tasks.md\`，\`design.md\`（仅当需要时），以及受影响功能的增量规范
 - 编写增量：使用\`## 新增|修改|移除|重命名需求\`；每个需求至少包含一个\`#### 场景：\`
-- 验证：\`openspec-cn validate [change-id] --strict\`并修复问题
+- 验证：\`openspec-cn validate [change-id] --strict --no-interactive\`并修复问题
 - 请求批准：在提案获得批准前不要开始实施
 
 ## 三阶段工作流
@@ -44,7 +44,7 @@ AI编程助手使用OpenSpec进行规范驱动开发的说明文档。
 1. 查看\`openspec/project.md\`，\`openspec-cn list\`和\`openspec-cn list --specs\`以了解当前上下文。
 2. 选择唯一的动词开头\`change-id\`并在\`openspec/changes/<id>/\`下创建\`proposal.md\`、\`tasks.md\`、可选的\`design.md\`，以及在\`openspec/changes/<id>/\`下的规范增量。
 3. 使用\`## 新增|修改|移除需求\`编写规范增量，每个需求至少包含一个\`#### 场景：\`。
-4. 运行\`openspec-cn validate <id> --strict\`并在分享提案前解决任何问题。
+4. 运行\`openspec-cn validate <id> --strict --no-interactive\`并在分享提案前解决任何问题。
 
 ### 阶段 2：实施变更
 将这些步骤作为TODO跟踪并逐一完成。
@@ -61,7 +61,7 @@ AI编程助手使用OpenSpec进行规范驱动开发的说明文档。
 - 移动\`changes/[name]/\` → \`changes/archive/YYYY-MM-DD-[name]/\`
 - 如果功能发生更改，更新\`specs/\`
 - 对于仅工具变更，使用\`openspec-cn archive <change-id> --skip-specs --yes\`（始终明确传递变更ID）
-- 运行\`openspec-cn validate --strict\`以确认归档的变更通过检查
+- 运行\`openspec-cn validate --strict --no-interactive\`以确认归档的变更通过检查
 
 ## 任何任务前
 
@@ -108,7 +108,7 @@ openspec-cn validate              # 批量验证模式
 
 # 调试
 openspec-cn show [change] --json --deltas-only
-openspec-cn validate [change] --strict
+openspec-cn validate [change] --strict --no-interactive
 \`\`\`
 
 ### 命令标志
@@ -306,7 +306,7 @@ openspec/
 
 \`\`\`bash
 # 始终使用严格模式进行全面检查
-openspec-cn validate [change] --strict
+openspec-cn validate [change] --strict --no-interactive
 
 # 调试增量解析
 openspec-cn show [change] --json | jq '.deltas'
@@ -343,7 +343,7 @@ cat > openspec/changes/$CHANGE/specs/auth/spec.md << 'EOF'
 EOF
 
 # 4) 验证
-openspec-cn validate $CHANGE --strict
+openspec-cn validate $CHANGE --strict --no-interactive
 \`\`\`
 
 ## 多功能示例
@@ -449,7 +449,7 @@ notifications/spec.md
 \`\`\`bash
 openspec-cn list              # 正在进行什么？
 openspec-cn show [item]       # 查看详情
-openspec-cn validate --strict # 正确吗？
+openspec-cn validate --strict --no-interactive  # 正确吗？
 openspec-cn archive <change-id> [--yes|-y]  # 标记完成（添加--yes用于自动化）
 \`\`\`
 

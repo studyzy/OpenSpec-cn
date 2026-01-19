@@ -463,6 +463,13 @@ OpenSpec将每个功能的变更分组到一个文件夹中（`openspec/changes/
 - 本地开发CLI：`pnpm run dev` 或 `pnpm run dev:cli`
 - 约定式提交（单行）：`type(scope): subject`
 
+<details>
+<summary><strong>Maintainers & Advisors</strong></summary>
+
+See [MAINTAINERS.md](MAINTAINERS.md) for the list of core maintainers and advisors who help guide the project.
+
+</details>
+
 ## 许可证
 
 MIT

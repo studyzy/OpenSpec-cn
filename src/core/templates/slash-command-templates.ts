@@ -16,7 +16,7 @@ const proposalSteps = `**步骤**
 4. 当解决方案跨越多个系统、引入新模式或在提交规范前需要权衡讨论时，在\`design.md\`中记录架构推理。
 5. 在\`openspec/changes/<id>/specs/<capability>/spec.md\`中起草规范增量（每个功能一个文件夹），使用\`## 新增需求|修改需求|移除需求|重命名需求\`，每个需求至少有一个\`#### 场景：\`，并在相关时交叉引用相关功能。
 6. 将\`tasks.md\`起草为有序的小型可验证工作项列表，这些项提供用户可见的进展，包括验证（测试、工具），并突出显示依赖关系或可并行工作。
-7. 使用\`openspec-cn validate <id> --strict\`验证并在分享提案前解决每个问题。`;
+7. 使用\`openspec-cn validate <id> --strict --no-interactive\`验证并在分享提案前解决每个问题。`;
 
 const proposalReferences = `**参考**
 - 当验证失败时，使用\`openspec-cn show <id> --json --deltas-only\`或\`openspec-cn show <spec> --type spec\`检查详情。
@@ -45,9 +45,20 @@ const archiveSteps = `**步骤**
 4. 查看命令输出以确认目标规范已更新且变更已放入\`openspec/changes/archive/\`。
 5. 使用\`openspec-cn validate --strict\`验证，如果出现异常，使用\`openspec-cn show <id>\`检查。`;
 
-const archiveReferences = `**参考**
-- 在归档前使用\`openspec-cn list\`确认变更ID。
-- 使用\`openspec-cn list --specs\`检查刷新的规范，并在交前解决任何验证问题。`;
+const archiveSteps = `**Steps**
+1. Determine the change ID to archive:
+   - If this prompt already includes a specific change ID (for example inside a \`<ChangeId>\` block populated by slash-command arguments), use that value after trimming whitespace.
+   - If the conversation references a change loosely (for example by title or summary), run \`openspec list\` to surface likely IDs, share the relevant candidates, and confirm which one the user intends.
+   - Otherwise, review the conversation, run \`openspec list\`, and ask the user which change to archive; wait for a confirmed change ID before proceeding.
+   - If you still cannot identify a single change ID, stop and tell the user you cannot archive anything yet.
+2. Validate the change ID by running \`openspec list\` (or \`openspec show <id>\`) and stop if the change is missing, already archived, or otherwise not ready to archive.
+3. Run \`openspec archive <id> --yes\` so the CLI moves the change and applies spec updates without prompts (use \`--skip-specs\` only for tooling-only work).
+4. Review the command output to confirm the target specs were updated and the change landed in \`changes/archive/\`.
+5. Validate with \`openspec validate --strict --no-interactive\` and inspect with \`openspec show <id>\` if anything looks off.`;
+
+const archiveReferences = `**Reference**
+- Use \`openspec list\` to confirm change IDs before archiving.
+- Inspect refreshed specs with \`openspec list --specs\` and address any validation issues before handing off.`;
 
 export const slashCommandBodies: Record<SlashCommandId, string> = {
   proposal: [proposalGuardrails, proposalSteps, proposalReferences].join('\n\n'),
