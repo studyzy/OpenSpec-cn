@@ -49,10 +49,10 @@
 
             meta = with pkgs.lib; {
               description = "AI-native system for spec-driven development";
-              homepage = "https://github.com/Fission-AI/OpenSpec";
+              homepage = "https://github.com/studyzy/OpenSpec-cn";
               license = licenses.mit;
               maintainers = [ ];
-              mainProgram = "openspec";
+              mainProgram = "openspec-cn";
             };
           });
         });
@@ -60,7 +60,7 @@
       apps = forAllSystems (system: {
         default = {
           type = "app";
-          program = "${self.packages.${system}.default}/bin/openspec";
+          program = "${self.packages.${system}.default}/bin/openspec-cn";
         };
       });
 
