@@ -157,12 +157,12 @@ export const COMMAND_REGISTRY: CommandDefinition[] = [
   },
   {
     name: 'feedback',
-    description: 'Submit feedback about OpenSpec',
+    description: '提交关于 OpenSpec 的反馈',
     acceptsPositional: true,
     flags: [
       {
         name: 'body',
-        description: 'Detailed description for the feedback',
+        description: '反馈的详细描述',
         takesValue: true,
       },
     ],
@@ -381,75 +381,75 @@ export const COMMAND_REGISTRY: CommandDefinition[] = [
   },
   {
     name: 'schema',
-    description: 'Manage workflow schemas',
+    description: '管理工作流 Schema',
     flags: [],
     subcommands: [
       {
         name: 'which',
-        description: 'Show where a schema resolves from',
+        description: '显示 Schema 从何处解析',
         acceptsPositional: true,
         positionalType: 'schema-name',
         flags: [
           COMMON_FLAGS.json,
           {
             name: 'all',
-            description: 'List all schemas with their resolution sources',
+            description: '列出所有 Schema 及其解析来源',
           },
         ],
       },
       {
         name: 'validate',
-        description: 'Validate a schema structure and templates',
+        description: '验证 Schema 结构和模板',
         acceptsPositional: true,
         positionalType: 'schema-name',
         flags: [
           COMMON_FLAGS.json,
           {
             name: 'verbose',
-            description: 'Show detailed validation steps',
+            description: '显示详细的验证步骤',
           },
         ],
       },
       {
         name: 'fork',
-        description: 'Copy an existing schema to project for customization',
+        description: '复制现有 Schema 到项目以进行自定义',
         acceptsPositional: true,
         positionalType: 'schema-name',
         flags: [
           COMMON_FLAGS.json,
           {
             name: 'force',
-            description: 'Overwrite existing destination',
+            description: '覆盖现有目标',
           },
         ],
       },
       {
         name: 'init',
-        description: 'Create a new project-local schema',
+        description: '创建新的项目本地 Schema',
         acceptsPositional: true,
         flags: [
           COMMON_FLAGS.json,
           {
             name: 'description',
-            description: 'Schema description',
+            description: 'Schema 描述',
             takesValue: true,
           },
           {
             name: 'artifacts',
-            description: 'Comma-separated artifact IDs',
+            description: '逗号分隔的产出物 ID',
             takesValue: true,
           },
           {
             name: 'default',
-            description: 'Set as project default schema',
+            description: '设置为项目默认 Schema',
           },
           {
             name: 'no-default',
-            description: 'Do not prompt to set as default',
+            description: '不提示设置为默认',
           },
           {
             name: 'force',
-            description: 'Overwrite existing schema',
+            description: '覆盖现有 Schema',
           },
         ],
       },

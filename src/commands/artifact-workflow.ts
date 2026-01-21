@@ -732,8 +732,8 @@ async function templatesCommand(options: TemplatesOptions): Promise<void> {
       return;
     }
 
-    console.log(`Schema: ${schemaName}`);
-    console.log(`来源: ${source}`);
+    console.log(`Schema：${schemaName}`);
+    console.log(`来源：${source}`);
     console.log();
 
     for (const t of templates) {
@@ -919,9 +919,9 @@ ${template.content}
     // Config creation section
     console.log('━'.repeat(70));
     console.log();
-    console.log(chalk.bold('📋 Project Configuration (Optional)'));
+    console.log(chalk.bold('📋 项目配置 (可选)'));
     console.log();
-    console.log('Configure project defaults for OpenSpec workflows.');
+    console.log('配置 OpenSpec 工作流的项目默认设置。');
     console.log();
 
     // Check if config already exists
@@ -931,17 +931,17 @@ ${template.content}
 
     if (configExists) {
       // Config already exists, skip creation
-      console.log(chalk.blue('ℹ️  openspec/config.yaml already exists. Skipping config creation.'));
+      console.log(chalk.blue('ℹ️  openspec/config.yaml 已存在。跳过配置创建。'));
       console.log();
-      console.log('   To update config, edit openspec/config.yaml manually or:');
-      console.log('   1. Delete openspec/config.yaml');
-      console.log('   2. Run openspec artifact-experimental-setup again');
+      console.log('   要更新配置，请手动编辑 openspec/config.yaml 或：');
+      console.log('   1. 删除 openspec/config.yaml');
+      console.log('   2. 再次运行 openspec artifact-experimental-setup');
       console.log();
     } else if (!process.stdin.isTTY) {
       // Non-interactive mode (CI, automation, piped input)
-      console.log(chalk.blue('ℹ️  Skipping config prompts (non-interactive mode)'));
+      console.log(chalk.blue('ℹ️  跳过配置提示（非交互模式）'));
       console.log();
-      console.log('   To create config manually, add openspec/config.yaml with:');
+      console.log('   要手动创建配置，请添加包含以下内容的 openspec/config.yaml：');
       console.log(chalk.dim('   schema: spec-driven'));
       console.log();
     } else {
@@ -952,27 +952,27 @@ ${template.content}
         await FileSystemUtils.writeFile(configPath, yamlContent);
 
         console.log();
-        console.log(chalk.green('✓ Created openspec/config.yaml'));
+        console.log(chalk.green('✓ 已创建 openspec/config.yaml'));
         console.log();
-        console.log(`   Default schema: ${chalk.cyan(DEFAULT_SCHEMA)}`);
+        console.log(`   默认 Schema：${chalk.cyan(DEFAULT_SCHEMA)}`);
         console.log();
-        console.log(chalk.dim('   Edit the file to add project context and per-artifact rules.'));
+        console.log(chalk.dim('   编辑该文件以添加项目上下文和每个产出物的规则。'));
         console.log();
 
         // Git commit suggestion
-        console.log(chalk.bold('To share with team:'));
+        console.log(chalk.bold('与团队共享：'));
         console.log(chalk.dim('  git add openspec/config.yaml .claude/'));
-        console.log(chalk.dim('  git commit -m "Setup OpenSpec experimental workflow"'));
+        console.log(chalk.dim('  git commit -m "设置 OpenSpec 实验性工作流"'));
         console.log();
       } catch (writeError) {
         // Handle file write errors
         console.error();
-        console.error(chalk.red('✗ Failed to write openspec/config.yaml'));
+        console.error(chalk.red('✗ 写入 openspec/config.yaml 失败'));
         console.error(chalk.dim(`  ${(writeError as Error).message}`));
         console.error();
-        console.error('Fallback: Create config manually:');
-        console.error(chalk.dim('  1. Create openspec/config.yaml'));
-        console.error(chalk.dim('  2. Copy the following content:'));
+        console.error('备选方案：手动创建配置：');
+        console.error(chalk.dim('  1. 创建 openspec/config.yaml'));
+        console.error(chalk.dim('  2. 复制以下内容：'));
         console.error();
         console.error(chalk.dim(yamlContent));
         console.error();
@@ -1000,7 +1000,7 @@ ${template.content}
     console.log('  • /opsx:apply - 实现任务');
     console.log('  • /opsx:ff - 一键创建所有产出物');
     console.log('  • /opsx:sync - 将增量规范同步到主规范');
-    console.log('  • /opsx:verify - Verify implementation matches artifacts');
+    console.log('  • /opsx:verify - 验证实现是否与产出物匹配');
     console.log('  • /opsx:archive - 归档已完成的变更');
     console.log();
     console.log(chalk.yellow('💡 这是一个实验性功能。'));

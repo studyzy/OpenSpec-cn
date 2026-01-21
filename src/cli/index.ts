@@ -301,15 +301,15 @@ program
 // Feedback command
 program
   .command('feedback <message>')
-  .description('Submit feedback about OpenSpec')
-  .option('--body <text>', 'Detailed description for the feedback')
+  .description('提交关于 OpenSpec 的反馈')
+  .option('--body <text>', '反馈的详细描述')
   .action(async (message: string, options?: { body?: string }) => {
     try {
       const feedbackCommand = new FeedbackCommand();
       await feedbackCommand.execute(message, options);
     } catch (error) {
       console.log();
-      ora().fail(`Error: ${(error as Error).message}`);
+      ora().fail(`错误：${(error as Error).message}`);
       process.exit(1);
     }
   });
@@ -366,7 +366,7 @@ completionCmd
 // Hidden command for machine-readable completion data
 program
   .command('__complete <type>', { hidden: true })
-  .description('Output completion data in machine-readable format (internal use)')
+  .description('以机器可读格式输出补全数据（内部使用）')
   .action(async (type: string) => {
     try {
       const completionCommand = new CompletionCommand();
