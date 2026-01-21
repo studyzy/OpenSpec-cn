@@ -146,7 +146,7 @@ Kilo Code会自动发现团队工作流。将生成的文件保存在 `.kilocode
 
 #### 步骤1：全局安装CLI
 
-**Option A: Using npm**
+**选项 A：使用 npm**
 
 ```bash
 npm install -g @studyzy/openspec-cn@latest
@@ -158,29 +158,29 @@ cd OpenSpec-cn
 make install
 ```
 
-Verify installation:
+验证安装：
 ```bash
-openspec --version
+openspec-cn --version
 ```
 
-**Option B: Using Nix (NixOS and Nix package manager)**
+**选项 B：使用 Nix（NixOS 和 Nix 包管理器）**
 
-Run OpenSpec directly without installation:
+直接运行 OpenSpec 而无需安装：
 ```bash
-nix run github:Fission-AI/OpenSpec -- init
+nix run github:studyzy/OpenSpec-cn -- init
 ```
 
-Or install to your profile:
+或者安装到您的配置文件：
 ```bash
-nix profile install github:Fission-AI/OpenSpec
+nix profile install github:studyzy/OpenSpec-cn
 ```
 
-Or add to your development environment in `flake.nix`:
+或者添加到您的 `flake.nix` 开发环境中：
 ```nix
 {
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
-    openspec.url = "github:Fission-AI/OpenSpec";
+    openspec.url = "github:studyzy/OpenSpec-cn";
   };
 
   outputs = { nixpkgs, openspec, ... }: {
@@ -191,7 +191,7 @@ Or add to your development environment in `flake.nix`:
 }
 ```
 
-Verify installation:
+验证安装：
 ```bash
 openspec-cn --version
 ```

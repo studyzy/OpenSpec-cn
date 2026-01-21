@@ -397,7 +397,7 @@ describe('schema command shell completion registry', () => {
 
     const schemaCmd = COMMAND_REGISTRY.find((cmd) => cmd.name === 'schema');
     expect(schemaCmd).toBeDefined();
-    expect(schemaCmd?.description).toBe('Manage workflow schemas');
+    expect(schemaCmd?.description).toBe('管理工作流 Schema');
   });
 
   it('should have all schema subcommands in registry', async () => {
