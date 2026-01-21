@@ -28,8 +28,10 @@ import {
   type SchemaInfo,
 } from '../core/artifact-graph/index.js';
 import { createChange, validateChangeName } from '../utils/change-utils.js';
-import { getExploreSkillTemplate, getNewChangeSkillTemplate, getContinueChangeSkillTemplate, getApplyChangeSkillTemplate, getFfChangeSkillTemplate, getSyncSpecsSkillTemplate, getArchiveChangeSkillTemplate, getVerifyChangeSkillTemplate, getOpsxExploreCommandTemplate, getOpsxNewCommandTemplate, getOpsxContinueCommandTemplate, getOpsxApplyCommandTemplate, getOpsxFfCommandTemplate, getOpsxSyncCommandTemplate, getOpsxArchiveCommandTemplate, getOpsxVerifyCommandTemplate } from '../core/templates/skill-templates.js';
+import { getExploreSkillTemplate, getNewChangeSkillTemplate, getContinueChangeSkillTemplate, getApplyChangeSkillTemplate, getFfChangeSkillTemplate, getSyncSpecsSkillTemplate, getArchiveChangeSkillTemplate, getBulkArchiveChangeSkillTemplate, getVerifyChangeSkillTemplate, getOpsxExploreCommandTemplate, getOpsxNewCommandTemplate, getOpsxContinueCommandTemplate, getOpsxApplyCommandTemplate, getOpsxFfCommandTemplate, getOpsxSyncCommandTemplate, getOpsxArchiveCommandTemplate, getOpsxBulkArchiveCommandTemplate, getOpsxVerifyCommandTemplate } from '../core/templates/skill-templates.js';
 import { FileSystemUtils } from '../utils/file-system.js';
+import { serializeConfig } from '../core/config-prompts.js';
+import { readProjectConfig } from '../core/project-config.js';
 
 // -----------------------------------------------------------------------------
 // Types for Apply Instructions
@@ -157,11 +159,14 @@ async function validateChangeExists(
 
 /**
  * Validates that a schema exists and returns available schemas if not.
+ *
+ * @param schemaName - The schema name to validate
+ * @param projectRoot - Optional project root for project-local schema resolution
  */
-function validateSchemaExists(schemaName: string): string {
-  const schemaDir = getSchemaDir(schemaName);
+function validateSchemaExists(schemaName: string, projectRoot?: string): string {
+  const schemaDir = getSchemaDir(schemaName, projectRoot);
   if (!schemaDir) {
-    const availableSchemas = listSchemas();
+    const availableSchemas = listSchemas(projectRoot);
     throw new Error(
       `未找到 Schema '${schemaName}'。可用的 Schema 如下：\n  ${availableSchemas.join('\n  ')}`
     );
@@ -188,7 +193,7 @@ async function statusCommand(options: StatusOptions): Promise<void> {
 
     // Validate schema if explicitly provided
     if (options.schema) {
-      validateSchemaExists(options.schema);
+      validateSchemaExists(options.schema, projectRoot);
     }
 
     // loadChangeContext will auto-detect schema from metadata if not provided
@@ -258,7 +263,7 @@ async function instructionsCommand(
 
     // Validate schema if explicitly provided
     if (options.schema) {
-      validateSchemaExists(options.schema);
+      validateSchemaExists(options.schema, projectRoot);
     }
 
     // loadChangeContext will auto-detect schema from metadata if not provided
@@ -282,7 +287,7 @@ async function instructionsCommand(
       );
     }
 
-    const instructions = generateInstructions(context, artifactId);
+    const instructions = generateInstructions(context, artifactId, projectRoot);
     const isBlocked = instructions.dependencies.some((d) => !d.done);
 
     spinner.stop();
@@ -596,7 +601,7 @@ async function applyInstructionsCommand(options: ApplyInstructionsOptions): Prom
 
     // Validate schema if explicitly provided
     if (options.schema) {
-      validateSchemaExists(options.schema);
+      validateSchemaExists(options.schema, projectRoot);
     }
 
     // generateApplyInstructions uses loadChangeContext which auto-detects schema
@@ -680,27 +685,40 @@ interface TemplatesOptions {
 interface TemplateInfo {
   artifactId: string;
   templatePath: string;
-  source: 'user' | 'package';
+  source: 'project' | 'user' | 'package';
 }
 
 async function templatesCommand(options: TemplatesOptions): Promise<void> {
   const spinner = ora('正在加载模板...').start();
 
   try {
-    const schemaName = validateSchemaExists(options.schema ?? DEFAULT_SCHEMA);
-    const schema = resolveSchema(schemaName);
+    const projectRoot = process.cwd();
+    const schemaName = validateSchemaExists(options.schema ?? DEFAULT_SCHEMA, projectRoot);
+    const schema = resolveSchema(schemaName, projectRoot);
     const graph = ArtifactGraph.fromSchema(schema);
-    const schemaDir = getSchemaDir(schemaName)!;
+    const schemaDir = getSchemaDir(schemaName, projectRoot)!;
 
-    // Determine if this is a user override or package built-in
-    const { getUserSchemasDir } = await import('../core/artifact-graph/resolver.js');
+    // Determine the source (project, user, or package)
+    const {
+      getUserSchemasDir,
+      getProjectSchemasDir,
+    } = await import('../core/artifact-graph/resolver.js');
+    const projectSchemasDir = getProjectSchemasDir(projectRoot);
     const userSchemasDir = getUserSchemasDir();
-    const isUserOverride = schemaDir.startsWith(userSchemasDir);
+
+    let source: 'project' | 'user' | 'package';
+    if (schemaDir.startsWith(projectSchemasDir)) {
+      source = 'project';
+    } else if (schemaDir.startsWith(userSchemasDir)) {
+      source = 'user';
+    } else {
+      source = 'package';
+    }
 
     const templates: TemplateInfo[] = graph.getAllArtifacts().map((artifact) => ({
       artifactId: artifact.id,
       templatePath: path.join(schemaDir, 'templates', artifact.template),
-      source: isUserOverride ? 'user' : 'package',
+      source,
     }));
 
     spinner.stop();
@@ -714,8 +732,8 @@ async function templatesCommand(options: TemplatesOptions): Promise<void> {
       return;
     }
 
-    console.log(`Schema：${schemaName}`);
-    console.log(`来源：${isUserOverride ? '用户覆盖' : '包内置'}`);
+    console.log(`Schema: ${schemaName}`);
+    console.log(`来源: ${source}`);
     console.log();
 
     for (const t of templates) {
@@ -747,17 +765,18 @@ async function newChangeCommand(name: string | undefined, options: NewChangeOpti
     throw new Error(validation.error);
   }
 
+  const projectRoot = process.cwd();
+
   // Validate schema if provided
   if (options.schema) {
-    validateSchemaExists(options.schema);
+    validateSchemaExists(options.schema, projectRoot);
   }
 
   const schemaDisplay = options.schema ? `（使用 Schema '${options.schema}'）` : '';
   const spinner = ora(`正在创建变更 '${name}'${schemaDisplay}...`).start();
 
   try {
-    const projectRoot = process.cwd();
-    await createChange(projectRoot, name, { schema: options.schema });
+    const result = await createChange(projectRoot, name, { schema: options.schema });
 
     // If description provided, create README.md with description
     if (options.description) {
@@ -767,8 +786,7 @@ async function newChangeCommand(name: string | undefined, options: NewChangeOpti
       await fs.writeFile(readmePath, `# ${name}\n\n${options.description}\n`, 'utf-8');
     }
 
-    const schemaUsed = options.schema ?? DEFAULT_SCHEMA;
-    spinner.succeed(`已在 openspec/changes/${name}/ 创建变更 '${name}'（Schema：${schemaUsed}）`);
+    spinner.succeed(`已在 openspec/changes/${name}/ 创建变更 '${name}'（Schema：${result.schema}）`);
   } catch (error) {
     spinner.fail(`创建变更 '${name}' 失败`);
     throw error;
@@ -800,6 +818,7 @@ async function artifactExperimentalSetupCommand(): Promise<void> {
     const ffChangeSkill = getFfChangeSkillTemplate();
     const syncSpecsSkill = getSyncSpecsSkillTemplate();
     const archiveChangeSkill = getArchiveChangeSkillTemplate();
+    const bulkArchiveChangeSkill = getBulkArchiveChangeSkillTemplate();
     const verifyChangeSkill = getVerifyChangeSkillTemplate();
 
     // Get command templates
@@ -810,6 +829,7 @@ async function artifactExperimentalSetupCommand(): Promise<void> {
     const ffCommand = getOpsxFfCommandTemplate();
     const syncCommand = getOpsxSyncCommandTemplate();
     const archiveCommand = getOpsxArchiveCommandTemplate();
+    const bulkArchiveCommand = getOpsxBulkArchiveCommandTemplate();
     const verifyCommand = getOpsxVerifyCommandTemplate();
 
     // Create skill directories and SKILL.md files
@@ -821,6 +841,7 @@ async function artifactExperimentalSetupCommand(): Promise<void> {
       { template: ffChangeSkill, dirName: 'openspec-ff-change' },
       { template: syncSpecsSkill, dirName: 'openspec-sync-specs' },
       { template: archiveChangeSkill, dirName: 'openspec-archive-change' },
+      { template: bulkArchiveChangeSkill, dirName: 'openspec-bulk-archive-change' },
       { template: verifyChangeSkill, dirName: 'openspec-verify-change' },
     ];
 
@@ -853,6 +874,7 @@ ${template.instructions}
       { template: ffCommand, fileName: 'ff.md' },
       { template: syncCommand, fileName: 'sync.md' },
       { template: archiveCommand, fileName: 'archive.md' },
+      { template: bulkArchiveCommand, fileName: 'bulk-archive.md' },
       { template: verifyCommand, fileName: 'verify.md' },
     ];
 
@@ -892,6 +914,72 @@ ${template.content}
     for (const file of createdCommandFiles) {
       console.log(chalk.green('  ✓ ' + file));
     }
+    console.log();
+
+    // Config creation section
+    console.log('━'.repeat(70));
+    console.log();
+    console.log(chalk.bold('📋 Project Configuration (Optional)'));
+    console.log();
+    console.log('Configure project defaults for OpenSpec workflows.');
+    console.log();
+
+    // Check if config already exists
+    const configPath = path.join(projectRoot, 'openspec', 'config.yaml');
+    const configYmlPath = path.join(projectRoot, 'openspec', 'config.yml');
+    const configExists = fs.existsSync(configPath) || fs.existsSync(configYmlPath);
+
+    if (configExists) {
+      // Config already exists, skip creation
+      console.log(chalk.blue('ℹ️  openspec/config.yaml already exists. Skipping config creation.'));
+      console.log();
+      console.log('   To update config, edit openspec/config.yaml manually or:');
+      console.log('   1. Delete openspec/config.yaml');
+      console.log('   2. Run openspec artifact-experimental-setup again');
+      console.log();
+    } else if (!process.stdin.isTTY) {
+      // Non-interactive mode (CI, automation, piped input)
+      console.log(chalk.blue('ℹ️  Skipping config prompts (non-interactive mode)'));
+      console.log();
+      console.log('   To create config manually, add openspec/config.yaml with:');
+      console.log(chalk.dim('   schema: spec-driven'));
+      console.log();
+    } else {
+      // Create config with default schema
+      const yamlContent = serializeConfig({ schema: DEFAULT_SCHEMA });
+
+      try {
+        await FileSystemUtils.writeFile(configPath, yamlContent);
+
+        console.log();
+        console.log(chalk.green('✓ Created openspec/config.yaml'));
+        console.log();
+        console.log(`   Default schema: ${chalk.cyan(DEFAULT_SCHEMA)}`);
+        console.log();
+        console.log(chalk.dim('   Edit the file to add project context and per-artifact rules.'));
+        console.log();
+
+        // Git commit suggestion
+        console.log(chalk.bold('To share with team:'));
+        console.log(chalk.dim('  git add openspec/config.yaml .claude/'));
+        console.log(chalk.dim('  git commit -m "Setup OpenSpec experimental workflow"'));
+        console.log();
+      } catch (writeError) {
+        // Handle file write errors
+        console.error();
+        console.error(chalk.red('✗ Failed to write openspec/config.yaml'));
+        console.error(chalk.dim(`  ${(writeError as Error).message}`));
+        console.error();
+        console.error('Fallback: Create config manually:');
+        console.error(chalk.dim('  1. Create openspec/config.yaml'));
+        console.error(chalk.dim('  2. Copy the following content:'));
+        console.error();
+        console.error(chalk.dim(yamlContent));
+        console.error();
+      }
+    }
+
+    console.log('━'.repeat(70));
     console.log();
     console.log(chalk.bold('📖 用法：'));
     console.log();
@@ -933,7 +1021,8 @@ interface SchemasOptions {
 }
 
 async function schemasCommand(options: SchemasOptions): Promise<void> {
-  const schemas = listSchemasWithInfo();
+  const projectRoot = process.cwd();
+  const schemas = listSchemasWithInfo(projectRoot);
 
   if (options.json) {
     console.log(JSON.stringify(schemas, null, 2));
@@ -944,7 +1033,12 @@ async function schemasCommand(options: SchemasOptions): Promise<void> {
   console.log();
 
   for (const schema of schemas) {
-    const sourceLabel = schema.source === 'user' ? chalk.dim('（用户覆盖）') : '';
+    let sourceLabel = '';
+    if (schema.source === 'project') {
+      sourceLabel = chalk.cyan(' (project)');
+    } else if (schema.source === 'user') {
+      sourceLabel = chalk.dim('（用户覆盖）');
+    }
     console.log(`  ${chalk.bold(schema.name)}${sourceLabel}`);
     console.log(`    ${schema.description}`);
     console.log(`    产出物：${schema.artifacts.join(' → ')}`);

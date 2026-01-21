@@ -24,17 +24,20 @@ export function getExploreSkillTemplate(): SkillTemplate {
     description: '进入探索模式 - 一个用于探索想法、调查问题和澄清需求的思考伙伴。当用户想要在进行更改之前或期间深入思考某事时使用。',
     instructions: `进入探索模式。深入思考。自由想象。跟随对话的任何方向。
 
-**这是一种姿态，而非工作流程。** 没有固定的步骤，没有要求的顺序，没有强制的输出。你是一个帮助用户进行探索的思考伙伴。
+**IMPORTANT: Explore mode is for thinking, not implementing.** You may read files, search code, and investigate the codebase, but you must NEVER write code or implement features. If the user asks you to implement something, remind them to exit explore mode first (e.g., start a change with \`/opsx:new\` or \`/opsx:ff\`). You MAY create OpenSpec artifacts (proposals, designs, specs) if the user asks—that's capturing thinking, not implementing.
+
+**This is a stance, not a workflow.** There are no fixed steps, no required sequence, no mandatory outputs. You're a thinking partner helping the user explore.
 
 ---
 
 ## 姿态
 
-- **好奇而非说教** - 提出自然产生的问题，不要遵循脚本
-- **可视化** - 在有助于澄清思路时大方使用 ASCII 图表
-- **自适应** - 跟随有趣的思路，当新信息出现时及时转向
-- **耐心** - 不要急于下结论，让问题的轮廓自然显现
-- **落地** - 在相关时探索实际代码库，不要只进行理论探讨
+- **Curious, not prescriptive** - Ask questions that emerge naturally, don't follow a script
+- **Open threads, not interrogations** - Surface multiple interesting directions and let the user follow what resonates. Don't funnel them through a single path of questions.
+- **Visual** - Use ASCII diagrams liberally when they'd help clarify thinking
+- **Adaptive** - Follow interesting threads, pivot when new information emerges
+- **Patient** - Don't rush to conclusions, let the shape of the problem emerge
+- **Grounded** - Explore the actual codebase when relevant, don't just theorize
 
 ---
 
@@ -289,13 +292,14 @@ You: 那改变了一切。
 
 ## 护栏 (Guardrails)
 
-- **不要假装理解** - 如果某事不清楚，深入挖掘
-- **不要匆忙** - 探索是思考时间，不是任务时间
-- **不要强迫结构** - 让模式自然浮现
-- **不要自动捕获** - 提议保存见解，不要直接做
-- **务必可视化** - 一张好的图表胜过千言万语
-- **务必探索代码库** - 将讨论建立在现实基础上
-- **务必质疑假设** - 包括用户的和你自己的`
+- **Don't implement** - Never write code or implement features. Creating OpenSpec artifacts is fine, writing application code is not.
+- **Don't fake understanding** - If something is unclear, dig deeper
+- **Don't rush** - Discovery is thinking time, not task time
+- **Don't force structure** - Let patterns emerge naturally
+- **Don't auto-capture** - Offer to save insights, don't just do it
+- **Do visualize** - A good diagram is worth many paragraphs
+- **Do explore the codebase** - Ground discussions in reality
+- **Do question assumptions** - Including the user's and your own`
   };
 }
 
@@ -385,7 +389,7 @@ export function getContinueChangeSkillTemplate(): SkillTemplate {
     description: '通过创建下一个产出物继续处理 OpenSpec 变更。当用户想要推进其变更、创建下一个产出物或继续其工作流程时使用。',
     instructions: `通过创建下一个产出物继续处理变更。
 
-**输入**：可选地指定变更名称。如果省略，必须提示选择可用变更。
+**Input**: Optionally specify a change name. If omitted, check if it can be inferred from conversation context. If vague or ambiguous you MUST prompt for available changes.
 
 **步骤**
 
@@ -499,19 +503,18 @@ export function getApplyChangeSkillTemplate(): SkillTemplate {
     description: '实现 OpenSpec 变更中的任务。当用户想要开始实现、继续实现或处理任务时使用。',
     instructions: `实现 OpenSpec 变更中的任务。
 
-**输入**：可选地指定变更名称。如果省略，必须提示选择可用变更。
+**Input**: Optionally specify a change name. If omitted, check if it can be inferred from conversation context. If vague or ambiguous you MUST prompt for available changes.
 
 **步骤**
 
-1. **如果没有提供变更名称，提示选择**
+1. **Select the change**
 
-   运行 \`openspec-cn list --json\` 获取可用变更。使用 **AskUserQuestion tool** 让用户选择。
+   If a name is provided, use it. Otherwise:
+   - Infer from conversation context if the user mentioned a change
+   - Auto-select if only one active change exists
+   - If ambiguous, run \`openspec list --json\` to get available changes and use the **AskUserQuestion tool** to let the user select
 
-   显示准备好实现的变更（有任务产出物）。
-   如果可用，包括每个变更使用的 Schema。
-   将任务未完成的变更标记为 "(In Progress)"。
-
-   **重要提示**：不要猜测或自动选择变更。始终让用户选择。
+   Always announce: "Using change: <name>" and how to override (e.g., \`/opsx:apply <other>\`).
 
 2. **检查状态以了解 Schema**
    \`\`\`bash
@@ -754,7 +757,7 @@ export function getSyncSpecsSkillTemplate(): SkillTemplate {
 
 这是一个 **Agent 驱动** 的操作 - 你将读取增量规范并直接编辑主规范以应用更改。这允许智能合并（例如，添加场景而不复制整个需求）。
 
-**输入**：可选地指定变更名称。如果省略，必须提示选择可用变更。
+**Input**: Optionally specify a change name. If omitted, check if it can be inferred from conversation context. If vague or ambiguous you MUST prompt for available changes.
 
 **步骤**
 
@@ -904,7 +907,9 @@ export function getOpsxExploreCommandTemplate(): CommandTemplate {
     tags: ['workflow', 'explore', 'experimental', 'thinking'],
     content: `进入探索模式。深入思考。自由可视化。跟随对话的发展。
 
-**这是一种姿态，而非工作流。** 没有固定的步骤，没有要求的顺序，没有强制的输出。你是一个帮助用户探索的思考伙伴。
+**IMPORTANT: Explore mode is for thinking, not implementing.** You may read files, search code, and investigate the codebase, but you must NEVER write code or implement features. If the user asks you to implement something, remind them to exit explore mode first (e.g., start a change with \`/opsx:new\` or \`/opsx:ff\`). You MAY create OpenSpec artifacts (proposals, designs, specs) if the user asks—that's capturing thinking, not implementing.
+
+**This is a stance, not a workflow.** There are no fixed steps, no required sequence, no mandatory outputs. You're a thinking partner helping the user explore.
 
 **输入**：\`/opsx:explore\` 之后的参数是用户想要思考的任何内容。可能是：
 - 一个模糊的想法："real-time collaboration"
@@ -917,11 +922,12 @@ export function getOpsxExploreCommandTemplate(): CommandTemplate {
 
 ## 姿态 (The Stance)
 
-- **好奇，而非指令式** - 提出自然涌现的问题，不要照本宣科
-- **可视化** - 当有助于理清思路时，大量使用 ASCII 图表
-- **适应性** - 追随有趣的线索，当新信息出现时灵活调整
-- **耐心** - 不要急于下结论，让问题的形态自然浮现
-- **脚踏实地** - 在相关时探索实际的代码库，不要只是空谈理论
+- **Curious, not prescriptive** - Ask questions that emerge naturally, don't follow a script
+- **Open threads, not interrogations** - Surface multiple interesting directions and let the user follow what resonates. Don't funnel them through a single path of questions.
+- **Visual** - Use ASCII diagrams liberally when they'd help clarify thinking
+- **Adaptive** - Follow interesting threads, pivot when new information emerges
+- **Patient** - Don't rush to conclusions, let the shape of the problem emerge
+- **Grounded** - Explore the actual codebase when relevant, don't just theorize
 
 ---
 
@@ -1057,13 +1063,14 @@ openspec-cn list --json
 
 ## 护栏 (Guardrails)
 
-- **不要假装理解** - 如果某事不清楚，深入挖掘
-- **不要匆忙** - 探索是思考时间，不是任务时间
-- **不要强迫结构** - 让模式自然浮现
-- **不要自动捕获** - 提议保存见解，不要直接做
-- **务必可视化** - 一张好的图表胜过千言万语
-- **务必探索代码库** - 将讨论建立在现实基础上
-- **务必质疑假设** - 包括用户的和你自己的`
+- **Don't implement** - Never write code or implement features. Creating OpenSpec artifacts is fine, writing application code is not.
+- **Don't fake understanding** - If something is unclear, dig deeper
+- **Don't rush** - Discovery is thinking time, not task time
+- **Don't force structure** - Let patterns emerge naturally
+- **Don't auto-capture** - Offer to save insights, don't just do it
+- **Do visualize** - A good diagram is worth many paragraphs
+- **Do explore the codebase** - Ground discussions in reality
+- **Do question assumptions** - Including the user's and your own`
   };
 }
 
@@ -1153,7 +1160,7 @@ export function getOpsxContinueCommandTemplate(): CommandTemplate {
     tags: ['workflow', 'artifacts', 'experimental'],
     content: `通过创建下一个产出物继续处理变更。
 
-**输入**：可选地在 \`/opsx:continue\` 后指定 \`--change <name>\`。如果省略，必须提示选择可用变更。
+**Input**: Optionally specify a change name after \`/opsx:continue\` (e.g., \`/opsx:continue add-auth\`). If omitted, check if it can be inferred from conversation context. If vague or ambiguous you MUST prompt for available changes.
 
 **步骤**
 
@@ -1268,19 +1275,18 @@ export function getOpsxApplyCommandTemplate(): CommandTemplate {
     tags: ['workflow', 'artifacts', 'experimental'],
     content: `实现 OpenSpec 变更中的任务。
 
-**输入**：可选地在 \`/opsx:apply\` 后指定 \`--change <name>\`。如果省略，必须提示选择可用变更。
+**Input**: Optionally specify a change name (e.g., \`/opsx:apply add-auth\`). If omitted, check if it can be inferred from conversation context. If vague or ambiguous you MUST prompt for available changes.
 
 **步骤**
 
-1. **如果没有提供变更名称，提示选择**
+1. **Select the change**
 
-   运行 \`openspec-cn list --json\` 获取可用变更。使用 **AskUserQuestion tool** 让用户选择。
+   If a name is provided, use it. Otherwise:
+   - Infer from conversation context if the user mentioned a change
+   - Auto-select if only one active change exists
+   - If ambiguous, run \`openspec list --json\` to get available changes and use the **AskUserQuestion tool** to let the user select
 
-   显示准备好实现的变更（有任务产出物）。
-   如果可用，包括每个变更使用的 Schema。
-   将任务未完成的变更标记为 "(In Progress)"。
-
-   **重要提示**：不要猜测或自动选择变更。始终让用户选择。
+   Always announce: "Using change: <name>" and how to override (e.g., \`/opsx:apply <other>\`).
 
 2. **检查状态以了解 Schema**
    \`\`\`bash
@@ -1523,7 +1529,7 @@ export function getArchiveChangeSkillTemplate(): SkillTemplate {
     description: '归档实验性工作流中已完成的变更。当用户想要在实现完成后最终确定并归档变更时使用。',
     instructions: `归档实验性工作流中已完成的变更。
 
-**输入**：可选地指定变更名称。如果省略，必须提示选择可用变更。
+**Input**: Optionally specify a change name. If omitted, check if it can be inferred from conversation context. If vague or ambiguous you MUST prompt for available changes.
 
 **步骤**
 
@@ -1562,38 +1568,20 @@ export function getArchiveChangeSkillTemplate(): SkillTemplate {
 
    **如果没有任务文件存在：** 继续，无需任务相关警告。
 
-4. **检查增量规范是否需要同步**
+4. **Assess delta spec sync state**
 
-   检查变更中是否存在带有规范文件的 \`specs/\` 目录。
+   Check for delta specs at \`openspec/changes/<name>/specs/\`. If none exist, proceed without sync prompt.
 
-   **如果存在增量规范，执行快速同步检查：**
+   **If delta specs exist:**
+   - Compare each delta spec with its corresponding main spec at \`openspec/specs/<capability>/spec.md\`
+   - Determine what changes would be applied (adds, modifications, removals, renames)
+   - Show a combined summary before prompting
 
-   a. **对于每个增量规范** 于 \`openspec/changes/<name>/specs/<capability>/spec.md\`：
-      - 提取需求名称（匹配 \`### Requirement: <name>\` 的行）
-      - 注意存在哪些部分（ADDED, MODIFIED, REMOVED）
+   **Prompt options:**
+   - If changes needed: "Sync now (recommended)", "Archive without syncing"
+   - If already synced: "Archive now", "Sync anyway", "Cancel"
 
-   b. **检查对应的主规范** 于 \`openspec/specs/<capability>/spec.md\`：
-      - 如果主规范不存在 → 需要同步
-      - 如果主规范存在，检查 ADDED 需求名称是否出现在其中
-      - 如果任何 ADDED 需求在主规范中缺失 → 需要同步
-
-   c. **报告发现：**
-
-      **如果需要同步：**
-      \`\`\`
-      ⚠️ Delta specs may not be synced:
-      - specs/auth/spec.md → Main spec missing requirement "Token Refresh"
-      - specs/api/spec.md → Main spec doesn't exist yet
-
-      Would you like to sync now before archiving?
-      \`\`\`
-      - 使用 **AskUserQuestion tool** 提供选项："Sync now", "Archive without syncing"
-      - 如果用户选择同步，执行 /opsx:sync 逻辑（使用 openspec-sync-specs skill）
-
-      **如果已同步（找到所有需求）：**
-      - 继续，无需提示（规范似乎已同步）
-
-   **如果不存在增量规范：** 继续，无需同步相关检查。
+   If user chooses sync, execute /opsx:sync logic (use the openspec-sync-specs skill). Proceed to archive regardless of choice.
 
 5. **执行归档**
 
@@ -1626,22 +1614,268 @@ export function getArchiveChangeSkillTemplate(): SkillTemplate {
 \`\`\`
 ## 归档完成
 
-**变更：** <change-name>
-**Schema：** <schema-name>
-**归档至：** openspec/changes/archive/YYYY-MM-DD-<name>/
-**规范：** ✓ 已同步到主规范（或 "无增量规范" 或 "⚠️ 未同步"）
+**Change:** <change-name>
+**Schema:** <schema-name>
+**Archived to:** openspec/changes/archive/YYYY-MM-DD-<name>/
+**Specs:** ✓ Synced to main specs (or "No delta specs" or "Sync skipped")
 
 所有产出物已完成。所有任务已完成。
 \`\`\`
 
-**护栏**
-- 如果未提供，始终提示选择变更
-- 使用产出物图（openspec-cn status --json）进行完成检查
-- 不要因警告阻止归档 - 只是通知并确认
-- 移动到归档时保留 .openspec.yaml（它随目录移动）
-- 显示发生了什么的清晰摘要
-- 如果请求同步，使用 openspec-sync-specs 方法（agent 驱动）
-- 快速同步检查：在增量规范中查找需求名称，验证它们是否存在于主规范中`
+**Guardrails**
+- Always prompt for change selection if not provided
+- Use artifact graph (openspec status --json) for completion checking
+- Don't block archive on warnings - just inform and confirm
+- Preserve .openspec.yaml when moving to archive (it moves with the directory)
+- Show clear summary of what happened
+- If sync is requested, use openspec-sync-specs approach (agent-driven)
+- If delta specs exist, always run the sync assessment and show the combined summary before prompting`
+  };
+}
+
+/**
+ * Template for openspec-bulk-archive-change skill
+ * For archiving multiple completed changes at once
+ */
+export function getBulkArchiveChangeSkillTemplate(): SkillTemplate {
+  return {
+    name: 'openspec-bulk-archive-change',
+    description: 'Archive multiple completed changes at once. Use when archiving several parallel changes.',
+    instructions: `Archive multiple completed changes in a single operation.
+
+This skill allows you to batch-archive changes, handling spec conflicts intelligently by checking the codebase to determine what's actually implemented.
+
+**Input**: None required (prompts for selection)
+
+**Steps**
+
+1. **Get active changes**
+
+   Run \`openspec list --json\` to get all active changes.
+
+   If no active changes exist, inform user and stop.
+
+2. **Prompt for change selection**
+
+   Use **AskUserQuestion tool** with multi-select to let user choose changes:
+   - Show each change with its schema
+   - Include an option for "All changes"
+   - Allow any number of selections (1+ works, 2+ is the typical use case)
+
+   **IMPORTANT**: Do NOT auto-select. Always let the user choose.
+
+3. **Batch validation - gather status for all selected changes**
+
+   For each selected change, collect:
+
+   a. **Artifact status** - Run \`openspec status --change "<name>" --json\`
+      - Parse \`schemaName\` and \`artifacts\` list
+      - Note which artifacts are \`done\` vs other states
+
+   b. **Task completion** - Read \`openspec/changes/<name>/tasks.md\`
+      - Count \`- [ ]\` (incomplete) vs \`- [x]\` (complete)
+      - If no tasks file exists, note as "No tasks"
+
+   c. **Delta specs** - Check \`openspec/changes/<name>/specs/\` directory
+      - List which capability specs exist
+      - For each, extract requirement names (lines matching \`### Requirement: <name>\`)
+
+4. **Detect spec conflicts**
+
+   Build a map of \`capability -> [changes that touch it]\`:
+
+   \`\`\`
+   auth -> [change-a, change-b]  <- CONFLICT (2+ changes)
+   api  -> [change-c]            <- OK (only 1 change)
+   \`\`\`
+
+   A conflict exists when 2+ selected changes have delta specs for the same capability.
+
+5. **Resolve conflicts agentically**
+
+   **For each conflict**, investigate the codebase:
+
+   a. **Read the delta specs** from each conflicting change to understand what each claims to add/modify
+
+   b. **Search the codebase** for implementation evidence:
+      - Look for code implementing requirements from each delta spec
+      - Check for related files, functions, or tests
+
+   c. **Determine resolution**:
+      - If only one change is actually implemented -> sync that one's specs
+      - If both implemented -> apply in chronological order (older first, newer overwrites)
+      - If neither implemented -> skip spec sync, warn user
+
+   d. **Record resolution** for each conflict:
+      - Which change's specs to apply
+      - In what order (if both)
+      - Rationale (what was found in codebase)
+
+6. **Show consolidated status table**
+
+   Display a table summarizing all changes:
+
+   \`\`\`
+   | Change               | Artifacts | Tasks | Specs   | Conflicts | Status |
+   |---------------------|-----------|-------|---------|-----------|--------|
+   | schema-management   | Done      | 5/5   | 2 delta | None      | Ready  |
+   | project-config      | Done      | 3/3   | 1 delta | None      | Ready  |
+   | add-oauth           | Done      | 4/4   | 1 delta | auth (!)  | Ready* |
+   | add-verify-skill    | 1 left    | 2/5   | None    | None      | Warn   |
+   \`\`\`
+
+   For conflicts, show the resolution:
+   \`\`\`
+   * Conflict resolution:
+     - auth spec: Will apply add-oauth then add-jwt (both implemented, chronological order)
+   \`\`\`
+
+   For incomplete changes, show warnings:
+   \`\`\`
+   Warnings:
+   - add-verify-skill: 1 incomplete artifact, 3 incomplete tasks
+   \`\`\`
+
+7. **Confirm batch operation**
+
+   Use **AskUserQuestion tool** with a single confirmation:
+
+   - "Archive N changes?" with options based on status
+   - Options might include:
+     - "Archive all N changes"
+     - "Archive only N ready changes (skip incomplete)"
+     - "Cancel"
+
+   If there are incomplete changes, make clear they'll be archived with warnings.
+
+8. **Execute archive for each confirmed change**
+
+   Process changes in the determined order (respecting conflict resolution):
+
+   a. **Sync specs** if delta specs exist:
+      - Use the openspec-sync-specs approach (agent-driven intelligent merge)
+      - For conflicts, apply in resolved order
+      - Track if sync was done
+
+   b. **Perform the archive**:
+      \`\`\`bash
+      mkdir -p openspec/changes/archive
+      mv openspec/changes/<name> openspec/changes/archive/YYYY-MM-DD-<name>
+      \`\`\`
+
+   c. **Track outcome** for each change:
+      - Success: archived successfully
+      - Failed: error during archive (record error)
+      - Skipped: user chose not to archive (if applicable)
+
+9. **Display summary**
+
+   Show final results:
+
+   \`\`\`
+   ## Bulk Archive Complete
+
+   Archived 3 changes:
+   - schema-management-cli -> archive/2026-01-19-schema-management-cli/
+   - project-config -> archive/2026-01-19-project-config/
+   - add-oauth -> archive/2026-01-19-add-oauth/
+
+   Skipped 1 change:
+   - add-verify-skill (user chose not to archive incomplete)
+
+   Spec sync summary:
+   - 4 delta specs synced to main specs
+   - 1 conflict resolved (auth: applied both in chronological order)
+   \`\`\`
+
+   If any failures:
+   \`\`\`
+   Failed 1 change:
+   - some-change: Archive directory already exists
+   \`\`\`
+
+**Conflict Resolution Examples**
+
+Example 1: Only one implemented
+\`\`\`
+Conflict: specs/auth/spec.md touched by [add-oauth, add-jwt]
+
+Checking add-oauth:
+- Delta adds "OAuth Provider Integration" requirement
+- Searching codebase... found src/auth/oauth.ts implementing OAuth flow
+
+Checking add-jwt:
+- Delta adds "JWT Token Handling" requirement
+- Searching codebase... no JWT implementation found
+
+Resolution: Only add-oauth is implemented. Will sync add-oauth specs only.
+\`\`\`
+
+Example 2: Both implemented
+\`\`\`
+Conflict: specs/api/spec.md touched by [add-rest-api, add-graphql]
+
+Checking add-rest-api (created 2026-01-10):
+- Delta adds "REST Endpoints" requirement
+- Searching codebase... found src/api/rest.ts
+
+Checking add-graphql (created 2026-01-15):
+- Delta adds "GraphQL Schema" requirement
+- Searching codebase... found src/api/graphql.ts
+
+Resolution: Both implemented. Will apply add-rest-api specs first,
+then add-graphql specs (chronological order, newer takes precedence).
+\`\`\`
+
+**Output On Success**
+
+\`\`\`
+## Bulk Archive Complete
+
+Archived N changes:
+- <change-1> -> archive/YYYY-MM-DD-<change-1>/
+- <change-2> -> archive/YYYY-MM-DD-<change-2>/
+
+Spec sync summary:
+- N delta specs synced to main specs
+- No conflicts (or: M conflicts resolved)
+\`\`\`
+
+**Output On Partial Success**
+
+\`\`\`
+## Bulk Archive Complete (partial)
+
+Archived N changes:
+- <change-1> -> archive/YYYY-MM-DD-<change-1>/
+
+Skipped M changes:
+- <change-2> (user chose not to archive incomplete)
+
+Failed K changes:
+- <change-3>: Archive directory already exists
+\`\`\`
+
+**Output When No Changes**
+
+\`\`\`
+## No Changes to Archive
+
+No active changes found. Use \`/opsx:new\` to create a new change.
+\`\`\`
+
+**Guardrails**
+- Allow any number of changes (1+ is fine, 2+ is the typical use case)
+- Always prompt for selection, never auto-select
+- Detect spec conflicts early and resolve by checking codebase
+- When both changes are implemented, apply specs in chronological order
+- Skip spec sync only when implementation is missing (warn user)
+- Show clear per-change status before confirming
+- Use single confirmation for entire batch
+- Track and report all outcomes (success/skip/fail)
+- Preserve .openspec.yaml when moving to archive
+- Archive directory target uses current date: YYYY-MM-DD-<name>
+- If archive target exists, fail that change but continue with others`
   };
 }
 
@@ -1658,7 +1892,7 @@ export function getOpsxSyncCommandTemplate(): CommandTemplate {
 
 这是一个 **Agent 驱动** 的操作 - 你将读取增量规范并直接编辑主规范以应用更改。这允许智能合并（例如，添加场景而不复制整个需求）。
 
-**输入**：可选地在 \`/opsx:sync\` 后指定 \`--change <name>\`。如果省略，必须提示选择可用变更。
+**Input**: Optionally specify a change name after \`/opsx:sync\` (e.g., \`/opsx:sync add-auth\`). If omitted, check if it can be inferred from conversation context. If vague or ambiguous you MUST prompt for available changes.
 
 **步骤**
 
@@ -1794,7 +2028,7 @@ export function getVerifyChangeSkillTemplate(): SkillTemplate {
     description: '验证实现是否与变更产出物匹配。当用户想要在归档前验证实现是否完整、正确且一致时使用。',
     instructions: `验证实现是否与变更产出物（规范、任务、设计）匹配。
 
-**输入**：可选地指定变更名称。如果省略，必须提示选择可用变更。
+**Input**: Optionally specify a change name. If omitted, check if it can be inferred from conversation context. If vague or ambiguous you MUST prompt for available changes.
 
 **步骤**
 
@@ -1963,7 +2197,7 @@ export function getOpsxArchiveCommandTemplate(): CommandTemplate {
     tags: ['workflow', 'archive', 'experimental'],
     content: `归档实验性工作流中已完成的变更。
 
-**输入**：可选地在 \`/opsx:archive\` 后指定 \`--change <name>\`。如果省略，必须提示选择可用变更。
+**Input**: Optionally specify a change name after \`/opsx:archive\` (e.g., \`/opsx:archive add-auth\`). If omitted, check if it can be inferred from conversation context. If vague or ambiguous you MUST prompt for available changes.
 
 **步骤**
 
@@ -2002,38 +2236,20 @@ export function getOpsxArchiveCommandTemplate(): CommandTemplate {
 
    **如果没有任务文件存在：** 继续，无需任务相关警告。
 
-4. **检查增量规范是否需要同步**
+4. **Assess delta spec sync state**
 
-   检查变更中是否存在带有规范文件的 \`specs/\` 目录。
+   Check for delta specs at \`openspec/changes/<name>/specs/\`. If none exist, proceed without sync prompt.
 
-   **如果存在增量规范，执行快速同步检查：**
+   **If delta specs exist:**
+   - Compare each delta spec with its corresponding main spec at \`openspec/specs/<capability>/spec.md\`
+   - Determine what changes would be applied (adds, modifications, removals, renames)
+   - Show a combined summary before prompting
 
-   a. **对于每个增量规范** 于 \`openspec/changes/<name>/specs/<capability>/spec.md\`：
-      - 提取需求名称（匹配 \`### Requirement: <name>\` 的行）
-      - 注意存在哪些部分（ADDED, MODIFIED, REMOVED）
+   **Prompt options:**
+   - If changes needed: "Sync now (recommended)", "Archive without syncing"
+   - If already synced: "Archive now", "Sync anyway", "Cancel"
 
-   b. **检查对应的主规范** 于 \`openspec/specs/<capability>/spec.md\`：
-      - 如果主规范不存在 → 需要同步
-      - 如果主规范存在，检查 ADDED 需求名称是否出现在其中
-      - 如果任何 ADDED 需求在主规范中缺失 → 需要同步
-
-   c. **报告发现：**
-
-      **如果需要同步：**
-      \`\`\`
-      ⚠️ Delta specs may not be synced:
-      - specs/auth/spec.md → Main spec missing requirement "Token Refresh"
-      - specs/api/spec.md → Main spec doesn't exist yet
-
-      Would you like to sync now before archiving?
-      \`\`\`
-      - 使用 **AskUserQuestion tool** 提供选项："Sync now", "Archive without syncing"
-      - 如果用户选择同步，执行 \`/opsx:sync\` 逻辑
-
-      **如果已同步（找到所有需求）：**
-      - 继续，无需提示（规范似乎已同步）
-
-   **如果不存在增量规范：** 继续，无需同步相关检查。
+   If user chooses sync, execute \`/opsx:sync\` logic. Proceed to archive regardless of choice.
 
 5. **执行归档**
 
@@ -2054,12 +2270,12 @@ export function getOpsxArchiveCommandTemplate(): CommandTemplate {
 
 6. **显示摘要**
 
-   显示归档完成摘要，包括：
-   - 变更名称
-   - 使用的 Schema
-   - 归档位置
-   - 规范是否已同步（如果适用）
-   - 关于任何警告的说明（未完成的产出物/任务）
+   Show archive completion summary including:
+   - Change name
+   - Schema that was used
+   - Archive location
+   - Spec sync status (synced / sync skipped / no delta specs)
+   - Note about any warnings (incomplete artifacts/tasks)
 
 **成功时的输出**
 
@@ -2092,15 +2308,15 @@ export function getOpsxArchiveCommandTemplate(): CommandTemplate {
 \`\`\`
 ## 归档完成（带警告）
 
-**变更：** <change-name>
-**Schema：** <schema-name>
-**归档至：** openspec/changes/archive/YYYY-MM-DD-<name>/
-**规范：** ⚠️ 未同步
+**Change:** <change-name>
+**Schema:** <schema-name>
+**Archived to:** openspec/changes/archive/YYYY-MM-DD-<name>/
+**Specs:** Sync skipped (user chose to skip)
 
-**警告：**
-- 归档时有 2 个未完成的产出物
-- 归档时有 3 个未完成的任务
-- 增量规范未同步（用户选择跳过）
+**Warnings:**
+- Archived with 2 incomplete artifacts
+- Archived with 3 incomplete tasks
+- Delta spec sync was skipped (user chose to skip)
 
 如果这不是故意的，请检查归档。
 \`\`\`
@@ -2121,14 +2337,261 @@ export function getOpsxArchiveCommandTemplate(): CommandTemplate {
 3. 等待不同的日期再归档
 \`\`\`
 
-**护栏**
-- 如果未提供，始终提示选择变更
-- 使用产出物图（openspec-cn status --json）进行完成检查
-- 不要因警告阻止归档 - 只是通知并确认
-- 移动到归档时保留 .openspec.yaml（它随目录移动）
-- 快速同步检查：在增量规范中查找需求名称，验证它们是否存在于主规范中
-- 显示发生了什么的清晰摘要
-- 如果请求同步，使用 /opsx:sync 方法（agent 驱动）`
+**Guardrails**
+- Always prompt for change selection if not provided
+- Use artifact graph (openspec status --json) for completion checking
+- Don't block archive on warnings - just inform and confirm
+- Preserve .openspec.yaml when moving to archive (it moves with the directory)
+- Show clear summary of what happened
+- If sync is requested, use /opsx:sync approach (agent-driven)
+- If delta specs exist, always run the sync assessment and show the combined summary before prompting`
+  };
+}
+
+/**
+ * Template for /opsx:bulk-archive slash command
+ */
+export function getOpsxBulkArchiveCommandTemplate(): CommandTemplate {
+  return {
+    name: 'OPSX: Bulk Archive',
+    description: 'Archive multiple completed changes at once',
+    category: 'Workflow',
+    tags: ['workflow', 'archive', 'experimental', 'bulk'],
+    content: `Archive multiple completed changes in a single operation.
+
+This skill allows you to batch-archive changes, handling spec conflicts intelligently by checking the codebase to determine what's actually implemented.
+
+**Input**: None required (prompts for selection)
+
+**Steps**
+
+1. **Get active changes**
+
+   Run \`openspec list --json\` to get all active changes.
+
+   If no active changes exist, inform user and stop.
+
+2. **Prompt for change selection**
+
+   Use **AskUserQuestion tool** with multi-select to let user choose changes:
+   - Show each change with its schema
+   - Include an option for "All changes"
+   - Allow any number of selections (1+ works, 2+ is the typical use case)
+
+   **IMPORTANT**: Do NOT auto-select. Always let the user choose.
+
+3. **Batch validation - gather status for all selected changes**
+
+   For each selected change, collect:
+
+   a. **Artifact status** - Run \`openspec status --change "<name>" --json\`
+      - Parse \`schemaName\` and \`artifacts\` list
+      - Note which artifacts are \`done\` vs other states
+
+   b. **Task completion** - Read \`openspec/changes/<name>/tasks.md\`
+      - Count \`- [ ]\` (incomplete) vs \`- [x]\` (complete)
+      - If no tasks file exists, note as "No tasks"
+
+   c. **Delta specs** - Check \`openspec/changes/<name>/specs/\` directory
+      - List which capability specs exist
+      - For each, extract requirement names (lines matching \`### Requirement: <name>\`)
+
+4. **Detect spec conflicts**
+
+   Build a map of \`capability -> [changes that touch it]\`:
+
+   \`\`\`
+   auth -> [change-a, change-b]  <- CONFLICT (2+ changes)
+   api  -> [change-c]            <- OK (only 1 change)
+   \`\`\`
+
+   A conflict exists when 2+ selected changes have delta specs for the same capability.
+
+5. **Resolve conflicts agentically**
+
+   **For each conflict**, investigate the codebase:
+
+   a. **Read the delta specs** from each conflicting change to understand what each claims to add/modify
+
+   b. **Search the codebase** for implementation evidence:
+      - Look for code implementing requirements from each delta spec
+      - Check for related files, functions, or tests
+
+   c. **Determine resolution**:
+      - If only one change is actually implemented -> sync that one's specs
+      - If both implemented -> apply in chronological order (older first, newer overwrites)
+      - If neither implemented -> skip spec sync, warn user
+
+   d. **Record resolution** for each conflict:
+      - Which change's specs to apply
+      - In what order (if both)
+      - Rationale (what was found in codebase)
+
+6. **Show consolidated status table**
+
+   Display a table summarizing all changes:
+
+   \`\`\`
+   | Change               | Artifacts | Tasks | Specs   | Conflicts | Status |
+   |---------------------|-----------|-------|---------|-----------|--------|
+   | schema-management   | Done      | 5/5   | 2 delta | None      | Ready  |
+   | project-config      | Done      | 3/3   | 1 delta | None      | Ready  |
+   | add-oauth           | Done      | 4/4   | 1 delta | auth (!)  | Ready* |
+   | add-verify-skill    | 1 left    | 2/5   | None    | None      | Warn   |
+   \`\`\`
+
+   For conflicts, show the resolution:
+   \`\`\`
+   * Conflict resolution:
+     - auth spec: Will apply add-oauth then add-jwt (both implemented, chronological order)
+   \`\`\`
+
+   For incomplete changes, show warnings:
+   \`\`\`
+   Warnings:
+   - add-verify-skill: 1 incomplete artifact, 3 incomplete tasks
+   \`\`\`
+
+7. **Confirm batch operation**
+
+   Use **AskUserQuestion tool** with a single confirmation:
+
+   - "Archive N changes?" with options based on status
+   - Options might include:
+     - "Archive all N changes"
+     - "Archive only N ready changes (skip incomplete)"
+     - "Cancel"
+
+   If there are incomplete changes, make clear they'll be archived with warnings.
+
+8. **Execute archive for each confirmed change**
+
+   Process changes in the determined order (respecting conflict resolution):
+
+   a. **Sync specs** if delta specs exist:
+      - Use the openspec-sync-specs approach (agent-driven intelligent merge)
+      - For conflicts, apply in resolved order
+      - Track if sync was done
+
+   b. **Perform the archive**:
+      \`\`\`bash
+      mkdir -p openspec/changes/archive
+      mv openspec/changes/<name> openspec/changes/archive/YYYY-MM-DD-<name>
+      \`\`\`
+
+   c. **Track outcome** for each change:
+      - Success: archived successfully
+      - Failed: error during archive (record error)
+      - Skipped: user chose not to archive (if applicable)
+
+9. **Display summary**
+
+   Show final results:
+
+   \`\`\`
+   ## Bulk Archive Complete
+
+   Archived 3 changes:
+   - schema-management-cli -> archive/2026-01-19-schema-management-cli/
+   - project-config -> archive/2026-01-19-project-config/
+   - add-oauth -> archive/2026-01-19-add-oauth/
+
+   Skipped 1 change:
+   - add-verify-skill (user chose not to archive incomplete)
+
+   Spec sync summary:
+   - 4 delta specs synced to main specs
+   - 1 conflict resolved (auth: applied both in chronological order)
+   \`\`\`
+
+   If any failures:
+   \`\`\`
+   Failed 1 change:
+   - some-change: Archive directory already exists
+   \`\`\`
+
+**Conflict Resolution Examples**
+
+Example 1: Only one implemented
+\`\`\`
+Conflict: specs/auth/spec.md touched by [add-oauth, add-jwt]
+
+Checking add-oauth:
+- Delta adds "OAuth Provider Integration" requirement
+- Searching codebase... found src/auth/oauth.ts implementing OAuth flow
+
+Checking add-jwt:
+- Delta adds "JWT Token Handling" requirement
+- Searching codebase... no JWT implementation found
+
+Resolution: Only add-oauth is implemented. Will sync add-oauth specs only.
+\`\`\`
+
+Example 2: Both implemented
+\`\`\`
+Conflict: specs/api/spec.md touched by [add-rest-api, add-graphql]
+
+Checking add-rest-api (created 2026-01-10):
+- Delta adds "REST Endpoints" requirement
+- Searching codebase... found src/api/rest.ts
+
+Checking add-graphql (created 2026-01-15):
+- Delta adds "GraphQL Schema" requirement
+- Searching codebase... found src/api/graphql.ts
+
+Resolution: Both implemented. Will apply add-rest-api specs first,
+then add-graphql specs (chronological order, newer takes precedence).
+\`\`\`
+
+**Output On Success**
+
+\`\`\`
+## Bulk Archive Complete
+
+Archived N changes:
+- <change-1> -> archive/YYYY-MM-DD-<change-1>/
+- <change-2> -> archive/YYYY-MM-DD-<change-2>/
+
+Spec sync summary:
+- N delta specs synced to main specs
+- No conflicts (or: M conflicts resolved)
+\`\`\`
+
+**Output On Partial Success**
+
+\`\`\`
+## Bulk Archive Complete (partial)
+
+Archived N changes:
+- <change-1> -> archive/YYYY-MM-DD-<change-1>/
+
+Skipped M changes:
+- <change-2> (user chose not to archive incomplete)
+
+Failed K changes:
+- <change-3>: Archive directory already exists
+\`\`\`
+
+**Output When No Changes**
+
+\`\`\`
+## No Changes to Archive
+
+No active changes found. Use \`/opsx:new\` to create a new change.
+\`\`\`
+
+**Guardrails**
+- Allow any number of changes (1+ is fine, 2+ is the typical use case)
+- Always prompt for selection, never auto-select
+- Detect spec conflicts early and resolve by checking codebase
+- When both changes are implemented, apply specs in chronological order
+- Skip spec sync only when implementation is missing (warn user)
+- Show clear per-change status before confirming
+- Use single confirmation for entire batch
+- Track and report all outcomes (success/skip/fail)
+- Preserve .openspec.yaml when moving to archive
+- Archive directory target uses current date: YYYY-MM-DD-<name>
+- If archive target exists, fail that change but continue with others`
   };
 }
 
@@ -2143,7 +2606,7 @@ export function getOpsxVerifyCommandTemplate(): CommandTemplate {
     tags: ['workflow', 'verify', 'experimental'],
     content: `验证实现是否与变更产出物（规范、任务、设计）匹配。
 
-**输入**：可选地在 \`/opsx:verify\` 后指定 \`--change <name>\`。如果省略，必须提示选择可用变更。
+**Input**: Optionally specify a change name after \`/opsx:verify\` (e.g., \`/opsx:verify add-auth\`). If omitted, check if it can be inferred from conversation context. If vague or ambiguous you MUST prompt for available changes.
 
 **步骤**
 
@@ -2298,5 +2761,113 @@ export function getOpsxVerifyCommandTemplate(): CommandTemplate {
 - 代码引用格式：\`file.ts:123\`
 - 具体的、可操作的建议
 - 不要使用模糊的建议，如 "考虑审查"`
+  };
+}
+/**
+ * Template for feedback skill
+ * For collecting and submitting user feedback with context enrichment
+ */
+export function getFeedbackSkillTemplate(): SkillTemplate {
+  return {
+    name: 'feedback',
+    description: 'Collect and submit user feedback about OpenSpec with context enrichment and anonymization.',
+    instructions: `Help the user submit feedback about OpenSpec.
+
+**Goal**: Guide the user through collecting, enriching, and submitting feedback while ensuring privacy through anonymization.
+
+**Process**
+
+1. **Gather context from the conversation**
+   - Review recent conversation history for context
+   - Identify what task was being performed
+   - Note what worked well or poorly
+   - Capture specific friction points or praise
+
+2. **Draft enriched feedback**
+   - Create a clear, descriptive title (single sentence, no "Feedback:" prefix needed)
+   - Write a body that includes:
+     - What the user was trying to do
+     - What happened (good or bad)
+     - Relevant context from the conversation
+     - Any specific suggestions or requests
+
+3. **Anonymize sensitive information**
+   - Replace file paths with \`<path>\` or generic descriptions
+   - Replace API keys, tokens, secrets with \`<redacted>\`
+   - Replace company/organization names with \`<company>\`
+   - Replace personal names with \`<user>\`
+   - Replace specific URLs with \`<url>\` unless public/relevant
+   - Keep technical details that help understand the issue
+
+4. **Present draft for approval**
+   - Show the complete draft to the user
+   - Display both title and body clearly
+   - Ask for explicit approval before submitting
+   - Allow the user to request modifications
+
+5. **Submit on confirmation**
+   - Use the \`openspec feedback\` command to submit
+   - Format: \`openspec feedback "title" --body "body content"\`
+   - The command will automatically add metadata (version, platform, timestamp)
+
+**Example Draft**
+
+\`\`\`
+Title: Error handling in artifact workflow needs improvement
+
+Body:
+I was working on creating a new change and encountered an issue with
+the artifact workflow. When I tried to continue after creating the
+proposal, the system didn't clearly indicate that I needed to complete
+the specs first.
+
+Suggestion: Add clearer error messages that explain dependency chains
+in the artifact workflow. Something like "Cannot create design.md
+because specs are not complete (0/2 done)."
+
+Context: Using the spec-driven schema with <path>/my-project
+\`\`\`
+
+**Anonymization Examples**
+
+Before:
+\`\`\`
+Working on /Users/john/mycompany/auth-service/src/oauth.ts
+Failed with API key: sk_live_abc123xyz
+Working at Acme Corp
+\`\`\`
+
+After:
+\`\`\`
+Working on <path>/oauth.ts
+Failed with API key: <redacted>
+Working at <company>
+\`\`\`
+
+**Guardrails**
+
+- MUST show complete draft before submitting
+- MUST ask for explicit approval
+- MUST anonymize sensitive information
+- ALLOW user to modify draft before submitting
+- DO NOT submit without user confirmation
+- DO include relevant technical context
+- DO keep conversation-specific insights
+
+**User Confirmation Required**
+
+Always ask:
+\`\`\`
+Here's the feedback I've drafted:
+
+Title: [title]
+
+Body:
+[body]
+
+Does this look good? I can modify it if you'd like, or submit it as-is.
+\`\`\`
+
+Only proceed with submission after user confirms.`
   };
 }
