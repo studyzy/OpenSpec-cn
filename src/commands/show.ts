@@ -125,7 +125,16 @@ export class ShowCommand {
   private warnIrrelevantFlags(type: ItemType, options: { [k: string]: any }): boolean {
     const irrelevant: string[] = [];
     if (type === 'change') {
-      for (const k of SPEC_FLAG_KEYS) if (k in options) irrelevant.push(k);
+      for (const k of SPEC_FLAG_KEYS) {
+        if (k in options) {
+          // Special handling for --no-scenarios which defaults to true in Commander
+          // We only want to warn if the user explicitly passed --no-scenarios (value is false)
+          if (k === 'scenarios' && options[k] === true) {
+            continue;
+          }
+          irrelevant.push(k);
+        }
+      }
     } else {
       for (const k of CHANGE_FLAG_KEYS) if (k in options) irrelevant.push(k);
     }
