@@ -31,7 +31,9 @@ artifacts:
     instruction: |
       创建定义系统“应该做什么”的规范文件。
 
-      为 `specs/<name>/spec.md` 中的每个功能/特性区域创建一个规范文件。
+      Create one spec file per capability listed in the proposal's Capabilities section.
+      - New capabilities: use the exact kebab-case name from the proposal (specs/<capability>/spec.md).
+      - Modified capabilities: use the existing spec folder name from openspec/specs/<capability>/ when creating the delta spec at specs/<capability>/spec.md.
 
       增量操作（使用 ## 标题）：
       - **ADDED Requirements**: 新功能
@@ -105,16 +107,19 @@ artifacts:
 
   - id: tasks
     generates: tasks.md
-    description: 从规范和设计中推导出的实现任务
+    description: Implementation checklist with trackable tasks
     template: tasks.md
     instruction: |
       创建分解实现工作的任务列表。
 
-      指南：
-      - 在 ## 编号标题下对相关任务进行分组
-      - 每个任务都是一个复选框：- [ ] X.Y 任务描述
-      - 任务应当足够小，以便在一次会话中完成
-      - 按依赖关系对任务进行排序（必须先做什么？）
+      **IMPORTANT: Follow the template below exactly.** The apply phase parses
+      checkbox format to track progress. Tasks not using `- [ ]` won't be tracked.
+
+      Guidelines:
+      - Group related tasks under ## numbered headings
+      - Each task MUST be a checkbox: `- [ ] X.Y Task description`
+      - Tasks should be small enough to complete in one session
+      - Order tasks by dependency (what must be done first?)
 
       示例：
       ```

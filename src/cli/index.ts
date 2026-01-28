@@ -15,8 +15,21 @@ import { ShowCommand } from '../commands/show.js';
 import { CompletionCommand } from '../commands/completion.js';
 import { FeedbackCommand } from '../commands/feedback.js';
 import { registerConfigCommand } from '../commands/config.js';
-import { registerArtifactWorkflowCommands } from '../commands/artifact-workflow.js';
 import { registerSchemaCommand } from '../commands/schema.js';
+import {
+  statusCommand,
+  instructionsCommand,
+  applyInstructionsCommand,
+  templatesCommand,
+  schemasCommand,
+  newChangeCommand,
+  DEFAULT_SCHEMA,
+  type StatusOptions,
+  type InstructionsOptions,
+  type TemplatesOptions,
+  type SchemasOptions,
+  type NewChangeOptions,
+} from '../commands/workflow/index.js';
 import { maybeShowTelemetryNotice, trackCommand, shutdown } from '../telemetry/index.js';
 
 const program = new Command();
@@ -76,18 +89,19 @@ program.hook('postAction', async () => {
   await shutdown();
 });
 
-const availableToolIds = AI_TOOLS.filter((tool) => tool.available).map((tool) => tool.value);
+const availableToolIds = AI_TOOLS.filter((tool) => tool.skillsDir).map((tool) => tool.value);
 const toolsOptionDescription = `非交互式配置AI工具。使用 "all"、"none" 或逗号分隔的列表：${availableToolIds.join(', ')}`;
 
 program
   .command('init [path]')
   .description('在您的项目中初始化OpenSpec')
   .option('--tools <tools>', toolsOptionDescription)
-  .action(async (targetPath = '.', options?: { tools?: string }) => {
+  .option('--force', 'Auto-cleanup legacy files without prompting')
+  .action(async (targetPath = '.', options?: { tools?: string; force?: boolean }) => {
     try {
       // Validate that the path is a valid directory
       const resolvedPath = path.resolve(targetPath);
-      
+
       try {
         const stats = await fs.stat(resolvedPath);
         if (!stats.isDirectory()) {
@@ -103,10 +117,11 @@ program
           throw new Error(`无法访问路径 "${targetPath}": ${error.message}`);
         }
       }
-      
+
       const { InitCommand } = await import('../core/init.js');
       const initCommand = new InitCommand({
         tools: options?.tools,
+        force: options?.force,
       });
       await initCommand.execute(targetPath);
     } catch (error) {
@@ -116,13 +131,36 @@ program
     }
   });
 
+// Hidden alias: 'experimental' -> 'init' for backwards compatibility
+program
+  .command('experimental', { hidden: true })
+  .description('Alias for init (deprecated)')
+  .option('--tool <tool-id>', 'Target AI tool (maps to --tools)')
+  .option('--no-interactive', 'Disable interactive prompts')
+  .action(async (options?: { tool?: string; noInteractive?: boolean }) => {
+    try {
+      console.log('Note: "openspec experimental" is deprecated. Use "openspec init" instead.');
+      const { InitCommand } = await import('../core/init.js');
+      const initCommand = new InitCommand({
+        tools: options?.tool,
+        interactive: options?.noInteractive === true ? false : undefined,
+      });
+      await initCommand.execute('.');
+    } catch (error) {
+      console.log();
+      ora().fail(`Error: ${(error as Error).message}`);
+      process.exit(1);
+    }
+  });
+
 program
   .command('update [path]')
   .description('更新OpenSpec指令文件')
-  .action(async (targetPath = '.') => {
+  .option('--force', 'Force update even when tools are up to date')
+  .action(async (targetPath = '.', options?: { force?: boolean }) => {
     try {
       const resolvedPath = path.resolve(targetPath);
-      const updateCommand = new UpdateCommand();
+      const updateCommand = new UpdateCommand({ force: options?.force });
       await updateCommand.execute(resolvedPath);
     } catch (error) {
       console.log(); // Empty line for spacing
@@ -377,7 +415,96 @@ program
     }
   });
 
-// Register artifact workflow commands (experimental)
-registerArtifactWorkflowCommands(program);
+// ═══════════════════════════════════════════════════════════
+// Workflow Commands (formerly experimental)
+// ═══════════════════════════════════════════════════════════
+
+// Status command
+program
+  .command('status')
+  .description('Display artifact completion status for a change')
+  .option('--change <id>', 'Change name to show status for')
+  .option('--schema <name>', 'Schema override (auto-detected from config.yaml)')
+  .option('--json', 'Output as JSON')
+  .action(async (options: StatusOptions) => {
+    try {
+      await statusCommand(options);
+    } catch (error) {
+      console.log();
+      ora().fail(`Error: ${(error as Error).message}`);
+      process.exit(1);
+    }
+  });
+
+// Instructions command
+program
+  .command('instructions [artifact]')
+  .description('Output enriched instructions for creating an artifact or applying tasks')
+  .option('--change <id>', 'Change name')
+  .option('--schema <name>', 'Schema override (auto-detected from config.yaml)')
+  .option('--json', 'Output as JSON')
+  .action(async (artifactId: string | undefined, options: InstructionsOptions) => {
+    try {
+      // Special case: "apply" is not an artifact, but a command to get apply instructions
+      if (artifactId === 'apply') {
+        await applyInstructionsCommand(options);
+      } else {
+        await instructionsCommand(artifactId, options);
+      }
+    } catch (error) {
+      console.log();
+      ora().fail(`Error: ${(error as Error).message}`);
+      process.exit(1);
+    }
+  });
+
+// Templates command
+program
+  .command('templates')
+  .description('Show resolved template paths for all artifacts in a schema')
+  .option('--schema <name>', `Schema to use (default: ${DEFAULT_SCHEMA})`)
+  .option('--json', 'Output as JSON mapping artifact IDs to template paths')
+  .action(async (options: TemplatesOptions) => {
+    try {
+      await templatesCommand(options);
+    } catch (error) {
+      console.log();
+      ora().fail(`Error: ${(error as Error).message}`);
+      process.exit(1);
+    }
+  });
+
+// Schemas command
+program
+  .command('schemas')
+  .description('List available workflow schemas with descriptions')
+  .option('--json', 'Output as JSON (for agent use)')
+  .action(async (options: SchemasOptions) => {
+    try {
+      await schemasCommand(options);
+    } catch (error) {
+      console.log();
+      ora().fail(`Error: ${(error as Error).message}`);
+      process.exit(1);
+    }
+  });
+
+// New command group with change subcommand
+const newCmd = program.command('new').description('Create new items');
+
+newCmd
+  .command('change <name>')
+  .description('Create a new change directory')
+  .option('--description <text>', 'Description to add to README.md')
+  .option('--schema <name>', `Workflow schema to use (default: ${DEFAULT_SCHEMA})`)
+  .action(async (name: string, options: NewChangeOptions) => {
+    try {
+      await newChangeCommand(name, options);
+    } catch (error) {
+      console.log();
+      ora().fail(`Error: ${(error as Error).message}`);
+      process.exit(1);
+    }
+  });
 
 program.parse();
