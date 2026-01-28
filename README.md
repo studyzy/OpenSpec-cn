@@ -17,7 +17,10 @@
 > [!NOTE]
 > 本项目为中文汉化分支：**openspec-cn**（npm：`@studyzy/openspec-cn`）。
 >
-> 原版项目：OpenSpec（仓库：`https://github.com/Fission-AI/OpenSpec`，npm：`@fission-ai/openspec`）。
+> 原版项目：OpenSpec
+> 仓库：https://github.com/Fission-AI/OpenSpec
+> npm：`@fission-ai/openspec` <a href="https://www.npmjs.com/package/@fission-ai/openspec"><img alt="npm version" src="https://img.shields.io/npm/v/@fission-ai/openspec?style=flat-square" /></a>
+
 
 <details>
 <summary><strong>最受喜爱的规范（spec）框架。</strong></summary>
@@ -168,6 +171,8 @@ openspec-cn update
 ## 参与贡献
 
 **小修小补** —— Bug 修复、错别字修正与小型改进可以直接提交 PR。
+
+**汉化问题** —— 因为汉化导致的Bug 修复、错别字修正与小型改进建议可以直接提交[Issue](https://github.com/studyzy/OpenSpec-cn/issues)。
 
 **较大改动** —— 对于新功能、重大重构或架构调整，请先提交一个 OpenSpec 变更提案，以便在实现前对齐意图与目标。
 

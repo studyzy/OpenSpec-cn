@@ -4,9 +4,10 @@ People who maintain and guide OpenSpec.
 
 ## Core Maintainers
 
-| Name | GitHub | Role |
-|------|--------|------|
+| Name            | GitHub                                 | Role           |
+|-----------------|----------------------------------------|----------------|
 | Tabish Bidiwale | [@TabishB](https://github.com/TabishB) | Lead maintainer |
+| Devin Zeng      | [@studyzy](https://github.com/studyzy)| 汉化作者           |
 
 ## Advisors
 
