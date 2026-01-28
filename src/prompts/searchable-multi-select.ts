@@ -139,22 +139,22 @@ async function createSearchableMultiSelect(): Promise<
         ? selectedValues
             .map((v) => chalk.bgCyan.black(` ${choiceMap.get(v)?.name} `))
             .join(' ')
-        : chalk.dim('(none selected)');
-    lines.push(`  Selected: ${chips}`);
+        : chalk.dim('(无选择)');
+    lines.push(`  已选择: ${chips}`);
 
     // Search box
     lines.push(
-      `  Search: ${chalk.yellow('[')}${searchText || chalk.dim('type to filter')}${chalk.yellow(']')}`
+      `  搜索: ${chalk.yellow('[')}${searchText || chalk.dim('输入以过滤')}${chalk.yellow(']')}`
     );
 
     // Instructions
     lines.push(
-      `  ${chalk.cyan('↑↓')} navigate • ${chalk.cyan('Enter')} add • ${chalk.cyan('Backspace')} remove • ${chalk.cyan('Tab')} confirm`
+      `  ${chalk.cyan('↑↓')} 导航 • ${chalk.cyan('Enter')} 添加 • ${chalk.cyan('Backspace')} 删除 • ${chalk.cyan('Tab')} 确认`
     );
 
     // List
     if (filteredChoices.length === 0) {
-      lines.push(chalk.yellow('  No matches'));
+      lines.push(chalk.yellow('  无匹配'));
     } else {
       // Calculate pagination
       const startIndex = Math.max(

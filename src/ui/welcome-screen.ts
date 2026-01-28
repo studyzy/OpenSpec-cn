@@ -17,19 +17,19 @@ const ART_COLUMN_WIDTH = 24;
  */
 function getWelcomeText(): string[] {
   return [
-    chalk.white.bold('Welcome to OpenSpec'),
-    chalk.dim('A lightweight spec-driven framework'),
+    chalk.white.bold('欢迎使用 OpenSpec-cn'),
+    chalk.dim('一个轻量级的规范驱动框架'),
     '',
-    chalk.white('This setup will configure:'),
-    chalk.dim('  • Agent Skills for AI tools'),
-    chalk.dim('  • /opsx:* slash commands'),
+    chalk.white('此设置将配置:'),
+    chalk.dim('  • AI 工具的代理技能'),
+    chalk.dim('  • /opsx:* 斜杠命令'),
     '',
-    chalk.white('Quick start after setup:'),
-    `  ${chalk.yellow('/opsx:new')}      ${chalk.dim('Create a change')}`,
-    `  ${chalk.yellow('/opsx:continue')} ${chalk.dim('Next artifact')}`,
-    `  ${chalk.yellow('/opsx:apply')}    ${chalk.dim('Implement tasks')}`,
+    chalk.white('设置后快速开始:'),
+    `  ${chalk.yellow('/opsx:new')}      ${chalk.dim('创建变更')}`,
+    `  ${chalk.yellow('/opsx:continue')} ${chalk.dim('下一个产出物')}`,
+    `  ${chalk.yellow('/opsx:apply')}    ${chalk.dim('实现任务')}`,
     '',
-    chalk.cyan('Press Enter to select tools...'),
+    chalk.cyan('按 Enter 选择工具...'),
   ];
 }
 

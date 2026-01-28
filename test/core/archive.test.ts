@@ -18,17 +18,17 @@ describe('ArchiveCommand', () => {
 
   beforeEach(async () => {
     // Create temp directory
-    tempDir = path.join(os.tmpdir(), `openspec-archive-test-${Date.now()}`);
+  tempDir = path.join(os.tmpdir(), `openspec-archive-test-${Date.now()}`);
     await fs.mkdir(tempDir, { recursive: true });
     
     // Change to temp directory
     process.chdir(tempDir);
     
     // Create OpenSpec structure
-    const openspecDir = path.join(tempDir, 'openspec');
-    await fs.mkdir(path.join(openspecDir, 'changes'), { recursive: true });
-    await fs.mkdir(path.join(openspecDir, 'specs'), { recursive: true });
-    await fs.mkdir(path.join(openspecDir, 'changes', 'archive'), { recursive: true });
+  const openspecDir = path.join(tempDir, 'openspec');
+  await fs.mkdir(path.join(openspecDir, 'changes'), { recursive: true });
+  await fs.mkdir(path.join(openspecDir, 'specs'), { recursive: true });
+  await fs.mkdir(path.join(openspecDir, 'changes', 'archive'), { recursive: true });
     
     // Suppress console.log during tests
     console.log = vi.fn();

@@ -16,8 +16,8 @@ describe('instruction-loader', () => {
       // Uses built-in spec-driven schema
       const template = loadTemplate('spec-driven', 'proposal.md');
 
-      expect(template).toContain('## Why');
-      expect(template).toContain('## What Changes');
+      expect(template).toContain('## 为什么');
+      expect(template).toContain('## 变更内容');
     });
 
     it('should throw TemplateLoadError for non-existent template', () => {
@@ -149,7 +149,7 @@ describe('instruction-loader', () => {
       const context = loadChangeContext(tempDir, 'my-change');
       const instructions = generateInstructions(context, 'proposal');
 
-      expect(instructions.template).toContain('## Why');
+      expect(instructions.template).toContain('## 为什么');
     });
 
     it('should show dependencies with completion status', () => {
@@ -218,7 +218,7 @@ context: |
         expect(instructions.context).toContain('Tech stack: TypeScript, React');
         expect(instructions.context).toContain('API style: RESTful');
         expect(instructions.template).not.toContain('Tech stack');
-        expect(instructions.template).toContain('## Why'); // Actual template content
+        expect(instructions.template).toContain('## 为什么'); // Actual template content
       });
 
       it('should return undefined context when config is absent', () => {
@@ -227,7 +227,7 @@ context: |
 
         expect(instructions.context).toBeUndefined();
         expect(instructions.rules).toBeUndefined();
-        expect(instructions.template).toContain('## Why'); // Actual template content
+        expect(instructions.template).toContain('## 为什么'); // Actual template content
       });
 
       it('should preserve multi-line context', () => {
@@ -357,7 +357,7 @@ rules:
         // All three should be separate
         expect(instructions.context).toBe('Project context here');
         expect(instructions.rules).toEqual(['Rule 1']);
-        expect(instructions.template).toContain('## Why');
+        expect(instructions.template).toContain('## 为什么');
         // Template should not contain context or rules
         expect(instructions.template).not.toContain('Project context here');
         expect(instructions.template).not.toContain('Rule 1');
@@ -379,7 +379,7 @@ context: Project context only
 
         expect(instructions.context).toBe('Project context only');
         expect(instructions.rules).toBeUndefined();
-        expect(instructions.template).toContain('## Why');
+        expect(instructions.template).toContain('## 为什么');
       });
 
       it('should handle rules without context', () => {
@@ -400,7 +400,7 @@ rules:
 
         expect(instructions.context).toBeUndefined();
         expect(instructions.rules).toEqual(['Rule only']);
-        expect(instructions.template).toContain('## Why');
+        expect(instructions.template).toContain('## 为什么');
       });
 
       it('should work without project root parameter', () => {
@@ -409,7 +409,7 @@ rules:
 
         expect(instructions.context).toBeUndefined();
         expect(instructions.rules).toBeUndefined();
-        expect(instructions.template).toContain('## Why');
+        expect(instructions.template).toContain('## 为什么');
       });
     });
 

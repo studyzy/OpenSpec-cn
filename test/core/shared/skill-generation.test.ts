@@ -24,7 +24,7 @@ describe('skill-generation', () => {
       const templates = getSkillTemplates();
       const dirNames = templates.map(t => t.dirName);
 
-      expect(dirNames).toContain('openspec-explore');
+  expect(dirNames).toContain('openspec-explore');
       expect(dirNames).toContain('openspec-new-change');
       expect(dirNames).toContain('openspec-continue-change');
       expect(dirNames).toContain('openspec-apply-change');

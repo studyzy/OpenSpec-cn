@@ -14,7 +14,7 @@ artifacts:
       - **What Changes**: 变更的列表。明确说明新功能、修改或移除。使用 **BREAKING** 标记破坏性变更。
       - **Capabilities**: 确定将创建或修改哪些规范：
         - **New Capabilities**: 列出引入的新功能。每个功能都将对应一个新的 `specs/<name>/spec.md`。使用 kebab-case 命名（例如：`user-auth`, `data-export`）。
-        - **Modified Capabilities**: 列出需求发生变化的现有功能。仅当规范层面的行为发生变化时（不只是实现细节）才包含在内。每个功能都需要一个增量规范文件。检查 `openspec/specs/` 以获取现有的规范名称。如果没有需求变化，请保持为空。
+        - **修改功能**: 列出需求发生变化的现有功能。仅当规范层面的行为发生变化时（不只是实现细节）才包含在内。每个功能都需要一个增量规范文件。检查项目目录中的 `specs/` 以获取现有的规范名称。如果没有需求变化，请保持为空。
       - **Impact**: 受影响的代码、API、依赖或系统。
 
       重要提示：Capabilities 章节至关重要。它建立了提案阶段与规范阶段之间的契约。在填写此章节之前，请研究现有的规范。此处列出的每个功能都需要一个对应的规范文件。
@@ -29,11 +29,11 @@ artifacts:
     description: 变更的详细规范
     template: spec.md
     instruction: |
-      创建定义系统“应该做什么”的规范文件。
+      创建定义系统"应该做什么"的规范文件。
 
-      Create one spec file per capability listed in the proposal's Capabilities section.
-      - New capabilities: use the exact kebab-case name from the proposal (specs/<capability>/spec.md).
-      - Modified capabilities: use the existing spec folder name from openspec/specs/<capability>/ when creating the delta spec at specs/<capability>/spec.md.
+      为提案 Capabilities 章节中列出的每个功能创建一个规范文件：
+      - 新增功能：使用提案中的精确 kebab-case 名称（specs/<capability>/spec.md）。
+      - 修改功能：在创建增量规范时，使用项目目录中原有的规范文件夹名称（在 specs/<capability>/spec.md 中创建）。
 
       增量操作（使用 ## 标题）：
       - **ADDED Requirements**: 新功能
@@ -43,15 +43,15 @@ artifacts:
 
       格式要求：
       - 每个需求：`### 需求：<名称>` 后面跟描述
-      - 使用 SHALL/MUST 等规范性词汇（避免使用 should/may）
+      - 使用 SHALL/MUST/必须/禁止等规范性词汇（避免使用 should/may）
       - 每个场景：`#### 场景：<名称>` 使用 当/那么（WHEN/THEN）格式
       - **关键提示**：场景标题必须恰好使用 4 个井号 (`####`)。使用 3 个井号或列表将导致处理失败。
       - 每个需求必须至少有一个场景。
 
-      MODIFIED 需求工作流：
-      1. 在 openspec/specs/<capability>/spec.md 中找到现有的需求
+      修改需求工作流：
+      1. 在项目的 specs/<capability>/spec.md 中找到现有的需求
       2. 复制整个需求块（从 `### 需求：` 到所有场景）
-      3. 粘贴到 `## MODIFIED Requirements` 下并编辑以反映新行为
+      3. 粘贴到 `## 修改需求` 下并编辑以反映新行为
       4. 确保标题文本完全匹配（空格不敏感）
 
       常见陷阱：使用 MODIFIED 时只包含部分内容会导致归档时丢失细节。如果只是添加新关注点而不改变现有行为，请使用 ADDED 代替。
@@ -107,19 +107,18 @@ artifacts:
 
   - id: tasks
     generates: tasks.md
-    description: Implementation checklist with trackable tasks
+    description: 可追踪任务的实施清单
     template: tasks.md
     instruction: |
       创建分解实现工作的任务列表。
 
-      **IMPORTANT: Follow the template below exactly.** The apply phase parses
-      checkbox format to track progress. Tasks not using `- [ ]` won't be tracked.
+      **重要提示：严格遵循以下模板格式。** 应用阶段会解析复选框格式来跟踪进度。不使用 `- [ ]` 格式的任务将不会被跟踪。
 
-      Guidelines:
-      - Group related tasks under ## numbered headings
-      - Each task MUST be a checkbox: `- [ ] X.Y Task description`
-      - Tasks should be small enough to complete in one session
-      - Order tasks by dependency (what must be done first?)
+      指南：
+      - 将相关任务分组到 ## 编号标题下
+      - 每个任务必须是复选框：`- [ ] X.Y 任务描述`
+      - 任务应该足够小，可以在一次会话中完成
+      - 按依赖关系排序任务（什么必须先做？）
 
       示例：
       ```

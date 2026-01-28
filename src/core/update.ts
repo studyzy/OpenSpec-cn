@@ -68,8 +68,8 @@ export class UpdateCommand {
     const configuredTools = getConfiguredTools(resolvedProjectPath);
 
     if (configuredTools.length === 0 && newlyConfiguredTools.length === 0) {
-      console.log(chalk.yellow('No configured tools found.'));
-      console.log(chalk.dim('Run "openspec init" to set up tools.'));
+      console.log(chalk.yellow('未找到配置的工具。'));
+      console.log(chalk.dim('运行 "openspec-cn init" 来设置工具。'));
       return;
     }
 
@@ -88,7 +88,7 @@ export class UpdateCommand {
 
     // 6. Display update plan
     if (this.force) {
-      console.log(`Force updating ${configuredTools.length} tool(s): ${configuredTools.join(', ')}`);
+      console.log(`强制更新 ${configuredTools.length} 个工具: ${configuredTools.join(', ')}`);
     } else {
       this.displayUpdatePlan(toolsNeedingUpdate, toolsUpToDate);
     }
@@ -107,7 +107,7 @@ export class UpdateCommand {
       const tool = AI_TOOLS.find((t) => t.value === toolId);
       if (!tool?.skillsDir) continue;
 
-      const spinner = ora(`Updating ${tool.name}...`).start();
+      const spinner = ora(`正在更新 ${tool.name}...`).start();
 
       try {
         const skillsDir = path.join(resolvedProjectPath, tool.skillsDir, 'skills');
@@ -132,10 +132,10 @@ export class UpdateCommand {
           }
         }
 
-        spinner.succeed(`Updated ${tool.name}`);
+        spinner.succeed(`已更新 ${tool.name}`);
         updatedTools.push(tool.name);
       } catch (error) {
-        spinner.fail(`Failed to update ${tool.name}`);
+        spinner.fail(`更新失败 ${tool.name}`);
         failedTools.push({
           name: tool.name,
           error: error instanceof Error ? error.message : String(error)
@@ -146,25 +146,25 @@ export class UpdateCommand {
     // 9. Summary
     console.log();
     if (updatedTools.length > 0) {
-      console.log(chalk.green(`✓ Updated: ${updatedTools.join(', ')} (v${OPENSPEC_VERSION})`));
+      console.log(chalk.green(`✓ 已更新: ${updatedTools.join(', ')} (v${OPENSPEC_VERSION})`));
     }
     if (failedTools.length > 0) {
-      console.log(chalk.red(`✗ Failed: ${failedTools.map(f => `${f.name} (${f.error})`).join(', ')}`));
+      console.log(chalk.red(`✗ 失败: ${failedTools.map(f => `${f.name} (${f.error})`).join(', ')}`));
     }
 
     // 10. Show onboarding message for newly configured tools from legacy upgrade
     if (newlyConfiguredTools.length > 0) {
       console.log();
-      console.log(chalk.bold('Getting started:'));
-      console.log('  /opsx:new       Start a new change');
-      console.log('  /opsx:continue  Create the next artifact');
-      console.log('  /opsx:apply     Implement tasks');
+      console.log(chalk.bold('快速开始:'));
+      console.log('  /opsx:new       开始一个新的变更');
+      console.log('  /opsx:continue  创建下一个产出物');
+      console.log('  /opsx:apply     实施任务');
       console.log();
-      console.log(`Learn more: ${chalk.cyan('https://github.com/Fission-AI/OpenSpec')}`);
+      console.log(`了解更多: ${chalk.cyan('https://github.com/Fission-AI/OpenSpec')}`);
     }
 
     console.log();
-    console.log(chalk.dim('Restart your IDE for changes to take effect.'));
+    console.log(chalk.dim('重启 IDE 以使更改生效。'));
   }
 
   /**
@@ -172,10 +172,10 @@ export class UpdateCommand {
    */
   private displayUpToDateMessage(toolStatuses: ToolVersionStatus[]): void {
     const toolNames = toolStatuses.map((s) => s.toolId);
-    console.log(chalk.green(`✓ All ${toolStatuses.length} tool(s) up to date (v${OPENSPEC_VERSION})`));
-    console.log(chalk.dim(`  Tools: ${toolNames.join(', ')}`));
+    console.log(chalk.green(`✓ 所有 ${toolStatuses.length} 个工具已是最新版本 (v${OPENSPEC_VERSION})`));
+    console.log(chalk.dim(`  工具: ${toolNames.join(', ')}`));
     console.log();
-    console.log(chalk.dim('Use --force to refresh skills anyway.'));
+    console.log(chalk.dim('使用 --force 强制刷新 skills。'));
   }
 
   /**
@@ -190,11 +190,11 @@ export class UpdateCommand {
       return `${s.toolId} (${fromVersion} → ${OPENSPEC_VERSION})`;
     });
 
-    console.log(`Updating ${needingUpdate.length} tool(s): ${updates.join(', ')}`);
+    console.log(`正在更新 ${needingUpdate.length} 个工具: ${updates.join(', ')}`);
 
     if (upToDate.length > 0) {
       const upToDateNames = upToDate.map((s) => s.toolId);
-      console.log(chalk.dim(`Already up to date: ${upToDateNames.join(', ')}`));
+      console.log(chalk.dim(`已是最新版本: ${upToDateNames.join(', ')}`));
     }
   }
 
@@ -306,7 +306,7 @@ export class UpdateCommand {
     }
 
     // Show what tools were detected from legacy artifacts
-    console.log(chalk.bold('Tools detected from legacy artifacts:'));
+    console.log(chalk.bold('从旧文件检测到的工具:'));
     for (const toolId of validUnconfiguredTools) {
       const tool = AI_TOOLS.find((t) => t.value === toolId);
       console.log(`  • ${tool?.name || toolId}`);

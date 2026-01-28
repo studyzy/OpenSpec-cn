@@ -84,7 +84,7 @@ export class SpecCommand {
 
     const specPath = join(this.SPECS_DIR, specId, 'spec.md');
     if (!existsSync(specPath)) {
-      throw new Error(`未找到规范 '${specId}'，路径：openspec/specs/${specId}/spec.md`);
+      throw new Error(`未找到规范 '${specId}'，路径：${this.SPECS_DIR}/${specId}/spec.md`);
     }
 
     if (options.json) {
@@ -220,7 +220,7 @@ export function registerSpecCommand(rootProgram: typeof program) {
         const specPath = join(SPECS_DIR, specId, 'spec.md');
         
         if (!existsSync(specPath)) {
-          throw new Error(`未找到规范 '${specId}'，路径：openspec/specs/${specId}/spec.md`);
+          throw new Error(`未找到规范 '${specId}'，路径：${SPECS_DIR}/${specId}/spec.md`);
         }
 
         const validator = new Validator(options.strict);

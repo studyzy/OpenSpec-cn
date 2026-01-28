@@ -24,7 +24,7 @@ export interface NewChangeOptions {
 
 export async function newChangeCommand(name: string | undefined, options: NewChangeOptions): Promise<void> {
   if (!name) {
-    throw new Error('Missing required argument <name>');
+    throw new Error('缺少必需参数 <name>');
   }
 
   const validation = validateChangeName(name);
@@ -53,9 +53,9 @@ export async function newChangeCommand(name: string | undefined, options: NewCha
       await fs.writeFile(readmePath, `# ${name}\n\n${options.description}\n`, 'utf-8');
     }
 
-    spinner.succeed(`Created change '${name}' at openspec/changes/${name}/ (schema: ${result.schema})`);
+    spinner.succeed(`已创建变更 '${name}'，位于 openspec/changes/${name}/ (架构: ${result.schema})`);
   } catch (error) {
-    spinner.fail(`Failed to create change '${name}'`);
+    spinner.fail(`创建变更 '${name}' 失败`);
     throw error;
   }
 }

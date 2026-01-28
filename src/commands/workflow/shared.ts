@@ -111,10 +111,10 @@ export async function validateChangeExists(
   if (!changeName) {
     const available = await getAvailableChanges();
     if (available.length === 0) {
-      throw new Error('No changes found. Create one with: openspec new change <name>');
+      throw new Error('未找到变更。请使用: openspec-cn new change <name> 创建一个');
     }
     throw new Error(
-      `Missing required option --change. Available changes:\n  ${available.join('\n  ')}`
+      `缺少必需选项 --change。可用的变更:\n  ${available.join('\n  ')}`
     );
   }
 
@@ -132,11 +132,11 @@ export async function validateChangeExists(
     const available = await getAvailableChanges();
     if (available.length === 0) {
       throw new Error(
-        `Change '${changeName}' not found. No changes exist. Create one with: openspec new change <name>`
+        `未找到变更 '${changeName}'。不存在变更。请使用: openspec-cn new change <name> 创建一个`
       );
     }
     throw new Error(
-      `Change '${changeName}' not found. Available changes:\n  ${available.join('\n  ')}`
+      `未找到变更 '${changeName}'。可用的变更:\n  ${available.join('\n  ')}`
     );
   }
 

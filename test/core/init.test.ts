@@ -51,7 +51,7 @@ describe('InitCommand', () => {
       await initCommand.execute(testDir);
 
       const skillNames = [
-        'openspec-explore',
+  'openspec-explore',
         'openspec-new-change',
         'openspec-continue-change',
         'openspec-apply-change',
@@ -158,7 +158,7 @@ describe('InitCommand', () => {
     it('should throw error for invalid tool names', async () => {
       const initCommand = new InitCommand({ tools: 'invalid-tool', force: true });
 
-      await expect(initCommand.execute(testDir)).rejects.toThrow(/Invalid tool\(s\): invalid-tool/);
+      await expect(initCommand.execute(testDir)).rejects.toThrow(/无效工具.*: invalid-tool/);
     });
 
     it('should handle comma-separated tool names with spaces', async () => {
@@ -177,7 +177,7 @@ describe('InitCommand', () => {
       const initCommand = new InitCommand({ tools: 'all,claude', force: true });
 
       await expect(initCommand.execute(testDir)).rejects.toThrow(
-        /Cannot combine reserved values "all" or "none" with specific tool IDs/
+        /不能同时使用保留值 "all" 或 "none" 与具体工具 ID/
       );
     });
 
@@ -266,8 +266,8 @@ describe('InitCommand', () => {
       const skillFile = path.join(testDir, '.claude', 'skills', 'openspec-explore', 'SKILL.md');
       const content = await fs.readFile(skillFile, 'utf-8');
 
-      expect(content).toContain('Enter explore mode');
-      expect(content).toContain('thinking partner');
+      expect(content).toContain('进入探索模式');
+      expect(content).toContain('思考伙伴');
     });
 
     it('should include new-change skill instructions', async () => {
@@ -348,7 +348,7 @@ describe('InitCommand', () => {
       );
 
       const initCommand = new InitCommand({ tools: 'claude', force: true });
-      await expect(initCommand.execute(readOnlyDir)).rejects.toThrow(/Insufficient permissions/);
+      await expect(initCommand.execute(readOnlyDir)).rejects.toThrow(/没有权限/);
     });
 
     it('should throw error in non-interactive mode without --tools flag', async () => {

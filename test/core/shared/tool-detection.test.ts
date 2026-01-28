@@ -29,7 +29,7 @@ describe('tool-detection', () => {
   describe('SKILL_NAMES', () => {
     it('should contain all 9 skill names', () => {
       expect(SKILL_NAMES).toHaveLength(9);
-      expect(SKILL_NAMES).toContain('openspec-explore');
+  expect(SKILL_NAMES).toContain('openspec-explore');
       expect(SKILL_NAMES).toContain('openspec-new-change');
       expect(SKILL_NAMES).toContain('openspec-continue-change');
       expect(SKILL_NAMES).toContain('openspec-apply-change');
@@ -121,7 +121,7 @@ describe('tool-detection', () => {
     it('should return null when generatedBy is not present', async () => {
       const filePath = path.join(testDir, 'skill.md');
       await fs.writeFile(filePath, `---
-name: openspec-explore
+      name: openspec-explore
 metadata:
   author: openspec
   version: "1.0"
@@ -137,7 +137,7 @@ Content here
     it('should extract generatedBy version with double quotes', async () => {
       const filePath = path.join(testDir, 'skill.md');
       await fs.writeFile(filePath, `---
-name: openspec-explore
+      name: openspec-explore
 metadata:
   author: openspec
   version: "1.0"
@@ -154,7 +154,7 @@ Content here
     it('should extract generatedBy version with single quotes', async () => {
       const filePath = path.join(testDir, 'skill.md');
       await fs.writeFile(filePath, `---
-name: openspec-explore
+      name: openspec-explore
 metadata:
   generatedBy: '0.24.0'
 ---
@@ -169,7 +169,7 @@ Content here
     it('should extract generatedBy version without quotes', async () => {
       const filePath = path.join(testDir, 'skill.md');
       await fs.writeFile(filePath, `---
-name: openspec-explore
+      name: openspec-explore
 metadata:
   generatedBy: 0.25.0
 ---
@@ -201,7 +201,7 @@ Content here
       const skillDir = path.join(testDir, '.claude', 'skills', 'openspec-explore');
       await fs.mkdir(skillDir, { recursive: true });
       await fs.writeFile(path.join(skillDir, 'SKILL.md'), `---
-name: openspec-explore
+      name: openspec-explore
 metadata:
   author: openspec
   version: "1.0"
@@ -220,7 +220,7 @@ Content here
       const skillDir = path.join(testDir, '.claude', 'skills', 'openspec-explore');
       await fs.mkdir(skillDir, { recursive: true });
       await fs.writeFile(path.join(skillDir, 'SKILL.md'), `---
-name: openspec-explore
+      name: openspec-explore
 metadata:
   author: openspec
   version: "1.0"
@@ -240,7 +240,7 @@ Content here
       const skillDir = path.join(testDir, '.claude', 'skills', 'openspec-explore');
       await fs.mkdir(skillDir, { recursive: true });
       await fs.writeFile(path.join(skillDir, 'SKILL.md'), `---
-name: openspec-explore
+      name: openspec-explore
 metadata:
   author: openspec
   version: "1.0"

@@ -96,7 +96,7 @@ program
   .command('init [path]')
   .description('在您的项目中初始化OpenSpec')
   .option('--tools <tools>', toolsOptionDescription)
-  .option('--force', 'Auto-cleanup legacy files without prompting')
+  .option('--force', '自动清理旧文件而不提示')
   .action(async (targetPath = '.', options?: { tools?: string; force?: boolean }) => {
     try {
       // Validate that the path is a valid directory
@@ -134,12 +134,12 @@ program
 // Hidden alias: 'experimental' -> 'init' for backwards compatibility
 program
   .command('experimental', { hidden: true })
-  .description('Alias for init (deprecated)')
+  .description('init 的别名（已弃用）')
   .option('--tool <tool-id>', 'Target AI tool (maps to --tools)')
   .option('--no-interactive', 'Disable interactive prompts')
   .action(async (options?: { tool?: string; noInteractive?: boolean }) => {
     try {
-      console.log('Note: "openspec experimental" is deprecated. Use "openspec init" instead.');
+      console.log('注意："openspec-cn experimental" 已弃用。请使用 "openspec-cn init" 代替。');
       const { InitCommand } = await import('../core/init.js');
       const initCommand = new InitCommand({
         tools: options?.tool,
@@ -156,7 +156,7 @@ program
 program
   .command('update [path]')
   .description('更新OpenSpec指令文件')
-  .option('--force', 'Force update even when tools are up to date')
+  .option('--force', '即使工具已是最新也强制更新')
   .action(async (targetPath = '.', options?: { force?: boolean }) => {
     try {
       const resolvedPath = path.resolve(targetPath);
@@ -422,10 +422,10 @@ program
 // Status command
 program
   .command('status')
-  .description('Display artifact completion status for a change')
-  .option('--change <id>', 'Change name to show status for')
-  .option('--schema <name>', 'Schema override (auto-detected from config.yaml)')
-  .option('--json', 'Output as JSON')
+  .description('显示变更的产出物完成状态')
+  .option('--change <id>', '要显示状态的变更名称')
+  .option('--schema <name>', 'Schema 覆盖（从 config.yaml 自动检测）')
+  .option('--json', '以 JSON 格式输出')
   .action(async (options: StatusOptions) => {
     try {
       await statusCommand(options);
@@ -439,10 +439,10 @@ program
 // Instructions command
 program
   .command('instructions [artifact]')
-  .description('Output enriched instructions for creating an artifact or applying tasks')
-  .option('--change <id>', 'Change name')
-  .option('--schema <name>', 'Schema override (auto-detected from config.yaml)')
-  .option('--json', 'Output as JSON')
+  .description('输出用于创建产出物或应用任务的丰富指令')
+  .option('--change <id>', '变更名称')
+  .option('--schema <name>', 'Schema 覆盖（从 config.yaml 自动检测）')
+  .option('--json', '以 JSON 格式输出')
   .action(async (artifactId: string | undefined, options: InstructionsOptions) => {
     try {
       // Special case: "apply" is not an artifact, but a command to get apply instructions
@@ -461,9 +461,9 @@ program
 // Templates command
 program
   .command('templates')
-  .description('Show resolved template paths for all artifacts in a schema')
+  .description('显示 Schema 中所有产出物的已解析模板路径')
   .option('--schema <name>', `Schema to use (default: ${DEFAULT_SCHEMA})`)
-  .option('--json', 'Output as JSON mapping artifact IDs to template paths')
+  .option('--json', '以 JSON 格式输出产出物 ID 到模板路径的映射')
   .action(async (options: TemplatesOptions) => {
     try {
       await templatesCommand(options);
@@ -477,8 +477,8 @@ program
 // Schemas command
 program
   .command('schemas')
-  .description('List available workflow schemas with descriptions')
-  .option('--json', 'Output as JSON (for agent use)')
+  .description('列出可用的工作流 Schema 及其描述')
+  .option('--json', '以 JSON 格式输出（供 Agent 使用）')
   .action(async (options: SchemasOptions) => {
     try {
       await schemasCommand(options);
@@ -490,13 +490,13 @@ program
   });
 
 // New command group with change subcommand
-const newCmd = program.command('new').description('Create new items');
+const newCmd = program.command('new').description('创建新项目');
 
 newCmd
   .command('change <name>')
-  .description('Create a new change directory')
+  .description('创建一个新的变更目录')
   .option('--description <text>', 'Description to add to README.md')
-  .option('--schema <name>', `Workflow schema to use (default: ${DEFAULT_SCHEMA})`)
+  .option('--schema <name>', `要使用的工作流 Schema（默认：${DEFAULT_SCHEMA}）`)
   .action(async (name: string, options: NewChangeOptions) => {
     try {
       await newChangeCommand(name, options);

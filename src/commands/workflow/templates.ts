@@ -33,7 +33,7 @@ export interface TemplateInfo {
 // -----------------------------------------------------------------------------
 
 export async function templatesCommand(options: TemplatesOptions): Promise<void> {
-  const spinner = ora('Loading templates...').start();
+  const spinner = ora('正在加载模板...').start();
 
   try {
     const projectRoot = process.cwd();
