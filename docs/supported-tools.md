@@ -19,7 +19,7 @@ OpenSpec 支持 20 多种 AI 编码助手。当您运行 `openspec-cn init` 时�
 | Claude Code | `.claude/skills/` | `.claude/commands/opsx/` |
 | Cline | `.cline/skills/` | `.clinerules/workflows/` |
 | CodeBuddy | `.codebuddy/skills/` | `.codebuddy/commands/opsx/` |
-| Codex | `.codex/skills/` | `.codex/prompts/` |
+| Codex | `.codex/skills/` | `~/.codex/prompts/`* |
 | Continue | `.continue/skills/` | `.continue/prompts/` |
 | CoStrict | `.cospec/skills/` | `.cospec/openspec/commands/` |
 | Crush | `.crush/skills/` | `.crush/commands/opsx/` |
@@ -33,7 +33,10 @@ OpenSpec 支持 20 多种 AI 编码助手。当您运行 `openspec-cn init` 时�
 | Qoder | `.qoder/skills/` | `.qoder/commands/opsx/` |
 | Qwen Code | `.qwen/skills/` | `.qwen/commands/` |
 | RooCode | `.roo/skills/` | `.roo/commands/` |
-| Windsurf | `.windsurf/skills/` | `.windsurf/commands/opsx/` |
+| Trae | `.trae/skills/` | `.trae/skills/` (via `/openspec-*`) |
+| Windsurf | `.windsurf/skills/` | `.windsurf/workflows/` |
+
+\* Codex commands are installed to the global home directory (`~/.codex/prompts/` or `$CODEX_HOME/prompts/`), not the project directory.
 
 ## 非交互式设置
 
@@ -50,7 +53,7 @@ openspec-cn init --tools all
 openspec-cn init --tools none
 ```
 
-**可用的工具 ID：** `amazon-q`, `antigravity`, `auggie`, `claude`, `cline`, `codebuddy`, `codex`, `continue`, `costrict`, `crush`, `cursor`, `factory`, `gemini`, `github-copilot`, `iflow`, `kilocode`, `opencode`, `qoder`, `qwen`, `roocode`, `windsurf`
+**可用的工具 ID：** `amazon-q`, `antigravity`, `auggie`, `claude`, `cline`, `codebuddy`, `codex`, `continue`, `costrict`, `crush`, `cursor`, `factory`, `gemini`, `github-copilot`, `iflow`, `kilocode`, `opencode`, `qoder`, `qwen`, `roocode`, `trae`, `windsurf`
 
 ## 安装内容
 

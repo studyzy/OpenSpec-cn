@@ -464,7 +464,7 @@ rules:
 列出所有可用的模式：
 
 ```bash
-openspec-cn workflow schemas
+openspec-cn schemas
 ```
 
 ### 自定义模式
@@ -508,7 +508,7 @@ openspec-cn init --force
 运行此命令以查看有效的制品 ID：
 
 ```bash
-openspec-cn workflow schemas --json
+openspec-cn schemas --json
 ```
 
 ### 配置未应用

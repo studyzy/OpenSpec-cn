@@ -1,4 +1,5 @@
 import { describe, it, expect } from 'vitest';
+import os from 'os';
 import path from 'path';
 import { amazonQAdapter } from '../../../src/core/command-generation/adapters/amazon-q.js';
 import { antigravityAdapter } from '../../../src/core/command-generation/adapters/antigravity.js';
@@ -107,7 +108,7 @@ describe('command-generation/adapters', () => {
 
     it('should generate correct file path', () => {
       const filePath = windsurfAdapter.getFilePath('explore');
-      expect(filePath).toBe(path.join('.windsurf', 'commands', 'opsx', 'explore.md'));
+      expect(filePath).toBe(path.join('.windsurf', 'workflows', 'opsx-explore.md'));
     });
 
     it('should format file similar to Claude format', () => {
@@ -205,9 +206,43 @@ describe('command-generation/adapters', () => {
       expect(codexAdapter.toolId).toBe('codex');
     });
 
-    it('should generate correct file path', () => {
+    it('should return an absolute path', () => {
       const filePath = codexAdapter.getFilePath('explore');
-      expect(filePath).toBe(path.join('.codex', 'prompts', 'opsx-explore.md'));
+      expect(path.isAbsolute(filePath)).toBe(true);
+    });
+
+    it('should generate path ending with correct structure', () => {
+      const filePath = codexAdapter.getFilePath('explore');
+      expect(filePath).toMatch(/prompts[/\\]opsx-explore\.md$/);
+    });
+
+    it('should default to homedir/.codex', () => {
+      const original = process.env.CODEX_HOME;
+      delete process.env.CODEX_HOME;
+      try {
+        const filePath = codexAdapter.getFilePath('explore');
+        const expected = path.join(os.homedir(), '.codex', 'prompts', 'opsx-explore.md');
+        expect(filePath).toBe(expected);
+      } finally {
+        if (original !== undefined) {
+          process.env.CODEX_HOME = original;
+        }
+      }
+    });
+
+    it('should respect CODEX_HOME env var', () => {
+      const original = process.env.CODEX_HOME;
+      process.env.CODEX_HOME = '/custom/codex-home';
+      try {
+        const filePath = codexAdapter.getFilePath('explore');
+        expect(filePath).toBe(path.join(path.resolve('/custom/codex-home'), 'prompts', 'opsx-explore.md'));
+      } finally {
+        if (original !== undefined) {
+          process.env.CODEX_HOME = original;
+        } else {
+          delete process.env.CODEX_HOME;
+        }
+      }
     });
 
     it('should format file with description and argument-hint', () => {
@@ -418,6 +453,33 @@ describe('command-generation/adapters', () => {
       expect(output).toContain('---\n\n');
       expect(output).toContain('This is the command body.');
     });
+
+    it('should transform colon-based command references to hyphen-based', () => {
+      const contentWithCommands: CommandContent = {
+        ...sampleContent,
+        body: 'Use /opsx:new to start, then /opsx:apply to implement.',
+      };
+      const output = opencodeAdapter.formatFile(contentWithCommands);
+      expect(output).toContain('/opsx-new');
+      expect(output).toContain('/opsx-apply');
+      expect(output).not.toContain('/opsx:new');
+      expect(output).not.toContain('/opsx:apply');
+    });
+
+    it('should handle multiple command references in body', () => {
+      const contentWithMultipleCommands: CommandContent = {
+        ...sampleContent,
+        body: `/opsx:explore for ideas
+/opsx:new to create
+/opsx:continue to proceed
+/opsx:apply to implement`,
+      };
+      const output = opencodeAdapter.formatFile(contentWithMultipleCommands);
+      expect(output).toContain('/opsx-explore');
+      expect(output).toContain('/opsx-new');
+      expect(output).toContain('/opsx-continue');
+      expect(output).toContain('/opsx-apply');
+    });
   });
 
   describe('qoderAdapter', () => {
@@ -495,7 +557,7 @@ describe('command-generation/adapters', () => {
 
     it('Windsurf adapter uses path.join for paths', () => {
       const filePath = windsurfAdapter.getFilePath('test');
-      expect(filePath.split(path.sep)).toEqual(['.windsurf', 'commands', 'opsx', 'test.md']);
+      expect(filePath.split(path.sep)).toEqual(['.windsurf', 'workflows', 'opsx-test.md']);
     });
 
     it('All adapters use path.join for paths', () => {

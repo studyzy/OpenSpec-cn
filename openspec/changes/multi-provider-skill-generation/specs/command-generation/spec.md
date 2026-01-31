@@ -30,7 +30,7 @@ The system SHALL define a `ToolCommandAdapter` interface for per-tool formatting
 - **WHEN** implementing a tool adapter
 - **THEN** `ToolCommandAdapter` SHALL require:
   - `toolId`: string identifier matching `AIToolOption.value`
-  - `getFilePath(commandId: string)`: returns relative file path for command
+  - `getFilePath(commandId: string)`: returns file path for command (relative from project root, or absolute for global-scoped tools like Codex)
   - `formatFile(content: CommandContent)`: returns complete file content with frontmatter
 
 #### Scenario: Claude adapter formatting
@@ -49,7 +49,7 @@ The system SHALL define a `ToolCommandAdapter` interface for per-tool formatting
 
 - **WHEN** formatting a command for Windsurf
 - **THEN** the adapter SHALL output YAML frontmatter with `name`, `description`, `category`, `tags` fields
-- **AND** file path SHALL follow pattern `.windsurf/commands/opsx/<id>.md`
+- **AND** file path SHALL follow pattern `.windsurf/workflows/opsx-<id>.md`
 
 ### Requirement: Command generator function
 

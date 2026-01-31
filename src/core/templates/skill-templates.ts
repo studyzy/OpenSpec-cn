@@ -1758,11 +1758,11 @@ export function getOpsxContinueCommandTemplate(): CommandTemplate {
 
    ---
 
-   **如果所有产出物已完成 (\`isComplete: true\`)**：
-   - 祝贺用户
-   - 显示最终状态，包括使用的 Schema
-   - 建议："所有产出物已创建！您现在可以实现此变更或将其归档。"
-   - 停止
+   **If all artifacts are complete (\`isComplete: true\`)**:
+   - Congratulate the user
+   - Show final status including the schema used
+   - Suggest: "All artifacts created! You can now implement this change with \`/opsx:apply\` or archive it with \`/opsx:archive\`."
+   - STOP
 
    ---
 
@@ -1950,7 +1950,7 @@ export function getOpsxApplyCommandTemplate(): CommandTemplate {
 - [x] 任务 2
 ...
 
-所有任务已完成！准备归档此变更。
+All tasks complete! You can archive this change with \`/opsx:archive\`.
 \`\`\`
 
 **暂停时的输出（遇到问题）**
