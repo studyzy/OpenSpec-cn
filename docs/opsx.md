@@ -1,16 +1,16 @@
 # OPSX 工作流
 
-> Feedback welcome on [Discord](https://discord.gg/YctCnvvshC).
+> 欢迎在 [Discord](https://discord.gg/YctCnvvshC) 上反馈意见。
 
 ## 它是什么？
 
-OPSX is now the standard workflow for OpenSpec.
+OPSX 现在是 OpenSpec 的标准工作流。
 
-It's a **fluid, iterative workflow** for OpenSpec changes. No more rigid phases — just actions you can take anytime.
+它是 OpenSpec 变更的**灵活、迭代式工作流**。不再有僵化的阶段——你可以随时采取任何行动。
 
 ## 为什么存在
 
-The legacy OpenSpec workflow works, but it's **locked down**:
+传统的 OpenSpec 工作流程虽然可用，但它是**封闭的**：
 
 - **指令是硬编码的**——埋在 TypeScript 中，你无法修改
 - **全有或全无**——一个大命令创建所有内容，无法单独测试各个部分
@@ -25,7 +25,7 @@ The legacy OpenSpec workflow works, but it's **locked down**:
 4. **快速迭代**——更改模板，立即测试，无需重新构建
 
 ```
-Legacy workflow:                      OPSX:
+传统工作流：                    OPSX：
 ┌────────────────────────┐           ┌────────────────────────┐
 │  硬编码在包中            │           │  schema.yaml           │◄── 你编辑这个
 │  (无法修改)             │           │  templates/*.md        │◄── 或这个
@@ -59,11 +59,11 @@ Legacy workflow:                      OPSX:
 ## 设置
 
 ```bash
-# Make sure you have openspec installed — skills are automatically generated
-openspec init
+# 确保已安装 openspec-cn — 技能会自动生成
+openspec-cn init
 ```
 
-This creates skills in `.claude/skills/` (or equivalent) that AI coding assistants auto-detect.
+这会在 `.claude/skills/`（或等效目录）中创建技能，AI 编码助手会自动检测这些技能。
 
 在设置过程中，系统会提示你创建**项目配置**（`openspec/config.yaml`）。这是可选的，但推荐这样做。
 
@@ -73,7 +73,7 @@ This creates skills in `.claude/skills/` (or equivalent) that AI coding assistan
 
 ### 创建配置
 
-配置在 `openspec init` 期间创建，或手动创建：
+配置在 `openspec-cn init` 期间创建，或手动创建：
 
 ```yaml
 # openspec/config.yaml
@@ -298,14 +298,14 @@ rules:
 
 ## 架构深入解析
 
-This section explains how OPSX works under the hood and how it compares to the legacy workflow.
+本节解释 OPSX 在底层的工作原理以及它与传统工作流的比较。
 
 ### 理念：阶段 vs 行动
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────────┐
-│                         LEGACY WORKFLOW                                      │
-│                    (Phase-Locked, All-or-Nothing)                           │
+│                         传统工作流                                            │
+│                    (阶段锁定，全有或全无)                                      │
 ├─────────────────────────────────────────────────────────────────────────────┤
 │                                                                             │
 │   ┌──────────────┐      ┌──────────────┐      ┌──────────────┐              │
@@ -346,11 +346,11 @@ This section explains how OPSX works under the hood and how it compares to the l
 
 ### 组件架构
 
-**Legacy workflow** uses hardcoded templates in TypeScript:
+**传统工作流**使用 TypeScript 中的硬编码模板：
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────────┐
-│                      LEGACY WORKFLOW COMPONENTS                              │
+│                      传统工作流组件                                           │
 ├─────────────────────────────────────────────────────────────────────────────┤
 │                                                                             │
 │   硬编码模板（TypeScript 字符串）                                              │
@@ -445,7 +445,7 @@ This section explains how OPSX works under the hood and how it compares to the l
 
 ### 信息流
 
-**Legacy workflow** — agent receives static instructions:
+**传统工作流**——代理接收静态指令：
 
 ```
   用户: "/opsx:proposal"
@@ -504,7 +504,7 @@ This section explains how OPSX works under the hood and how it compares to the l
 
 ### 迭代模型
 
-**Legacy workflow** — awkward to iterate:
+**传统工作流**——迭代很困难：
 
 ```
   ┌─────────┐     ┌─────────┐     ┌─────────┐
@@ -597,7 +597,7 @@ artifacts:
 
 ### 总结
 
-| Aspect | Legacy | OPSX |
+| 方面 | 传统 | OPSX |
 |--------|----------|------|
 | **模板** | 硬编码的 TypeScript | 外部 YAML + Markdown |
 | **依赖关系** | 无（一次性全部） | DAG 与拓扑排序 |
