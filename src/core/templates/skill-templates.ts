@@ -1758,11 +1758,11 @@ export function getOpsxContinueCommandTemplate(): CommandTemplate {
 
    ---
 
-   **If all artifacts are complete (\`isComplete: true\`)**:
-   - Congratulate the user
-   - Show final status including the schema used
-   - Suggest: "All artifacts created! You can now implement this change with \`/opsx:apply\` or archive it with \`/opsx:archive\`."
-   - STOP
+   **如果所有产出物已完成 (\`isComplete: true\`)**：
+   - 祝贺用户
+   - 显示最终状态，包括使用的 Schema
+   - 建议："所有产出物已创建！您现在可以使用 \`/opsx:apply\` 实施此变更或使用 \`/opsx:archive\` 归档它。"
+   - 停止
 
    ---
 
@@ -1772,20 +1772,20 @@ export function getOpsxContinueCommandTemplate(): CommandTemplate {
      \`\`\`bash
      openspec-cn instructions <artifact-id> --change "<name>" --json
      \`\`\`
-   - Parse the JSON. The key fields are:
-     - \`context\`: Project background (constraints for you - do NOT include in output)
-     - \`rules\`: Artifact-specific rules (constraints for you - do NOT include in output)
-     - \`template\`: The structure to use for your output file
-     - \`instruction\`: Schema-specific guidance
-     - \`outputPath\`: Where to write the artifact
-     - \`dependencies\`: Completed artifacts to read for context
-   - **Create the artifact file**:
-     - Read any completed dependency files for context
-     - Use \`template\` as the structure - fill in its sections
-     - Apply \`context\` and \`rules\` as constraints when writing - but do NOT copy them into the file
-     - Write to the output path specified in instructions
-   - Show what was created and what's now unlocked
-   - STOP after creating ONE artifact
+   - 解析 JSON。关键字段包括：
+     - \`context\`：项目背景（对你的约束 - 不要包含在输出中）
+     - \`rules\`：产出物特定规则（对你的约束 - 不要包含在输出中）
+     - \`template\`：用于输出文件的结构
+     - \`instruction\`：Schema 特定指导
+     - \`outputPath\`：写入产出物的位置
+     - \`dependencies\`：已完成的产出物，用于读取上下文
+   - **创建产出物文件**：
+     - 读取任何已完成的依赖文件以获取上下文
+     - 使用 \`template\` 作为结构 - 填充其各个部分
+     - 在编写时应用 \`context\` 和 \`rules\` 作为约束 - 但不要将它们复制到文件中
+     - 写入指令中指定的输出路径
+   - 显示创建的内容以及现在解锁的内容
+   - 创建一个产出物后停止
 
    ---
 
@@ -1950,7 +1950,7 @@ export function getOpsxApplyCommandTemplate(): CommandTemplate {
 - [x] 任务 2
 ...
 
-All tasks complete! You can archive this change with \`/opsx:archive\`.
+所有任务已完成！您可以使用 \`/opsx:archive\` 归档此变更。
 \`\`\`
 
 **暂停时的输出（遇到问题）**

@@ -36,7 +36,7 @@ OpenSpec 支持 20 多种 AI 编码助手。当您运行 `openspec-cn init` 时�
 | Trae | `.trae/skills/` | `.trae/skills/` (via `/openspec-*`) |
 | Windsurf | `.windsurf/skills/` | `.windsurf/workflows/` |
 
-\* Codex commands are installed to the global home directory (`~/.codex/prompts/` or `$CODEX_HOME/prompts/`), not the project directory.
+\* Codex 命令安装到全局主目录（`~/.codex/prompts/` 或 `$CODEX_HOME/prompts/`），而不是项目目录。
 
 ## 非交互式设置
 
