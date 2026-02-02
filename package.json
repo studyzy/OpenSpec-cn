@@ -1,6 +1,6 @@
 {
   "name": "@studyzy/openspec-cn",
-  "version": "1.1.1",
+  "version": "1.1.1-1",
   "description": "面向AI编程助手的规范驱动开发框架OpenSpec的简体中文汉化版本",
   "keywords": [
     "openspec",
