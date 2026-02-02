@@ -118,7 +118,7 @@ openspec-cn list --json
 
 如果用户提到变更或你检测到相关变更：
 
-1. **阅读现有工件以获取上下文**
+1. **阅读现有产出物以获取上下文**
    - \`openspec/changes/<name>/proposal.md\`
    - \`openspec/changes/<name>/design.md\`
    - \`openspec/changes/<name>/tasks.md\`
@@ -137,7 +137,7 @@ openspec-cn list --json
    | 做出设计决策 | \`design.md\` |
    | 范围变更 | \`proposal.md\` |
    | 识别出新工作 | \`tasks.md\` |
-   | 假设失效 | 相关工件 |
+   | 假设失效 | 相关产出物 |
 
    提议示例：
    - “这是一个设计决策。要把它记录在 design.md 中吗？”
@@ -152,7 +152,7 @@ openspec-cn list --json
 
 - 遵循脚本
 - 每次都问相同的问题
-- 生成特定的工件
+- 生成特定的产出物
 - 得出结论
 - 如果离题有价值，不必保持在主题上
 - 简短（这是思考时间）
@@ -163,11 +163,11 @@ openspec-cn list --json
 
 **用户提出一个模糊的想法：**
 \`\`\`
-User: 我正在考虑添加实时协作
+用户: 我正在考虑添加实时协作
 
-You: 实时协作是一个很大的领域。让我想想……
+你: 实时协作是一个很大的领域。让我想想……
 
-      协作谱系 (COLLABORATION SPECTRUM)
+      协作谱系
       ════════════════════════════════════════════
 
          感知               协调                同步
@@ -186,9 +186,9 @@ You: 实时协作是一个很大的领域。让我想想……
 
 **用户提出一个具体问题：**
 \`\`\`
-User: 认证系统一团糟
+用户: 认证系统一团糟
 
-You: [阅读代码库]
+你: [阅读代码库]
 
      ┌─────────────────────────────────────────────┐
      │              当前认证流程                   │
@@ -217,10 +217,10 @@ You: [阅读代码库]
 
 **用户在实施中途卡住：**
 \`\`\`
-User: /opsx:explore add-auth-system
+用户: /opsx:explore add-auth-system
       OAuth 集成比预期的要复杂
 
-You: [阅读变更工件]
+你: [阅读变更产出物]
 
      你在任务 4：“实现 OAuth 流程”
 
@@ -234,13 +234,13 @@ You: [阅读变更工件]
 
 **用户想要比较选项：**
 \`\`\`
-User: 我们应该用 Postgres 还是 SQLite？
+用户: 我们应该用 Postgres 还是 SQLite？
 
-You: 通用的回答很无聊。上下文是什么？
+你: 通用的回答很无聊。上下文是什么？
 
-User: 一个跟踪本地开发环境的 CLI 工具
+用户: 一个跟踪本地开发环境的 CLI 工具
 
-You: 那改变了一切。
+你: 那改变了一切。
 
      ┌─────────────────────────────────────────────────┐
      │         CLI 工具数据存储                       │
@@ -268,7 +268,7 @@ You: 那改变了一切。
 没有要求的结束方式。探索可能会：
 
 - **流入行动**：“准备好开始了吗？ /opsx:new 或 /opsx:ff”
-- **导致工件更新**：“已用这些决定更新 design.md”
+- **导致产出物更新**：“已用这些决定更新 design.md”
 - **仅提供清晰度**：用户得到了他们需要的，继续前进
 - **稍后继续**：“我们可以随时继续这个话题”
 
@@ -293,7 +293,7 @@ You: 那改变了一切。
 
 ---
 
-## 护栏 (Guardrails)
+## 护栏
 
 - **不要实施** - 绝不编写代码或实现功能。创建 OpenSpec 产出物是可以的，编写应用程序代码是不行的。
 - **不要假装理解** - 如果某些事情不清楚，请深入挖掘
@@ -304,7 +304,7 @@ You: 那改变了一切。
 - **要探索代码库** - 将讨论建立在现实基础上
 - **要质疑假设** - 包括用户的和你自己的`,
     license: 'MIT',
-    compatibility: 'Requires openspec CLI.',
+    compatibility: '需要 openspec CLI。',
     metadata: { author: 'openspec', version: '1.0' },
   };
 }
@@ -336,9 +336,9 @@ export function getNewChangeSkillTemplate(): SkillTemplate {
 
    除非用户明确要求不同的工作流，否则使用默认 Schema（省略 \`--schema\`）。
 
-   **Use a different schema only if the user mentions:**
-   - A specific schema name → use \`--schema <name>\`
-   - "show workflows" or "what workflows" → run \`openspec schemas --json\` and let them choose
+   **仅当用户提到以下内容时才使用不同的模式：**
+   - 特定模式名称 → 使用 \`--schema <name>\`
+   - "显示工作流" 或 "有哪些工作流" → 运行 \`openspec-cn schemas --json\` 并让他们选择
 
    **否则**：省略 \`--schema\` 以使用默认值。
 
@@ -355,9 +355,9 @@ export function getNewChangeSkillTemplate(): SkillTemplate {
    \`\`\`
    这会显示哪些产出物需要创建，以及哪些已就绪（依赖项已满足）。
 
-5. **Get instructions for the first artifact**
-   The first artifact depends on the schema (e.g., \`proposal\` for spec-driven).
-   Check the status output to find the first artifact with status "ready".
+5. **获取第一个产出物的指令**
+   第一个产出物取决于所使用的 schema（例如：spec-driven 通常先生成 \`proposal\`）。
+   检查 status 输出，找到第一个状态为 "ready" 的产出物。
    \`\`\`bash
    openspec-cn instructions <first-artifact-id> --change "<name>"
    \`\`\`
@@ -382,7 +382,7 @@ export function getNewChangeSkillTemplate(): SkillTemplate {
 - 如果同名变更已存在，建议继续处理该变更
 - 如果使用非默认工作流，请传递 --schema`,
     license: 'MIT',
-    compatibility: 'Requires openspec CLI.',
+    compatibility: '需要 openspec CLI。',
     metadata: { author: 'openspec', version: '1.0' },
   };
 }
@@ -419,10 +419,10 @@ export function getContinueChangeSkillTemplate(): SkillTemplate {
    \`\`\`bash
    openspec-cn status --change "<name>" --json
    \`\`\`
-   Parse the JSON to understand current state. The response includes:
-   - \`schemaName\`: The workflow schema being used (e.g., "spec-driven")
-   - \`artifacts\`: Array of artifacts with their status ("done", "ready", "blocked")
-   - \`isComplete\`: Boolean indicating if all artifacts are complete
+   解析 JSON 以了解当前状态。响应包括：
+   - \`schemaName\`：正在使用的工作流 schema（例如："spec-driven"）
+   - \`artifacts\`：产出物数组及其状态（"done"、"ready"、"blocked"）
+   - \`isComplete\`：布尔值，表示是否所有产出物都已完成
 
 3. **根据状态行动**：
 
@@ -442,20 +442,20 @@ export function getContinueChangeSkillTemplate(): SkillTemplate {
      \`\`\`bash
      openspec-cn instructions <artifact-id> --change "<name>" --json
      \`\`\`
-   - Parse the JSON. The key fields are:
-     - \`context\`: Project background (constraints for you - do NOT include in output)
-     - \`rules\`: Artifact-specific rules (constraints for you - do NOT include in output)
-     - \`template\`: The structure to use for your output file
-     - \`instruction\`: Schema-specific guidance
-     - \`outputPath\`: Where to write the artifact
-     - \`dependencies\`: Completed artifacts to read for context
-   - **Create the artifact file**:
-     - Read any completed dependency files for context
-     - Use \`template\` as the structure - fill in its sections
-     - Apply \`context\` and \`rules\` as constraints when writing - but do NOT copy them into the file
-     - Write to the output path specified in instructions
-   - Show what was created and what's now unlocked
-   - STOP after creating ONE artifact
+   - 解析 JSON。关键字段包括：
+     - \`context\`：项目背景（对你的约束 - 不要包含在输出中）
+     - \`rules\`：产出物特定规则（对你的约束 - 不要包含在输出中）
+     - \`template\`：输出文件使用的结构
+     - \`instruction\`：schema 特定指导
+     - \`outputPath\`：产出物写入路径
+     - \`dependencies\`：已完成的依赖产出物（用于读取上下文）
+   - **创建产出物文件**：
+     - 阅读任何已完成的依赖文件以获取上下文
+     - 使用 \`template\` 作为结构 - 填充各个章节
+     - 在编写时将 \`context\` 和 \`rules\` 作为约束 - 但不要把它们复制进文件
+     - 写入指令中指定的 outputPath
+   - 展示创建了什么，以及现在解锁了什么
+   - 创建一个产出物后停止
 
    ---
 
@@ -483,27 +483,27 @@ export function getContinueChangeSkillTemplate(): SkillTemplate {
 
 常见的产出物模式：
 
-**spec-driven schema** (proposal → specs → design → tasks):
-- **proposal.md**: Ask user about the change if not clear. Fill in Why, What Changes, Capabilities, Impact.
-  - The Capabilities section is critical - each capability listed will need a spec file.
-- **specs/<capability>/spec.md**: Create one spec per capability listed in the proposal's Capabilities section (use the capability name, not the change name).
-- **design.md**: Document technical decisions, architecture, and implementation approach.
-- **tasks.md**: Break down implementation into checkboxed tasks.
+**spec-driven schema**（proposal → specs → design → tasks）：
+- **proposal.md**：如果变更不清楚，先向用户确认。填写“为什么”“什么变化”“能力”“影响”。
+  - “能力”部分很关键——列出的每个能力都需要一个 spec 文件。
+- **specs/<capability>/spec.md**：为提案“能力”部分列出的每个能力创建一个 spec（使用 capability 名称，而不是 change 名称）。
+- **design.md**：记录技术决策、架构和实现方法。
+- **tasks.md**：把实现拆分为带复选框的任务。
 
-For other schemas, follow the \`instruction\` field from the CLI output.
+对于其他 schema，遵循 CLI 输出中的 \`instruction\` 字段。
 
-**Guardrails**
-- Create ONE artifact per invocation
-- Always read dependency artifacts before creating a new one
-- Never skip artifacts or create out of order
-- If context is unclear, ask the user before creating
-- Verify the artifact file exists after writing before marking progress
-- Use the schema's artifact sequence, don't assume specific artifact names
-- **IMPORTANT**: \`context\` and \`rules\` are constraints for YOU, not content for the file
-  - Do NOT copy \`<context>\`, \`<rules>\`, \`<project_context>\` blocks into the artifact
-  - These guide what you write, but should never appear in the output`,
+**护栏**
+- 每次调用只创建一个产出物
+- 创建新产出物前，总是先阅读依赖产出物
+- 不要跳过产出物，也不要乱序创建
+- 如果上下文不清楚，创建前先询问用户
+- 写入后先确认产出物文件存在，再标记进度
+- 使用 schema 的产出物顺序，不要假设固定的产出物名称
+- **重要**：\`context\` 和 \`rules\` 是对你的约束，不是文件内容
+  - 不要把 \`<context>\`、\`<rules>\`、\`<project_context>\` 块复制进产出物
+  - 它们用于指导你写作，但绝不能出现在输出中`,
     license: 'MIT',
-    compatibility: 'Requires openspec CLI.',
+    compatibility: '需要 openspec CLI。',
     metadata: { author: 'openspec', version: '1.0' },
   };
 }
@@ -535,9 +535,9 @@ export function getApplyChangeSkillTemplate(): SkillTemplate {
    \`\`\`bash
    openspec-cn status --change "<name>" --json
    \`\`\`
-   Parse the JSON to understand:
-   - \`schemaName\`: The workflow being used (e.g., "spec-driven")
-   - Which artifact contains the tasks (typically "tasks" for spec-driven, check status for others)
+   解析 JSON 以了解：
+   - \`schemaName\`：正在使用的工作流（例如："spec-driven"）
+   - 哪个产出物包含任务（对于 spec-driven 通常是 "tasks"，检查其他产出物的状态）
 
 3. **获取应用指令**
 
@@ -561,7 +561,7 @@ export function getApplyChangeSkillTemplate(): SkillTemplate {
    阅读 apply instructions 输出中 \`contextFiles\` 列出的文件。
    文件取决于正在使用的 Schema：
    - **spec-driven**: proposal, specs, design, tasks
-   - Other schemas: follow the contextFiles from CLI output
+   - 其他模式：遵循 CLI 输出中的 contextFiles
 
 5. **显示当前进度**
 
@@ -662,7 +662,7 @@ export function getApplyChangeSkillTemplate(): SkillTemplate {
 - **可以随时调用**：在所有产出物完成之前（如果存在任务），部分实现之后，与其他操作交错
 - **允许产出物更新**：如果实现揭示了设计问题，建议更新产出物 - 不是阶段锁定的，流畅地工作`,
     license: 'MIT',
-    compatibility: 'Requires openspec CLI.',
+    compatibility: '需要 openspec CLI。',
     metadata: { author: 'openspec', version: '1.0' },
   };
 }
@@ -715,17 +715,17 @@ export function getFfChangeSkillTemplate(): SkillTemplate {
         \`\`\`bash
         openspec-cn instructions <artifact-id> --change "<name>" --json
         \`\`\`
-      - The instructions JSON includes:
-        - \`context\`: Project background (constraints for you - do NOT include in output)
-        - \`rules\`: Artifact-specific rules (constraints for you - do NOT include in output)
-        - \`template\`: The structure to use for your output file
-        - \`instruction\`: Schema-specific guidance for this artifact type
-        - \`outputPath\`: Where to write the artifact
-        - \`dependencies\`: Completed artifacts to read for context
-      - Read any completed dependency files for context
-      - Create the artifact file using \`template\` as the structure
-      - Apply \`context\` and \`rules\` as constraints - but do NOT copy them into the file
-      - Show brief progress: "✓ Created <artifact-id>"
+      - 指令 JSON 包括：
+        - \`context\`：项目背景（对你的约束 - 不要包含在输出中）
+        - \`rules\`：产出物特定规则（对你的约束 - 不要包含在输出中）
+        - \`template\`：用于输出文件的结构
+        - \`instruction\`：此产出物类型的模式特定指导
+        - \`outputPath\`：写入产出物的位置
+        - \`dependencies\`：已完成的产出物，用于读取上下文
+      - 读取任何已完成的依赖文件以获取上下文
+      - 使用 \`template\` 作为结构创建产出物文件
+      - 应用 \`context\` 和 \`rules\` 作为约束 - 但不要将它们复制到文件中
+      - 显示简短进度："✓ 已创建 <artifact-id>"
 
    b. **继续直到所有 \`applyRequires\` 产出物完成**
       - 创建每个产出物后，重新运行 \`openspec-cn status --change "<name>" --json\`
@@ -751,13 +751,13 @@ export function getFfChangeSkillTemplate(): SkillTemplate {
 
 **产出物创建指南**
 
-- Follow the \`instruction\` field from \`openspec instructions\` for each artifact type
-- The schema defines what each artifact should contain - follow it
-- Read dependency artifacts for context before creating new ones
-- Use \`template\` as the structure for your output file - fill in its sections
-- **IMPORTANT**: \`context\` and \`rules\` are constraints for YOU, not content for the file
-  - Do NOT copy \`<context>\`, \`<rules>\`, \`<project_context>\` blocks into the artifact
-  - These guide what you write, but should never appear in the output
+- 遵循每个产出物类型的 \`openspec-cn instructions\` 中的 \`instruction\` 字段
+- 模式定义了每个产出物应包含的内容 - 遵循它
+- 在创建新产出物之前阅读依赖产出物以获取上下文
+- 使用 \`template\` 作为输出文件的结构 - 填充其各个部分
+- **重要提示**：\`context\` 和 \`rules\` 是对你的约束，而不是文件内容
+  - 不要将 \`<context>\`、\`<rules>\`、\`<project_context>\` 块复制到产出物中
+  - 这些引导你编写内容，但不应出现在输出中
 
 **护栏**
 - 创建实现所需的所有产出物（由 Schema 的 \`apply.requires\` 定义）
@@ -766,7 +766,7 @@ export function getFfChangeSkillTemplate(): SkillTemplate {
 - 如果同名变更已存在，建议继续处理该变更
 - 在继续下一个之前，验证写入后每个产出物文件是否存在`,
     license: 'MIT',
-    compatibility: 'Requires openspec CLI.',
+    compatibility: '需要 openspec CLI。',
     metadata: { author: 'openspec', version: '1.0' },
   };
 }
@@ -800,10 +800,10 @@ export function getSyncSpecsSkillTemplate(): SkillTemplate {
    在 \`openspec/changes/<name>/specs/*/spec.md\` 中查找增量规范文件。
 
    每个增量规范文件包含如下部分：
-   - \`## ADDED Requirements\` - 要添加的新需求
-   - \`## MODIFIED Requirements\` - 对现有需求的更改
-   - \`## REMOVED Requirements\` - 要移除的需求
-   - \`## RENAMED Requirements\` - 要重命名的需求（FROM:/TO: 格式）
+   - \`## 新增需求\` - 要添加的新需求
+   - \`## 修改需求\` - 对现有需求的更改
+   - \`## 移除需求\` - 要移除的需求
+   - \`## 重命名需求\` - 要重命名的需求（从/到 格式）
 
    如果没有找到增量规范，通知用户并停止。
 
@@ -817,11 +817,11 @@ export function getSyncSpecsSkillTemplate(): SkillTemplate {
 
    c. **智能地应用更改**：
 
-      **ADDED Requirements:**
+      **新增需求：**
       - 如果需求在主规范中不存在 → 添加它
       - 如果需求已存在 → 更新它以匹配（视为隐式 MODIFIED）
 
-      **MODIFIED Requirements:**
+      **修改需求：**
       - 在主规范中找到该需求
       - 应用更改 - 这可能是：
         - 添加新场景（不需要复制现有场景）
@@ -829,16 +829,16 @@ export function getSyncSpecsSkillTemplate(): SkillTemplate {
         - 更改需求描述
       - 保留增量中未提及的场景/内容
 
-      **REMOVED Requirements:**
+      **移除需求：**
       - 从主规范中移除整个需求块
 
-      **RENAMED Requirements:**
+      **重命名需求：**
       - 找到 FROM 需求，重命名为 TO
 
    d. **创建新主规范** 如果 capability 尚不存在：
       - 创建 \`openspec/specs/<capability>/spec.md\`
-      - 添加 Purpose 部分（可以简短，标记为 TBD）
-      - 添加 Requirements 部分以及 ADDED 需求
+      - 添加 目的 部分（可以简短，标记为 待定）
+      - 添加 需求 部分以及 新增需求
 
 4. **显示摘要**
 
@@ -849,30 +849,30 @@ export function getSyncSpecsSkillTemplate(): SkillTemplate {
 **增量规范格式参考**
 
 \`\`\`markdown
-## ADDED Requirements
+## 新增需求
 
-### Requirement: New Feature
-The system SHALL do something new.
+### 需求： 新功能
+系统 应当 实现新的能力。
 
-#### Scenario: Basic case
-- **WHEN** user does X
-- **THEN** system does Y
+#### 场景： 基本场景
+- **当** 用户执行 X
+- **那么** 系统执行 Y
 
-## MODIFIED Requirements
+## 修改需求
 
-### Requirement: Existing Feature
-#### Scenario: New scenario to add
-- **WHEN** user does A
-- **THEN** system does B
+### 需求： 现有功能
+#### 场景： 需要新增的场景
+- **当** 用户执行 A
+- **那么** 系统执行 B
 
-## REMOVED Requirements
+## 移除需求
 
-### Requirement: Deprecated Feature
+### 需求： 已废弃功能
 
-## RENAMED Requirements
+## 重命名需求
 
-- FROM: \`### Requirement: Old Name\`
-- TO: \`### Requirement: New Name\`
+- 从： \`### 需求： Old Name\`
+- 到： \`### 需求： New Name\`
 \`\`\`
 
 **关键原则：智能合并**
@@ -890,12 +890,12 @@ The system SHALL do something new.
 已更新主规范：
 
 **<capability-1>**：
-- 添加需求："New Feature"
-- 修改需求："Existing Feature"（添加了 1 个场景）
+- 添加需求："新功能"
+- 修改需求："现有功能"（添加了 1 个场景）
 
 **<capability-2>**：
 - 创建了新规范文件
-- 添加需求："Another Feature"
+- 添加需求："另一个功能"
 
 主规范现已更新。变更保持活动状态 - 在实现完成后归档。
 \`\`\`
@@ -907,7 +907,7 @@ The system SHALL do something new.
 - 在进行时显示你正在更改的内容
 - 操作应该是幂等的 - 运行两次应给出相同的结果`,
     license: 'MIT',
-    compatibility: 'Requires openspec CLI.',
+    compatibility: '需要 openspec CLI。',
     metadata: { author: 'openspec', version: '1.0' },
   };
 }
@@ -919,10 +919,10 @@ The system SHALL do something new.
 export function getOnboardSkillTemplate(): SkillTemplate {
   return {
     name: 'openspec-onboard',
-    description: 'Guided onboarding for OpenSpec - walk through a complete workflow cycle with narration and real codebase work.',
+    description: 'OpenSpec 引导式入门 - 通过讲解与在真实代码库中动手，走完一个完整的工作流周期。',
     instructions: getOnboardInstructions(),
     license: 'MIT',
-    compatibility: 'Requires openspec CLI.',
+    compatibility: '需要 openspec CLI。',
     metadata: { author: 'openspec', version: '1.0' },
   };
 }
@@ -984,7 +984,7 @@ openspec-cn status --json 2>&1 || echo "NOT_INITIALIZED"
 2. **缺少错误处理** - 吞没错误的 \`catch\` 块，没有try-catch的风险操作
 3. **没有测试的函数** - 交叉引用 \`src/\` 和测试目录
 4. **类型问题** - TypeScript文件中的 \`any\` 类型（\`: any\`、\`as any\`）
-5. **调试工件** - 非调试代码中的 \`console.log\`、\`console.debug\`、\`debugger\` 语句
+5. **调试产出物** - 非调试代码中的 \`console.log\`、\`console.debug\`、\`debugger\` 语句
 6. **缺少验证** - 没有验证的用户输入处理程序
 
 同时检查最近的git活动：
@@ -1469,9 +1469,9 @@ export interface CommandTemplate {
  */
 export function getOpsxExploreCommandTemplate(): CommandTemplate {
   return {
-    name: 'OPSX: Explore',
+    name: 'OPSX: 探索',
     description: '进入探索模式 - 构思想法、调查问题、澄清需求',
-    category: 'Workflow',
+    category: '工作流',
     tags: ['workflow', 'explore', 'experimental', 'thinking'],
     content: `进入探索模式。深入思考。自由可视化。跟随对话的发展。
 
@@ -1480,15 +1480,15 @@ export function getOpsxExploreCommandTemplate(): CommandTemplate {
 **这是一种姿态，而不是一种工作流。** 没有固定的步骤，没有要求的顺序，没有强制性的输出。你是一个思考伙伴，帮助用户进行探索。
 
 **输入**：\`/opsx:explore\` 之后的参数是用户想要思考的任何内容。可能是：
-- 一个模糊的想法："real-time collaboration"
-- 一个具体的问题："the auth system is getting unwieldy"
+- 一个模糊的想法："实时协作"
+- 一个具体的问题："认证系统越来越难维护"
 - 一个变更名称："add-dark-mode"（在该变更的上下文中探索）
-- 一个比较："postgres vs sqlite for this"
+- 一个比较："这个场景下该用 Postgres 还是 SQLite"
 - 无（仅进入探索模式）
 
 ---
 
-## 姿态 (The Stance)
+## 姿态
 
 - **好奇而非说教** - 提出自然产生的问题，不要照本宣科
 - **开放话题而非审问** - 浮现多个有趣的方向，让用户选择产生共鸣的部分。不要把他们限制在单一的提问路径中。
@@ -1575,7 +1575,7 @@ openspec-cn list --json
 
 如果用户提到变更或你检测到相关变更：
 
-1. **阅读现有工件以获取上下文**
+1. **阅读现有产出物以获取上下文**
    - \`openspec/changes/<name>/proposal.md\`
    - \`openspec/changes/<name>/design.md\`
    - \`openspec/changes/<name>/tasks.md\`
@@ -1594,7 +1594,7 @@ openspec-cn list --json
    | 做出设计决策 | \`design.md\` |
    | 范围变更 | \`proposal.md\` |
    | 识别出新工作 | \`tasks.md\` |
-   | 假设失效 | 相关工件 |
+   | 假设失效 | 相关产出物 |
 
    提议示例：
    - “这是一个设计决策。要把它记录在 design.md 中吗？”
@@ -1609,7 +1609,7 @@ openspec-cn list --json
 
 - 遵循脚本
 - 每次都问相同的问题
-- 生成特定的工件
+- 生成特定的产出物
 - 得出结论
 - 如果离题有价值，不必保持在主题上
 - 简短（这是思考时间）
@@ -1621,7 +1621,7 @@ openspec-cn list --json
 没有要求的结束方式。探索可能会：
 
 - **流入行动**：“准备好开始了吗？ \`/opsx:new\` 或 \`/opsx:ff\`”
-- **导致工件更新**：“已用这些决定更新 design.md”
+- **导致产出物更新**：“已用这些决定更新 design.md”
 - **仅提供清晰度**：用户得到了他们需要的，继续前进
 - **稍后继续**：“我们可以随时继续这个话题”
 
@@ -1629,7 +1629,7 @@ openspec-cn list --json
 
 ---
 
-## 护栏 (Guardrails)
+## 护栏
 
 - **不要实施** - 绝不编写代码或实现功能。创建 OpenSpec 产出物是可以的，编写应用程序代码是不行的。
 - **不要假装理解** - 如果某些事情不清楚，请深入挖掘
@@ -1647,9 +1647,9 @@ openspec-cn list --json
  */
 export function getOpsxNewCommandTemplate(): CommandTemplate {
   return {
-    name: 'OPSX: New',
+    name: 'OPSX: 新建',
     description: '使用实验性的产出物工作流 (OPSX) 启动新变更',
-    category: 'Workflow',
+    category: '工作流',
     tags: ['workflow', 'artifacts', 'experimental'],
     content: `使用实验性的产出物驱动方法启动新变更。
 
@@ -1670,9 +1670,9 @@ export function getOpsxNewCommandTemplate(): CommandTemplate {
 
    除非用户明确要求不同的工作流，否则使用默认 Schema（省略 \`--schema\`）。
 
-   **Use a different schema only if the user mentions:**
-   - A specific schema name → use \`--schema <name>\`
-   - "show workflows" or "what workflows" → run \`openspec schemas --json\` and let them choose
+   **仅当用户提到以下内容时才使用不同的模式：**
+   - 特定模式名称 → 使用 \`--schema <name>\`
+   - "显示工作流" 或 "有哪些工作流" → 运行 \`openspec-cn schemas --json\` 并让他们选择
 
    **否则**：省略 \`--schema\` 以使用默认值。
 
@@ -1721,9 +1721,9 @@ export function getOpsxNewCommandTemplate(): CommandTemplate {
  */
 export function getOpsxContinueCommandTemplate(): CommandTemplate {
   return {
-    name: 'OPSX: Continue',
+    name: 'OPSX: 继续',
     description: '继续处理变更 - 创建下一个产出物（实验性）',
-    category: 'Workflow',
+    category: '工作流',
     tags: ['workflow', 'artifacts', 'experimental'],
     content: `通过创建下一个产出物继续处理变更。
 
@@ -1749,10 +1749,10 @@ export function getOpsxContinueCommandTemplate(): CommandTemplate {
    \`\`\`bash
    openspec-cn status --change "<name>" --json
    \`\`\`
-   Parse the JSON to understand current state. The response includes:
-   - \`schemaName\`: The workflow schema being used (e.g., "spec-driven")
-   - \`artifacts\`: Array of artifacts with their status ("done", "ready", "blocked")
-   - \`isComplete\`: Boolean indicating if all artifacts are complete
+   解析 JSON 以了解当前状态。响应包括：
+   - \`schemaName\`：正在使用的工作流 schema（例如："spec-driven"）
+   - \`artifacts\`：产出物数组及其状态（"done"、"ready"、"blocked"）
+   - \`isComplete\`：布尔值，表示是否所有产出物都已完成
 
 3. **根据状态行动**：
 
@@ -1813,25 +1813,25 @@ export function getOpsxContinueCommandTemplate(): CommandTemplate {
 
 常见的产出物模式：
 
-**spec-driven schema** (proposal → specs → design → tasks):
-- **proposal.md**: Ask user about the change if not clear. Fill in Why, What Changes, Capabilities, Impact.
-  - The Capabilities section is critical - each capability listed will need a spec file.
-- **specs/<capability>/spec.md**: Create one spec per capability listed in the proposal's Capabilities section (use the capability name, not the change name).
-- **design.md**: Document technical decisions, architecture, and implementation approach.
-- **tasks.md**: Break down implementation into checkboxed tasks.
+**spec-driven schema**（proposal → specs → design → tasks）：
+- **proposal.md**：如果变更不清楚，先向用户确认。填写“为什么”“什么变化”“能力”“影响”。
+  - “能力”部分很关键——列出的每个能力都需要一个 spec 文件。
+- **specs/<capability>/spec.md**：为提案“能力”部分列出的每个能力创建一个 spec（使用 capability 名称，而不是 change 名称）。
+- **design.md**：记录技术决策、架构和实现方法。
+- **tasks.md**：把实现拆分为带复选框的任务。
 
-For other schemas, follow the \`instruction\` field from the CLI output.
+对于其他 schema，遵循 CLI 输出中的 \`instruction\` 字段。
 
-**Guardrails**
-- Create ONE artifact per invocation
-- Always read dependency artifacts before creating a new one
-- Never skip artifacts or create out of order
-- If context is unclear, ask the user before creating
-- Verify the artifact file exists after writing before marking progress
-- Use the schema's artifact sequence, don't assume specific artifact names
-- **IMPORTANT**: \`context\` and \`rules\` are constraints for YOU, not content for the file
-  - Do NOT copy \`<context>\`, \`<rules>\`, \`<project_context>\` blocks into the artifact
-  - These guide what you write, but should never appear in the output`
+**护栏**
+- 每次调用只创建一个产出物
+- 创建新产出物前，总是先阅读依赖产出物
+- 不要跳过产出物，也不要乱序创建
+- 如果上下文不清楚，创建前先询问用户
+- 写入后先确认产出物文件存在，再标记进度
+- 使用 schema 的产出物顺序，不要假设固定的产出物名称
+- **重要**：\`context\` 和 \`rules\` 是对你的约束，不是文件内容
+  - 不要把 \`<context>\`、\`<rules>\`、\`<project_context>\` 块复制进产出物
+  - 它们用于指导你写作，但绝不能出现在输出中`
   };
 }
 
@@ -1840,9 +1840,9 @@ For other schemas, follow the \`instruction\` field from the CLI output.
  */
 export function getOpsxApplyCommandTemplate(): CommandTemplate {
   return {
-    name: 'OPSX: Apply',
+    name: 'OPSX: 应用',
     description: '实现 OpenSpec 变更中的任务（实验性）',
-    category: 'Workflow',
+    category: '工作流',
     tags: ['workflow', 'artifacts', 'experimental'],
     content: `实现 OpenSpec 变更中的任务。
 
@@ -1863,9 +1863,9 @@ export function getOpsxApplyCommandTemplate(): CommandTemplate {
    \`\`\`bash
    openspec-cn status --change "<name>" --json
    \`\`\`
-   Parse the JSON to understand:
-   - \`schemaName\`: The workflow being used (e.g., "spec-driven")
-   - Which artifact contains the tasks (typically "tasks" for spec-driven, check status for others)
+   解析 JSON 以了解：
+   - \`schemaName\`：正在使用的工作流（例如："spec-driven"）
+   - 哪个产出物包含任务（对于 spec-driven 通常是 "tasks"，检查其他产出物的状态）
 
 3. **获取应用指令**
 
@@ -1889,7 +1889,7 @@ export function getOpsxApplyCommandTemplate(): CommandTemplate {
    阅读 apply instructions 输出中 \`contextFiles\` 列出的文件。
    文件取决于正在使用的 Schema：
    - **spec-driven**: proposal, specs, design, tasks
-   - Other schemas: follow the contextFiles from CLI output
+   - 其他模式：遵循 CLI 输出中的 contextFiles
 
 5. **显示当前进度**
 
@@ -1998,9 +1998,9 @@ export function getOpsxApplyCommandTemplate(): CommandTemplate {
  */
 export function getOpsxFfCommandTemplate(): CommandTemplate {
   return {
-    name: 'OPSX: Fast Forward',
+    name: 'OPSX: 快进',
     description: '一键创建变更并生成实现所需的所有产出物',
-    category: 'Workflow',
+    category: '工作流',
     tags: ['workflow', 'artifacts', 'experimental'],
     content: `快速完成产出物创建 - 生成开始实现所需的一切。
 
@@ -2042,17 +2042,17 @@ export function getOpsxFfCommandTemplate(): CommandTemplate {
         \`\`\`bash
         openspec-cn instructions <artifact-id> --change "<name>" --json
         \`\`\`
-      - The instructions JSON includes:
-        - \`context\`: Project background (constraints for you - do NOT include in output)
-        - \`rules\`: Artifact-specific rules (constraints for you - do NOT include in output)
-        - \`template\`: The structure to use for your output file
-        - \`instruction\`: Schema-specific guidance for this artifact type
-        - \`outputPath\`: Where to write the artifact
-        - \`dependencies\`: Completed artifacts to read for context
-      - Read any completed dependency files for context
-      - Create the artifact file using \`template\` as the structure
-      - Apply \`context\` and \`rules\` as constraints - but do NOT copy them into the file
-      - Show brief progress: "✓ Created <artifact-id>"
+      - 指令 JSON 包括：
+        - \`context\`：项目背景（对你的约束 - 不要包含在输出中）
+        - \`rules\`：产出物特定规则（对你的约束 - 不要包含在输出中）
+        - \`template\`：用于输出文件的结构
+        - \`instruction\`：此产出物类型的模式特定指导
+        - \`outputPath\`：写入产出物的位置
+        - \`dependencies\`：已完成的产出物，用于读取上下文
+      - 读取任何已完成的依赖文件以获取上下文
+      - 使用 \`template\` 作为结构创建产出物文件
+      - 应用 \`context\` 和 \`rules\` 作为约束 - 但不要将它们复制到文件中
+      - 显示简短进度："✓ 已创建 <artifact-id>"
 
    b. **继续直到所有 \`applyRequires\` 产出物完成**
       - 创建每个产出物后，重新运行 \`openspec-cn status --change "<name>" --json\`
@@ -2120,8 +2120,8 @@ export function getArchiveChangeSkillTemplate(): SkillTemplate {
    运行 \`openspec-cn status --change "<name>" --json\` 检查产出物完成情况。
 
    解析 JSON 以了解：
-   - \`schemaName\`: 正在使用的工作流
-   - \`artifacts\`: 产出物列表及其状态（\`done\` 或其他）
+   - \`schemaName\`：正在使用的工作流
+   - \`artifacts\`：产出物列表及其状态（\`done\` 或其他）
 
    **如果有任何产出物未 \`done\`：**
    - 显示列出未完成产出物的警告
@@ -2141,20 +2141,20 @@ export function getArchiveChangeSkillTemplate(): SkillTemplate {
 
    **如果没有任务文件存在：** 继续，无需任务相关警告。
 
-4. **Assess delta spec sync state**
+4. **评估增量规范同步状态**
 
-   Check for delta specs at \`openspec/changes/<name>/specs/\`. If none exist, proceed without sync prompt.
+   检查 \`openspec/changes/<name>/specs/\` 中的增量规范。如果不存在，则在没有同步提示的情况下继续。
 
-   **If delta specs exist:**
-   - Compare each delta spec with its corresponding main spec at \`openspec/specs/<capability>/spec.md\`
-   - Determine what changes would be applied (adds, modifications, removals, renames)
-   - Show a combined summary before prompting
+   **如果存在增量规范：**
+   - 将每个增量规范与其在 \`openspec/specs/<capability>/spec.md\` 对应的各主规范进行比较
+   - 确定将应用哪些更改（添加、修改、移除、重命名）
+   - 在提示前显示综合摘要
 
-   **Prompt options:**
-   - If changes needed: "Sync now (recommended)", "Archive without syncing"
-   - If already synced: "Archive now", "Sync anyway", "Cancel"
+   **提示选项：**
+   - 如果需要更改：“立即同步（推荐）”、“归档而不同步”
+   - 如果已同步：“立即归档”、“仍然同步”、“取消”
 
-   If user chooses sync, execute /opsx:sync logic (use the openspec-sync-specs skill). Proceed to archive regardless of choice.
+   如果用户选择同步，执行 /opsx:sync 逻辑（使用 openspec-sync-specs 技能）。无论选择如何，都继续归档。
 
 5. **执行归档**
 
@@ -2187,10 +2187,10 @@ export function getArchiveChangeSkillTemplate(): SkillTemplate {
 \`\`\`
 ## 归档完成
 
-**Change:** <change-name>
-**Schema:** <schema-name>
-**Archived to:** openspec/changes/archive/YYYY-MM-DD-<name>/
-**Specs:** ✓ Synced to main specs (or "No delta specs" or "Sync skipped")
+**变更：** <change-name>
+**模式：** <schema-name>
+**归档至：** openspec/changes/archive/YYYY-MM-DD-<name>/
+**规范：** ✓ 已同步到主规范（或 "无增量规范" 或 "同步已跳过"）
 
 所有产出物已完成。所有任务已完成。
 \`\`\`
@@ -2204,7 +2204,7 @@ export function getArchiveChangeSkillTemplate(): SkillTemplate {
 - 如果请求同步，使用 openspec-sync-specs 方法（代理驱动）
 - 如果存在增量规格说明，始终运行同步评估并在提示前显示综合摘要`,
     license: 'MIT',
-    compatibility: 'Requires openspec CLI.',
+    compatibility: '需要 openspec CLI。',
     metadata: { author: 'openspec', version: '1.0' },
   };
 }
@@ -2254,7 +2254,7 @@ export function getBulkArchiveChangeSkillTemplate(): SkillTemplate {
 
    c. **增量规格说明** - 检查 \`openspec/changes/<name>/specs/\` 目录
       - 列出存在哪些能力规格说明
-      - 对于每个，提取需求名称（匹配 \`### Requirement: <name>\` 的行）
+      - 对于每个，提取需求名称（匹配 \`### 需求： <name>\` 的行）
 
 4. **检测规格说明冲突**
 
@@ -2453,7 +2453,7 @@ export function getBulkArchiveChangeSkillTemplate(): SkillTemplate {
 - 归档目录目标使用当前日期：YYYY-MM-DD-<name>
 - 如果归档目标已存在，该变更失败但继续处理其他变更`,
     license: 'MIT',
-    compatibility: 'Requires openspec CLI.',
+    compatibility: '需要 openspec CLI。',
     metadata: { author: 'openspec', version: '1.0' },
   };
 }
@@ -2463,9 +2463,9 @@ export function getBulkArchiveChangeSkillTemplate(): SkillTemplate {
  */
 export function getOpsxSyncCommandTemplate(): CommandTemplate {
   return {
-    name: 'OPSX: Sync',
+    name: 'OPSX: 同步',
     description: '将变更中的增量规范同步到主规范',
-    category: 'Workflow',
+    category: '工作流',
     tags: ['workflow', 'specs', 'experimental'],
     content: `将变更中的增量规范同步到主规范。
 
@@ -2488,10 +2488,10 @@ export function getOpsxSyncCommandTemplate(): CommandTemplate {
    在 \`openspec/changes/<name>/specs/*/spec.md\` 中查找增量规范文件。
 
    每个增量规范文件包含如下部分：
-   - \`## ADDED Requirements\` - 要添加的新需求
-   - \`## MODIFIED Requirements\` - 对现有需求的更改
-   - \`## REMOVED Requirements\` - 要移除的需求
-   - \`## RENAMED Requirements\` - 要重命名的需求（FROM:/TO: 格式）
+   - \`## 新增需求\` - 要添加的新需求
+   - \`## 修改需求\` - 对现有需求的更改
+   - \`## 移除需求\` - 要移除的需求
+   - \`## 重命名需求\` - 要重命名的需求（从/到 格式）
 
    如果没有找到增量规范，通知用户并停止。
 
@@ -2505,11 +2505,11 @@ export function getOpsxSyncCommandTemplate(): CommandTemplate {
 
    c. **智能地应用更改**：
 
-      **ADDED Requirements:**
+      **新增需求：**
       - 如果需求在主规范中不存在 → 添加它
       - 如果需求已存在 → 更新它以匹配（视为隐式 MODIFIED）
 
-      **MODIFIED Requirements:**
+      **修改需求：**
       - 在主规范中找到该需求
       - 应用更改 - 这可能是：
         - 添加新场景（不需要复制现有场景）
@@ -2517,16 +2517,16 @@ export function getOpsxSyncCommandTemplate(): CommandTemplate {
         - 更改需求描述
       - 保留增量中未提及的场景/内容
 
-      **REMOVED Requirements:**
+      **移除需求：**
       - 从主规范中移除整个需求块
 
-      **RENAMED Requirements:**
+      **重命名需求：**
       - 找到 FROM 需求，重命名为 TO
 
    d. **创建新主规范** 如果 capability 尚不存在：
       - 创建 \`openspec/specs/<capability>/spec.md\`
-      - 添加 Purpose 部分（可以简短，标记为 TBD）
-      - 添加 Requirements 部分以及 ADDED 需求
+      - 添加 目的 部分（可以简短，标记为 待定）
+      - 添加 需求 部分以及 新增需求
 
 4. **显示摘要**
 
@@ -2537,30 +2537,30 @@ export function getOpsxSyncCommandTemplate(): CommandTemplate {
 **增量规范格式参考**
 
 \`\`\`markdown
-## ADDED Requirements
+## 新增需求
 
-### Requirement: New Feature
-The system SHALL do something new.
+### 需求： 新功能
+系统 应当 实现新的能力。
 
-#### Scenario: Basic case
-- **WHEN** user does X
-- **THEN** system does Y
+#### 场景： 基本场景
+- **当** 用户执行 X
+- **那么** 系统执行 Y
 
-## MODIFIED Requirements
+## 修改需求
 
-### Requirement: Existing Feature
-#### Scenario: New scenario to add
-- **WHEN** user does A
-- **THEN** system does B
+### 需求： 现有功能
+#### 场景： 需要新增的场景
+- **当** 用户执行 A
+- **那么** 系统执行 B
 
-## REMOVED Requirements
+## 移除需求
 
-### Requirement: Deprecated Feature
+### 需求： 已废弃功能
 
-## RENAMED Requirements
+## 重命名需求
 
-- FROM: \`### Requirement: Old Name\`
-- TO: \`### Requirement: New Name\`
+- 从： \`### 需求： Old Name\`
+- 到： \`### 需求： New Name\`
 \`\`\`
 
 **关键原则：智能合并**
@@ -2578,12 +2578,12 @@ The system SHALL do something new.
 已更新主规范：
 
 **<capability-1>**：
-- 添加需求："New Feature"
-- 修改需求："Existing Feature"（添加了 1 个场景）
+- 添加需求："新功能"
+- 修改需求："现有功能"（添加了 1 个场景）
 
 **<capability-2>**：
 - 创建了新规范文件
-- 添加需求："Another Feature"
+- 添加需求："另一个功能"
 
 主规范现已更新。变更保持活动状态 - 在实现完成后归档。
 \`\`\`
@@ -2625,9 +2625,9 @@ export function getVerifyChangeSkillTemplate(): SkillTemplate {
    \`\`\`bash
    openspec-cn status --change "<name>" --json
    \`\`\`
-   Parse the JSON to understand:
-   - \`schemaName\`: The workflow being used (e.g., "spec-driven")
-   - Which artifacts exist for this change
+   解析 JSON 以了解：
+   - \`schemaName\`：正在使用的工作流模式（例如："spec-driven"）
+   - 此变更存在哪些产出物
 
 3. **获取变更目录并加载产出物**
 
@@ -2658,7 +2658,7 @@ export function getVerifyChangeSkillTemplate(): SkillTemplate {
 
    **规范覆盖率**：
    - 如果 \`openspec/changes/<name>/specs/\` 中存在增量规范：
-     - 提取所有需求（标记为 "### Requirement:"）
+     - 提取所有需求（标记为 "### 需求："）
      - 对于每个需求：
        - 在代码库中搜索与需求相关的关键词
        - 评估实现是否可能存在
@@ -2678,7 +2678,7 @@ export function getVerifyChangeSkillTemplate(): SkillTemplate {
        - 建议："根据需求 X 审查 <文件>:<行>"
 
    **场景覆盖率**：
-   - 对于增量规范中的每个场景（标记为 "#### Scenario:"）：
+   - 对于增量规范中的每个场景（标记为 "#### 场景："）：
      - 检查代码中是否处理了条件
      - 检查是否存在覆盖该场景的测试
      - 如果场景看起来未覆盖：
@@ -2763,7 +2763,7 @@ export function getVerifyChangeSkillTemplate(): SkillTemplate {
 - 具体的、可操作的建议
 - 不要使用模糊的建议，如 "考虑审查"`,
     license: 'MIT',
-    compatibility: 'Requires openspec CLI.',
+    compatibility: '需要 openspec CLI。',
     metadata: { author: 'openspec', version: '1.0' },
   };
 }
@@ -2773,9 +2773,9 @@ export function getVerifyChangeSkillTemplate(): SkillTemplate {
  */
 export function getOpsxArchiveCommandTemplate(): CommandTemplate {
   return {
-    name: 'OPSX: Archive',
+    name: 'OPSX: 归档',
     description: '归档实验性工作流中已完成的变更',
-    category: 'Workflow',
+    category: '工作流',
     tags: ['workflow', 'archive', 'experimental'],
     content: `归档实验性工作流中已完成的变更。
 
@@ -2797,8 +2797,8 @@ export function getOpsxArchiveCommandTemplate(): CommandTemplate {
    运行 \`openspec-cn status --change "<name>" --json\` 检查产出物完成情况。
 
    解析 JSON 以了解：
-   - \`schemaName\`: 正在使用的工作流
-   - \`artifacts\`: 产出物列表及其状态（\`done\` 或其他）
+   - \`schemaName\`：正在使用的工作流
+   - \`artifacts\`：产出物列表及其状态（\`done\` 或其他）
 
    **如果有任何产出物未 \`done\`：**
    - 显示列出未完成产出物的警告
@@ -2926,7 +2926,7 @@ export function getOpsxArchiveCommandTemplate(): CommandTemplate {
 - 移动到归档时保留 .openspec.yaml（它与目录一起移动）
 - 显示清晰的操作摘要
 - 如果请求同步，使用 /opsx:sync 方法（代理驱动）
-- If delta specs exist, always run the sync assessment and show the combined summary before prompting`
+- 如果存在增量规格说明，请始终运行同步评估，并在提示前显示综合摘要`
   };
 }
 
@@ -2936,9 +2936,9 @@ export function getOpsxArchiveCommandTemplate(): CommandTemplate {
  */
 export function getOpsxOnboardCommandTemplate(): CommandTemplate {
   return {
-    name: 'OPSX: Onboard',
+    name: 'OPSX: 入门',
     description: '引导式入门 - 通过完整的OpenSpec工作流周期进行讲解',
-    category: 'Workflow',
+    category: '工作流',
     tags: ['workflow', 'onboarding', 'tutorial', 'learning'],
     content: getOnboardInstructions(),
   };
@@ -2951,7 +2951,7 @@ export function getOpsxBulkArchiveCommandTemplate(): CommandTemplate {
   return {
     name: 'OPSX: 批量归档',
     description: '一次归档多个已完成的变更',
-    category: 'Workflow',
+    category: '工作流',
     tags: ['workflow', 'archive', 'experimental', 'bulk'],
     content: `在单个操作中归档多个已完成的变更。
 
@@ -2990,7 +2990,7 @@ export function getOpsxBulkArchiveCommandTemplate(): CommandTemplate {
 
    c. **增量规格说明** - 检查 \`openspec/changes/<name>/specs/\` 目录
       - 列出存在哪些能力规格说明
-      - 对于每个，提取需求名称（匹配 \`### Requirement: <name>\` 的行）
+      - 对于每个，提取需求名称（匹配 \`### 需求： <name>\` 的行）
 
 4. **检测规格说明冲突**
 
@@ -3196,9 +3196,9 @@ export function getOpsxBulkArchiveCommandTemplate(): CommandTemplate {
  */
 export function getOpsxVerifyCommandTemplate(): CommandTemplate {
   return {
-    name: 'OPSX: Verify',
+    name: 'OPSX: 验证',
     description: '在归档前验证实现是否与变更产出物匹配',
-    category: 'Workflow',
+    category: '工作流',
     tags: ['workflow', 'verify', 'experimental'],
     content: `验证实现是否与变更产出物（规范、任务、设计）匹配。
 
@@ -3220,9 +3220,9 @@ export function getOpsxVerifyCommandTemplate(): CommandTemplate {
    \`\`\`bash
    openspec-cn status --change "<name>" --json
    \`\`\`
-   Parse the JSON to understand:
-   - \`schemaName\`: The workflow being used (e.g., "spec-driven")
-   - Which artifacts exist for this change
+   解析 JSON 以了解：
+   - \`schemaName\`：正在使用的工作流模式（例如："spec-driven"）
+   - 此变更存在哪些产出物
 
 3. **获取变更目录并加载产出物**
 
@@ -3253,7 +3253,7 @@ export function getOpsxVerifyCommandTemplate(): CommandTemplate {
 
    **规范覆盖率**：
    - 如果 \`openspec/changes/<name>/specs/\` 中存在增量规范：
-     - 提取所有需求（标记为 "### Requirement:"）
+     - 提取所有需求（标记为 "### 需求："）
      - 对于每个需求：
        - 在代码库中搜索与需求相关的关键词
        - 评估实现是否可能存在
@@ -3273,7 +3273,7 @@ export function getOpsxVerifyCommandTemplate(): CommandTemplate {
        - 建议："根据需求 X 审查 <文件>:<行>"
 
    **场景覆盖率**：
-   - 对于增量规范中的每个场景（标记为 "#### Scenario:"）：
+   - 对于增量规范中的每个场景（标记为 "#### 场景："）：
      - 检查代码中是否处理了条件
      - 检查是否存在覆盖该场景的测试
      - 如果场景看起来未覆盖：
@@ -3366,104 +3366,102 @@ export function getOpsxVerifyCommandTemplate(): CommandTemplate {
 export function getFeedbackSkillTemplate(): SkillTemplate {
   return {
     name: 'feedback',
-    description: 'Collect and submit user feedback about OpenSpec with context enrichment and anonymization.',
-    instructions: `Help the user submit feedback about OpenSpec.
+    description: '收集并提交有关 OpenSpec 的用户反馈，包含上下文增强和匿名化。',
+    instructions: `帮助用户提交有关 OpenSpec 的反馈。
 
-**Goal**: Guide the user through collecting, enriching, and submitting feedback while ensuring privacy through anonymization.
+**目标**：引导用户完成收集、增强和提交反馈的过程，同时通过匿名化确保隐私。
 
-**Process**
+**过程**
 
-1. **Gather context from the conversation**
-   - Review recent conversation history for context
-   - Identify what task was being performed
-   - Note what worked well or poorly
-   - Capture specific friction points or praise
+1. **从对话中收集上下文**
+   - 审查最近的对话历史以获取上下文
+   - 识别正在执行的任务
+   - 记录哪些工作顺利或不顺利
+   - 捕捉具体的摩擦点或赞美
 
-2. **Draft enriched feedback**
-   - Create a clear, descriptive title (single sentence, no "Feedback:" prefix needed)
-   - Write a body that includes:
-     - What the user was trying to do
-     - What happened (good or bad)
-     - Relevant context from the conversation
-     - Any specific suggestions or requests
+2. **起草增强的反馈**
+   - 创建一个清晰、具描述性的标题（单句，无需“反馈：”前缀）
+   - 编写包含以下内容的正文：
+     - 用户试图做什么
+     - 发生了什么（好或坏）
+     - 来自对话的相关上下文
+     - 任何具体的建议或要求
 
-3. **Anonymize sensitive information**
-   - Replace file paths with \`<path>\` or generic descriptions
-   - Replace API keys, tokens, secrets with \`<redacted>\`
-   - Replace company/organization names with \`<company>\`
-   - Replace personal names with \`<user>\`
-   - Replace specific URLs with \`<url>\` unless public/relevant
-   - Keep technical details that help understand the issue
+3. **对敏感信息进行匿名化**
+   - 将文件路径替换为 \`<path>\` 或通用描述
+   - 将 API 密钥、令牌、机密替换为 \`<redacted>\`
+   - 将公司/组织名称替换为 \`<company>\`
+   - 将个人姓名替换为 \`<user>\`
+   - 将特定的 URL 替换为 \`<url>\`（除非是公开的/相关的）
+   - 保留有助于理解问题的技术细节
 
-4. **Present draft for approval**
-   - Show the complete draft to the user
-   - Display both title and body clearly
-   - Ask for explicit approval before submitting
-   - Allow the user to request modifications
+4. **展示草案以供批准**
+   - 向用户展示完整的草案
+   - 清晰地展示标题和正文
+   - 在提交前征求明确的批准
+   - 允许用户要求修改
 
-5. **Submit on confirmation**
-   - Use the \`openspec feedback\` command to submit
-   - Format: \`openspec feedback "title" --body "body content"\`
-   - The command will automatically add metadata (version, platform, timestamp)
+5. **确认后提交**
+   - 使用 \`openspec-cn feedback\` 命令进行提交
+   - 格式：\`openspec-cn feedback "标题" --body "正文内容"\`
+   - 该命令将自动添加元数据（版本、平台、时间戳）
 
-**Example Draft**
+**草案示例**
 
 \`\`\`
-Title: Error handling in artifact workflow needs improvement
+标题：产出物工作流中的错误处理需要改进
 
-Body:
-I was working on creating a new change and encountered an issue with
-the artifact workflow. When I tried to continue after creating the
-proposal, the system didn't clearly indicate that I needed to complete
-the specs first.
+正文：
+我正在尝试创建一个新变更，并在产出物工作流中遇到了一个问题。
+当我尝试在创建提案后继续时，系统没有清晰地表明我需要先完成
+规范（specs）。
 
-Suggestion: Add clearer error messages that explain dependency chains
-in the artifact workflow. Something like "Cannot create design.md
-because specs are not complete (0/2 done)."
+建议：在产出物工作流中添加更清晰的错误消息，解释依赖链。
+例如：“无法创建 design.md，因为规范尚未完成（0/2 已完成）。”
 
-Context: Using the spec-driven schema with <path>/my-project
+上下文：使用 spec-driven 模式与 <path>/my-project
 \`\`\`
 
-**Anonymization Examples**
+**匿名化示例**
 
-Before:
+之前：
 \`\`\`
-Working on /Users/john/mycompany/auth-service/src/oauth.ts
-Failed with API key: sk_live_abc123xyz
-Working at Acme Corp
-\`\`\`
-
-After:
-\`\`\`
-Working on <path>/oauth.ts
-Failed with API key: <redacted>
-Working at <company>
+正在处理 /Users/john/mycompany/auth-service/src/oauth.ts
+失败，API 密钥为：sk_live_abc123xyz
+在 Acme Corp 工作
 \`\`\`
 
-**Guardrails**
-
-- MUST show complete draft before submitting
-- MUST ask for explicit approval
-- MUST anonymize sensitive information
-- ALLOW user to modify draft before submitting
-- DO NOT submit without user confirmation
-- DO include relevant technical context
-- DO keep conversation-specific insights
-
-**User Confirmation Required**
-
-Always ask:
+之后：
 \`\`\`
-Here's the feedback I've drafted:
-
-Title: [title]
-
-Body:
-[body]
-
-Does this look good? I can modify it if you'd like, or submit it as-is.
+正在处理 <path>/oauth.ts
+失败，API 密钥为：<redacted>
+在 <company> 工作
 \`\`\`
 
-Only proceed with submission after user confirms.`
+**护栏**
+
+- 必须在提交前展示完整草案
+- 必须征求明确的批准
+- 必须对敏感信息进行匿名化
+- 允许用户在提交前修改草案
+- 严禁在未经用户确认的情况下提交
+- 务必包含相关的技术上下文
+- 务必保留对话特定的见解
+
+**需要用户确认**
+
+始终询问：
+\`\`\`
+这是我起草的反馈：
+
+标题：[标题]
+
+正文：
+[正文]
+
+看起来可以吗？如果您愿意，我可以修改它，或者按原样提交。
+\`\`\`
+
+只有在用户确认后才继续提交。`
   };
 }
