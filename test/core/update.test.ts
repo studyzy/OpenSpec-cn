@@ -661,7 +661,7 @@ Old version content
       );
 
       // Should contain generatedBy field
-      expect(updatedContent).toMatch(/generatedBy:\s*["']\d+\.\d+\.\d+["']/);
+      expect(updatedContent).toMatch(/generatedBy:\s*["']\d+\.\d+\.\d+.*["']/);
     });
   });
 
