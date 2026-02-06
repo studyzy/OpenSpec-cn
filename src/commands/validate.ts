@@ -170,11 +170,11 @@ export class ValidateCommand {
     const bullets: string[] = [];
     if (type === 'change') {
       bullets.push('- 确保变更在specs/中有增量：使用标题## 新增|修改|移除|重命名需求');
-      bullets.push('- 每个需求必须至少包含一个#### 场景：块');
+      bullets.push('- 每个需求必须至少包含一个#### 场景:块');
       bullets.push('- 调试解析的增量：openspec-cn change show <id> --json --deltas-only');
     } else {
       bullets.push('- 确保规范包含## 目的和## 需求部分');
-      bullets.push('- 每个需求必须至少包含一个#### 场景：块');
+      bullets.push('- 每个需求必须至少包含一个#### 场景:块');
       bullets.push('- 使用--json重新运行以查看结构化报告');
     }
     console.error('后续步骤：');

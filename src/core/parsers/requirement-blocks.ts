@@ -1,5 +1,5 @@
 export interface RequirementBlock {
-  headerLine: string; // e.g., '### Requirement: Something' or '### 需求： Something'
+  headerLine: string; // e.g., '### Requirement: Something' or '### 需求: Something'
   name: string; // e.g., 'Something'
   raw: string; // full block including headerLine and following content
 }

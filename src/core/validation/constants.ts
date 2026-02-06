@@ -38,11 +38,11 @@ export const VALIDATION_MESSAGES = {
   
   // Guidance snippets (appended to primary messages for remediation)
   GUIDE_NO_DELTAS:
-    '未找到增量。确保您的变更在specs/目录下有功能文件夹（例如specs/http-server/spec.md），其中包含使用增量标题（## 新增需求/修改需求/移除需求/重命名需求）的.md文件，并且每个需求至少包含一个"#### 场景："块。提示：运行"openspec-cn change show <change-id> --json --deltas-only"来检查解析的增量。',
+    '未找到增量。确保您的变更在specs/目录下有功能文件夹（例如specs/http-server/spec.md），其中包含使用增量标题（## 新增需求/修改需求/移除需求/重命名需求）的.md文件，并且每个需求至少包含一个"#### 场景:"块。提示：运行"openspec-cn change show <change-id> --json --deltas-only"来检查解析的增量。',
   GUIDE_MISSING_SPEC_SECTIONS:
-    '缺少必需部分。预期标题："## 目的"和"## 需求"。示例：\n## 目的\n[简要目的]\n\n## 需求\n### 需求：清晰的需求陈述\n用户应当...\n\n#### 场景：描述性名称\n- **当** ...\n- **那么** ...',
+    '缺少必需部分。预期标题："## 目的"和"## 需求"。示例：\n## 目的\n[简要目的]\n\n## 需求\n### 需求:清晰的需求陈述\n用户应当...\n\n#### 场景:描述性名称\n- **当** ...\n- **那么** ...',
   GUIDE_MISSING_CHANGE_SECTIONS:
     '缺少必需部分。预期标题："## 为什么"和"## 变更内容"。确保在specs/中使用增量标题记录增量。',
   GUIDE_SCENARIO_FORMAT:
-    '场景必须使用四级标题。将项目符号列表转换为：\n#### 场景：简短名称\n- **当** ...\n- **那么** ...\n- **并且** ...',
+    '场景必须使用四级标题。将项目符号列表转换为：\n#### 场景:简短名称\n- **当** ...\n- **那么** ...\n- **并且** ...',
 } as const;

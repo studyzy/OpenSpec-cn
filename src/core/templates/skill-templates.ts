@@ -851,28 +851,28 @@ export function getSyncSpecsSkillTemplate(): SkillTemplate {
 \`\`\`markdown
 ## 新增需求
 
-### 需求： 新功能
+### 需求: 新功能
 系统 应当 实现新的能力。
 
-#### 场景： 基本场景
+#### 场景: 基本场景
 - **当** 用户执行 X
 - **那么** 系统执行 Y
 
 ## 修改需求
 
-### 需求： 现有功能
-#### 场景： 需要新增的场景
+### 需求: 现有功能
+#### 场景: 需要新增的场景
 - **当** 用户执行 A
 - **那么** 系统执行 B
 
 ## 移除需求
 
-### 需求： 已废弃功能
+### 需求: 已废弃功能
 
 ## 重命名需求
 
-- 从： \`### 需求： Old Name\`
-- 到： \`### 需求： New Name\`
+- 从: \`### 需求: Old Name\`
+- 到: \`### 需求: New Name\`
 \`\`\`
 
 **关键原则：智能合并**
@@ -1196,11 +1196,11 @@ mkdir -p openspec/changes/<name>/specs/<capability-name>
 
 ## 新增需求
 
-### 需求：<名称>
+### 需求: <名称>
 
 <系统应该做什么的描述>
 
-#### 场景：<场景名称>
+#### 场景: <场景名称>
 
 - **当** <触发条件>
 - **那么** <预期结果>
@@ -2254,7 +2254,7 @@ export function getBulkArchiveChangeSkillTemplate(): SkillTemplate {
 
    c. **增量规格说明** - 检查 \`openspec/changes/<name>/specs/\` 目录
       - 列出存在哪些能力规格说明
-      - 对于每个，提取需求名称（匹配 \`### 需求： <name>\` 的行）
+      - 对于每个，提取需求名称（匹配 \`### 需求: <name>\` 的行）
 
 4. **检测规格说明冲突**
 
@@ -2539,28 +2539,28 @@ export function getOpsxSyncCommandTemplate(): CommandTemplate {
 \`\`\`markdown
 ## 新增需求
 
-### 需求： 新功能
+### 需求: 新功能
 系统 应当 实现新的能力。
 
-#### 场景： 基本场景
+#### 场景: 基本场景
 - **当** 用户执行 X
 - **那么** 系统执行 Y
 
 ## 修改需求
 
-### 需求： 现有功能
-#### 场景： 需要新增的场景
+### 需求: 现有功能
+#### 场景: 需要新增的场景
 - **当** 用户执行 A
 - **那么** 系统执行 B
 
 ## 移除需求
 
-### 需求： 已废弃功能
+### 需求: 已废弃功能
 
 ## 重命名需求
 
-- 从： \`### 需求： Old Name\`
-- 到： \`### 需求： New Name\`
+- 从: \`### 需求: Old Name\`
+- 到: \`### 需求: New Name\`
 \`\`\`
 
 **关键原则：智能合并**
@@ -2658,7 +2658,7 @@ export function getVerifyChangeSkillTemplate(): SkillTemplate {
 
    **规范覆盖率**：
    - 如果 \`openspec/changes/<name>/specs/\` 中存在增量规范：
-     - 提取所有需求（标记为 "### 需求："）
+     - 提取所有需求（标记为 "### 需求:"）
      - 对于每个需求：
        - 在代码库中搜索与需求相关的关键词
        - 评估实现是否可能存在
@@ -2678,7 +2678,7 @@ export function getVerifyChangeSkillTemplate(): SkillTemplate {
        - 建议："根据需求 X 审查 <文件>:<行>"
 
    **场景覆盖率**：
-   - 对于增量规范中的每个场景（标记为 "#### 场景："）：
+   - 对于增量规范中的每个场景（标记为 "#### 场景:"）：
      - 检查代码中是否处理了条件
      - 检查是否存在覆盖该场景的测试
      - 如果场景看起来未覆盖：
@@ -2990,7 +2990,7 @@ export function getOpsxBulkArchiveCommandTemplate(): CommandTemplate {
 
    c. **增量规格说明** - 检查 \`openspec/changes/<name>/specs/\` 目录
       - 列出存在哪些能力规格说明
-      - 对于每个，提取需求名称（匹配 \`### 需求： <name>\` 的行）
+      - 对于每个，提取需求名称（匹配 \`### 需求: <name>\` 的行）
 
 4. **检测规格说明冲突**
 
@@ -3253,7 +3253,7 @@ export function getOpsxVerifyCommandTemplate(): CommandTemplate {
 
    **规范覆盖率**：
    - 如果 \`openspec/changes/<name>/specs/\` 中存在增量规范：
-     - 提取所有需求（标记为 "### 需求："）
+     - 提取所有需求（标记为 "### 需求:"）
      - 对于每个需求：
        - 在代码库中搜索与需求相关的关键词
        - 评估实现是否可能存在
@@ -3273,7 +3273,7 @@ export function getOpsxVerifyCommandTemplate(): CommandTemplate {
        - 建议："根据需求 X 审查 <文件>:<行>"
 
    **场景覆盖率**：
-   - 对于增量规范中的每个场景（标记为 "#### 场景："）：
+   - 对于增量规范中的每个场景（标记为 "#### 场景:"）：
      - 检查代码中是否处理了条件
      - 检查是否存在覆盖该场景的测试
      - 如果场景看起来未覆盖：

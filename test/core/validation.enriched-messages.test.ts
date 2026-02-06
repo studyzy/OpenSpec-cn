@@ -67,7 +67,7 @@ Text of requirement
     const warn = report.issues.find(i => i.path.includes('requirements[0].scenarios'));
     expect(warn?.message).toContain('需求必须至少有一个场景');
     expect(warn?.message).toContain('场景必须使用四级标题');
-    expect(warn?.message).toContain('#### 场景：');
+    expect(warn?.message).toContain('#### 场景:');
   });
 });
 

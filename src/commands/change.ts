@@ -284,7 +284,7 @@ export class ChangeCommand {
   private printNextSteps(): void {
     const bullets: string[] = [];
     bullets.push('- 确保变更在specs/中有增量：使用标题## 新增|修改|移除|重命名需求');
-    bullets.push('- 每个需求必须至少包含一个#### 场景：块');
+    bullets.push('- 每个需求必须至少包含一个#### 场景:块');
     bullets.push('- 调试解析的增量：openspec-cn change show <id> --json --deltas-only');
     console.error('后续步骤：');
     bullets.forEach(b => console.error(`  ${b}`));
