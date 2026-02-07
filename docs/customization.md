@@ -339,4 +339,4 @@ openspec-cn schema fork spec-driven with-review
 
 ## 另请参阅
 
-- [CLI Reference: Schema Commands](cli.md#schema-commands) - Full command documentation
+- [CLI 参考：Schema 命令](cli.md#schema-commands) - 终端命令
