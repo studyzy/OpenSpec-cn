@@ -657,6 +657,6 @@ AI 创建了不完整或不正确的制品。
 
 ## 下一步
 
-- [Workflows](workflows.md) - Common patterns and when to use each command
-- [CLI](cli.md) - Terminal commands for management and validation
-- [Customization](customization.md) - Create custom schemas and workflows
+- [工作流](workflows.md) - 常用模式以及何时使用每个命令
+- [CLI](cli.md) - 终端命令
+- [自定义](customization.md) - 创建自定义模式和模板
