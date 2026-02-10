@@ -527,7 +527,7 @@ export function getApplyChangeSkillTemplate(): SkillTemplate {
    如果提供了名称，使用它。否则：
    - 如果用户提到了某个变更，从对话上下文中推断
    - 如果只存在一个活动变更，自动选择
-   - 如果不明确，运行 \`openspec list --json\` 获取可用变更，并使用 **AskUserQuestion tool** 让用户选择
+   - 如果不明确，运行 \`openspec-cn list --json\` 获取可用变更，并使用 **AskUserQuestion tool** 让用户选择
 
    始终宣布：“正在使用变更：<name>”以及如何覆盖（例如，\`/opsx:apply <other>\`）。
 
@@ -1855,7 +1855,7 @@ export function getOpsxApplyCommandTemplate(): CommandTemplate {
    如果提供了名称,使用它。否则：
    - 如果用户提到了某个变更，从对话上下文中推断
    - 如果只存在一个活动变更，自动选择
-   - 如果不明确，运行 \`openspec list --json\` 获取可用变更，并使用 **AskUserQuestion tool** 让用户选择
+   - 如果不明确，运行 \`openspec-cn list --json\` 获取可用变更，并使用 **AskUserQuestion tool** 让用户选择
 
    始终宣布："正在使用变更：<name>"以及如何覆盖（例如，\`/opsx:apply <other>\`）。
 
@@ -2197,7 +2197,7 @@ export function getArchiveChangeSkillTemplate(): SkillTemplate {
 
 **防护措施**
 - 如果未提供变更，始终提示选择
-- 使用产出物图（openspec status --json）进行完成度检查
+- 使用产出物图（openspec-cn status --json）进行完成度检查
 - 不要在警告时阻止归档 - 只需告知并确认
 - 移动到归档时保留 .openspec.yaml（它与目录一起移动）
 - 显示清晰的操作摘要
@@ -2227,7 +2227,7 @@ export function getBulkArchiveChangeSkillTemplate(): SkillTemplate {
 
 1. **获取活动变更**
 
-   运行 \`openspec list --json\` 获取所有活动变更。
+   运行 \`openspec-cn list --json\` 获取所有活动变更。
 
    如果不存在活动变更，通知用户并停止。
 
@@ -2244,7 +2244,7 @@ export function getBulkArchiveChangeSkillTemplate(): SkillTemplate {
 
    对于每个选定的变更，收集：
 
-   a. **产出物状态** - 运行 \`openspec status --change "<name>" --json\`
+   a. **产出物状态** - 运行 \`openspec-cn status --change "<name>" --json\`
       - 解析 \`schemaName\` 和 \`artifacts\` 列表
       - 注意哪些产出物是 \`done\` 状态而非其他状态
 
@@ -2921,7 +2921,7 @@ export function getOpsxArchiveCommandTemplate(): CommandTemplate {
 
 **防护措施**
 - 如果未提供变更，始终提示选择
-- 使用产出物图（openspec status --json）进行完成度检查
+- 使用产出物图（openspec-cn status --json）进行完成度检查
 - 不要在警告时阻止归档 - 只需告知并确认
 - 移动到归档时保留 .openspec.yaml（它与目录一起移动）
 - 显示清晰的操作摘要
@@ -2963,7 +2963,7 @@ export function getOpsxBulkArchiveCommandTemplate(): CommandTemplate {
 
 1. **获取活动变更**
 
-   运行 \`openspec list --json\` 获取所有活动变更。
+   运行 \`openspec-cn list --json\` 获取所有活动变更。
 
    如果不存在活动变更，通知用户并停止。
 
@@ -2980,7 +2980,7 @@ export function getOpsxBulkArchiveCommandTemplate(): CommandTemplate {
 
    对于每个选定的变更，收集：
 
-   a. **产出物状态** - 运行 \`openspec status --change "<name>" --json\`
+   a. **产出物状态** - 运行 \`openspec-cn status --change "<name>" --json\`
       - 解析 \`schemaName\` 和 \`artifacts\` 列表
       - 注意哪些产出物是 \`done\` 状态而非其他状态
 

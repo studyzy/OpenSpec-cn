@@ -65,17 +65,17 @@ function generateMetadata(): string {
   const timestamp = getTimestamp();
 
   return `---
-Submitted via OpenSpec CLI
-- Version: ${version}
-- Platform: ${platform}
-- Timestamp: ${timestamp}`;
+通过 OpenSpec CLI 提交
+- 版本: ${version}
+- 平台: ${platform}
+- 时间戳: ${timestamp}`;
 }
 
 /**
  * Format the feedback title
  */
 function formatTitle(message: string): string {
-  return `Feedback: ${message}`;
+  return `反馈: ${message}`;
 }
 
 /**
@@ -98,7 +98,7 @@ function formatBody(bodyText?: string): string {
  * Generate a pre-filled GitHub issue URL for manual submission
  */
 function generateManualSubmissionUrl(title: string, body: string): string {
-  const repo = 'Fission-AI/OpenSpec';
+  const repo = 'studyzy/OpenSpec-cn';
   const encodedTitle = encodeURIComponent(title);
   const encodedBody = encodeURIComponent(body);
   const encodedLabels = encodeURIComponent('feedback');
@@ -110,12 +110,12 @@ function generateManualSubmissionUrl(title: string, body: string): string {
  * Display formatted feedback content for manual submission
  */
 function displayFormattedFeedback(title: string, body: string): void {
-  console.log('\n--- FORMATTED FEEDBACK ---');
-  console.log(`Title: ${title}`);
-  console.log(`Labels: feedback`);
-  console.log('\nBody:');
+  console.log('\n--- 格式化后的反馈内容 ---');
+  console.log(`标题: ${title}`);
+  console.log(`标签: feedback`);
+  console.log('\n正文:');
   console.log(body);
-  console.log('--- END FEEDBACK ---\n');
+  console.log('--- 反馈结束 ---\n');
 }
 
 /**
@@ -130,7 +130,7 @@ function submitViaGhCli(title: string, body: string): void {
         'issue',
         'create',
         '--repo',
-        'Fission-AI/OpenSpec',
+        'studyzy/OpenSpec-cn',
         '--title',
         title,
         '--body',
@@ -142,8 +142,8 @@ function submitViaGhCli(title: string, body: string): void {
     );
 
     const issueUrl = result.trim();
-    console.log(`\n✓ Feedback submitted successfully!`);
-    console.log(`Issue URL: ${issueUrl}\n`);
+    console.log(`\n✓ 反馈提交成功！`);
+    console.log(`Issue 链接: ${issueUrl}\n`);
   } catch (error: any) {
     // Display the error output from gh CLI
     if (error.stderr) {
@@ -162,19 +162,19 @@ function submitViaGhCli(title: string, body: string): void {
  */
 function handleFallback(title: string, body: string, reason: 'missing' | 'unauthenticated'): void {
   if (reason === 'missing') {
-    console.log('⚠️  GitHub CLI not found. Manual submission required.');
+    console.log('⚠️  未找到 GitHub CLI。需要手动提交。');
   } else {
-    console.log('⚠️  GitHub authentication required. Manual submission required.');
+    console.log('⚠️  GitHub 未认证。需要手动提交。');
   }
 
   displayFormattedFeedback(title, body);
 
   const manualUrl = generateManualSubmissionUrl(title, body);
-  console.log('Please submit your feedback manually:');
+  console.log('请手动提交您的反馈:');
   console.log(manualUrl);
 
   if (reason === 'unauthenticated') {
-    console.log('\nTo auto-submit in the future: gh auth login');
+    console.log('\n若要将来自动提交，请运行: gh auth login');
   }
 
   // Exit with success code (fallback is successful)

@@ -237,7 +237,7 @@ changeCmd
   .option('--long', '显示ID、标题和计数')
   .action(async (options?: { json?: boolean; long?: boolean }) => {
     try {
-      console.error('警告："openspec change list" 已弃用。请使用 "openspec-cn list"。');
+      console.error('警告："openspec-cn change list" 已弃用。请使用 "openspec-cn list"。');
       const changeCommand = new ChangeCommand();
       await changeCommand.list(options);
     } catch (error) {

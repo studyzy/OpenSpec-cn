@@ -36,7 +36,7 @@ clean:
 release:
 	$(PNPM) run release:local
 
-test:
+test: build
 	$(PNPM) test
 
 lint:

@@ -91,7 +91,7 @@ export function registerConfigCommand(program: Command): void {
       if (!keyValidation.valid && !allowUnknown) {
         const reason = keyValidation.reason ? ` ${keyValidation.reason}。` : '';
         console.error(`错误：无效的配置键 "${key}"。${reason}`);
-        console.error('使用 "openspec config list" 查看可用键。');
+        console.error('使用 "openspec-cn config list" 查看可用键。');
         console.error('传递 --allow-unknown 以跳过此检查。');
         process.exitCode = 1;
         return;
@@ -146,7 +146,7 @@ export function registerConfigCommand(program: Command): void {
     .action(async (options: { all?: boolean; yes?: boolean }) => {
       if (!options.all) {
         console.error('错误：重置时必须指定 --all 参数');
-        console.error('用法：openspec config reset --all [-y]');
+        console.error('用法：openspec-cn config reset --all [-y]');
         process.exitCode = 1;
         return;
       }

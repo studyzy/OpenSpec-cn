@@ -58,7 +58,7 @@ export class CompletionCommand {
 
       // No shell specified and cannot auto-detect
       console.error('错误：无法自动检测 Shell。请明确指定 Shell。');
-      console.error(`用法：openspec completion ${operationName} [shell]`);
+      console.error(`用法：openspec-cn completion ${operationName} [shell]`);
       console.error(`当前支持的 Shell 有：${CompletionFactory.getSupportedShells().join(', ')}`);
       process.exitCode = 1;
       return null;

@@ -100,17 +100,17 @@ describe('FeedbackCommand', () => {
 
       // Should display warning
       expect(consoleLogSpy).toHaveBeenCalledWith(
-        expect.stringContaining('GitHub CLI not found')
+        expect.stringContaining('⚠️  未找到 GitHub CLI。需要手动提交。')
       );
 
       // Should show formatted feedback
       expect(consoleLogSpy).toHaveBeenCalledWith(
-        expect.stringContaining('--- FORMATTED FEEDBACK ---')
+        expect.stringContaining('--- 格式化后的反馈内容 ---')
       );
 
       // Should show manual submission URL
       expect(consoleLogSpy).toHaveBeenCalledWith(
-        expect.stringContaining('https://github.com/Fission-AI/OpenSpec/issues/new')
+        expect.stringContaining('https://github.com/studyzy/OpenSpec-cn/issues/new')
       );
     });
 
@@ -134,24 +134,24 @@ describe('FeedbackCommand', () => {
 
       // Should display warning
       expect(consoleLogSpy).toHaveBeenCalledWith(
-        expect.stringContaining('GitHub authentication required')
+        expect.stringContaining('⚠️  GitHub 未认证。需要手动提交。')
       );
 
       // Should show auth instructions
       expect(consoleLogSpy).toHaveBeenCalledWith(
-        expect.stringContaining('To auto-submit in the future: gh auth login')
+        expect.stringContaining('若要将来自动提交，请运行: gh auth login')
       );
 
       // Should show formatted feedback
       expect(consoleLogSpy).toHaveBeenCalledWith(
-        expect.stringContaining('--- FORMATTED FEEDBACK ---')
+        expect.stringContaining('--- 格式化后的反馈内容 ---')
       );
     });
   });
 
   describe('successful feedback submission', () => {
     it('should submit feedback via gh CLI when authenticated', async () => {
-      const issueUrl = 'https://github.com/Fission-AI/OpenSpec/issues/123';
+      const issueUrl = 'https://github.com/studyzy/OpenSpec-cn/issues/123';
 
       // Simulate gh installed and authenticated
       mockExecSync.mockImplementation((cmd: string, options?: any) => {
@@ -175,11 +175,11 @@ describe('FeedbackCommand', () => {
           'issue',
           'create',
           '--repo',
-          'Fission-AI/OpenSpec',
+          'studyzy/OpenSpec-cn',
           '--title',
-          'Feedback: Great tool!',
+          '反馈: Great tool!',
           '--body',
-          expect.stringContaining('Submitted via OpenSpec CLI'),
+          expect.stringContaining('通过 OpenSpec CLI 提交'),
           '--label',
           'feedback',
         ],
@@ -191,7 +191,7 @@ describe('FeedbackCommand', () => {
 
       // Should display success message
       expect(consoleLogSpy).toHaveBeenCalledWith(
-        expect.stringContaining('Feedback submitted successfully')
+        expect.stringContaining('反馈提交成功！')
       );
 
       // Should display issue URL
@@ -201,7 +201,7 @@ describe('FeedbackCommand', () => {
     });
 
     it('should include --body flag when body is provided', async () => {
-      const issueUrl = 'https://github.com/Fission-AI/OpenSpec/issues/124';
+      const issueUrl = 'https://github.com/studyzy/OpenSpec-cn/issues/124';
 
       mockExecSync.mockImplementation((cmd: string, options?: any) => {
         if (cmd === 'which gh' || cmd === 'where gh') {
@@ -239,7 +239,7 @@ describe('FeedbackCommand', () => {
         return '';
       });
 
-      mockExecFileSync.mockReturnValue('https://github.com/Fission-AI/OpenSpec/issues/125\n');
+      mockExecFileSync.mockReturnValue('https://github.com/studyzy/OpenSpec-cn/issues/125\n');
 
       await feedbackCommand.execute('Test message');
 
@@ -248,7 +248,7 @@ describe('FeedbackCommand', () => {
         'gh',
         expect.arrayContaining([
           '--title',
-          'Feedback: Test message',
+          '反馈: Test message',
         ]),
         expect.any(Object)
       );
@@ -265,7 +265,7 @@ describe('FeedbackCommand', () => {
         return '';
       });
 
-      mockExecFileSync.mockReturnValue('https://github.com/Fission-AI/OpenSpec/issues/126\n');
+      mockExecFileSync.mockReturnValue('https://github.com/studyzy/OpenSpec-cn/issues/126\n');
 
       await feedbackCommand.execute('Test', { body: 'Body text' });
 
@@ -274,7 +274,7 @@ describe('FeedbackCommand', () => {
         'gh',
         expect.arrayContaining([
           '--body',
-          expect.stringMatching(/Submitted via OpenSpec CLI[\s\S]*Version:[\s\S]*Platform:[\s\S]*Timestamp:/),
+          expect.stringMatching(/通过 OpenSpec CLI 提交[\s\S]*版本:[\s\S]*平台:[\s\S]*时间戳:/),
         ]),
         expect.any(Object)
       );
@@ -291,7 +291,7 @@ describe('FeedbackCommand', () => {
         return '';
       });
 
-      mockExecFileSync.mockReturnValue('https://github.com/Fission-AI/OpenSpec/issues/127\n');
+      mockExecFileSync.mockReturnValue('https://github.com/studyzy/OpenSpec-cn/issues/127\n');
 
       await feedbackCommand.execute('Test');
 
@@ -351,7 +351,7 @@ describe('FeedbackCommand', () => {
         return '';
       });
 
-      mockExecFileSync.mockReturnValue('https://github.com/Fission-AI/OpenSpec/issues/128\n');
+      mockExecFileSync.mockReturnValue('https://github.com/studyzy/OpenSpec-cn/issues/128\n');
 
       await feedbackCommand.execute('Test with "quotes"', {
         body: 'Body with "quotes"',
@@ -362,7 +362,7 @@ describe('FeedbackCommand', () => {
         'gh',
         expect.arrayContaining([
           '--title',
-          'Feedback: Test with "quotes"',
+          '反馈: Test with "quotes"',
           '--body',
           expect.stringContaining('Body with "quotes"'),
         ]),
@@ -387,16 +387,16 @@ describe('FeedbackCommand', () => {
 
       // Verify formatted output structure
       expect(consoleLogSpy).toHaveBeenCalledWith(
-        expect.stringContaining('--- FORMATTED FEEDBACK ---')
+        expect.stringContaining('--- 格式化后的反馈内容 ---')
       );
       expect(consoleLogSpy).toHaveBeenCalledWith(
-        expect.stringContaining('Title: Feedback: Test message')
+        expect.stringContaining('标题: 反馈: Test message')
       );
       expect(consoleLogSpy).toHaveBeenCalledWith(
-        expect.stringContaining('Labels: feedback')
+        expect.stringContaining('标签: feedback')
       );
       expect(consoleLogSpy).toHaveBeenCalledWith(
-        expect.stringContaining('--- END FEEDBACK ---')
+        expect.stringContaining('--- 反馈结束 ---')
       );
     });
 
@@ -415,7 +415,7 @@ describe('FeedbackCommand', () => {
 
       // Verify URL is shown
       const urlCall = consoleLogSpy.mock.calls.find((call: any[]) =>
-        call[0]?.includes('https://github.com/Fission-AI/OpenSpec/issues/new')
+        call[0]?.includes('https://github.com/studyzy/OpenSpec-cn/issues/new')
       );
       expect(urlCall).toBeDefined();
 
