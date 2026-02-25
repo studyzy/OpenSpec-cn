@@ -632,7 +632,7 @@ Legacy content without generatedBy
 
       // Should show "unknown → version" in the update message - version info is in separate line
       expect(consoleSpy).toHaveBeenCalledWith(
-        expect.stringContaining('1.1.1')
+        expect.stringContaining('1.2.0')
       );
 
       consoleSpy.mockRestore();
@@ -662,7 +662,7 @@ Old version content
 
       // Should show version transition
       expect(consoleSpy).toHaveBeenCalledWith(
-        expect.stringContaining('0.1.0 → 1.1.1')
+        expect.stringContaining('0.1.0 → 1.2.0')
       );
 
       consoleSpy.mockRestore();
@@ -931,7 +931,7 @@ ${OPENSPEC_MARKERS.end}
 
       // Should show warning about --force
       expect(consoleSpy).toHaveBeenCalledWith(
-        expect.stringContaining('Run with --force to auto-cleanup legacy files, or run interactively.')
+        expect.stringContaining('使用 --force 自动清理旧文件，或在交互模式下运行。')
       );
 
       // Should continue with update
@@ -1599,7 +1599,7 @@ content
         call.map(arg => String(arg)).join(' ')
       );
       const hasDeselectedRemovalNote = calls.some(call =>
-        call.includes('deselected workflows')
+        call.includes('已取消选择的工作流')
       );
       expect(hasDeselectedRemovalNote).toBe(true);
 
@@ -1626,7 +1626,7 @@ content
         call.map(arg => String(arg)).join(' ')
       );
       const hasNewToolMessage = calls.some(call =>
-        call.includes("Detected new tool: Cursor. Run 'openspec init' to add it.")
+        call.includes('检测到新的工具：Cursor')
       );
       expect(hasNewToolMessage).toBe(true);
 
@@ -1652,12 +1652,12 @@ content
       );
 
       const consolidatedCalls = calls.filter(call =>
-        call.includes('Detected new tools:')
+        call.includes('检测到新的工具：')
       );
       expect(consolidatedCalls).toHaveLength(1);
       expect(consolidatedCalls[0]).toContain('GitHub Copilot');
       expect(consolidatedCalls[0]).toContain('Windsurf');
-      expect(consolidatedCalls[0]).toContain("Run 'openspec init' to add them.");
+      expect(consolidatedCalls[0]).toContain("openspec-cn init");
 
       const repeatedSingularCalls = calls.filter(call =>
         call.includes('Detected new tool:')
@@ -1759,7 +1759,7 @@ content
         call.map(arg => String(arg)).join(' ')
       );
       const hasToolsList = calls.some(call =>
-        call.includes('Tools:') && call.includes('Claude Code')
+        call.includes('工具:') && call.includes('Claude Code')
       );
       expect(hasToolsList).toBe(true);
 

@@ -382,7 +382,7 @@ export function registerSchemaCommand(program: Command): void {
         if (options?.json) {
           console.log(JSON.stringify(resolution, null, 2));
         } else {
-          console.log(`Schema: ${resolution.name}`);
+          console.log(`Schema：${resolution.name}`);
           console.log(`来源: ${resolution.source}`);
           console.log(`路径: ${resolution.path}`);
 
