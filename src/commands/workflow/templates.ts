@@ -84,7 +84,7 @@ export async function templatesCommand(options: TemplatesOptions): Promise<void>
     }
 
     console.log(`Schema: ${schemaName}`);
-    console.log(`Source: ${source}`);
+    console.log(`来源：${source}`);
     console.log();
 
     for (const t of templates) {

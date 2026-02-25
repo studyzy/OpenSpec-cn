@@ -326,7 +326,7 @@ export class InitCommand {
       .map((toolId) => AI_TOOLS.find((t) => t.value === toolId)?.name || toolId);
 
     if (configuredNames.length > 0) {
-      console.log(`OpenSpec configured: ${configuredNames.join(', ')} (pre-selected)`);
+      console.log(`OpenSpec 已配置：${configuredNames.join(', ')}（已预选）`);
     }
 
     const detectedOnlyNames = detectedTools
@@ -335,9 +335,9 @@ export class InitCommand {
 
     if (detectedOnlyNames.length > 0) {
       const detectionLabel = shouldPreselectDetected
-        ? 'pre-selected for first-time setup'
-        : 'not pre-selected';
-      console.log(`Detected tool directories: ${detectedOnlyNames.join(', ')} (${detectionLabel})`);
+        ? '首次设置已预选'
+        : '未预选';
+      console.log(`检测到工具目录：${detectedOnlyNames.join(', ')}（${detectionLabel}）`);
     }
 
     const selectedTools = await searchableMultiSelect({
@@ -666,7 +666,7 @@ export class InitCommand {
       } else if (skillCount > 0) {
         console.log(`${skillCount} 个技能在 ${toolDirs}/ 中`);
       } else if (commandCount > 0) {
-        console.log(`${commandCount} commands in ${toolDirs}/`);
+        console.log(`${commandCount} 个命令在 ${toolDirs}/ 中`);
       }
     }
 
@@ -705,13 +705,13 @@ export class InitCommand {
     const activeWorkflows = [...getProfileWorkflows(activeProfile, globalCfg.workflows)];
     console.log();
     if (activeWorkflows.includes('propose')) {
-      console.log(chalk.bold('Getting started:'));
-      console.log('  Start your first change: /opsx:propose "your idea"');
+      console.log(chalk.bold('开始使用：'));
+      console.log('  开始您的第一个变更：/opsx:propose "您的想法"');
     } else if (activeWorkflows.includes('new')) {
-      console.log(chalk.bold('Getting started:'));
-      console.log('  Start your first change: /opsx:new "your idea"');
+      console.log(chalk.bold('开始使用：'));
+      console.log('  开始您的第一个变更：/opsx:new "您的想法"');
     } else {
-      console.log("Done. Run 'openspec config profile' to configure your workflows.");
+      console.log("完成。运行 'openspec-cn config profile' 配置您的工作流程。");
     }
 
     // Links

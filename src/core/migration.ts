@@ -126,6 +126,6 @@ export function migrateIfNeeded(projectPath: string, tools: AIToolOption[]): voi
   }
   saveGlobalConfig(config);
 
-  console.log(`Migrated: custom profile with ${installedWorkflows.length} workflows`);
-  console.log("New in this version: /opsx:propose. Try 'openspec config profile core' for the streamlined experience.");
+  console.log(`已迁移：自定义配置，共 ${installedWorkflows.length} 个工作流程`);
+  console.log("本版本新增：/opsx:propose。尝试 'openspec-cn config profile core' 获得精简体验。");
 }
