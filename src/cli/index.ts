@@ -97,7 +97,8 @@ program
   .description('在您的项目中初始化OpenSpec')
   .option('--tools <tools>', toolsOptionDescription)
   .option('--force', '自动清理旧文件而不提示')
-  .action(async (targetPath = '.', options?: { tools?: string; force?: boolean }) => {
+  .option('--profile <profile>', 'Override global config profile (core or custom)')
+  .action(async (targetPath = '.', options?: { tools?: string; force?: boolean; profile?: string }) => {
     try {
       // Validate that the path is a valid directory
       const resolvedPath = path.resolve(targetPath);
@@ -122,6 +123,7 @@ program
       const initCommand = new InitCommand({
         tools: options?.tools,
         force: options?.force,
+        profile: options?.profile,
       });
       await initCommand.execute(targetPath);
     } catch (error) {

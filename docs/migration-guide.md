@@ -46,7 +46,7 @@ OPSX 用流畅的、基于行动的方法取代了旧的阶段锁定工作流。
 - Windsurf：`.windsurf/workflows/openspec-*.md`
 - Cline：`.clinerules/workflows/openspec-*.md`
 - Roo：`.roo/commands/openspec-*.md`
-- GitHub Copilot：`.github/prompts/openspec-*.prompt.md`
+- GitHub Copilot：`.github/prompts/openspec-*.prompt.md` (IDE extensions only; not supported in Copilot CLI)
 - 其他（Augment、Continue、Amazon Q 等）
 
 迁移会检测您配置的任何工具并清理其旧文件。
@@ -330,14 +330,14 @@ AI 将帮助您识别什么是必不可少的，什么可以被修剪。
 OPSX 使用行动，而不是阶段：
 
 ```
-         ┌───────────────────────────────────────────┐
-         │           ACTIONS (not phases)            │
-         │                                           │
-         │ new ◄──► continue ◄──► apply ◄──► archive │
-         │   │          │           │           │    │
-         │   └──────────┴───────────┴───────────┘    │
-         │              any order                    │
-         └───────────────────────────────────────────┘
+         ┌───────────────────────────────────────────────┐
+         │           ACTIONS (not phases)                │
+         │                                               │
+         │     new ◄──► continue ◄──► apply ◄──► archive │
+         │      │          │           │             │   │
+         │      └──────────┴───────────┴─────────────┘   │
+         │                    any order                  │
+         └───────────────────────────────────────────────┘
 ```
 
 ### 依赖图

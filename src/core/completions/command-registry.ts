@@ -377,6 +377,11 @@ export const COMMAND_REGISTRY: CommandDefinition[] = [
         description: '在 $EDITOR 中打开配置文件',
         flags: [],
       },
+      {
+        name: 'profile',
+        description: 'Configure workflow profile (interactive picker or preset shortcut)',
+        flags: [],
+      },
     ],
   },
   {

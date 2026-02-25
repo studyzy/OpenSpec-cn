@@ -767,6 +767,7 @@ openspec-cn config <subcommand> [options]
 | `unset <key>` | 移除键 |
 | `reset` | 重置为默认值 |
 | `edit` | 在 `$EDITOR` 中打开编辑 |
+| `profile [preset]` | Configure workflow profile interactively or via preset |
 
 **示例：**
 
@@ -794,6 +795,37 @@ openspec-cn config reset --all --yes
 
 # 在编辑器中编辑配置
 openspec-cn config edit
+
+# Configure profile with action-based wizard
+openspec config profile
+
+# Fast preset: switch workflows to core (keeps delivery mode)
+openspec config profile core
+```
+
+`openspec config profile` starts with a current-state summary, then lets you choose:
+- Change delivery + workflows
+- Change delivery only
+- Change workflows only
+- Keep current settings (exit)
+
+If you keep current settings, no changes are written and no update prompt is shown.
+If there are no config changes but the current project files are out of sync with your global profile/delivery, OpenSpec will show a warning and suggest running `openspec update`.
+Pressing `Ctrl+C` also cancels the flow cleanly (no stack trace) and exits with code `130`.
+In the workflow checklist, `[x]` means the workflow is selected in global config. To apply those selections to project files, run `openspec update` (or choose `Apply changes to this project now?` when prompted inside a project).
+
+**Interactive examples:**
+
+```bash
+# Delivery-only update
+openspec config profile
+# choose: Change delivery only
+# choose delivery: Skills only
+
+# Workflows-only update
+openspec config profile
+# choose: Change workflows only
+# toggle workflows in the checklist, then confirm
 ```
 
 ---
