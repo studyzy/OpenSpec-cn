@@ -323,7 +323,8 @@ describe('PowerShellInstaller', () => {
 
       expect(result).toBe(true);
       const content = await fs.readFile(profilePath, 'utf-8');
-      expect(content).toBe('# User config\n');
+      // UTF-8 BOM should be present for Windows PowerShell 5.1 compatibility
+      expect(content).toBe('\uFEFF# User config\n');
     });
 
     it('should preserve user content outside markers', async () => {
@@ -401,7 +402,8 @@ Register-ArgumentCompleter -CommandName openspec -ScriptBlock $openspecCompleter
 
       const targetPath = installer.getInstallationPath();
       const content = await fs.readFile(targetPath, 'utf-8');
-      expect(content).toBe(mockCompletionScript);
+      // UTF-8 BOM should be prepended for Windows PowerShell 5.1 compatibility
+      expect(content).toBe('\uFEFF' + mockCompletionScript);
     });
 
     it('should detect when already installed with same content', async () => {
@@ -437,9 +439,9 @@ Register-ArgumentCompleter -CommandName openspec -ScriptBlock $openspecCompleter
       expect(result.success).toBe(true);
       expect(result.backupPath).toBeDefined();
 
-      // Verify backup contains original content
+      // Verify backup contains original content with BOM
       const backupContent = await fs.readFile(result.backupPath!, 'utf-8');
-      expect(backupContent).toBe(mockCompletionScript);
+      expect(backupContent).toBe('\uFEFF' + mockCompletionScript);
     });
 
     it('should configure PowerShell profile when not disabled', async () => {
@@ -528,7 +530,8 @@ Register-ArgumentCompleter -CommandName openspec -ScriptBlock $openspecCompleter
       expect(result.success).toBe(true);
       const targetPath = installer.getInstallationPath();
       const content = await fs.readFile(targetPath, 'utf-8');
-      expect(content).toBe('');
+      // UTF-8 BOM should be present for Windows PowerShell 5.1 compatibility
+      expect(content).toBe('\uFEFF');
     });
 
     it('should handle completion script with special characters', async () => {
@@ -540,7 +543,8 @@ Register-ArgumentCompleter -CommandName openspec -ScriptBlock $openspecCompleter
       expect(result.success).toBe(true);
       const targetPath = installer.getInstallationPath();
       const content = await fs.readFile(targetPath, 'utf-8');
-      expect(content).toBe(specialScript);
+      // UTF-8 BOM should be prepended for Windows PowerShell 5.1 compatibility
+      expect(content).toBe('\uFEFF' + specialScript);
     });
   });
 

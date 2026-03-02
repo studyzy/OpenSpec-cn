@@ -154,7 +154,9 @@ export class PowerShellInstaller {
         ].join('\n');
 
         const newContent = profileContent + openspecBlock;
-        await fs.writeFile(profilePath, newContent, 'utf-8');
+        // Use UTF-8 with BOM for Windows PowerShell 5.1 compatibility
+        const bomContent = '\uFEFF' + newContent;
+        await fs.writeFile(profilePath, bomContent, 'utf-8');
         anyConfigured = true;
       } catch (error) {
         // Continue to next profile if this one fails
@@ -206,8 +208,9 @@ export class PowerShellInstaller {
 
         // Clean up extra newlines
         const newContent = (beforeBlock.trimEnd() + '\n' + afterBlock.trimStart()).trim() + '\n';
-
-        await fs.writeFile(profilePath, newContent, 'utf-8');
+        // Use UTF-8 with BOM for Windows PowerShell 5.1 compatibility
+        const bomContent = '\uFEFF' + newContent;
+        await fs.writeFile(profilePath, bomContent, 'utf-8');
         anyRemoved = true;
       } catch (error) {
         console.warn(`Warning: Could not clean ${profilePath}: ${error}`);
@@ -230,7 +233,11 @@ export class PowerShellInstaller {
       // Check if already installed with same content
       let isUpdate = false;
       try {
-        const existingContent = await fs.readFile(targetPath, 'utf-8');
+        let existingContent = await fs.readFile(targetPath, 'utf-8');
+        // Remove BOM if present for comparison (BOM is added on write for Windows compatibility)
+        if (existingContent.charCodeAt(0) === 0xfeff) {
+          existingContent = existingContent.slice(1);
+        }
         if (existingContent === completionScript) {
           // Already installed and up to date
           return {
@@ -257,8 +264,9 @@ export class PowerShellInstaller {
       // Backup existing file if updating
       const backupPath = isUpdate ? await this.backupExistingFile(targetPath) : undefined;
 
-      // Write the completion script
-      await fs.writeFile(targetPath, completionScript, 'utf-8');
+      // Write the completion script with UTF-8 BOM for Windows PowerShell 5.1 compatibility
+      const bomCompletionScript = '\uFEFF' + completionScript;
+      await fs.writeFile(targetPath, bomCompletionScript, 'utf-8');
 
       // Auto-configure PowerShell profile
       const profileConfigured = await this.configureProfile(targetPath);
