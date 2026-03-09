@@ -43,48 +43,48 @@ interface WorkflowPromptMeta {
 
 const WORKFLOW_PROMPT_META: Record<string, WorkflowPromptMeta> = {
   propose: {
-    name: 'Propose change',
-    description: 'Create proposal, design, and tasks from a request',
+    name: '提议变更',
+    description: '根据请求创建提议、设计和任务',
   },
   explore: {
-    name: 'Explore ideas',
-    description: 'Investigate a problem before implementation',
+    name: '探索想法',
+    description: '在实现前调查问题',
   },
   new: {
-    name: 'New change',
-    description: 'Create a new change scaffold quickly',
+    name: '新建变更',
+    description: '快速创建新变更脚手架',
   },
   continue: {
-    name: 'Continue change',
-    description: 'Resume work on an existing change',
+    name: '继续变更',
+    description: '恢复对现有变更的工作',
   },
   apply: {
-    name: 'Apply tasks',
-    description: 'Implement tasks from the current change',
+    name: '应用任务',
+    description: '实现当前变更中的任务',
   },
   ff: {
-    name: 'Fast-forward',
-    description: 'Run a faster implementation workflow',
+    name: '快速前进',
+    description: '运行更快的实现工作流',
   },
   sync: {
-    name: 'Sync specs',
-    description: 'Sync change artifacts with specs',
+    name: '同步规格',
+    description: '将变更制品与规格同步',
   },
   archive: {
-    name: 'Archive change',
-    description: 'Finalize and archive a completed change',
+    name: '归档变更',
+    description: '最终确定并归档已完成的变更',
   },
   'bulk-archive': {
-    name: 'Bulk archive',
-    description: 'Archive multiple completed changes together',
+    name: '批量归档',
+    description: '一起归档多个已完成的变更',
   },
   verify: {
-    name: 'Verify change',
-    description: 'Run verification checks against a change',
+    name: '验证变更',
+    description: '针对变更运行验证检查',
   },
   onboard: {
-    name: 'Onboard',
-    description: 'Guided onboarding flow for OpenSpec',
+    name: '入门指南',
+    description: 'OpenSpec 入门引导流程',
   },
 };
 
@@ -198,7 +198,7 @@ function maybeWarnConfigDrift(
   if (!hasProjectConfigDrift(projectDir, state.workflows, state.delivery)) {
     return;
   }
-  console.log(colorize('Warning: Global config is not applied to this project. Run `openspec update` to sync.'));
+  console.log(colorize('警告：全局配置未应用于此项目。请运行 `openspec-cn update` 来同步。'));
 }
 
 /**
@@ -369,7 +369,7 @@ export function registerConfigCommand(program: Command): void {
           });
         } catch (error) {
           if (isPromptCancellationError(error)) {
-            console.log('Reset cancelled.');
+            console.log('重置已取消。');
             process.exitCode = 130;
             return;
           }
@@ -452,28 +452,28 @@ export function registerConfigCommand(program: Command): void {
   // config profile [preset]
   configCmd
     .command('profile [preset]')
-    .description('Configure workflow profile (interactive picker or preset shortcut)')
+    .description('配置工作流档案（交互式选择器或预设快捷方式）')
     .action(async (preset?: string) => {
-      // Preset shortcut: `openspec config profile core`
+      // Preset shortcut: `openspec-cn config profile core`
       if (preset === 'core') {
         const config = getGlobalConfig();
         config.profile = 'core';
         config.workflows = [...CORE_WORKFLOWS];
         // Preserve delivery setting
         saveGlobalConfig(config);
-        console.log('Config updated. Run `openspec update` in your projects to apply.');
+        console.log('配置已更新。请在您的项目中运行 `openspec-cn update` 来应用。');
         return;
       }
 
       if (preset) {
-        console.error(`Error: Unknown profile preset "${preset}". Available presets: core`);
+        console.error(`错误：未知的档案预设 "${preset}"。可用预设：core`);
         process.exitCode = 1;
         return;
       }
 
       // Non-interactive check
       if (!process.stdout.isTTY) {
-        console.error('Interactive mode required. Use `openspec config profile core` or set config via environment/flags.');
+        console.error('需要交互模式。使用 `openspec-cn config profile core` 或通过环境/标志设置配置。');
         process.exitCode = 1;
         return;
       }
@@ -486,41 +486,41 @@ export function registerConfigCommand(program: Command): void {
         const config = getGlobalConfig();
         const currentState = resolveCurrentProfileState(config);
 
-        console.log(chalk.bold('\nCurrent profile settings'));
-        console.log(`  Delivery: ${currentState.delivery}`);
-        console.log(`  Workflows: ${formatWorkflowSummary(currentState.workflows, currentState.profile)}`);
-        console.log(chalk.dim('  Delivery = where workflows are installed (skills, commands, or both)'));
-        console.log(chalk.dim('  Workflows = which actions are available (propose, explore, apply, etc.)'));
+        console.log(chalk.bold('\n当前档案设置'));
+        console.log(`  交付方式：${currentState.delivery}`);
+        console.log(`  工作流：${formatWorkflowSummary(currentState.workflows, currentState.profile)}`);
+        console.log(chalk.dim('  交付方式 = 工作流的安装位置（SKILL、命令或两者）'));
+        console.log(chalk.dim('  工作流 = 可用的操作（提议、探索、应用等）'));
         console.log();
 
         const action = await select<ProfileAction>({
-          message: 'What do you want to configure?',
+          message: '您想配置什么？',
           choices: [
             {
               value: 'both',
-              name: 'Delivery and workflows',
-              description: 'Update install mode and available actions together',
+              name: '交付方式和工作流',
+              description: '一起更新安装模式和可用操作',
             },
             {
               value: 'delivery',
-              name: 'Delivery only',
-              description: 'Change where workflows are installed',
+              name: '仅交付方式',
+              description: '更改工作流的安装位置',
             },
             {
               value: 'workflows',
-              name: 'Workflows only',
-              description: 'Change which workflow actions are available',
+              name: '仅工作流',
+              description: '更改可用的工作流操作',
             },
             {
               value: 'keep',
-              name: 'Keep current settings (exit)',
-              description: 'Leave configuration unchanged and exit',
+              name: '保持当前设置（退出）',
+              description: '保留配置不变并退出',
             },
           ],
         });
 
         if (action === 'keep') {
-          console.log('No config changes.');
+          console.log('没有配置更改。');
           maybeWarnConfigDrift(process.cwd(), currentState, chalk.yellow);
           return;
         }
@@ -535,28 +535,28 @@ export function registerConfigCommand(program: Command): void {
           const deliveryChoices: { value: Delivery; name: string; description: string }[] = [
             {
               value: 'both' as Delivery,
-              name: 'Both (skills + commands)',
-              description: 'Install workflows as both skills and slash commands',
+              name: '两者都安装（Skills + 命令）',
+              description: '同时将工作流作为技能和斜杠命令安装',
             },
             {
               value: 'skills' as Delivery,
-              name: 'Skills only',
-              description: 'Install workflows only as skills',
+              name: '仅Skills',
+              description: '仅将工作流作为SKILL安装',
             },
             {
               value: 'commands' as Delivery,
-              name: 'Commands only',
-              description: 'Install workflows only as slash commands',
+              name: '仅命令',
+              description: '仅将工作流作为斜杠命令安装',
             },
           ];
           for (const choice of deliveryChoices) {
             if (choice.value === currentState.delivery) {
-              choice.name += ' [current]';
+              choice.name += ' [当前]';
             }
           }
 
           nextState.delivery = await select<Delivery>({
-            message: 'Delivery mode (how workflows are installed):',
+            message: '交付方式（工作流的安装方式）：',
             choices: deliveryChoices,
             default: currentState.delivery,
           });
@@ -578,8 +578,8 @@ export function registerConfigCommand(program: Command): void {
           };
 
           const selectedWorkflows = await checkbox<string>({
-            message: 'Select workflows to make available:',
-            instructions: 'Space to toggle, Enter to confirm',
+            message: '选择要启用的工作流：',
+            instructions: '空格键切换，回车确认',
             pageSize: ALL_WORKFLOWS.length,
             theme: {
               icon: {
@@ -595,12 +595,12 @@ export function registerConfigCommand(program: Command): void {
 
         const diff = diffProfileState(currentState, nextState);
         if (!diff.hasChanges) {
-          console.log('No config changes.');
+          console.log('没有配置更改。');
           maybeWarnConfigDrift(process.cwd(), nextState, chalk.yellow);
           return;
         }
 
-        console.log(chalk.bold('\nConfig changes:'));
+        console.log(chalk.bold('\n配置变更：'));
         for (const line of diff.lines) {
           console.log(`  ${line}`);
         }
@@ -616,26 +616,26 @@ export function registerConfigCommand(program: Command): void {
         const openspecDir = path.join(projectDir, OPENSPEC_DIR_NAME);
         if (fs.existsSync(openspecDir)) {
           const applyNow = await confirm({
-            message: 'Apply changes to this project now?',
+            message: '立即将更改应用到此项目？',
             default: true,
           });
 
           if (applyNow) {
             try {
-              execSync('npx openspec update', { stdio: 'inherit', cwd: projectDir });
-              console.log('Run `openspec update` in your other projects to apply.');
+              execSync('npx openspec-cn update', { stdio: 'inherit', cwd: projectDir });
+              console.log('请在其他项目中运行 `openspec-cn update` 来应用。');
             } catch {
-              console.error('`openspec update` failed. Please run it manually to apply the profile changes.');
+              console.error('`openspec-cn update` 失败。请手动运行以应用档案变更。');
               process.exitCode = 1;
             }
             return;
           }
         }
 
-        console.log('Config updated. Run `openspec update` in your projects to apply.');
+        console.log('配置已更新。请在您的项目中运行 `openspec-cn update` 来应用。');
       } catch (error) {
         if (isPromptCancellationError(error)) {
-          console.log('Config profile cancelled.');
+          console.log('档案配置已取消。');
           process.exitCode = 130;
           return;
         }
