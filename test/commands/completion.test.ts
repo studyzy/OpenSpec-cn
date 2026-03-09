@@ -200,7 +200,7 @@ describe('CompletionCommand', () => {
         install: vi.fn().mockResolvedValue({
           success: false,
           isOhMyZsh: false,
-          message: 'Permission denied',
+          message: '权限不足',
         }),
         uninstall: vi.fn(),
         isInstalled: vi.fn(),
@@ -214,7 +214,7 @@ describe('CompletionCommand', () => {
       await cmd.install({ shell: 'zsh' });
 
       expect(consoleErrorSpy).toHaveBeenCalledWith(
-        expect.stringContaining('Permission denied')
+        expect.stringContaining('权限不足')
       );
       expect(process.exitCode).toBe(1);
     });
@@ -225,7 +225,7 @@ describe('CompletionCommand', () => {
         install: vi.fn(),
         uninstall: vi.fn().mockResolvedValue({
           success: false,
-          message: 'Completion script is not installed',
+          message: '补全脚本未安装',
         }),
         isInstalled: vi.fn(),
         getInstallationInfo: vi.fn(),
@@ -238,7 +238,7 @@ describe('CompletionCommand', () => {
       await cmd.uninstall({ shell: 'zsh', yes: true });
 
       expect(consoleErrorSpy).toHaveBeenCalledWith(
-        expect.stringContaining('Completion script is not installed')
+        expect.stringContaining('补全脚本未安装')
       );
       expect(process.exitCode).toBe(1);
     });

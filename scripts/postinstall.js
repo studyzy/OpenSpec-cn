@@ -72,7 +72,7 @@ async function installCompletions(shell) {
 
     // Check if shell is supported
     if (!CompletionFactory.isSupported(shell)) {
-      console.log(`\nTip: Run 'openspec completion install' for shell completions`);
+      console.log(`\n提示：运行 'openspec-cn completion install' 以安装 shell 补全`);
       return;
     }
 
@@ -87,19 +87,19 @@ async function installCompletions(shell) {
     if (result.success) {
       // Show success message based on installation type
       if (result.isOhMyZsh) {
-        console.log(`✓ Shell completions installed`);
-        console.log(`  Restart shell: exec zsh`);
+        console.log(`✓ Shell 补全脚本安装成功`);
+        console.log(`  重启 Shell：exec zsh`);
       } else if (result.zshrcConfigured) {
-        console.log(`✓ Shell completions installed and configured`);
-        console.log(`  Restart shell: exec zsh`);
+        console.log(`✓ Shell 补全脚本已安装并自动配置`);
+        console.log(`  重启 Shell：exec zsh`);
       } else {
-        console.log(`✓ Shell completions installed to ~/.zsh/completions/`);
-        console.log(`  Add to ~/.zshrc: fpath=(~/.zsh/completions $fpath)`);
-        console.log(`  Then: exec zsh`);
+        console.log(`✓ Shell 补全脚本已安装至 ~/.zsh/completions/`);
+        console.log(`  在 ~/.zshrc 中添加：fpath=(~/.zsh/completions $fpath)`);
+        console.log(`  然后运行：exec zsh`);
       }
     } else {
       // Installation failed, show tip for manual install
-      console.log(`\nTip: Run 'openspec completion install' for shell completions`);
+      console.log(`\n提示：运行 'openspec-cn completion install' 以安装 shell 补全`);
     }
   } catch (error) {
     // Fail gracefully - show tip for manual install
@@ -127,7 +127,7 @@ async function main() {
     // Detect shell
     const shell = await detectShell();
     if (!shell) {
-      console.log(`\nTip: Run 'openspec completion install' for shell completions`);
+      console.log(`\n提示：运行 'openspec-cn completion install' 以安装 shell 补全`);
       return;
     }
 

@@ -520,7 +520,7 @@ Register-ArgumentCompleter -CommandName openspec -ScriptBlock $openspecCompleter
       await fs.chmod(targetDir, 0o755);
 
       expect(result.success).toBe(false);
-      expect(result.message).toContain('Failed to install completion script');
+      expect(result.message).toContain('安装补全脚本失败');
     });
 
     it('should handle empty completion script', async () => {

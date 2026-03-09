@@ -117,7 +117,7 @@ describe('BashInstaller', () => {
 
       expect(content).toContain('# OPENSPEC:START');
       expect(content).toContain('# OPENSPEC:END');
-      expect(content).toContain('OpenSpec shell 补全配置');
+      expect(content).toContain('OpenSpec-cn shell 补全配置');
     });
 
     it('should include instructions when auto-config is disabled', async () => {
@@ -148,7 +148,7 @@ describe('BashInstaller', () => {
       const result = await invalidInstaller.install(testScript);
 
       expect(result.success).toBe(false);
-      expect(result.message).toContain('Failed to install');
+      expect(result.message).toContain('安装补全脚本失败');
     });
 
     it('should detect already-installed completion with identical content', async () => {
@@ -273,7 +273,7 @@ describe('BashInstaller', () => {
 
       expect(content).toContain('# OPENSPEC:START');
       expect(content).toContain('# OPENSPEC:END');
-      expect(content).toContain('# OpenSpec shell 补全配置');
+      expect(content).toContain('OpenSpec-cn shell 补全配置');
       expect(content).toContain(completionsDir);
     });
 

@@ -4,6 +4,21 @@ import path from 'path';
 import os from 'os';
 import { runCLI } from '../helpers/run-cli.js';
 
+async function createTempGlobalConfig(baseDir: string): Promise<{ XDG_CONFIG_HOME: string }> {
+  const configDir = path.join(baseDir, 'xdg-config');
+  const openspecDir = path.join(configDir, 'openspec');
+  await fs.mkdir(openspecDir, { recursive: true });
+  await fs.writeFile(
+    path.join(openspecDir, 'config.json'),
+    JSON.stringify({
+      profile: 'core',
+      delivery: 'both',
+      workflows: ['propose', 'explore', 'apply', 'archive'],
+    })
+  );
+  return { XDG_CONFIG_HOME: configDir };
+}
+
 describe('artifact-workflow CLI commands', () => {
   let tempDir: string;
   let changesDir: string;
@@ -607,6 +622,7 @@ artifacts:
     it('creates skills for Claude tool', async () => {
       const result = await runCLI(['experimental', '--tool', 'claude'], {
         cwd: tempDir,
+        env: await createTempGlobalConfig(tempDir),
       });
       expect(result.exitCode).toBe(0);
       const output = normalizePaths(getOutput(result));
@@ -622,6 +638,7 @@ artifacts:
     it('creates skills for Cursor tool', async () => {
       const result = await runCLI(['experimental', '--tool', 'cursor'], {
         cwd: tempDir,
+        env: await createTempGlobalConfig(tempDir),
       });
       expect(result.exitCode).toBe(0);
       const output = normalizePaths(getOutput(result));
@@ -642,6 +659,7 @@ artifacts:
     it('creates skills for Windsurf tool', async () => {
       const result = await runCLI(['experimental', '--tool', 'windsurf'], {
         cwd: tempDir,
+        env: await createTempGlobalConfig(tempDir),
       });
       expect(result.exitCode).toBe(0);
       const output = normalizePaths(getOutput(result));

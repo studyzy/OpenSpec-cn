@@ -77,9 +77,12 @@ export class ZshInstaller {
   async backupExistingFile(targetPath: string): Promise<string | undefined> {
     try {
       await fs.access(targetPath);
-      // File exists, create a backup
+      // File exists, create a hidden backup file so Zsh won't treat it as a completion function
       const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-      const backupPath = `${targetPath}.backup-${timestamp}`;
+      const backupPath = path.join(
+        path.dirname(targetPath),
+        `.${path.basename(targetPath)}.backup-${timestamp}`
+      );
       await fs.copyFile(targetPath, backupPath);
       return backupPath;
     } catch {
@@ -105,7 +108,7 @@ export class ZshInstaller {
    */
   private generateZshrcConfig(completionsDir: string): string {
     return [
-      '# OpenSpec shell 补全配置',
+      '# OpenSpec-cn shell 补全配置',
       `fpath=("${completionsDir}" $fpath)`,
       'autoload -Uz compinit',
       'compinit',
@@ -146,7 +149,7 @@ export class ZshInstaller {
       return true;
     } catch (error: any) {
       // Fail gracefully - don't break installation
-      console.debug(`Unable to configure .zshrc for completions: ${error.message}`);
+      console.debug(`无法为补全配置 .zshrc: ${error.message}`);
       return false;
     }
   }
@@ -182,7 +185,7 @@ export class ZshInstaller {
       return !content.includes(completionsDir);
     } catch (error) {
       // If we can't read .zshrc, assume config is needed
-      console.debug(`Unable to read .zshrc to check fpath config: ${error instanceof Error ? error.message : String(error)}`);
+      console.debug(`无法读取 .zshrc 以检查 fpath 配置: ${error instanceof Error ? error.message : String(error)}`);
       return true;
     }
   }
@@ -238,7 +241,7 @@ export class ZshInstaller {
       return true;
     } catch (error: any) {
       // Fail gracefully
-      console.debug(`Unable to remove .zshrc configuration: ${error.message}`);
+      console.debug(`无法移除 .zshrc 配置: ${error.message}`);
       return false;
     }
   }
@@ -274,7 +277,7 @@ export class ZshInstaller {
         isUpdate = true;
       } catch (error: any) {
         // File doesn't exist or can't be read, proceed with installation
-        console.debug(`Unable to read existing completion file at ${targetPath}: ${error.message}`);
+        console.debug(`无法在 ${targetPath} 读取现有的补全文件: ${error.message}`);
       }
 
       // Ensure the directory exists
@@ -339,7 +342,7 @@ export class ZshInstaller {
       return {
         success: false,
         isOhMyZsh: false,
-        message: `Failed to install completion script: ${error instanceof Error ? error.message : String(error)}`,
+        message: `安装补全脚本失败：${error instanceof Error ? error.message : String(error)}`,
       };
     }
   }
@@ -438,7 +441,7 @@ export class ZshInstaller {
         messages.push(`已从 ${targetPath} 移除补全脚本`);
       }
       if (zshrcCleaned && !isOhMyZsh) {
-        messages.push('已从 ~/.zshrc 移除 OpenSpec 配置');
+        messages.push('已从 ~/.zshrc 移除 OpenSpec-cn 配置');
       }
 
       return {

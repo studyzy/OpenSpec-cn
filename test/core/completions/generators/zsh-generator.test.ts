@@ -31,7 +31,7 @@ describe('ZshGenerator', () => {
 
       const script = generator.generate(commands);
 
-      expect(script).toContain('#compdef openspec');
+      expect(script).toContain('#compdef openspec-cn');
       expect(script).toContain('# Zsh completion script for OpenSpec CLI');
       expect(script).toContain('_openspec() {');
     });
@@ -351,7 +351,7 @@ describe('ZshGenerator', () => {
 
       const script = generator.generate(commands);
 
-      expect(script.trim().endsWith('compdef _openspec openspec')).toBe(true);
+      expect(script.trim().endsWith('compdef _openspec openspec-cn')).toBe(true);
     });
 
     it('should handle empty command list', () => {
@@ -359,7 +359,7 @@ describe('ZshGenerator', () => {
 
       const script = generator.generate(commands);
 
-      expect(script).toContain('#compdef openspec');
+      expect(script).toContain('#compdef openspec-cn');
       expect(script).toContain('_openspec() {');
     });
 

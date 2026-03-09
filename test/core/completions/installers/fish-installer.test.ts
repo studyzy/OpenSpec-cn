@@ -206,7 +206,7 @@ complete -c openspec -a 'validate' -d 'Validate specs'
       await fs.chmod(restrictedDir, 0o755);
 
       expect(result.success).toBe(false);
-      expect(result.message).toContain('Failed to install completion script');
+      expect(result.message).toContain('安装补全脚本失败');
     });
 
     it('should provide appropriate instructions for Fish', async () => {

@@ -73,7 +73,7 @@ export class FishInstaller {
         isUpdate = true;
       } catch (error: any) {
         // File doesn't exist or can't be read, proceed with installation
-        console.debug(`Unable to read existing completion file at ${targetPath}: ${error.message}`);
+        console.debug(`无法在 ${targetPath} 读取现有的补全文件: ${error.message}`);
       }
 
       // Ensure the directory exists
@@ -109,7 +109,7 @@ export class FishInstaller {
     } catch (error) {
       return {
         success: false,
-        message: `Failed to install completion script: ${error instanceof Error ? error.message : String(error)}`,
+        message: `安装补全脚本失败：${error instanceof Error ? error.message : String(error)}`,
       };
     }
   }

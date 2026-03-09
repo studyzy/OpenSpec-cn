@@ -101,7 +101,7 @@ export class BashInstaller {
    */
   private generateBashrcConfig(completionsDir: string): string {
     return [
-      '# OpenSpec shell 补全配置',
+      '# OpenSpec-cn shell 补全配置',
       `if [ -d "${completionsDir}" ]; then`,
       `  for f in "${completionsDir}"/*; do`,
       '    [ -f "$f" ] && . "$f"',
@@ -143,7 +143,7 @@ export class BashInstaller {
       return true;
     } catch (error: any) {
       // Fail gracefully - don't break installation
-      console.debug(`Unable to configure .bashrc for completions: ${error.message}`);
+      console.debug(`无法为补全配置 .bashrc: ${error.message}`);
       return false;
     }
   }
@@ -199,7 +199,7 @@ export class BashInstaller {
       return true;
     } catch (error: any) {
       // Fail gracefully
-      console.debug(`Unable to remove .bashrc configuration: ${error.message}`);
+      console.debug(`无法移除 .bashrc 配置: ${error.message}`);
       return false;
     }
   }
@@ -237,7 +237,7 @@ export class BashInstaller {
         isUpdate = true;
       } catch (error: any) {
         // File doesn't exist or can't be read, proceed with installation
-        console.debug(`Unable to read existing completion file at ${targetPath}: ${error.message}`);
+        console.debug(`无法在 ${targetPath} 读取现有的补全文件: ${error.message}`);
       }
 
       // Ensure the directory exists
@@ -295,7 +295,7 @@ export class BashInstaller {
     } catch (error) {
       return {
         success: false,
-        message: `Failed to install completion script: ${error instanceof Error ? error.message : String(error)}`,
+        message: `安装补全脚本失败：${error instanceof Error ? error.message : String(error)}`,
       };
     }
   }
@@ -314,7 +314,7 @@ export class BashInstaller {
       '',
       '如需启用补全，请在您的 ~/.bashrc 文件中添加以下内容：',
       '',
-      `  # 加载 OpenSpec 补全`,
+      `  # 加载 OpenSpec-cn 补全`,
       `  if [ -d "${completionsDir}" ]; then`,
       `    for f in "${completionsDir}"/*; do`,
       '      [ -f "$f" ] && . "$f"',

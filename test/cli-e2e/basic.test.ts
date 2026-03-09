@@ -16,6 +16,21 @@ async function fileExists(filePath: string): Promise<boolean> {
 
 const tempRoots: string[] = [];
 
+async function createTempGlobalConfig(baseDir: string): Promise<{ XDG_CONFIG_HOME: string }> {
+  const configDir = path.join(baseDir, 'xdg-config');
+  const openspecDir = path.join(configDir, 'openspec');
+  await fs.mkdir(openspecDir, { recursive: true });
+  await fs.writeFile(
+    path.join(openspecDir, 'config.json'),
+    JSON.stringify({
+      profile: 'core',
+      delivery: 'both',
+      workflows: ['propose', 'explore', 'apply', 'archive'],
+    })
+  );
+  return { XDG_CONFIG_HOME: configDir };
+}
+
 async function prepareFixture(fixtureName: string): Promise<string> {
   const base = await fs.mkdtemp(path.join(tmpdir(), 'openspec-cn-cli-e2e-'));
   tempRoots.push(base);
@@ -87,7 +102,7 @@ describe('openspec CLI e2e basics', () => {
       const codexHome = path.join(emptyProjectDir, '.codex');
       const result = await runCLI(['init', '--tools', 'all'], {
         cwd: emptyProjectDir,
-        env: { CODEX_HOME: codexHome },
+        env: { CODEX_HOME: codexHome, ...(await createTempGlobalConfig(emptyProjectDir)) },
       });
       expect(result.exitCode).toBe(0);
       expect(result.stdout).toContain('OpenSpec 设置完成');
@@ -104,7 +119,10 @@ describe('openspec CLI e2e basics', () => {
       const emptyProjectDir = path.join(projectDir, '..', 'empty-project');
       await fs.mkdir(emptyProjectDir, { recursive: true });
 
-      const result = await runCLI(['init', '--tools', 'claude'], { cwd: emptyProjectDir });
+      const result = await runCLI(['init', '--tools', 'claude'], {
+        cwd: emptyProjectDir,
+        env: await createTempGlobalConfig(emptyProjectDir),
+      });
       expect(result.exitCode).toBe(0);
       expect(result.stdout).toContain('OpenSpec 设置完成');
       expect(result.stdout).toContain('Claude Code');
