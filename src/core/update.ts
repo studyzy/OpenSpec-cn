@@ -272,7 +272,7 @@ export class UpdateCommand {
       console.log('  /opsx:continue  创建下一个产出物');
       console.log('  /opsx:apply     实施任务');
       console.log();
-      console.log(`了解更多: ${chalk.cyan('https://github.com/Fission-AI/OpenSpec')}`);
+      console.log(`了解更多: ${chalk.cyan('https://github.com/studyzy/OpenSpec-cn')}`);
     }
 
     const configuredAndNewTools = [...new Set([...configuredTools, ...newlyConfiguredTools])];

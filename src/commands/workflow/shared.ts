@@ -121,7 +121,7 @@ export async function validateChangeExists(
   // Validate change name format to prevent path traversal
   const nameValidation = validateChangeName(changeName);
   if (!nameValidation.valid) {
-    throw new Error(`Invalid change name '${changeName}': ${nameValidation.error}`);
+    throw new Error(`\u53d8\u66f4\u540d\u79f0\u65e0\u6548 '${changeName}': ${nameValidation.error}`);
   }
 
   // Check directory existence directly
@@ -154,7 +154,7 @@ export function validateSchemaExists(schemaName: string, projectRoot?: string): 
   if (!schemaDir) {
     const availableSchemas = listSchemas(projectRoot);
     throw new Error(
-      `Schema '${schemaName}' not found. Available schemas:\n  ${availableSchemas.join('\n  ')}`
+      `未找到架构 '${schemaName}'。可用的架构:\n  ${availableSchemas.join('\n  ')}`
     );
   }
   return schemaName;
