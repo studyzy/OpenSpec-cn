@@ -39,8 +39,8 @@ export async function newChangeCommand(name: string | undefined, options: NewCha
     validateSchemaExists(options.schema, projectRoot);
   }
 
-  const schemaDisplay = options.schema ? ` with schema '${options.schema}'` : '';
-  const spinner = ora(`Creating change '${name}'${schemaDisplay}...`).start();
+  const schemaDisplay = options.schema ? `，使用架构 '${options.schema}'` : '';
+  const spinner = ora(`正在创建变更 '${name}'${schemaDisplay}...`).start();
 
   try {
     const result = await createChange(projectRoot, name, { schema: options.schema });

@@ -97,7 +97,7 @@ program
   .description('在您的项目中初始化OpenSpec')
   .option('--tools <tools>', toolsOptionDescription)
   .option('--force', '自动清理旧文件而不提示')
-  .option('--profile <profile>', 'Override global config profile (core or custom)')
+  .option('--profile <profile>', '覆盖全局配置档案（core 或 custom）')
   .action(async (targetPath = '.', options?: { tools?: string; force?: boolean; profile?: string }) => {
     try {
       // Validate that the path is a valid directory
@@ -137,8 +137,8 @@ program
 program
   .command('experimental', { hidden: true })
   .description('init 的别名（已弃用）')
-  .option('--tool <tool-id>', 'Target AI tool (maps to --tools)')
-  .option('--no-interactive', 'Disable interactive prompts')
+  .option('--tool <tool-id>', '目标 AI 工具（映射到 --tools）')
+  .option('--no-interactive', '禁用交互式提示')
   .action(async (options?: { tool?: string; noInteractive?: boolean }) => {
     try {
       console.log('注意："openspec-cn experimental" 已弃用。请使用 "openspec-cn init" 代替。');
@@ -150,7 +150,7 @@ program
       await initCommand.execute('.');
     } catch (error) {
       console.log();
-      ora().fail(`Error: ${(error as Error).message}`);
+      ora().fail(`错误：${(error as Error).message}`);
       process.exit(1);
     }
   });
@@ -433,7 +433,7 @@ program
       await statusCommand(options);
     } catch (error) {
       console.log();
-      ora().fail(`Error: ${(error as Error).message}`);
+      ora().fail(`错误：${(error as Error).message}`);
       process.exit(1);
     }
   });
@@ -455,7 +455,7 @@ program
       }
     } catch (error) {
       console.log();
-      ora().fail(`Error: ${(error as Error).message}`);
+      ora().fail(`错误：${(error as Error).message}`);
       process.exit(1);
     }
   });
@@ -464,14 +464,14 @@ program
 program
   .command('templates')
   .description('显示 Schema 中所有产出物的已解析模板路径')
-  .option('--schema <name>', `Schema to use (default: ${DEFAULT_SCHEMA})`)
+  .option('--schema <name>', `要使用的 Schema（默认：${DEFAULT_SCHEMA}）`)
   .option('--json', '以 JSON 格式输出产出物 ID 到模板路径的映射')
   .action(async (options: TemplatesOptions) => {
     try {
       await templatesCommand(options);
     } catch (error) {
       console.log();
-      ora().fail(`Error: ${(error as Error).message}`);
+      ora().fail(`错误：${(error as Error).message}`);
       process.exit(1);
     }
   });
@@ -486,7 +486,7 @@ program
       await schemasCommand(options);
     } catch (error) {
       console.log();
-      ora().fail(`Error: ${(error as Error).message}`);
+      ora().fail(`错误：${(error as Error).message}`);
       process.exit(1);
     }
   });
@@ -497,14 +497,14 @@ const newCmd = program.command('new').description('创建新项目');
 newCmd
   .command('change <name>')
   .description('创建一个新的变更目录')
-  .option('--description <text>', 'Description to add to README.md')
+  .option('--description <text>', '添加到 README.md 的描述')
   .option('--schema <name>', `要使用的工作流 Schema（默认：${DEFAULT_SCHEMA}）`)
   .action(async (name: string, options: NewChangeOptions) => {
     try {
       await newChangeCommand(name, options);
     } catch (error) {
       console.log();
-      ora().fail(`Error: ${(error as Error).message}`);
+      ora().fail(`错误：${(error as Error).message}`);
       process.exit(1);
     }
   });

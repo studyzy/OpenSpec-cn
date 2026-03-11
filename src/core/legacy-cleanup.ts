@@ -379,7 +379,7 @@ export async function cleanupLegacyArtifacts(
       await FileSystemUtils.writeFile(filePath, newContent);
       result.modifiedFiles.push(fileName);
     } catch (error: any) {
-      result.errors.push(`Failed to modify ${fileName}: ${error.message}`);
+      result.errors.push(`修改 ${fileName} 失败：${error.message}`);
     }
   }
 
@@ -390,7 +390,7 @@ export async function cleanupLegacyArtifacts(
       await fs.rm(fullPath, { recursive: true, force: true });
       result.deletedDirs.push(dirPath);
     } catch (error: any) {
-      result.errors.push(`Failed to delete directory ${dirPath}: ${error.message}`);
+      result.errors.push(`删除目录 ${dirPath} 失败：${error.message}`);
     }
   }
 
@@ -401,7 +401,7 @@ export async function cleanupLegacyArtifacts(
       await fs.unlink(fullPath);
       result.deletedFiles.push(filePath);
     } catch (error: any) {
-      result.errors.push(`Failed to delete ${filePath}: ${error.message}`);
+      result.errors.push(`删除 ${filePath} 失败：${error.message}`);
     }
   }
 
@@ -413,7 +413,7 @@ export async function cleanupLegacyArtifacts(
         await fs.unlink(agentsPath);
         result.deletedFiles.push('openspec/AGENTS.md');
       } catch (error: any) {
-        result.errors.push(`Failed to delete openspec/AGENTS.md: ${error.message}`);
+        result.errors.push(`删除 openspec/AGENTS.md 失败：${error.message}`);
       }
     }
   }
@@ -485,17 +485,17 @@ function buildRemovalsList(detection: LegacyDetectionResult): Array<{ path: stri
   for (const dir of detection.slashCommandDirs) {
     // Split on both forward and backward slashes for Windows compatibility
     const toolDir = dir.split(/[\/\\]/)[0];
-    removals.push({ path: dir + '/', explanation: `replaced by ${toolDir}/skills/` });
+    removals.push({ path: dir + '/', explanation: `已被 ${toolDir}/skills/ 替代` });
   }
 
   // Slash command files (these are 100% OpenSpec-managed)
   for (const file of detection.slashCommandFiles) {
-    removals.push({ path: file, explanation: 'replaced by skills/' });
+    removals.push({ path: file, explanation: '已被 skills/ 替代' });
   }
 
   // openspec/AGENTS.md (inside openspec/, it's OpenSpec-managed)
   if (detection.hasOpenspecAgents) {
-    removals.push({ path: 'openspec/AGENTS.md', explanation: 'obsolete workflow file' });
+    removals.push({ path: 'openspec/AGENTS.md', explanation: '已废弃的工作流文件' });
   }
 
   // Note: Config files (CLAUDE.md, AGENTS.md, etc.) are NEVER in the removals list

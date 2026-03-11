@@ -186,7 +186,7 @@ export class InitCommand {
       return this.profileOverride;
     }
 
-    throw new Error(`Invalid profile "${this.profileOverride}". Available profiles: core, custom`);
+    throw new Error(`无效的档案 "${this.profileOverride}"。可用档案： core、custom`);
   }
 
   // ═══════════════════════════════════════════════════════════
@@ -283,13 +283,13 @@ export class InitCommand {
         return [...detectedToolIds];
       }
       throw new Error(
-        `No tools detected and no --tools flag provided. Valid tools:\n  ${validTools.join('\n  ')}\n\nUse --tools all, --tools none, or --tools claude,cursor,...`
+        `未检测到工具且未提供 --tools 参数。有效工具：\n  ${validTools.join('\n  ')}\n\n请使用 --tools all、--tools none 或 --tools claude,cursor,...`
       );
     }
 
     if (validTools.length === 0) {
       throw new Error(
-        `No tools available for skill generation.`
+        `没有可用于技能生成的工具。`
       );
     }
 
@@ -428,14 +428,14 @@ export class InitCommand {
       if (!tool) {
         const validToolIds = getToolsWithSkillsDir();
         throw new Error(
-          `Unknown tool '${toolId}'. Valid tools:\n  ${validToolIds.join('\n  ')}`
+          `未知工具 '${toolId}'。有效工具：\n  ${validToolIds.join('\n  ')}`
         );
       }
 
       if (!tool.skillsDir) {
         const validToolsWithSkills = getToolsWithSkillsDir();
         throw new Error(
-          `Tool '${toolId}' does not support skill generation.\nTools with skill generation support:\n  ${validToolsWithSkills.join('\n  ')}`
+          `工具 '${toolId}' 不支持技能生成。支持技能生成的工具：\n  ${validToolsWithSkills.join('\n  ')}`
         );
       }
 
@@ -526,7 +526,7 @@ export class InitCommand {
 
     // Process each tool
     for (const tool of tools) {
-      const spinner = ora(`Setting up ${tool.name}...`).start();
+      const spinner = ora(`正在配置 ${tool.name}...`).start();
 
       try {
         // Generate skill files if delivery includes skills
@@ -571,7 +571,7 @@ export class InitCommand {
           removedCommandCount += await this.removeCommandFiles(projectPath, tool.value);
         }
 
-        spinner.succeed(`Setup complete for ${tool.name}`);
+        spinner.succeed(`${tool.name} 配置完成`);
 
         if (tool.wasConfigured) {
           refreshedTools.push(tool);
@@ -579,7 +579,7 @@ export class InitCommand {
           createdTools.push(tool);
         }
       } catch (error) {
-        spinner.fail(`Failed for ${tool.name}`);
+        spinner.fail(`${tool.name} 配置失败`);
         failedTools.push({ name: tool.name, error: error as Error });
       }
     }
@@ -680,10 +680,10 @@ export class InitCommand {
       console.log(chalk.dim(`已跳过命令：${results.commandsSkipped.join(', ')} (无适配器)`));
     }
     if (results.removedCommandCount > 0) {
-      console.log(chalk.dim(`Removed: ${results.removedCommandCount} command files (delivery: skills)`));
+      console.log(chalk.dim(`已删除：${results.removedCommandCount} 个命令文件（交付方式: skills）`));
     }
     if (results.removedSkillCount > 0) {
-      console.log(chalk.dim(`Removed: ${results.removedSkillCount} skill directories (delivery: commands)`));
+      console.log(chalk.dim(`已删除：${results.removedSkillCount} 个技能目录（交付方式: commands）`));
     }
 
     // Config status

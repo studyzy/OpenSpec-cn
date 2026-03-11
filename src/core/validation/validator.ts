@@ -38,7 +38,7 @@ export class Validator {
       issues.push(...this.applySpecRules(spec, content));
       
     } catch (error) {
-      const baseMessage = error instanceof Error ? error.message : 'Unknown error';
+      const baseMessage = error instanceof Error ? error.message : '未知错误';
       const enriched = this.enrichTopLevelError(specName, baseMessage);
       issues.push({
         level: 'ERROR',
@@ -64,7 +64,7 @@ export class Validator {
       }
       issues.push(...this.applySpecRules(spec, content));
     } catch (error) {
-      const baseMessage = error instanceof Error ? error.message : 'Unknown error';
+      const baseMessage = error instanceof Error ? error.message : '未知错误';
       const enriched = this.enrichTopLevelError(specName, baseMessage);
       issues.push({ level: 'ERROR', path: 'file', message: enriched });
     }
@@ -90,7 +90,7 @@ export class Validator {
       issues.push(...this.applyChangeRules(change, content));
       
     } catch (error) {
-      const baseMessage = error instanceof Error ? error.message : 'Unknown error';
+      const baseMessage = error instanceof Error ? error.message : '未知错误';
       const enriched = this.enrichTopLevelError(changeName, baseMessage);
       issues.push({
         level: 'ERROR',

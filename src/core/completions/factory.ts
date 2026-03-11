@@ -59,7 +59,7 @@ export class CompletionFactory {
       case 'powershell':
         return new PowerShellGenerator();
       default:
-        throw new Error(`Unsupported shell: ${shell}`);
+        throw new Error(`不支持的 Shell: ${shell}`);
     }
   }
 
@@ -81,7 +81,7 @@ export class CompletionFactory {
       case 'powershell':
         return new PowerShellInstaller();
       default:
-        throw new Error(`Unsupported shell: ${shell}`);
+        throw new Error(`不支持的 Shell: ${shell}`);
     }
   }
 

@@ -121,7 +121,7 @@ export function deriveProfileFromWorkflowSelection(selectedWorkflows: string[]):
  * Format a compact workflow summary for the profile header.
  */
 export function formatWorkflowSummary(workflows: readonly string[], profile: Profile): string {
-  return `${workflows.length} selected (${profile})`;
+  return `${workflows.length} 个已选择（${profile}）`;
 }
 
 function stableWorkflowOrder(workflows: readonly string[]): string[] {
@@ -154,11 +154,11 @@ export function diffProfileState(before: ProfileState, after: ProfileState): Pro
   const lines: string[] = [];
 
   if (before.delivery !== after.delivery) {
-    lines.push(`delivery: ${before.delivery} -> ${after.delivery}`);
+    lines.push(`交付方式：${before.delivery} -> ${after.delivery}`);
   }
 
   if (before.profile !== after.profile) {
-    lines.push(`profile: ${before.profile} -> ${after.profile}`);
+    lines.push(`档案：${before.profile} -> ${after.profile}`);
   }
 
   const beforeOrdered = stableWorkflowOrder(before.workflows);
@@ -172,12 +172,12 @@ export function diffProfileState(before: ProfileState, after: ProfileState): Pro
   if (added.length > 0 || removed.length > 0) {
     const tokens: string[] = [];
     if (added.length > 0) {
-      tokens.push(`added ${added.join(', ')}`);
+      tokens.push(`已添加 ${added.join(', ')}`);
     }
     if (removed.length > 0) {
-      tokens.push(`removed ${removed.join(', ')}`);
+      tokens.push(`已移除 ${removed.join(', ')}`);
     }
-    lines.push(`workflows: ${tokens.join('; ')}`);
+    lines.push(`工作流：${tokens.join('；')}`);
   }
 
   return {
@@ -252,17 +252,17 @@ export function registerConfigCommand(program: Command): void {
         console.log(formatValueYaml(config));
 
         // Annotate profile settings
-        const profileSource = rawConfig.profile !== undefined ? '(explicit)' : '(default)';
-        const deliverySource = rawConfig.delivery !== undefined ? '(explicit)' : '(default)';
-        console.log(`\nProfile settings:`);
+        const profileSource = rawConfig.profile !== undefined ? '(显式设置)' : '(默认倦)';
+        const deliverySource = rawConfig.delivery !== undefined ? '(显式设置)' : '(默认倦)';
+        console.log(`\n档案设置：`);
         console.log(`  profile: ${config.profile} ${profileSource}`);
         console.log(`  delivery: ${config.delivery} ${deliverySource}`);
         if (config.profile === 'core') {
-          console.log(`  workflows: ${CORE_WORKFLOWS.join(', ')} (from core profile)`);
+          console.log(`  workflows: ${CORE_WORKFLOWS.join(', ')} (来自 core 档案)`);
         } else if (config.workflows && config.workflows.length > 0) {
-          console.log(`  workflows: ${config.workflows.join(', ')} (explicit)`);
+          console.log(`  workflows: ${config.workflows.join(', ')} (显式设置)`);
         } else {
-          console.log(`  workflows: (none)`);
+          console.log(`  workflows: (无)`);
         }
       }
     });
@@ -566,7 +566,7 @@ export function registerConfigCommand(program: Command): void {
           const formatWorkflowChoice = (workflow: string) => {
             const metadata = WORKFLOW_PROMPT_META[workflow] ?? {
               name: workflow,
-              description: `Workflow: ${workflow}`,
+      description: `工作流: ${workflow}`,
             };
             return {
               value: workflow,

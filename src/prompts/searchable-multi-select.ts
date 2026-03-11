@@ -74,7 +74,7 @@ async function createSearchableMultiSelect(): Promise<
         if (validate) {
           const result = validate(selectedValues);
           if (result !== true) {
-            setError(typeof result === 'string' ? result : 'Invalid');
+            setError(typeof result === 'string' ? result : '无效');
             return;
           }
         }
@@ -129,7 +129,7 @@ async function createSearchableMultiSelect(): Promise<
       const names = selectedValues
         .map((v) => choiceMap.get(v)?.name ?? v)
         .join(', ');
-      return `${prefix} ${chalk.bold(message)} ${chalk.cyan(names || '(none)')}`;
+      return `${prefix} ${chalk.bold(message)} ${chalk.cyan(names || '(无)')}`;
     }
 
     // Render active state
@@ -178,13 +178,13 @@ async function createSearchableMultiSelect(): Promise<
         const isRefresh = selected && item.configured;
         const statusLabel = !selected
           ? item.configured
-            ? ' (configured)'
+            ? ' (已配置)'
             : item.detected
-              ? ' (detected)'
+              ? ' (已检测)'
               : ''
           : '';
         const suffix = selected
-          ? chalk.dim(isRefresh ? ' (refresh)' : ' (selected)')
+          ? chalk.dim(isRefresh ? ' (刷新)' : ' (已选择)')
           : chalk.dim(statusLabel);
         lines.push(`  ${arrow} ${icon} ${name}${suffix}`);
       }
