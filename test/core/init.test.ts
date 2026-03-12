@@ -408,7 +408,7 @@ describe('InitCommand', () => {
     it('should throw error in non-interactive mode without --tools flag and no detected tools', async () => {
       const initCommand = new InitCommand({ interactive: false });
 
-      await expect(initCommand.execute(testDir)).rejects.toThrow(/No tools detected and no --tools flag/);
+      await expect(initCommand.execute(testDir)).rejects.toThrow(/未检测到工具且未提供 --tools 参数/);
     });
   });
 
@@ -520,7 +520,7 @@ describe('InitCommand - profile and detection features', () => {
     });
 
     await expect(initCommand.execute(testDir)).rejects.toThrow(
-      /Invalid profile "invalid-profile"/
+      /无效的档案 "invalid-profile"/
     );
   });
 
