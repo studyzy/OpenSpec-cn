@@ -193,7 +193,7 @@ describe('instruction-loader', () => {
       const context = loadChangeContext(tempDir, 'my-change');
 
       expect(() => generateInstructions(context, 'nonexistent')).toThrow(
-        "Artifact 'nonexistent' not found"
+        "未找到产出物 'nonexistent'"
       );
     });
 

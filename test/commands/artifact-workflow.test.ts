@@ -184,28 +184,28 @@ describe('artifact-workflow CLI commands', () => {
       });
       expect(result.exitCode).toBe(1);
       const output = getOutput(result);
-      expect(output).toContain("Schema 'unknown' not found");
+      expect(output).toContain("未找到架构 'unknown'");
     });
 
     it('rejects path traversal in change name', async () => {
       const result = await runCLI(['status', '--change', '../foo'], { cwd: tempDir });
       expect(result.exitCode).toBe(1);
       const output = getOutput(result);
-      expect(output).toContain('Invalid change name');
+      expect(output).toContain('变更名称无效');
     });
 
     it('rejects absolute path in change name', async () => {
       const result = await runCLI(['status', '--change', '/etc/passwd'], { cwd: tempDir });
       expect(result.exitCode).toBe(1);
       const output = getOutput(result);
-      expect(output).toContain('Invalid change name');
+      expect(output).toContain('变更名称无效');
     });
 
     it('rejects slashes in change name', async () => {
       const result = await runCLI(['status', '--change', 'foo/bar'], { cwd: tempDir });
       expect(result.exitCode).toBe(1);
       const output = getOutput(result);
-      expect(output).toContain('Invalid change name');
+      expect(output).toContain('变更名称无效');
     });
   });
 
@@ -269,8 +269,8 @@ describe('artifact-workflow CLI commands', () => {
       const result = await runCLI(['instructions', '--change', 'test-change'], { cwd: tempDir });
       expect(result.exitCode).toBe(1);
       const output = getOutput(result);
-      expect(output).toContain('Missing required argument <artifact>');
-      expect(output).toContain('Valid artifacts:');
+      expect(output).toContain('缺少必需参数 <artifact>');
+      expect(output).toContain('有效的产出物:');
     });
 
     it('errors for unknown artifact', async () => {
@@ -319,7 +319,7 @@ describe('artifact-workflow CLI commands', () => {
       const result = await runCLI(['templates', '--schema', 'nonexistent'], { cwd: tempDir });
       expect(result.exitCode).toBe(1);
       const output = getOutput(result);
-      expect(output).toContain("Schema 'nonexistent' not found");
+      expect(output).toContain("未找到架构 'nonexistent'");
     });
   });
 
@@ -352,7 +352,7 @@ describe('artifact-workflow CLI commands', () => {
       const result = await runCLI(['new', 'change', 'invalid name'], { cwd: tempDir });
       expect(result.exitCode).toBe(1);
       const output = getOutput(result);
-      expect(output).toContain('Error');
+      expect(output).toContain('错误');
     });
 
     it('errors for duplicate change name', async () => {
@@ -378,10 +378,10 @@ describe('artifact-workflow CLI commands', () => {
         cwd: tempDir,
       });
       expect(result.exitCode).toBe(0);
-      expect(result.stdout).toContain('## Apply: apply-change');
-      expect(result.stdout).toContain('Schema: spec-driven');
-      expect(result.stdout).toContain('### Context Files');
-      expect(result.stdout).toContain('### Instruction');
+      expect(result.stdout).toContain('## 应用： apply-change');
+      expect(result.stdout).toContain('架构： spec-driven');
+      expect(result.stdout).toContain('上下文文件：');
+      expect(result.stdout).toContain('指令：');
     });
 
     it('shows blocked state when required artifacts are missing', async () => {
@@ -392,7 +392,7 @@ describe('artifact-workflow CLI commands', () => {
         cwd: tempDir,
       });
       expect(result.exitCode).toBe(0);
-      expect(result.stdout).toContain('Blocked');
+      expect(result.stdout).toContain('被阻塞');
       expect(result.stdout).toContain('缺失的产出物: tasks');
     });
 
@@ -454,7 +454,7 @@ describe('artifact-workflow CLI commands', () => {
         { cwd: tempDir }
       );
       expect(result.exitCode).toBe(0);
-      expect(result.stdout).toContain('Schema: spec-driven');
+      expect(result.stdout).toContain('架构： spec-driven');
     });
 
     it('spec-driven schema uses apply block configuration', async () => {
@@ -562,7 +562,7 @@ artifacts:
       // All artifacts exist, should be ready with default instruction
       expect(json.schemaName).toBe('no-apply-full');
       expect(json.state).toBe('ready');
-      expect(json.instruction).toContain('All required artifacts complete');
+      expect(json.instruction).toContain('所有必需的产出物已完成');
     });
   });
 
