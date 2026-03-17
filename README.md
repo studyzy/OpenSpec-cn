@@ -112,6 +112,11 @@ openspec-cn init
 
 现在告诉你的 AI：`/opsx:new <你想要实现的功能>`
 
+或使用 `/opsx:propose <你想要构建的功能>` 来创建提案
+
+> [!TIP]
+> 如果你想使用扩展工作流（/opsx:new、/opsx:continue、/opsx:ff、/opsx:verify、/opsx:sync、/opsx:bulk-archive、/opsx:onboard），请运行 `openspec config profile` 进行选择，然后使用 `openspec update` 应用配置。
+
 > [!NOTE]
 > 不确定你的工具是否受支持？[查看完整列表](docs/supported-tools.md) – 我们支持 20+ 工具，并仍在持续增长。
 >
