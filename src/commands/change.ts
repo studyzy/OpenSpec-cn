@@ -226,7 +226,7 @@ export class ChangeCommand {
       } else {
         console.error(`变更 "${changeName}" 存在问题`);
         report.issues.forEach(issue => {
-          const label = issue.level === 'ERROR' ? 'ERROR' : 'WARNING';
+          const label = issue.level === 'ERROR' ? '错误' : '警告';
           const prefix = issue.level === 'ERROR' ? '✗' : '⚠';
           console.error(`${prefix} [${label}] ${issue.path}: ${issue.message}`);
         });

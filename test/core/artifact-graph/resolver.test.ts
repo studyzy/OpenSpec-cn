@@ -227,7 +227,7 @@ version: [[[invalid yaml
       } catch (e) {
         expect(e).toBeInstanceOf(SchemaLoadError);
         const error = e as SchemaLoadError;
-        expect(error.message).toContain('Failed to parse');
+        expect(error.message).toContain('解析架构文件失败');
         expect(error.message).toContain(schemaPath);
       }
     });
@@ -243,7 +243,7 @@ version: [[[invalid yaml
     });
 
     it('should throw when schema not found', () => {
-      expect(() => resolveSchema('nonexistent-schema')).toThrow(/not found/);
+      expect(() => resolveSchema('nonexistent-schema')).toThrow(/未找到/);
     });
 
     it('should list available schemas in error message', () => {

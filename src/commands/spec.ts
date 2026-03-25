@@ -234,7 +234,7 @@ export function registerSpecCommand(rootProgram: typeof program) {
           } else {
             console.error(`规范 '${specId}' 存在问题`);
             report.issues.forEach(issue => {
-              const label = issue.level === 'ERROR' ? 'ERROR' : issue.level;
+              const label = issue.level === 'ERROR' ? '错误' : issue.level === 'WARNING' ? '警告' : '信息';
               const prefix = issue.level === 'ERROR' ? '✗' : issue.level === 'WARNING' ? '⚠' : 'ℹ';
               console.error(`${prefix} [${label}] ${issue.path}: ${issue.message}`);
             });

@@ -83,7 +83,7 @@ export async function templatesCommand(options: TemplatesOptions): Promise<void>
       return;
     }
 
-    console.log(`Schema: ${schemaName}`);
+    console.log(`架构: ${schemaName}`);
     console.log(`来源：${source}`);
     console.log();
 

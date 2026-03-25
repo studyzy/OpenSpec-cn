@@ -90,7 +90,7 @@ rules:
           },
         });
         expect(consoleWarnSpy).toHaveBeenCalledWith(
-          expect.stringContaining("Invalid 'schema' field")
+          expect.stringContaining("配置中的 'schema' 字段无效")
         );
       });
 
@@ -116,7 +116,7 @@ rules:
           },
         });
         expect(consoleWarnSpy).toHaveBeenCalledWith(
-          expect.stringContaining("Invalid 'context' field")
+          expect.stringContaining("配置中的 'context' 字段无效")
         );
       });
 
@@ -138,7 +138,7 @@ rules: ["not", "an", "object"]
           context: 'Valid context',
         });
         expect(consoleWarnSpy).toHaveBeenCalledWith(
-          expect.stringContaining("Invalid 'rules' field")
+          expect.stringContaining("配置中的 'rules' 字段无效")
         );
       });
 
@@ -162,7 +162,7 @@ rules:
           context: 'Valid context',
         });
         expect(consoleWarnSpy).toHaveBeenCalledWith(
-          expect.stringContaining("Invalid 'rules' field")
+          expect.stringContaining("配置中的 'rules' 字段无效")
         );
       });
 
@@ -191,7 +191,7 @@ rules:
           },
         });
         expect(consoleWarnSpy).toHaveBeenCalledWith(
-          expect.stringContaining("Rules for 'specs' must be an array of strings")
+          expect.stringContaining("'specs' 的规则必须是字符串数组")
         );
       });
 
@@ -219,7 +219,7 @@ rules:
           },
         });
         expect(consoleWarnSpy).toHaveBeenCalledWith(
-          expect.stringContaining("Some rules for 'proposal' are empty strings")
+          expect.stringContaining("'proposal' 的某些规则是空字符串")
         );
       });
 
@@ -257,7 +257,7 @@ rules:
 
         expect(config).toBeNull();
         expect(consoleWarnSpy).toHaveBeenCalledWith(
-          expect.stringContaining('Failed to parse openspec/config.yaml'),
+          expect.stringContaining('解析 openspec/config.yaml 失败'),
           expect.anything()
         );
       });
@@ -271,7 +271,7 @@ rules:
 
         expect(config).toBeNull();
         expect(consoleWarnSpy).toHaveBeenCalledWith(
-          expect.stringContaining('not a valid YAML object')
+          expect.stringContaining('不是有效的 YAML 对象')
         );
       });
 
@@ -300,7 +300,7 @@ rules:
 
         expect(config?.context).toBe(smallContext);
         expect(consoleWarnSpy).not.toHaveBeenCalledWith(
-          expect.stringContaining('Context too large')
+          expect.stringContaining('上下文过大')
         );
       });
 
@@ -318,10 +318,10 @@ rules:
         expect(config).toEqual({ schema: 'spec-driven' });
         expect(config?.context).toBeUndefined();
         expect(consoleWarnSpy).toHaveBeenCalledWith(
-          expect.stringContaining('Context too large (51.0KB, limit: 50KB)')
+          expect.stringContaining('上下文过大（51.0KB，限制：50KB）')
         );
         expect(consoleWarnSpy).toHaveBeenCalledWith(
-          expect.stringContaining('Ignoring context field')
+          expect.stringContaining('忽略 context 字段')
         );
       });
 
@@ -338,7 +338,7 @@ rules:
 
         expect(config?.context).toBe(exactContext);
         expect(consoleWarnSpy).not.toHaveBeenCalledWith(
-          expect.stringContaining('Context too large')
+          expect.stringContaining('上下文过大')
         );
       });
 
@@ -359,7 +359,7 @@ context: |
 
         expect(config?.context).toBeUndefined();
         expect(consoleWarnSpy).toHaveBeenCalledWith(
-          expect.stringContaining('Context too large')
+          expect.stringContaining('上下文过大')
         );
       });
     });
@@ -507,9 +507,9 @@ rules:
       const warnings = validateConfigRules(rules, validIds, 'spec-driven');
 
       expect(warnings).toHaveLength(2);
-      expect(warnings[0]).toContain('Unknown artifact ID in rules: "testplan"');
-      expect(warnings[0]).toContain('Valid IDs for schema "spec-driven": design, proposal, specs, tasks');
-      expect(warnings[1]).toContain('Unknown artifact ID in rules: "documentation"');
+      expect(warnings[0]).toContain('规则中存在未知的产出物 ID："testplan"');
+      expect(warnings[0]).toContain('架构 "spec-driven" 的有效 ID：design, proposal, specs, tasks');
+      expect(warnings[1]).toContain('规则中存在未知的产出物 ID："documentation"');
     });
 
     it('should return warnings for all unknown artifact IDs', () => {
@@ -545,24 +545,24 @@ rules:
     it('should suggest close matches using fuzzy matching', () => {
       const message = suggestSchemas('spec-drven', availableSchemas); // Missing 'i'
 
-      expect(message).toContain("Schema 'spec-drven' not found");
-      expect(message).toContain('Did you mean one of these?');
-      expect(message).toContain('spec-driven (built-in)');
+      expect(message).toContain("架构 'spec-drven' 在 openspec/config.yaml 中未找到");
+      expect(message).toContain('您是否想要其中之一？');
+      expect(message).toContain('spec-driven (内置)');
     });
 
     it('should suggest custom-workflow for workflow typo', () => {
       const message = suggestSchemas('custom-workflo', availableSchemas);
 
-      expect(message).toContain('Did you mean one of these?');
+      expect(message).toContain('您是否想要其中之一？');
       expect(message).toContain('custom-workflow');
     });
 
     it('should list all available schemas', () => {
       const message = suggestSchemas('nonexistent', availableSchemas);
 
-      expect(message).toContain('Available schemas:');
-      expect(message).toContain('Built-in: spec-driven');
-      expect(message).toContain('Project-local: custom-workflow, team-process');
+      expect(message).toContain('可用架构：');
+      expect(message).toContain('内置：spec-driven');
+      expect(message).toContain('项目本地：custom-workflow, team-process');
     });
 
     it('should handle case when no project-local schemas exist', () => {
@@ -571,15 +571,15 @@ rules:
       ];
       const message = suggestSchemas('invalid', builtInOnly);
 
-      expect(message).toContain('Built-in: spec-driven');
-      expect(message).toContain('Project-local: (none found)');
+      expect(message).toContain('内置：spec-driven');
+      expect(message).toContain('项目本地：（未找到）');
     });
 
     it('should include fix instruction', () => {
       const message = suggestSchemas('wrong-schema', availableSchemas);
 
       expect(message).toContain(
-        "Fix: Edit openspec/config.yaml and change 'schema: wrong-schema' to a valid schema name"
+        "修复方法：编辑 openspec/config.yaml，将 'schema: wrong-schema' 改为有效的架构名称"
       );
     });
 
@@ -603,8 +603,8 @@ rules:
       const message = suggestSchemas('abcdefghijk', availableSchemas);
 
       // 'abcdefghijk' has large Levenshtein distance from all schemas
-      expect(message).not.toContain('Did you mean');
-      expect(message).toContain('Available schemas:');
+      expect(message).not.toContain('您是否想要');
+      expect(message).toContain('可用架构：');
     });
   });
 });

@@ -114,7 +114,7 @@ export function resolveSchema(name: string, projectRoot?: string): SchemaYaml {
   if (!schemaDir) {
     const availableSchemas = listSchemas(projectRoot);
     throw new Error(
-      `Schema '${normalizedName}' not found. Available schemas: ${availableSchemas.join(', ')}`
+      `架构 '${normalizedName}' 未找到。可用架构：${availableSchemas.join(', ')}`
     );
   }
 
@@ -127,7 +127,7 @@ export function resolveSchema(name: string, projectRoot?: string): SchemaYaml {
   } catch (err) {
     const ioError = err instanceof Error ? err : new Error(String(err));
     throw new SchemaLoadError(
-      `Failed to read schema at '${schemaPath}': ${ioError.message}`,
+      `读取架构文件失败 '${schemaPath}'：${ioError.message}`,
       schemaPath,
       ioError
     );
@@ -138,14 +138,14 @@ export function resolveSchema(name: string, projectRoot?: string): SchemaYaml {
   } catch (err) {
     if (err instanceof SchemaValidationError) {
       throw new SchemaLoadError(
-        `Invalid schema at '${schemaPath}': ${err.message}`,
+        `架构文件无效 '${schemaPath}'：${err.message}`,
         schemaPath,
         err
       );
     }
     const parseError = err instanceof Error ? err : new Error(String(err));
     throw new SchemaLoadError(
-      `Failed to parse schema at '${schemaPath}': ${parseError.message}`,
+      `解析架构文件失败 '${schemaPath}'：${parseError.message}`,
       schemaPath,
       parseError
     );
