@@ -6,22 +6,69 @@
 
 ## 快速参考
 
+### 默认快速路径（`core` 配置文件）
+
 | 命令 | 用途 |
 |---------|---------|
+| `/opsx:propose` | 一步创建变更并生成规划制品 |
 | `/opsx:explore` | 在提交变更前进行思路探索 |
-| `/opsx:new` | 开始一个新变更 |
-| `/opsx:continue` | 基于依赖关系创建下一个制品 |
-| `/opsx:ff` | 快速前进：一次性创建所有规划制品 |
 | `/opsx:apply` | 实施变更中的任务 |
-| `/opsx:verify` | 校验实现是否与制品匹配 |
-| `/opsx:sync` | 将增量规范合并到主规范中 |
 | `/opsx:archive` | 归档已完成的变更 |
+
+### 扩展工作流命令（自定义工作流选择）
+
+| 命令 | 用途 |
+|---------|---------|
+| `/opsx:new` | 创建新的变更骨架 |
+| `/opsx:continue` | 根据依赖关系创建下一个制品 |
+| `/opsx:ff` | 快速前进：一次性创建所有规划制品 |
+| `/opsx:verify` | 验证实现是否与制品匹配 |
+| `/opsx:sync` | 将增量规范合并到主规范中 |
 | `/opsx:bulk-archive` | 批量归档多个变更 |
-| `/opsx:onboard` | 完整的 OpenSpec 工作流引导教程 |
+| `/opsx:onboard` | 通过完整工作流的引导式教程 |
+
+默认全局配置文件为 `core`。要启用扩展工作流命令，运行 `openspec-cn config profile` 选择工作流，然后在项目中运行 `openspec-cn update`。
 
 ---
 
 ## 命令参考
+
+### `/opsx:propose`
+
+一步创建新变更并生成规划制品。这是 `core` 配置文件中的默认起始命令。
+
+**语法：**
+```text
+/opsx:propose [change-name-or-description]
+```
+
+**参数：**
+| 参数 | 必填 | 说明 |
+|----------|----------|-------------|
+| `change-name-or-description` | 否 | Kebab-case 名称或自然语言变更描述 |
+
+**功能：**
+- 创建 `openspec/changes/<change-name>/`
+- 生成实施前所需的制品（对于 `spec-driven`：提案、规范、设计、任务）
+- 当变更准备好执行 `/opsx:apply` 时停止
+
+**示例：**
+```text
+你：/opsx:propose add-dark-mode
+
+AI：已创建 openspec/changes/add-dark-mode/
+     ✓ proposal.md
+     ✓ specs/ui/spec.md
+     ✓ design.md
+     ✓ tasks.md
+     准备实施。运行 /opsx:apply。
+```
+
+**提示：**
+- 用于最快的端到端路径
+- 如果想逐步控制制品，启用扩展工作流并使用 `/opsx:new` + `/opsx:continue`
+
+---
 
 ### `/opsx:explore`
 
@@ -39,11 +86,11 @@
 | `topic` | 否 | 你想要探索或调查的主题 |
 
 **功能：**
-- 开启无需结构化的探索性对话
+- 开启一个无需固定结构的探索性对话
 - 调查代码库以回答问题
-- 比较不同选项和方案
-- 创建可视化图表来澄清思路
-- 当思路明确时可转为 `/opsx:new`
+- 比较各种选项和方案
+- 创建可视化图表以澄清思路
+- 当见解清晰时可过渡到 `/opsx:propose`（默认）或 `/opsx:new`（扩展工作流）
 
 **示例：**
 ```text
@@ -67,7 +114,7 @@ AI：让我调查你当前的认证设置...
 
 你：我们选择 JWT。可以开始一个变更吗？
 
-AI：随时可以开始。运行 /opsx:new add-jwt-auth 来开始。
+AI：随时可以开始。运行 /opsx:propose add-jwt-auth 来开始。
 ```
 
 **提示：**
@@ -80,7 +127,9 @@ AI：随时可以开始。运行 /opsx:new add-jwt-auth 来开始。
 
 ### `/opsx:new`
 
-开始一个新变更。创建变更文件夹结构并使用选定的 schema 进行脚手架搭建。
+创建新的变更骨架。创建变更文件夹并等待你使用 `/opsx:continue` 或 `/opsx:ff` 生成制品。
+
+此命令属于扩展工作流集（不包含在默认的 `core` 配置文件中）。
 
 **语法：**
 ```
@@ -574,15 +623,15 @@ AI：欢迎使用 OpenSpec！
 
 | 工具 | 语法示例 |
 |------|----------------|
-| Claude Code | `/opsx:new`, `/opsx:apply` |
-| Cursor | `/opsx-new`, `/opsx-apply` |
-| Windsurf | `/opsx-new`, `/opsx-apply` |
-| Copilot (IDE) | `/opsx-new`, `/opsx-apply` |
-| Trae | `/openspec-new-change`, `/openspec-apply-change` |
+| Claude Code | `/opsx:propose`, `/opsx:apply` |
+| Cursor | `/opsx-propose`, `/opsx-apply` |
+| Windsurf | `/opsx-propose`, `/opsx-apply` |
+| Copilot (IDE) | `/opsx-propose`, `/opsx-apply` |
+| Trae | 基于技能的调用，如 `/openspec-propose`、`/openspec-apply-change`（不生成 `opsx-*` 命令文件） |
 
-无论语法如何，功能都是相同的。
+各工具的意图相同，但命令的呈现方式可能因集成方式而异。
 
-> **Note:** GitHub Copilot commands (`.github/prompts/*.prompt.md`) are only available in IDE extensions (VS Code, JetBrains, Visual Studio). GitHub Copilot CLI does not currently support custom prompt files — see [Supported Tools](supported-tools.md) for details and workarounds.
+> **注意：** GitHub Copilot 命令（`.github/prompts/*.prompt.md`）仅在 IDE 扩展（VS Code、JetBrains、Visual Studio）中可用。GitHub Copilot CLI 目前不支持自定义提示文件——详见[支持的工具](supported-tools.md)。
 
 ---
 

@@ -14,6 +14,7 @@ import {
 import {
   validateChangeExists,
   validateSchemaExists,
+  getAvailableChanges,
   getStatusIndicator,
   getStatusColor,
 } from './shared.js';
@@ -37,6 +38,27 @@ export async function statusCommand(options: StatusOptions): Promise<void> {
 
   try {
     const projectRoot = process.cwd();
+
+    // Handle no-changes case gracefully — status is informational,
+    // so "no changes" is a valid state, not an error.
+    if (!options.change) {
+      const available = await getAvailableChanges(projectRoot);
+      if (available.length === 0) {
+        spinner.stop();
+        if (options.json) {
+          console.log(JSON.stringify({ changes: [], message: '没有活跃的变更。' }, null, 2));
+          return;
+        }
+        console.log('没有活跃的变更。使用以下命令创建: openspec-cn new change <name>');
+        return;
+      }
+      // Changes exist but --change not provided
+      spinner.stop();
+      throw new Error(
+        `缺少必需选项 --change。可用的变更:\n  ${available.join('\n  ')}`
+      );
+    }
+
     const changeName = await validateChangeExists(options.change, projectRoot);
 
     // Validate schema if explicitly provided

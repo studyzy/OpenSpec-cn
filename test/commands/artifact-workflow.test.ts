@@ -146,6 +146,22 @@ describe('artifact-workflow CLI commands', () => {
       expect(result.stdout).toContain('所有产出物已完成!');
     });
 
+    it('exits gracefully when no changes exist', async () => {
+      const result = await runCLI(['status'], { cwd: tempDir });
+      expect(result.exitCode).toBe(0);
+      expect(result.stdout).toContain('没有活跃的变更');
+      expect(result.stdout).toContain('openspec-cn new change');
+    });
+
+    it('exits gracefully with JSON when no changes exist', async () => {
+      const result = await runCLI(['status', '--json'], { cwd: tempDir });
+      expect(result.exitCode).toBe(0);
+
+      const json = JSON.parse(result.stdout);
+      expect(json.changes).toEqual([]);
+      expect(json.message).toBe('没有活跃的变更。');
+    });
+
     it('errors when --change is missing and lists available changes', async () => {
       await createTestChange('some-change');
 

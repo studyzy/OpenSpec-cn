@@ -44,7 +44,7 @@
 > [!TIP]
 > **全新工作流现已上线！** 我们用一种全新的“以制品（artifact）为导向”的工作流重构了 OpenSpec。
 >
-> 运行 `/opsx:onboard` 开始使用。→ [在此了解更多](docs/opsx.md)
+> 运行 `/opsx:propose "your idea"` 开始使用。→ [在此了解更多](docs/opsx.md)
 
 <p align="center">
   关注 <a href="https://x.com/0xTab">X 上的 @0xTab</a> 获取更新 · 加入 <a href="https://discord.gg/YctCnvvshC">OpenSpec Discord</a> 获取帮助与答疑。
@@ -54,21 +54,18 @@
 
 团队正在使用 OpenSpec？可 [发送邮件](mailto:teams@openspec.dev) 获取我们 Slack 频道的访问权限。
 
-<!-- TODO: 添加 /opsx:new → /opsx:archive 工作流的 GIF 演示 -->
+<!-- TODO: 添加 /opsx:propose → /opsx:archive 工作流的 GIF 演示 -->
 
 ## 看看效果
 
 ```text
-你：/opsx:new add-dark-mode
-AI：创建 openspec/changes/add-dark-mode/
-    准备创建：proposal
-
-你：/opsx:ff   # "fast-forward" - 生成全部规划文档
-AI：✓ proposal.md — 为什么要做、会改什么
-    ✓ specs/       — 需求与场景
-    ✓ design.md    — 技术方案
-    ✓ tasks.md     — 实现清单
-    准备进入实现！
+你：/opsx:propose add-dark-mode
+AI：已创建 openspec/changes/add-dark-mode/
+     ✓ proposal.md — 为什么要做这个，什么在变
+     ✓ specs/       — 需求和场景
+     ✓ design.md    — 技术方案
+     ✓ tasks.md     — 实现清单
+     准备好开始实现了！
 
 你：/opsx:apply
 AI：开始实现任务...
@@ -110,13 +107,12 @@ openspec-cn init
 
 ```
 
-现在告诉你的 AI：`/opsx:propose <你想要构建的功能>` 
+现在告诉你的 AI：`/opsx:propose <你想要构建的内容>`
 
-> [!TIP]
-> 如果你想使用扩展工作流（/opsx:new、/opsx:continue、/opsx:ff、/opsx:verify、/opsx:sync、/opsx:bulk-archive、/opsx:onboard），请运行 `openspec config profile` 进行选择，然后使用 `openspec update` 应用配置。
+如果你想要扩展工作流（`/opsx:new`、`/opsx:continue`、`/opsx:ff`、`/opsx:verify`、`/opsx:sync`、`/opsx:bulk-archive`、`/opsx:onboard`），请通过 `openspec-cn config profile` 选择，然后运行 `openspec-cn update` 应用。
 
 > [!NOTE]
-> 不确定你的工具是否受支持？[查看完整列表](docs/supported-tools.md) – 我们支持 20+ 工具，并仍在持续增长。
+> 不确定你的工具是否支持？[查看完整列表](docs/supported-tools.md) – 我们支持 25+ 种工具且持续增加。
 >
 > 同样支持 pnpm、yarn、bun 和 nix。可查看 [安装选项](docs/installation.md)。
 

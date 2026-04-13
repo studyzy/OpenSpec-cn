@@ -1,50 +1,62 @@
 # 支持的工具
 
-OpenSpec 支持 20 多种 AI 编码助手。当您运行 `openspec-cn init` 时，系统会提示您选择使用的工具，OpenSpec 将配置相应的集成。
+OpenSpec 兼容多种 AI 编程助手。运行 `openspec-cn init` 时，OpenSpec 会根据你当前的配置文件/工作流选择和交付方式来配置所选工具。
 
 ## 工作原理
 
-对于您选择的每个工具，OpenSpec 会安装：
+对于每个选定的工具，OpenSpec 可以安装：
 
-1. **技能** — 可重用的指令文件，用于驱动 `/opsx:*` 工作流命令
-2. **命令** — 特定于工具的斜杠命令绑定
+1. **技能**（如果交付方式包含技能）：`.../skills/openspec-*/SKILL.md`
+2. **命令**（如果交付方式包含命令）：工具特定的 `opsx-*` 命令文件
+
+默认情况下，OpenSpec 使用 `core` 配置文件，包含以下工作流：
+- `propose`
+- `explore`
+- `apply`
+- `archive`
+
+你可以通过 `openspec-cn config profile` 启用扩展工作流（`new`、`continue`、`ff`、`verify`、`sync`、`bulk-archive`、`onboard`），然后运行 `openspec-cn update`。
 
 ## 工具目录参考
 
-| 工具 | 技能位置 | 命令位置 |
-|------|-----------------|-------------------|
-| Amazon Q Developer | `.amazonq/skills/` | `.amazonq/prompts/` |
-| Antigravity | `.agent/skills/` | `.agent/workflows/` |
-| Auggie (Augment CLI) | `.augment/skills/` | `.augment/commands/` |
-| Claude Code | `.claude/skills/` | `.claude/commands/opsx/` |
-| Cline | `.cline/skills/` | `.clinerules/workflows/` |
-| CodeBuddy | `.codebuddy/skills/` | `.codebuddy/commands/opsx/` |
-| Codex | `.codex/skills/` | `~/.codex/prompts/`\* |
-| Continue | `.continue/skills/` | `.continue/prompts/` |
-| CoStrict | `.cospec/skills/` | `.cospec/openspec/commands/` |
-| Crush | `.crush/skills/` | `.crush/commands/opsx/` |
-| Cursor | `.cursor/skills/` | `.cursor/commands/` |
-| Factory Droid | `.factory/skills/` | `.factory/commands/` |
-| Gemini CLI | `.gemini/skills/` | `.gemini/commands/opsx/` |
-| GitHub Copilot | `.github/skills/` | `.github/prompts/`\*\* |
-| iFlow | `.iflow/skills/` | `.iflow/commands/` |
-| Kilo Code | `.kilocode/skills/` | `.kilocode/workflows/` |
-| Kiro | `.kiro/skills/` | `.kiro/prompts/` |
-| OpenCode | `.opencode/skills/` | `.opencode/command/` |
-| Pi | `.pi/skills/` | `.pi/prompts/` |
-| Qoder | `.qoder/skills/` | `.qoder/commands/opsx/` |
-| Qwen Code | `.qwen/skills/` | `.qwen/commands/` |
-| RooCode | `.roo/skills/` | `.roo/commands/` |
-| Trae | `.trae/skills/` | `.trae/skills/` (via `/openspec-*`) |
-| Windsurf | `.windsurf/skills/` | `.windsurf/workflows/` |
+| 工具 (ID) | 技能路径模式 | 命令路径模式 |
+|-----------|---------------------|----------------------|
+| Amazon Q Developer (`amazon-q`) | `.amazonq/skills/openspec-*/SKILL.md` | `.amazonq/prompts/opsx-<id>.md` |
+| Antigravity (`antigravity`) | `.agent/skills/openspec-*/SKILL.md` | `.agent/workflows/opsx-<id>.md` |
+| Auggie (`auggie`) | `.augment/skills/openspec-*/SKILL.md` | `.augment/commands/opsx-<id>.md` |
+| IBM Bob Shell (`bob`) | `.bob/skills/openspec-*/SKILL.md` | `.bob/commands/opsx-<id>.md` |
+| Claude Code (`claude`) | `.claude/skills/openspec-*/SKILL.md` | `.claude/commands/opsx/<id>.md` |
+| Cline (`cline`) | `.cline/skills/openspec-*/SKILL.md` | `.clinerules/workflows/opsx-<id>.md` |
+| CodeBuddy (`codebuddy`) | `.codebuddy/skills/openspec-*/SKILL.md` | `.codebuddy/commands/opsx/<id>.md` |
+| Codex (`codex`) | `.codex/skills/openspec-*/SKILL.md` | `$CODEX_HOME/prompts/opsx-<id>.md`\* |
+| ForgeCode (`forgecode`) | `.forge/skills/openspec-*/SKILL.md` | 不生成（无命令适配器；使用基于技能的 `/openspec-*` 调用） |
+| Continue (`continue`) | `.continue/skills/openspec-*/SKILL.md` | `.continue/prompts/opsx-<id>.prompt` |
+| CoStrict (`costrict`) | `.cospec/skills/openspec-*/SKILL.md` | `.cospec/openspec/commands/opsx-<id>.md` |
+| Crush (`crush`) | `.crush/skills/openspec-*/SKILL.md` | `.crush/commands/opsx/<id>.md` |
+| Cursor (`cursor`) | `.cursor/skills/openspec-*/SKILL.md` | `.cursor/commands/opsx-<id>.md` |
+| Factory Droid (`factory`) | `.factory/skills/openspec-*/SKILL.md` | `.factory/commands/opsx-<id>.md` |
+| Gemini CLI (`gemini`) | `.gemini/skills/openspec-*/SKILL.md` | `.gemini/commands/opsx/<id>.toml` |
+| GitHub Copilot (`github-copilot`) | `.github/skills/openspec-*/SKILL.md` | `.github/prompts/opsx-<id>.prompt.md`\*\* |
+| iFlow (`iflow`) | `.iflow/skills/openspec-*/SKILL.md` | `.iflow/commands/opsx-<id>.md` |
+| Junie (`junie`) | `.junie/skills/openspec-*/SKILL.md` | `.junie/commands/opsx-<id>.md` |
+| Kilo Code (`kilocode`) | `.kilocode/skills/openspec-*/SKILL.md` | `.kilocode/workflows/opsx-<id>.md` |
+| Kiro (`kiro`) | `.kiro/skills/openspec-*/SKILL.md` | `.kiro/prompts/opsx-<id>.prompt.md` |
+| Lingma (`lingma`) | `.lingma/skills/openspec-*/SKILL.md` | `.lingma/commands/opsx/<id>.md` |
+| OpenCode (`opencode`) | `.opencode/skills/openspec-*/SKILL.md` | `.opencode/commands/opsx-<id>.md` |
+| Pi (`pi`) | `.pi/skills/openspec-*/SKILL.md` | `.pi/prompts/opsx-<id>.md` |
+| Qoder (`qoder`) | `.qoder/skills/openspec-*/SKILL.md` | `.qoder/commands/opsx/<id>.md` |
+| Qwen Code (`qwen`) | `.qwen/skills/openspec-*/SKILL.md` | `.qwen/commands/opsx-<id>.toml` |
+| RooCode (`roocode`) | `.roo/skills/openspec-*/SKILL.md` | `.roo/commands/opsx-<id>.md` |
+| Trae (`trae`) | `.trae/skills/openspec-*/SKILL.md` | 不生成（无命令适配器；使用基于技能的 `/openspec-*` 调用） |
+| Windsurf (`windsurf`) | `.windsurf/skills/openspec-*/SKILL.md` | `.windsurf/workflows/opsx-<id>.md` |
 
-\* Codex 命令安装到全局主目录（`~/.codex/prompts/` 或 `$CODEX_HOME/prompts/`），而不是项目目录。
+\* Codex 命令安装在全局 Codex 主目录（如设置了 `$CODEX_HOME/prompts/`，否则为 `~/.codex/prompts/`），而非项目目录中。
 
-\*\* GitHub Copilot's `.github/prompts/*.prompt.md` files are recognized as custom slash commands in **IDE extensions only** (VS Code, JetBrains, Visual Studio). GitHub Copilot CLI does not currently support custom prompts from this directory — see [github/copilot-cli#618](https://github.com/github/copilot-cli/issues/618). If you use Copilot CLI, you may need to manually set up [custom agents](https://docs.github.com/en/copilot/how-tos/use-copilot-agents/coding-agent/create-custom-agents) in `.github/agents/` as a workaround.
+\*\* GitHub Copilot 的提示文件在 IDE 扩展（VS Code、JetBrains、Visual Studio）中被识别为自定义斜杠命令。Copilot CLI 目前不直接使用 `.github/prompts/*.prompt.md` 文件。
 
 ## 非交互式设置
 
-对于 CI/CD 或脚本化设置，使用 `--tools` 标志：
+用于 CI/CD 或脚本化设置，使用 `--tools`（可选 `--profile`）：
 
 ```bash
 # 配置特定工具
@@ -55,37 +67,43 @@ openspec-cn init --tools all
 
 # 跳过工具配置
 openspec-cn init --tools none
+
+# 覆盖此次运行的配置文件
+openspec-cn init --profile core
 ```
 
-**可用的工具 ID：** `amazon-q`, `antigravity`, `auggie`, `claude`, `cline`, `codebuddy`, `codex`, `continue`, `costrict`, `crush`, `cursor`, `factory`, `gemini`, `github-copilot`, `iflow`, `kilocode`, `kiro`, `opencode`, `pi`, `qoder`, `qwen`, `roocode`, `trae`, `windsurf`
+**可用工具 ID（`--tools`）：** `amazon-q`, `antigravity`, `auggie`, `bob`, `claude`, `cline`, `codex`, `codebuddy`, `continue`, `costrict`, `crush`, `cursor`, `factory`, `forgecode`, `gemini`, `github-copilot`, `iflow`, `junie`, `kilocode`, `kiro`, `lingma`, `opencode`, `pi`, `qoder`, `qwen`, `roocode`, `trae`, `windsurf`
 
-## 安装内容
+## 依赖工作流的安装
 
-对于每个工具，OpenSpec 会生成 10 个驱动 OPSX 工作流的技能文件：
+OpenSpec 根据选定的工作流安装工作流产出物：
 
-| 技能 | 用途 |
-|-------|---------|
-| `openspec-explore` | 探索思路的思考伙伴 |
-| `openspec-new-change` | 开始新的变更 |
-| `openspec-continue-change` | 创建下一个制品 |
-| `openspec-ff-change` | 快速跳过所有规划制品 |
-| `openspec-apply-change` | 实施任务 |
-| `openspec-verify-change` | 验证实施完整性 |
-| `openspec-sync-specs` | 将增量规范同步到主线（可选—如需要可归档提示词） |
-| `openspec-archive-change` | 归档已完成的变更 |
-| `openspec-bulk-archive-change` | 一次归档多个变更 |
-| `openspec-onboard` | 通过完整工作流周期的引导式入职 |
+- **Core 配置文件（默认）：** `propose`、`explore`、`apply`、`archive`
+- **自定义选择：** 所有工作流 ID 的任意子集：
+  `propose`、`explore`、`new`、`continue`、`apply`、`ff`、`sync`、`archive`、`bulk-archive`、`verify`、`onboard`
 
-这些技能通过斜杠命令调用，如 `/opsx:new`、`/opsx:apply` 等。完整列表请参阅[命令](commands.md)。
+换句话说，技能/命令的数量取决于配置文件和交付方式，不是固定的。
 
-## 添加新工具
+## 生成的技能名称
 
-想要添加对其他 AI 编码助手的支持？请查看[命令适配器模式](../CONTRIBUTING.md)或在 GitHub 上提出 issue。
+当通过配置文件/工作流配置选中时，OpenSpec 会生成以下技能：
 
----
+- `openspec-propose`
+- `openspec-explore`
+- `openspec-new-change`
+- `openspec-continue-change`
+- `openspec-apply-change`
+- `openspec-ff-change`
+- `openspec-sync-specs`
+- `openspec-archive-change`
+- `openspec-bulk-archive-change`
+- `openspec-verify-change`
+- `openspec-onboard`
 
-## 相关内容
+参阅 [命令](commands.md) 了解命令行为，参阅 [CLI](cli.md) 了解 `init`/`update` 选项。
 
-- [CLI 参考](cli.md) — 终端命令
+## 相关文档
+
+- [CLI 参考手册](cli.md) — 终端命令
 - [命令](commands.md) — 斜杠命令和技能
-- [入门指南](getting-started.md) — 首次设置
+- [入门指南](getting-started.md) — 首次设置指南

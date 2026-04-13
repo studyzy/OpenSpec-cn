@@ -28,7 +28,32 @@ OPSX（流畅行动）：
 
 > **自定义：** OPSX 工作流由定义制品序列的模式驱动。有关创建自定义模式的详细信息，请参阅[自定义](customization.md)。
 
-## 工作流模式
+## 两种模式
+
+### 默认快速路径（`core` 配置文件）
+
+新安装默认使用 `core`，提供以下命令：
+- `/opsx:propose`
+- `/opsx:explore`
+- `/opsx:apply`
+- `/opsx:archive`
+
+典型流程：
+
+```text
+/opsx:propose ──► /opsx:apply ──► /opsx:archive
+```
+
+### 扩展/完整工作流（自定义选择）
+
+如果你需要显式的脚手架与构建命令（`/opsx:new`、`/opsx:continue`、`/opsx:ff`、`/opsx:verify`、`/opsx:sync`、`/opsx:bulk-archive`、`/opsx:onboard`），可以通过以下方式启用：
+
+```bash
+openspec-cn config profile
+openspec-cn update
+```
+
+## 工作流模式（扩展模式）
 
 ### 快速功能
 
@@ -404,15 +429,16 @@ implement-2fa                 wip
 
 | 命令 | 目的 | 何时使用 |
 |---------|---------|-------------|
-| `/opsx:explore` | 思考想法 | 需求不明确、调查 |
-| `/opsx:new` | 开始变更 | 开始任何新工作 |
-| `/opsx:continue` | 创建下一个制品 | 逐步创建制品 |
-| `/opsx:ff` | 创建所有规划制品 | 范围明确，准备构建 |
-| `/opsx:apply` | 实施任务 | 准备编写代码 |
-| `/opsx:verify` | 验证实施 | 归档前，发现不匹配 |
-| `/opsx:sync` | 合并增量规范 | 可选—归档时会提示 |
-| `/opsx:archive` | 完成变更 | 所有工作完成 |
-| `/opsx:bulk-archive` | 归档多个变更 | 并行工作，批量完成 |
+| `/opsx:propose` | 创建变更 + 规划制品 | 默认快速路径（`core` 配置文件） |
+| `/opsx:explore` | 思考探索想法 | 需求不明确、需要调查时 |
+| `/opsx:new` | 创建变更脚手架 | 扩展模式，显式控制制品 |
+| `/opsx:continue` | 创建下一个制品 | 扩展模式，逐步创建制品 |
+| `/opsx:ff` | 创建所有规划制品 | 扩展模式，范围明确时 |
+| `/opsx:apply` | 实施任务 | 准备好编写代码时 |
+| `/opsx:verify` | 验证实施 | 扩展模式，归档前使用 |
+| `/opsx:sync` | 合并增量规范 | 扩展模式，可选 |
+| `/opsx:archive` | 完成变更 | 所有工作完成时 |
+| `/opsx:bulk-archive` | 批量归档多个变更 | 扩展模式，并行工作时 |
 
 ## 下一步
 

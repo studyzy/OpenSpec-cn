@@ -8,11 +8,11 @@ OPSX 用流畅的、基于行动的方法取代了旧的阶段锁定工作流。
 
 | 方面 | 旧版 | OPSX |
 |--------|--------|------|
-| **命令** | `/opsx:proposal`、`/opsx:apply`、`/opsx:archive` | `/opsx:new`、`/opsx:continue`、`/opsx:apply` 等 |
-| **工作流** | 一次性创建所有制品 | 逐步创建或一次性创建——您决定 |
-| **回退** | 尴尬的阶段门限 | 自然——随时更新任何制品 |
-| **自定义** | 固定结构 | 模式驱动，完全可扩展 |
-| **配置** | 带标记的 `CLAUDE.md` + `project.md` | `openspec/config.yaml` 中的干净配置 |
+| **命令** | `/openspec:proposal`、`/openspec:apply`、`/openspec:archive` | 默认：`/opsx:propose`、`/opsx:apply`、`/opsx:archive`（扩展工作流命令可选） |
+| **工作流** | 一次性创建所有制品 | 逐步创建或一次性创建——由你选择 |
+| **回退** | 笨拙的阶段门限 | 自然——随时更新任何制品 |
+| **自定义** | 固定结构 | Schema 驱动，完全可定制 |
+| **配置** | 带标记的 `CLAUDE.md` + `project.md` | 简洁的 `openspec/config.yaml` 配置 |
 
 **理念变化：** 工作不是线性的。OPSX 不再假装它是。
 
@@ -46,7 +46,7 @@ OPSX 用流畅的、基于行动的方法取代了旧的阶段锁定工作流。
 - Windsurf：`.windsurf/workflows/openspec-*.md`
 - Cline：`.clinerules/workflows/openspec-*.md`
 - Roo：`.roo/commands/openspec-*.md`
-- GitHub Copilot：`.github/prompts/openspec-*.prompt.md` (IDE extensions only; not supported in Copilot CLI)
+- GitHub Copilot：`.github/prompts/openspec-*.prompt.md`（仅限 IDE 扩展；Copilot CLI 不支持）
 - 其他（Augment、Continue、Amazon Q 等）
 
 迁移会检测您配置的任何工具并清理其旧文件。
@@ -83,6 +83,9 @@ OPSX 用流畅的、基于行动的方法取代了旧的阶段锁定工作流。
 ## 运行迁移
 
 `openspec-cn init` 和 `openspec-cn update` 都会检测旧文件并引导您完成相同的清理过程。使用适合您情况的任何一种：
+
+- 新安装默认使用 `core` 配置文件（`propose`、`explore`、`apply`、`archive`）。
+- 迁移安装会通过在需要时写入 `custom` 配置文件来保留您之前安装的工作流。
 
 ### 使用 `openspec-cn init`
 
@@ -139,7 +142,7 @@ OpenSpec 标记将被删除，您的内容保留：
 openspec-cn update
 ```
 
-update 命令也检测并清理旧制品，然后将您的技能刷新到最新版本。
+update 命令同样会检测和清理旧文件，然后刷新生成的技能/命令以匹配您当前的配置文件和交付方式设置。
 
 ### 非交互式/CI 环境
 
@@ -179,19 +182,19 @@ openspec-cn init --force --tools claude
 schema: spec-driven
 
 context: |
-  Tech stack: TypeScript, React, Node.js
-  Testing: Jest with React Testing Library
-  API: RESTful, documented in docs/api.md
-  We maintain backwards compatibility for all public APIs
+  技术栈：TypeScript、React、Node.js
+  测试：Jest + React Testing Library
+  API：RESTful，文档位于 docs/api.md
+  所有公共 API 必须保持向后兼容
 
 rules:
   proposal:
-    - Include rollback plan for risky changes
+    - 对高风险变更包含回滚计划
   specs:
-    - Use Given/When/Then format for scenarios
-    - Reference existing patterns before inventing new ones
+    - 场景使用 Given/When/Then 格式
+    - 先参考现有模式，再发明新的
   design:
-    - Include sequence diagrams for complex flows
+    - 复杂流程包含序列图
 ```
 
 ### 关键差异
@@ -273,29 +276,42 @@ AI 将帮助您识别什么是必不可少的，什么可以被修剪。
 
 ## 新命令
 
-迁移后，您有 9 个 OPSX 命令而不是 3 个：
+命令可用性取决于配置文件：
+
+**默认（`core` 配置文件）：**
 
 | 命令 | 用途 |
 |---------|---------|
-| `/opsx:explore` | 毫无结构地思考想法 |
-| `/opsx:new` | 开始新的变更 |
-| `/opsx:continue` | 创建下一个制品（一次一个） |
-| `/opsx:ff` | 快进——一次性创建所有规划制品 |
-| `/opsx:apply` | 从 tasks.md 实施任务 |
-| `/opsx:verify` | 验证实施是否匹配规范 |
-| `/opsx:sync` | 预览规范合并（可选—如果需要归档提示词） |
-| `/opsx:archive` | 最终确定并归档变更 |
-| `/opsx:bulk-archive` | 一次归档多个变更 |
+| `/opsx:propose` | 一步创建变更并生成规划制品 |
+| `/opsx:explore` | 自由思考，无需结构 |
+| `/opsx:apply` | 从 tasks.md 实现任务 |
+| `/opsx:archive` | 完成并归档变更 |
+
+**扩展工作流（自定义选择）：**
+
+| 命令 | 用途 |
+|---------|---------|
+| `/opsx:new` | 创建新的变更脚手架 |
+| `/opsx:continue` | 创建下一个制品（每次一个） |
+| `/opsx:ff` | 快进——一次性创建规划制品 |
+| `/opsx:verify` | 验证实现是否匹配规范 |
+| `/opsx:sync` | 预览/合并规范而不归档 |
+| `/opsx:bulk-archive` | 批量归档多个变更 |
+| `/opsx:onboard` | 引导式端到端入门工作流 |
+
+通过 `openspec-cn config profile` 启用扩展命令，然后运行 `openspec-cn update`。
 
 ### 从旧版映射的命令
 
 | 旧版 | OPSX 等效 |
 |--------|-----------------|
-| `/opsx:proposal` | `/opsx:new` 然后 `/opsx:ff` |
+| `/opsx:proposal` | `/opsx:propose`（默认）或 `/opsx:new` 然后 `/opsx:ff`（扩展） |
 | `/opsx:apply` | `/opsx:apply` |
 | `/opsx:archive` | `/opsx:archive` |
 
 ### 新功能
+
+这些功能是扩展工作流命令集的一部分。
 
 **细粒度制品创建：**
 ```
@@ -319,8 +335,8 @@ AI 将帮助您识别什么是必不可少的，什么可以被修剪。
 
 ```
 ┌──────────────┐      ┌──────────────┐      ┌──────────────┐
-│   PLANNING   │ ───► │ IMPLEMENTING │ ───► │   ARCHIVING  │
-│    PHASE     │      │    PHASE     │      │    PHASE     │
+│   规划      │ ───► │   实现      │ ───► │   归档      │
+│    阶段      │      │    阶段      │      │    阶段      │
 └──────────────┘      └──────────────┘      └──────────────┘
 
 如果您在实施过程中意识到设计是错误的？
@@ -331,12 +347,12 @@ OPSX 使用行动，而不是阶段：
 
 ```
          ┌───────────────────────────────────────────────┐
-         │           ACTIONS (not phases)                │
-         │                                               │
-         │     new ◄──► continue ◄──► apply ◄──► archive │
-         │      │          │           │             │   │
-         │      └──────────┴───────────┴─────────────┘   │
-         │                    any order                  │
+│           行动（而非阶段）                    │
+│                                               │
+│     new ◄──► continue ◄──► apply ◄──► archive │
+│      │          │           │             │   │
+│      └──────────┴───────────┴─────────────┘   │
+│                   任意顺序                     │
          └───────────────────────────────────────────────┘
 ```
 
@@ -346,21 +362,21 @@ OPSX 使用行动，而不是阶段：
 
 ```
                         proposal
-                       (root node)
+                       （根节点）
                             │
               ┌─────────────┴─────────────┐
               │                           │
               ▼                           ▼
            specs                       design
-        (requires:                  (requires:
-         proposal)                   proposal)
+        （依赖:                    （依赖:
+         proposal）                  proposal）
               │                           │
               └─────────────┬─────────────┘
                             │
                             ▼
                          tasks
-                     (requires:
-                     specs, design)
+                     （依赖:
+                     specs, design）
 ```
 
 当您运行 `/opsx:continue` 时，它会检查什么准备好了并提供下一个制品。您也可以按任何顺序创建多个准备好的制品。
@@ -437,13 +453,13 @@ context: |
 # 仅注入到匹配的制品中
 rules:
   proposal:
-    - Include rollback plan
+    - 包含回滚计划
   specs:
-    - Use Given/When/Then format
+    - 使用 Given/When/Then 格式
   design:
-    - Document fallback strategies
+    - 记录降级策略
   tasks:
-    - Break into 2-hour maximum chunks
+    - 拆分为最多 2 小时的工作块
 ```
 
 ### 模式解析
@@ -540,9 +556,10 @@ project/
 │   └── config.yaml               # 新：项目配置
 ├── .claude/
 │   └── skills/                   # 新：OPSX 技能
+│       ├── openspec-propose/     # 默认 core 配置文件
 │       ├── openspec-explore/
-│       ├── openspec-new-change/
-│       └── ...
+│       ├── openspec-apply-change/
+│       └── ...                   # 扩展配置文件添加 new/continue/ff 等
 ├── CLAUDE.md                     # OpenSpec 标记已删除，您的内容保留
 └── AGENTS.md                     # OpenSpec 标记已删除，您的内容保留
 ```
@@ -556,12 +573,15 @@ project/
 
 ### 命令速查表
 
-```
-/opsx:new          开始变更
-/opsx:continue     创建下一个制品
-/opsx:ff           创建所有规划制品
+```text
+/opsx:propose      快速开始（默认 core 配置文件）
 /opsx:apply        实施任务
 /opsx:archive      完成并归档
+
+# 扩展工作流（如果已启用）：
+/opsx:new          创建变更脚手架
+/opsx:continue     创建下一个制品
+/opsx:ff           创建规划制品
 ```
 
 ---

@@ -4,31 +4,21 @@
 
 ## 工作原理
 
-OpenSpec 帮助你与 AI 编码助手在**写代码之前**就先对“要构建什么”达成一致。整体流程遵循一个简单的模式：
+OpenSpec 帮助你和你的 AI 编程助手在编写任何代码之前，就要构建的内容达成一致。
 
+**默认快速路径（`core` 配置文件）：**
+
+```text
+/opsx:propose ──► /opsx:apply ──► /opsx:archive
 ```
-┌────────────────────┐
-│ 开始变更            │  /opsx:new
-└────────┬───────────┘
-         │
-         ▼
-┌────────────────────┐
-│ 创建制品            │  /opsx:ff 或 /opsx:continue
-│ (proposal, specs,  │
-│  design, tasks)    │
-└────────┬───────────┘
-         │
-         ▼
-┌────────────────────┐
-│ 实施任务            │  /opsx:apply
-│ (AI 编写代码)       │
-└────────┬───────────┘
-         │
-         ▼
-┌────────────────────┐
-│ 归档并合并规范       │  /opsx:archive
-└────────────────────┘
+
+**扩展路径（自定义工作流选择）：**
+
+```text
+/opsx:new ──► /opsx:ff 或 /opsx:continue ──► /opsx:apply ──► /opsx:verify ──► /opsx:archive
 ```
+
+默认全局配置文件为 `core`，包含 `propose`、`explore`、`apply` 和 `archive`。你可以通过 `openspec-cn config profile` 启用扩展工作流命令，然后运行 `openspec-cn update`。
 
 ## OpenSpec 创建的内容
 
@@ -87,33 +77,33 @@ proposal ──► specs ──► design ──► tasks ──► implement
 增量规范使用章节来指示变更类型：
 
 ```markdown
-# Delta for Auth
+# 认证增量规范
 
-## ADDED Requirements
+## 新增需求
 
-### Requirement: Two-Factor Authentication
-The system MUST require a second factor during login.
+### 需求：双因素认证
+系统必须在登录时要求第二因素。
 
-#### Scenario: OTP required
-- GIVEN a user with 2FA enabled
-- WHEN the user submits valid credentials
-- THEN an OTP challenge is presented
+#### 场景：需要 OTP
+- 当 用户启用了 2FA
+- 当 用户提交了有效凭证
+- 则 显示 OTP 挑战
 
-## MODIFIED Requirements
+## 修改需求
 
-### Requirement: Session Timeout
-The system SHALL expire sessions after 30 minutes of inactivity.
-(Previously: 60 minutes)
+### 需求：会话超时
+系统必须在 30 分钟无活动后过期会话。
+（之前为：60 分钟）
 
-#### Scenario: Idle timeout
-- GIVEN an authenticated session
-- WHEN 30 minutes pass without activity
-- THEN the session is invalidated
+#### 场景：空闲超时
+- 当 存在已认证的会话
+- 当 30 分钟无活动
+- 则 会话失效
 
-## REMOVED Requirements
+## 移除需求
 
-### Requirement: Remember Me
-(Deprecated in favor of 2FA)
+### 需求：记住我
+（已弃用，改为使用 2FA）
 ```
 
 ### 归档时会发生什么
@@ -130,94 +120,84 @@ The system SHALL expire sessions after 30 minutes of inactivity.
 
 让我们逐步介绍如何为应用程序添加深色模式。
 
-### 1. 开始变更
+### 1. 开始变更（默认方式）
 
-```
-你：/opsx:new add-dark-mode
+```text
+你：/opsx:propose add-dark-mode
 
 AI：已创建 openspec/changes/add-dark-mode/
-     准备创建：proposal
-```
-
-### 2. 创建制品
-
-使用 `/opsx:ff`（快进）一次性创建所有规划制品：
-
-```
-你：/opsx:ff
-
-AI：正在为 add-dark-mode 创建制品...
-     ✓ proposal.md — 为什么要做这个，有什么变化
+     ✓ proposal.md — 为什么要做这个，变更内容是什么
      ✓ specs/       — 需求和场景
-     ✓ design.md    — 技术方法
+     ✓ design.md    — 技术方案
      ✓ tasks.md     — 实施清单
-     准备实施！
+     已准备好实施！
 ```
 
-### 3. 创建的内容
+如果你启用了扩展工作流配置文件，也可以分两步完成：先 `/opsx:new` 然后 `/opsx:ff`（或用 `/opsx:continue` 逐步完成）。
+
+### 2. 创建的内容
 
 **proposal.md** - 捕获意图：
 
 ```markdown
-# Proposal: Add Dark Mode
+# 提案：添加深色模式
 
-## Intent
-Users have requested a dark mode option to reduce eye strain
-during nighttime usage.
+## 意图
+用户要求提供深色模式选项，以减少夜间使用时的眼睛疲劳。
 
-## Scope
-- Add theme toggle in settings
-- Support system preference detection
-- Persist preference in localStorage
+## 范围
+- 在设置中添加主题切换
+- 支持系统偏好检测
+- 在 localStorage 中持久化偏好
 
-## Approach
-Use CSS custom properties for theming with a React context
-for state management.
+## 方案
+使用 CSS 自定义属性进行主题化，配合 React context
+进行状态管理。
 ```
 
 **specs/ui/spec.md** - 显示新需求的增量规范：
 
 ```markdown
-# Delta for UI
+# UI 增量规范
 
-## ADDED Requirements
+## 新增需求
 
-### Requirement: Theme Selection
-The system SHALL allow users to choose between light and dark themes.
+### 需求：主题选择
+系统必须允许用户在浅色和深色主题之间进行选择。
 
-#### Scenario: Manual toggle
-- GIVEN a user on any page
-- WHEN the user clicks the theme toggle
-- THEN the theme switches immediately
-- AND the preference persists across sessions
+#### 场景：手动切换
+- 当 用户在任意页面上
+- 当 用户点击主题切换按钮
+- 则 主题立即切换
+- 并且 偏好在会话间持久化
 
-#### Scenario: System preference
-- GIVEN a user with no saved preference
-- WHEN the application loads
-- THEN the system's preferred color scheme is used
+#### 场景：系统偏好
+- 当 用户没有保存的偏好
+- 当 应用程序加载时
+- 则 使用系统的首选配色方案
 ```
 
 **tasks.md** - 实施清单：
 
 ```markdown
-# Tasks
+# 任务
 
-## 1. Theme Infrastructure
-- [ ] 1.1 Create ThemeContext with light/dark state
-- [ ] 1.2 Add CSS custom properties for colors
-- [ ] 1.3 Implement localStorage persistence
+## 1. 主题基础设施
+- [ ] 1.1 创建带浅色/深色状态的 ThemeContext
+- [ ] 1.2 添加用于颜色的 CSS 自定义属性
+- [ ] 1.3 实现 localStorage 持久化
 
-## 2. UI Components
-- [ ] 2.1 Create ThemeToggle component
-- [ ] 2.2 Add toggle to settings page
-- [ ] 2.3 Update Header to include quick toggle
+## 2. UI 组件
+- [ ] 2.1 创建 ThemeToggle 组件
+- [ ] 2.2 在设置页面中添加切换按钮
+- [ ] 2.3 更新 Header 以包含快捷切换
 
-## 3. Styling
-- [ ] 3.1 Define dark theme color palette
-- [ ] 3.2 Update components to use CSS variables
+## 3. 样式
+- [ ] 3.1 定义深色主题调色板
+- [ ] 3.2 更新组件以使用 CSS 变量
 ```
 
-### 4. Implement
+### 3. 实施
 
 ```
 你：/opsx:apply
@@ -233,7 +213,7 @@ AI：正在处理任务...
 
 在实施过程中，如果你发现设计需要调整，只需更新制品然后继续。
 
-### 5. Archive
+### 4. 归档
 
 ```
 你：/opsx:archive

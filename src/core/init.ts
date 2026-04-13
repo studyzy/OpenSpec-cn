@@ -208,17 +208,12 @@ export class InitCommand {
 
     const canPrompt = this.canPromptInteractively();
 
-    if (this.force) {
-      // --force flag: proceed with cleanup automatically
+    if (this.force || !canPrompt) {
+      // --force flag or non-interactive mode: proceed with cleanup automatically.
+      // Legacy slash commands are 100% OpenSpec-managed, and config file cleanup
+      // only removes markers (never deletes files), so auto-cleanup is safe.
       await this.performLegacyCleanup(projectPath, detection);
       return;
-    }
-
-    if (!canPrompt) {
-      // Non-interactive mode without --force: abort
-      console.log(chalk.red('在非交互模式下检测到旧文件。'));
-      console.log(chalk.dim('以交互模式运行以升级，或使用 --force 自动清理。'));
-      process.exit(1);
     }
 
     // Interactive mode: prompt for confirmation
@@ -540,8 +535,8 @@ export class InitCommand {
             const skillFile = path.join(skillDir, 'SKILL.md');
 
             // Generate SKILL.md content with YAML frontmatter including generatedBy
-            // Use hyphen-based command references for OpenCode
-            const transformer = tool.value === 'opencode' ? transformToHyphenCommands : undefined;
+            // Use hyphen-based command references for tools where filename = command name
+            const transformer = (tool.value === 'opencode' || tool.value === 'pi') ? transformToHyphenCommands : undefined;
             const skillContent = generateSkillContent(template, OPENSPEC_VERSION, transformer);
 
             // Write the skill file

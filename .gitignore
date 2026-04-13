@@ -156,3 +156,8 @@ opencode.json
 
 .idea/
 .npmrc
+# Codex
+.codex/
+
+# Bob
+.bob/

@@ -536,6 +536,24 @@ describe('InitCommand - profile and detection features', () => {
     expect(await fileExists(skillFile)).toBe(true);
   });
 
+  it('should auto-cleanup legacy artifacts in non-interactive mode without --force', async () => {
+    // Create legacy OpenCode command files (singular 'command' path)
+    const legacyDir = path.join(testDir, '.opencode', 'command');
+    await fs.mkdir(legacyDir, { recursive: true });
+    await fs.writeFile(path.join(legacyDir, 'opsx-propose.md'), 'legacy content');
+
+    // Run init in non-interactive mode without --force
+    const initCommand = new InitCommand({ tools: 'opencode' });
+    await initCommand.execute(testDir);
+
+    // Legacy files should be cleaned up automatically
+    expect(await fileExists(path.join(legacyDir, 'opsx-propose.md'))).toBe(false);
+
+    // New commands should be at the correct plural path
+    const newCommandsDir = path.join(testDir, '.opencode', 'commands');
+    expect(await directoryExists(newCommandsDir)).toBe(true);
+  });
+
   it('should preselect configured tools but not directory-detected tools in extend mode', async () => {
     // Simulate existing OpenSpec project (extend mode).
     await fs.mkdir(path.join(testDir, 'openspec'), { recursive: true });
@@ -547,6 +565,7 @@ describe('InitCommand - profile and detection features', () => {
 
     // Directory detected only (not configured with OpenSpec)
     await fs.mkdir(path.join(testDir, '.github'), { recursive: true });
+    await fs.writeFile(path.join(testDir, '.github', 'copilot-instructions.md'), '');
 
     searchableMultiSelectMock.mockResolvedValue(['claude']);
 
@@ -569,6 +588,7 @@ describe('InitCommand - profile and detection features', () => {
   it('should preselect detected tools for first-time interactive setup', async () => {
     // First-time init: no openspec/ directory and no configured OpenSpec skills.
     await fs.mkdir(path.join(testDir, '.github'), { recursive: true });
+    await fs.writeFile(path.join(testDir, '.github', 'copilot-instructions.md'), '');
 
     searchableMultiSelectMock.mockResolvedValue(['github-copilot']);
 
