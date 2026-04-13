@@ -138,7 +138,7 @@ export function getSyncSpecsSkillTemplate(): SkillTemplate {
 - 在进行时显示你正在更改的内容
 - 操作应该是幂等的 - 运行两次应给出相同的结果`,
     license: 'MIT',
-    compatibility: '需要 openspec CLI。',
+    compatibility: '需要 openspec-cn CLI。',
     metadata: { author: 'openspec', version: '1.0' },
   };
 }

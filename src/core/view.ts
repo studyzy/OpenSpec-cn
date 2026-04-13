@@ -9,11 +9,11 @@ export class ViewCommand {
     const openspecDir = path.join(targetPath, 'openspec');
     
     if (!fs.existsSync(openspecDir)) {
-      console.error(chalk.red('未找到OpenSpec目录'));
+      console.error(chalk.red('未找到 OpenSpec 目录'));
       process.exit(1);
     }
 
-    console.log(chalk.bold('\nOpenSpec 仪表板\n'));
+    console.log(chalk.bold('\nOpenSpec 看板\n'));
     console.log('═'.repeat(60));
 
     // Get changes and specs data

@@ -289,7 +289,7 @@ openspec-cn list --json
 - **要探索代码库** - 将讨论建立在现实基础上
 - **要质疑假设** - 包括用户的和你自己的`,
     license: 'MIT',
-    compatibility: '需要 openspec CLI。',
+    compatibility: '需要 openspec-cn CLI。',
     metadata: { author: 'openspec', version: '1.0' },
   };
 }

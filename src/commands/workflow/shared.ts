@@ -157,7 +157,7 @@ export function validateSchemaExists(schemaName: string, projectRoot?: string): 
   if (!schemaDir) {
     const availableSchemas = listSchemas(projectRoot);
     throw new Error(
-      `未找到架构 '${schemaName}'。可用的架构:\n  ${availableSchemas.join('\n  ')}`
+      `未找到 Schema '${schemaName}'。可用的 Schema:\n  ${availableSchemas.join('\n  ')}`
     );
   }
   return schemaName;

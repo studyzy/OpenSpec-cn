@@ -246,7 +246,7 @@ export function getBulkArchiveChangeSkillTemplate(): SkillTemplate {
 - 归档目录目标使用当前日期：YYYY-MM-DD-<name>
 - 如果归档目标已存在，该变更失败但继续处理其他变更`,
     license: 'MIT',
-    compatibility: '需要 openspec CLI。',
+    compatibility: '需要 openspec-cn CLI。',
     metadata: { author: 'openspec', version: '1.0' },
   };
 }

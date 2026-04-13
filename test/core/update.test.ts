@@ -106,7 +106,7 @@ describe('UpdateCommand', () => {
 name: openspec-explore (old)
 description: Old description
 license: MIT
-compatibility: Requires openspec CLI.
+compatibility: 需要 openspec-cn CLI。
 metadata:
   author: openspec
   version: "0.9"

@@ -14,7 +14,7 @@ export function getOpsxProposeSkillTemplate(): SkillTemplate {
 
 我将创建一个包含以下产出物的变更：
 - proposal.md（什么和为什么）
-- design.md（如何）
+- design.md（实现方式）
 - tasks.md（实现步骤）
 
 准备好实现后，运行 /opsx:apply
@@ -96,7 +96,7 @@ export function getOpsxProposeSkillTemplate(): SkillTemplate {
 **产出物创建指南**
 
 - 遵循每个产出物类型的 \`openspec-cn instructions\` 中的 \`instruction\` 字段
-- Schema 定义了每个产出物应包含的内容 - 遵循它
+- Schema 定义了每个产出物应包含的内容，遵循它
 - 在创建新产出物之前阅读依赖产出物以获取上下文
 - 使用 \`template\` 作为输出文件的结构 - 填充其各个部分
 - **重要提示**：\`context\` 和 \`rules\` 是对你的约束，而不是文件内容
@@ -110,7 +110,7 @@ export function getOpsxProposeSkillTemplate(): SkillTemplate {
 - 如果同名变更已存在，询问用户是否要继续它或创建一个新的
 - 在继续下一个之前，验证写入后每个产出物文件是否存在`,
     license: 'MIT',
-    compatibility: '需要 openspec CLI。',
+    compatibility: '需要 openspec-cn CLI。',
     metadata: { author: 'openspec', version: '1.0' },
   };
 }
@@ -125,7 +125,7 @@ export function getOpsxProposeCommandTemplate(): CommandTemplate {
 
 我将创建一个包含以下产出物的变更：
 - proposal.md（什么和为什么）
-- design.md（如何）
+- design.md（实现方式）
 - tasks.md（实现步骤）
 
 准备好实现后，运行 /opsx:apply
@@ -207,7 +207,7 @@ export function getOpsxProposeCommandTemplate(): CommandTemplate {
 **产出物创建指南**
 
 - 遵循每个产出物类型的 \`openspec-cn instructions\` 中的 \`instruction\` 字段
-- Schema 定义了每个产出物应包含的内容 - 遵循它
+- Schema 定义了每个产出物应包含的内容，遵循它
 - 在创建新产出物之前阅读依赖产出物以获取上下文
 - 使用 \`template\` 作为输出文件的结构 - 填充其各个部分
 - **重要提示**：\`context\` 和 \`rules\` 是对你的约束，而不是文件内容

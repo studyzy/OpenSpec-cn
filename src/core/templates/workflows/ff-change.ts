@@ -54,7 +54,7 @@ export function getFfChangeSkillTemplate(): SkillTemplate {
         - \`context\`：项目背景（对你的约束 - 不要包含在输出中）
         - \`rules\`：产出物特定规则（对你的约束 - 不要包含在输出中）
         - \`template\`：用于输出文件的结构
-        - \`instruction\`：此产出物类型的模式特定指导
+        - \`instruction\`：此产出物类型的 Schema 特定指导
         - \`outputPath\`：写入产出物的位置
         - \`dependencies\`：已完成的产出物，用于读取上下文
       - 读取任何已完成的依赖文件以获取上下文
@@ -87,7 +87,7 @@ export function getFfChangeSkillTemplate(): SkillTemplate {
 **产出物创建指南**
 
 - 遵循每个产出物类型的 \`openspec-cn instructions\` 中的 \`instruction\` 字段
-- 模式定义了每个产出物应包含的内容 - 遵循它
+- Schema 定义了每个产出物应包含的内容，遵循它
 - 在创建新产出物之前阅读依赖产出物以获取上下文
 - 使用 \`template\` 作为输出文件的结构 - 填充其各个部分
 - **重要提示**：\`context\` 和 \`rules\` 是对你的约束，而不是文件内容
@@ -101,7 +101,7 @@ export function getFfChangeSkillTemplate(): SkillTemplate {
 - 如果同名变更已存在，建议继续处理该变更
 - 在继续下一个之前，验证写入后每个产出物文件是否存在`,
     license: 'MIT',
-    compatibility: '需要 openspec CLI。',
+    compatibility: '需要 openspec-cn CLI。',
     metadata: { author: 'openspec', version: '1.0' },
   };
 }
@@ -156,7 +156,7 @@ export function getOpsxFfCommandTemplate(): CommandTemplate {
         - \`context\`：项目背景（对你的约束 - 不要包含在输出中）
         - \`rules\`：产出物特定规则（对你的约束 - 不要包含在输出中）
         - \`template\`：用于输出文件的结构
-        - \`instruction\`：此产出物类型的模式特定指导
+        - \`instruction\`：此产出物类型的 Schema 特定指导
         - \`outputPath\`：写入产出物的位置
         - \`dependencies\`：已完成的产出物，用于读取上下文
       - 读取任何已完成的依赖文件以获取上下文
@@ -189,7 +189,7 @@ export function getOpsxFfCommandTemplate(): CommandTemplate {
 **产出物创建指南**
 
 - 遵循每个产出物类型的 \`openspec-cn instructions\` 中的 \`instruction\` 字段
-- Schema 定义了每个产出物应包含的内容 - 遵循它
+- Schema 定义了每个产出物应包含的内容，遵循它
 - 在创建新产出物之前阅读依赖产出物以获取上下文
 - 使用 \`template\` 作为起点，根据上下文填写
 

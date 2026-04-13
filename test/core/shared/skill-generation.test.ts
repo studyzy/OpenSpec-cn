@@ -221,7 +221,7 @@ describe('skill-generation', () => {
       const content = generateSkillContent(template, '0.24.0');
 
       expect(content).toContain('license: MIT');
-      expect(content).toContain('compatibility: Requires openspec CLI.');
+      expect(content).toContain('compatibility: 需要 openspec-cn CLI。');
       expect(content).toContain('author: openspec');
       expect(content).toContain('version: "1.0"');
       expect(content).toContain('generatedBy: "0.24.0"');

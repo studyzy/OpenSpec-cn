@@ -30,10 +30,10 @@ export function getArchiveChangeSkillTemplate(): SkillTemplate {
    运行 \`openspec-cn status --change "<name>" --json\` 检查产出物完成情况。
 
    解析 JSON 以了解：
-   - \`schemaName\`：正在使用的工作流
-   - \`artifacts\`：产出物列表及其状态（\`done\` 或其他）
+   - \`schemaName\`：正在使用的工作流 Schema
+   - \`artifacts\`：产出物列表及其状态（\`done\` 或其他状态值）
 
-   **如果有任何产出物未 \`done\`：**
+   **如果有任何产出物不是 \`done\`：**
    - 显示列出未完成产出物的警告
    - 使用 **AskUserQuestion tool** 确认用户是否要继续
    - 如果用户确认，则继续
@@ -98,7 +98,7 @@ export function getArchiveChangeSkillTemplate(): SkillTemplate {
 ## 归档完成
 
 **变更：** <change-name>
-**模式：** <schema-name>
+**Schema：** <schema-name>
 **归档至：** openspec/changes/archive/YYYY-MM-DD-<name>/
 **规范：** ✓ 已同步到主规范（或 "无增量规范" 或 "同步已跳过"）
 
@@ -114,7 +114,7 @@ export function getArchiveChangeSkillTemplate(): SkillTemplate {
 - 如果请求同步，使用 openspec-sync-specs 方法（代理驱动）
 - 如果存在增量规格说明，始终运行同步评估并在提示前显示综合摘要`,
     license: 'MIT',
-    compatibility: '需要 openspec CLI。',
+    compatibility: '需要 openspec-cn CLI。',
     metadata: { author: 'openspec', version: '1.0' },
   };
 }
@@ -145,10 +145,10 @@ export function getOpsxArchiveCommandTemplate(): CommandTemplate {
    运行 \`openspec-cn status --change "<name>" --json\` 检查产出物完成情况。
 
    解析 JSON 以了解：
-   - \`schemaName\`：正在使用的工作流
-   - \`artifacts\`：产出物列表及其状态（\`done\` 或其他）
+   - \`schemaName\`：正在使用的工作流 Schema
+   - \`artifacts\`：产出物列表及其状态（\`done\` 或其他状态值）
 
-   **如果有任何产出物未 \`done\`：**
+   **如果有任何产出物不是 \`done\`：**
    - 显示列出未完成产出物的警告
    - 提示用户确认是否继续
    - 如果用户确认，则继续

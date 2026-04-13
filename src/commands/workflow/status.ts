@@ -89,7 +89,7 @@ export function printStatusText(status: ChangeStatus): void {
   const total = status.artifacts.length;
 
   console.log(`变更: ${status.changeName}`);
-  console.log(`架构: ${status.schemaName}`);
+  console.log(`Schema: ${status.schemaName}`);
   console.log(`进度: ${doneCount}/${total} 个产出物已完成`);
   console.log();
 
