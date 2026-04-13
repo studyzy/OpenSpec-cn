@@ -23,7 +23,7 @@ export function getContinueChangeSkillTemplate(): SkillTemplate {
    展示前 3-4 个最近修改的变更作为选项，显示：
    - 变更名称
    - Schema（如果存在 \`schema\` 字段，否则为 "spec-driven"）
-   - 状态（例如："0/5 tasks", "complete", "no tasks"）
+   - 状态（例如："0/5 个任务", "已完成", "无任务"）
    - 最近修改时间（来自 \`lastModified\` 字段）
 
    将最近修改的变更标记为 "(推荐)"，因为它很可能是用户想要继续的。
@@ -35,7 +35,7 @@ export function getContinueChangeSkillTemplate(): SkillTemplate {
    openspec-cn status --change "<name>" --json
    \`\`\`
    解析 JSON 以了解当前状态。响应包括：
-   - \`schemaName\`：正在使用的工作流 schema（例如："spec-driven"）
+   - \`schemaName\`：正在使用的工作流 Schema（例如："spec-driven"）
    - \`artifacts\`：产出物数组及其状态（"done"、"ready"、"blocked"）
    - \`isComplete\`：布尔值，表示是否所有产出物都已完成
 
@@ -61,7 +61,7 @@ export function getContinueChangeSkillTemplate(): SkillTemplate {
      - \`context\`：项目背景（对你的约束 - 不要包含在输出中）
      - \`rules\`：产出物特定规则（对你的约束 - 不要包含在输出中）
      - \`template\`：输出文件使用的结构
-     - \`instruction\`：schema 特定指导
+     - \`instruction\`：Schema 特定指导
      - \`outputPath\`：产出物写入路径
      - \`dependencies\`：已完成的依赖产出物（用于读取上下文）
    - **创建产出物文件**：
@@ -98,14 +98,14 @@ export function getContinueChangeSkillTemplate(): SkillTemplate {
 
 常见的产出物模式：
 
-**spec-driven schema**（proposal → specs → design → tasks）：
-- **proposal.md**：如果变更不清楚，先向用户确认。填写"为什么""什么变化""能力""影响"。
-  - "能力"部分很关键——列出的每个能力都需要一个 spec 文件。
-- **specs/<capability>/spec.md**：为提案"能力"部分列出的每个能力创建一个 spec（使用 capability 名称，而不是 change 名称）。
-- **design.md**：记录技术决策、架构和实现方法。
+**spec-driven Schema**（proposal → specs → design → tasks）：
+- **proposal.md**：如果变更不清楚，先向用户确认。填写“为什么”“变更内容”“功能”“影响”。
+  - "功能"部分很关键——列出的每个功能都需要一个 spec 文件。
+- **specs/<capability>/spec.md**：为提案"功能"部分列出的每个功能创建一个 spec（使用 capability 名称，而不是 change 名称）。
+- **design.md**：记录技术决策、系统设计和实现方法。
 - **tasks.md**：把实现拆分为带复选框的任务。
 
-对于其他 schema，遵循 CLI 输出中的 \`instruction\` 字段。
+对于其他 Schema，遵循 CLI 输出中的 \`instruction\` 字段。
 
 **护栏**
 - 每次调用只创建一个产出物
@@ -113,12 +113,12 @@ export function getContinueChangeSkillTemplate(): SkillTemplate {
 - 不要跳过产出物，也不要乱序创建
 - 如果上下文不清楚，创建前先询问用户
 - 写入后先确认产出物文件存在，再标记进度
-- 使用 schema 的产出物顺序，不要假设固定的产出物名称
+- 使用 Schema 定义的产出物顺序，不要假设固定的产出物名称
 - **重要**：\`context\` 和 \`rules\` 是对你的约束，不是文件内容
   - 不要把 \`<context>\`、\`<rules>\`、\`<project_context>\` 块复制进产出物
   - 它们用于指导你写作，但绝不能出现在输出中`,
     license: 'MIT',
-    compatibility: '需要 openspec CLI。',
+    compatibility: '需要 openspec-cn CLI。',
     metadata: { author: 'openspec', version: '1.0' },
   };
 }
@@ -142,7 +142,7 @@ export function getOpsxContinueCommandTemplate(): CommandTemplate {
    展示前 3-4 个最近修改的变更作为选项，显示：
    - 变更名称
    - Schema（如果存在 \`schema\` 字段，否则为 "spec-driven"）
-   - 状态（例如："0/5 tasks", "complete", "no tasks"）
+   - 状态（例如："0/5 个任务", "已完成", "无任务"）
    - 最近修改时间（来自 \`lastModified\` 字段）
 
    将最近修改的变更标记为 "(推荐)"，因为它很可能是用户想要继续的。
@@ -154,7 +154,7 @@ export function getOpsxContinueCommandTemplate(): CommandTemplate {
    openspec-cn status --change "<name>" --json
    \`\`\`
    解析 JSON 以了解当前状态。响应包括：
-   - \`schemaName\`：正在使用的工作流 schema（例如："spec-driven"）
+   - \`schemaName\`：正在使用的工作流 Schema（例如："spec-driven"）
    - \`artifacts\`：产出物数组及其状态（"done"、"ready"、"blocked"）
    - \`isComplete\`：布尔值，表示是否所有产出物都已完成
 
@@ -217,14 +217,14 @@ export function getOpsxContinueCommandTemplate(): CommandTemplate {
 
 常见的产出物模式：
 
-**spec-driven schema**（proposal → specs → design → tasks）：
-- **proposal.md**：如果变更不清楚，先向用户确认。填写"为什么""什么变化""能力""影响"。
-  - "能力"部分很关键——列出的每个能力都需要一个 spec 文件。
-- **specs/<capability>/spec.md**：为提案"能力"部分列出的每个能力创建一个 spec（使用 capability 名称，而不是 change 名称）。
-- **design.md**：记录技术决策、架构和实现方法。
+**spec-driven Schema**（proposal → specs → design → tasks）：
+- **proposal.md**：如果变更不清楚，先向用户确认。填写“为什么”“变更内容”“功能”“影响”。
+  - "功能"部分很关键——列出的每个功能都需要一个 spec 文件。
+- **specs/<capability>/spec.md**：为提案"功能"部分列出的每个功能创建一个 spec（使用 capability 名称，而不是 change 名称）。
+- **design.md**：记录技术决策、系统设计和实现方法。
 - **tasks.md**：把实现拆分为带复选框的任务。
 
-对于其他 schema，遵循 CLI 输出中的 \`instruction\` 字段。
+对于其他 Schema，遵循 CLI 输出中的 \`instruction\` 字段。
 
 **护栏**
 - 每次调用只创建一个产出物
@@ -232,7 +232,7 @@ export function getOpsxContinueCommandTemplate(): CommandTemplate {
 - 不要跳过产出物，也不要乱序创建
 - 如果上下文不清楚，创建前先询问用户
 - 写入后先确认产出物文件存在，再标记进度
-- 使用 schema 的产出物顺序，不要假设固定的产出物名称
+- 使用 Schema 定义的产出物顺序，不要假设固定的产出物名称
 - **重要**：\`context\` 和 \`rules\` 是对你的约束，不是文件内容
   - 不要把 \`<context>\`、\`<rules>\`、\`<project_context>\` 块复制进产出物
   - 它们用于指导你写作，但绝不能出现在输出中`

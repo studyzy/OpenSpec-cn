@@ -215,7 +215,7 @@ export function generateInstructions(
 ): ArtifactInstructions {
   const artifact = context.graph.getArtifact(artifactId);
   if (!artifact) {
-    throw new Error(`架构 '${context.schemaName}' 中未找到产出物 '${artifactId}'`);
+    throw new Error(`在 Schema '${context.schemaName}' 中未找到产出物 '${artifactId}'`);
   }
 
   const templateContent = loadTemplate(context.schemaName, artifact.template, context.projectRoot);

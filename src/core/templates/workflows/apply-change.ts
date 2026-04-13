@@ -30,7 +30,7 @@ export function getApplyChangeSkillTemplate(): SkillTemplate {
    openspec-cn status --change "<name>" --json
    \`\`\`
    解析 JSON 以了解：
-   - \`schemaName\`：正在使用的工作流（例如："spec-driven"）
+   - \`schemaName\`：正在使用的工作流 Schema（例如："spec-driven"）
    - 哪个产出物包含任务（对于 spec-driven 通常是 "tasks"，检查其他产出物的状态）
 
 3. **获取应用指令**
@@ -40,13 +40,13 @@ export function getApplyChangeSkillTemplate(): SkillTemplate {
    \`\`\`
 
    这返回：
-   - 上下文文件路径（因 Schema 而异 - 可能是 proposal/specs/design/tasks 或 spec/tests/implementation/docs）
+   - 上下文文件路径（因 Schema 而异，可能是 proposal/specs/design/tasks 或 spec/tests/implementation/docs）
    - 进度（总计，完成，剩余）
    - 带有状态的任务列表
    - 基于当前状态的动态指令
 
    **处理状态：**
-   - 如果 \`state: "blocked"\`（缺少产出物）：显示消息，建议使用 openspec-continue-change
+   - 如果 \`state: "blocked"\`（缺少产出物）：显示消息，建议使用 \`openspec-continue-change\`
    - 如果 \`state: "all_done"\`：祝贺，建议归档
    - 否则：继续实现
 
@@ -91,7 +91,7 @@ export function getApplyChangeSkillTemplate(): SkillTemplate {
 **实现期间的输出**
 
 \`\`\`
-## 正在实现：<change-name> (schema: <schema-name>)
+## 正在实现：<change-name>（Schema：<schema-name>）
 
 正在处理任务 3/7：<task description>
 [...正在进行实现...]
@@ -156,7 +156,7 @@ export function getApplyChangeSkillTemplate(): SkillTemplate {
 - **可以随时调用**：在所有产出物完成之前（如果存在任务），部分实现之后，与其他操作交错
 - **允许产出物更新**：如果实现揭示了设计问题，建议更新产出物 - 不是阶段锁定的，流畅地工作`,
     license: 'MIT',
-    compatibility: '需要 openspec CLI。',
+    compatibility: '需要 openspec-cn CLI。',
     metadata: { author: 'openspec', version: '1.0' },
   };
 }
@@ -187,7 +187,7 @@ export function getOpsxApplyCommandTemplate(): CommandTemplate {
    openspec-cn status --change "<name>" --json
    \`\`\`
    解析 JSON 以了解：
-   - \`schemaName\`：正在使用的工作流（例如："spec-driven"）
+   - \`schemaName\`：正在使用的工作流 Schema（例如："spec-driven"）
    - 哪个产出物包含任务（对于 spec-driven 通常是 "tasks"，检查其他产出物的状态）
 
 3. **获取应用指令**
@@ -248,7 +248,7 @@ export function getOpsxApplyCommandTemplate(): CommandTemplate {
 **实现期间的输出**
 
 \`\`\`
-## 正在实现：<change-name> (schema: <schema-name>)
+## 正在实现：<change-name>（Schema：<schema-name>）
 
 正在处理任务 3/7：<task description>
 [...正在进行实现...]

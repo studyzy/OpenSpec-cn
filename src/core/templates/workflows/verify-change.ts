@@ -31,7 +31,7 @@ export function getVerifyChangeSkillTemplate(): SkillTemplate {
    openspec-cn status --change "<name>" --json
    \`\`\`
    解析 JSON 以了解：
-   - \`schemaName\`：正在使用的工作流模式（例如："spec-driven"）
+   - \`schemaName\`：正在使用的工作流 Schema（例如："spec-driven"）
    - 此变更存在哪些产出物
 
 3. **获取变更目录并加载产出物**
@@ -94,7 +94,7 @@ export function getVerifyChangeSkillTemplate(): SkillTemplate {
 
    **设计遵循情况**：
    - 如果 contextFiles 中存在 design.md：
-     - 提取关键决策（查找 "Decision:"、"Approach:"、"Architecture:" 等部分）
+     - 提取关键决策（查找“决策:”“方案:”“设计:”等部分）
      - 验证实现是否遵循这些决策
      - 如果检测到矛盾：
        - 添加 WARNING："未遵循设计决策：<决策>"
@@ -168,7 +168,7 @@ export function getVerifyChangeSkillTemplate(): SkillTemplate {
 - 具体的、可操作的建议
 - 不要使用模糊的建议，如 "考虑审查"`,
     license: 'MIT',
-    compatibility: '需要 openspec CLI。',
+    compatibility: '需要 openspec-cn CLI。',
     metadata: { author: 'openspec', version: '1.0' },
   };
 }
@@ -200,7 +200,7 @@ export function getOpsxVerifyCommandTemplate(): CommandTemplate {
    openspec-cn status --change "<name>" --json
    \`\`\`
    解析 JSON 以了解：
-   - \`schemaName\`：正在使用的工作流模式（例如："spec-driven"）
+   - \`schemaName\`：正在使用的工作流 Schema（例如："spec-driven"）
    - 此变更存在哪些产出物
 
 3. **获取变更目录并加载产出物**
@@ -263,7 +263,7 @@ export function getOpsxVerifyCommandTemplate(): CommandTemplate {
 
    **设计遵循情况**：
    - 如果 contextFiles 中存在 design.md：
-     - 提取关键决策（查找 "Decision:"、"Approach:"、"Architecture:" 等部分）
+     - 提取关键决策（查找“决策:”“方案:”“设计:”等部分）
      - 验证实现是否遵循这些决策
      - 如果检测到矛盾：
        - 添加 WARNING："未遵循设计决策：<决策>"

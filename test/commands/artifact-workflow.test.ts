@@ -200,7 +200,7 @@ describe('artifact-workflow CLI commands', () => {
       });
       expect(result.exitCode).toBe(1);
       const output = getOutput(result);
-      expect(output).toContain("未找到架构 'unknown'");
+      expect(output).toContain("未找到 Schema 'unknown'");
     });
 
     it('rejects path traversal in change name', async () => {
@@ -297,7 +297,7 @@ describe('artifact-workflow CLI commands', () => {
       });
       expect(result.exitCode).toBe(1);
       const output = getOutput(result);
-      expect(output).toContain("在架构 'spec-driven' 中未找到产出物 'unknown-artifact'");
+      expect(output).toContain("在 Schema 'spec-driven' 中未找到产出物 'unknown-artifact'");
       expect(output).toContain('有效的产出物:');
     });
   });
@@ -335,7 +335,7 @@ describe('artifact-workflow CLI commands', () => {
       const result = await runCLI(['templates', '--schema', 'nonexistent'], { cwd: tempDir });
       expect(result.exitCode).toBe(1);
       const output = getOutput(result);
-      expect(output).toContain("未找到架构 'nonexistent'");
+      expect(output).toContain("未找到 Schema 'nonexistent'");
     });
   });
 
@@ -395,7 +395,7 @@ describe('artifact-workflow CLI commands', () => {
       });
       expect(result.exitCode).toBe(0);
       expect(result.stdout).toContain('## 应用： apply-change');
-      expect(result.stdout).toContain('架构： spec-driven');
+      expect(result.stdout).toContain('Schema： spec-driven');
       expect(result.stdout).toContain('上下文文件：');
       expect(result.stdout).toContain('指令：');
     });
@@ -470,7 +470,7 @@ describe('artifact-workflow CLI commands', () => {
         { cwd: tempDir }
       );
       expect(result.exitCode).toBe(0);
-      expect(result.stdout).toContain('架构： spec-driven');
+      expect(result.stdout).toContain('Schema： spec-driven');
     });
 
     it('spec-driven schema uses apply block configuration', async () => {

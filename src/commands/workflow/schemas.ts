@@ -28,7 +28,7 @@ export async function schemasCommand(options: SchemasOptions): Promise<void> {
     return;
   }
 
-  console.log('可用的架构:');
+  console.log('可用的 Schema:');
   console.log();
 
   for (const schema of schemas) {

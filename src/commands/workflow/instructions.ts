@@ -73,7 +73,7 @@ export async function instructionsCommand(
       spinner.stop();
       const validIds = context.graph.getAllArtifacts().map((a) => a.id);
       throw new Error(
-        `在架构 '${context.schemaName}' 中未找到产出物 '${artifactId}'。有效的产出物:\n  ${validIds.join('\n  ')}`
+        `在 Schema '${context.schemaName}' 中未找到产出物 '${artifactId}'。有效的产出物:\n  ${validIds.join('\n  ')}`
       );
     }
 
@@ -191,7 +191,7 @@ export function printInstructionsText(instructions: ArtifactInstructions, isBloc
 
   // Success criteria placeholder
   console.log('<success_criteria>');
-  console.log('<!-- 在架构验证规则中定义 -->');
+  console.log('<!-- 在 Schema 校验规则中定义 -->');
   console.log('</success_criteria>');
   console.log();
 
@@ -432,7 +432,7 @@ export function printApplyInstructionsText(instructions: ApplyInstructions): voi
   const { changeName, schemaName, contextFiles, progress, tasks, state, missingArtifacts, instruction } = instructions;
 
   console.log(`## 应用： ${changeName}`);
-  console.log(`架构： ${schemaName}`);
+  console.log(`Schema： ${schemaName}`);
   console.log();
 
   // Warning for blocked state

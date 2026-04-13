@@ -12,7 +12,7 @@ export function getOnboardSkillTemplate(): SkillTemplate {
     description: 'OpenSpec 引导式入门 - 通过讲解与在真实代码库中动手，走完一个完整的工作流周期。',
     instructions: getOnboardInstructions(),
     license: 'MIT',
-    compatibility: '需要 openspec CLI。',
+    compatibility: '需要 openspec-cn CLI。',
     metadata: { author: 'openspec', version: '1.0' },
   };
 }
@@ -24,17 +24,17 @@ function getOnboardInstructions(): string {
 
 ## 准备阶段
 
-开始前，检查OpenSpec CLI是否已安装：
+开始前，检查 openspec-cn CLI 是否已安装：
 
 \`\`\`bash
-# Unix/macOS
-openspec-cn --version 2>&1 || echo "CLI_NOT_INSTALLED"
-# Windows (PowerShell)
-# if (Get-Command openspec-cn -ErrorAction SilentlyContinue) { openspec-cn --version } else { echo "CLI_NOT_INSTALLED" }
+# macOS / Linux
+openspec-cn --version 2>&1 || echo "未安装 CLI"
+# Windows PowerShell
+# if (Get-Command openspec-cn -ErrorAction SilentlyContinue) { openspec-cn --version } else { echo "未安装 CLI" }
 \`\`\`
 
-**如果CLI未安装：**
-> OpenSpec CLI 未安装。请先安装它，然后返回 \`/opsx:onboard\`。
+**如果 CLI 未安装：**
+> openspec-cn CLI 未安装。请先安装它，然后返回 \`/opsx:onboard\`。
 
 如果未安装，请在此停止。
 
@@ -79,10 +79,10 @@ openspec-cn --version 2>&1 || echo "CLI_NOT_INSTALLED"
 
 同时检查最近的git活动：
 \`\`\`bash
-# Unix/macOS
-git log --oneline -10 2>/dev/null || echo "No git history"
-# Windows (PowerShell)
-# git log --oneline -10 2>$null; if ($LASTEXITCODE -ne 0) { echo "No git history" }
+# macOS / Linux
+git log --oneline -10 2>/dev/null || echo "没有 Git 历史"
+# Windows PowerShell
+# git log --oneline -10 2>$null; if ($LASTEXITCODE -ne 0) { echo "没有 Git 历史" }
 \`\`\`
 
 ### 提出建议
@@ -322,7 +322,7 @@ mkdir -p openspec/changes/<name>/specs/<capability-name>
 对于小变更，这可能很简短。没关系——不是每个变更都需要深入的设计讨论。
 \`\`\`
 
-**执行：** 起草design.md：
+**执行：** 起草 design.md：
 
 \`\`\`
 这是设计：
@@ -408,7 +408,7 @@ mkdir -p openspec/changes/<name>/specs/<capability-name>
 1. 宣布："正在处理任务N：[描述]"
 2. 在代码库中实现变更
 3. 自然地引用规格说明/设计："规格说明说X，所以我做Y"
-4. 在tasks.md中标记完成：\`- [ ]\` → \`- [x]\`
+4. 在 tasks.md 中标记完成：\`- [ ]\` → \`- [x]\`
 5. 简要状态："✓ 任务N完成"
 
 保持叙述轻量——不要过度解释每一行代码。

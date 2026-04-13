@@ -39,7 +39,7 @@ export async function newChangeCommand(name: string | undefined, options: NewCha
     validateSchemaExists(options.schema, projectRoot);
   }
 
-  const schemaDisplay = options.schema ? `，使用架构 '${options.schema}'` : '';
+  const schemaDisplay = options.schema ? `，使用 Schema '${options.schema}'` : '';
   const spinner = ora(`正在创建变更 '${name}'${schemaDisplay}...`).start();
 
   try {
@@ -53,7 +53,7 @@ export async function newChangeCommand(name: string | undefined, options: NewCha
       await fs.writeFile(readmePath, `# ${name}\n\n${options.description}\n`, 'utf-8');
     }
 
-    spinner.succeed(`已创建变更 '${name}'，位于 openspec/changes/${name}/ (架构: ${result.schema})`);
+    spinner.succeed(`已创建变更 '${name}'，位于 openspec/changes/${name}/ (Schema: ${result.schema})`);
   } catch (error) {
     spinner.fail(`创建变更 '${name}' 失败`);
     throw error;

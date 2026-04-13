@@ -107,7 +107,7 @@ export function getFeedbackSkillTemplate(): SkillTemplate {
 
 只有在用户确认后才继续提交。`,
     license: 'MIT',
-    compatibility: '需要 openspec CLI。',
+    compatibility: '需要 openspec-cn CLI。',
     metadata: { author: 'openspec', version: '1.0' },
   };
 }
