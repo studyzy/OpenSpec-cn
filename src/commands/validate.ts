@@ -158,7 +158,7 @@ export class ValidateCommand {
     } else {
       console.error(`${type === 'change' ? '变更' : '规范'} '${id}' 存在问题`);
       for (const issue of report.issues) {
-        const label = issue.level === 'ERROR' ? 'ERROR' : issue.level;
+        const label = issue.level === 'ERROR' ? '错误' : issue.level === 'WARNING' ? '警告' : '信息';
         const prefix = issue.level === 'ERROR' ? '✗' : issue.level === 'WARNING' ? '⚠' : 'ℹ';
         console.error(`${prefix} [${label}] ${issue.path}: ${issue.message}`);
       }
@@ -247,14 +247,14 @@ export class ValidateCommand {
           const currentIndex = index++;
           const task = queue[currentIndex];
           running++;
-          if (spinner) spinner.text = `Validating (${currentIndex + 1}/${queue.length})...`;
+          if (spinner) spinner.text = `正在验证 (${currentIndex + 1}/${queue.length})...`;
           task()
             .then(res => {
               results.push(res);
               if (res.valid) passed++; else failed++;
             })
             .catch((error: any) => {
-              const message = error?.message || 'Unknown error';
+              const message = error?.message || '未知错误';
               const res: BulkItemResult = { id: getPlannedId(currentIndex, changeIds, specIds) ?? 'unknown', type: getPlannedType(currentIndex, changeIds, specIds) ?? 'change', valid: false, issues: [{ level: 'ERROR', path: 'file', message }], durationMs: 0 };
               results.push(res);
               failed++;

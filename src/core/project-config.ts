@@ -78,7 +78,7 @@ export function readProjectConfig(projectRoot: string): ProjectConfig | null {
     const raw = parseYaml(content);
 
     if (!raw || typeof raw !== 'object') {
-      console.warn(`openspec/config.yaml is not a valid YAML object`);
+      console.warn(`openspec/config.yaml 不是有效的 YAML 对象`);
       return null;
     }
 
@@ -90,7 +90,7 @@ export function readProjectConfig(projectRoot: string): ProjectConfig | null {
     if (schemaResult.success) {
       config.schema = schemaResult.data;
     } else if (raw.schema !== undefined) {
-      console.warn(`Invalid 'schema' field in config (must be non-empty string)`);
+      console.warn(`配置中的 'schema' 字段无效（必须是非空字符串）`);
     }
 
     // Parse context field with size limit
@@ -102,14 +102,14 @@ export function readProjectConfig(projectRoot: string): ProjectConfig | null {
         const contextSize = Buffer.byteLength(contextResult.data, 'utf-8');
         if (contextSize > MAX_CONTEXT_SIZE) {
           console.warn(
-            `Context too large (${(contextSize / 1024).toFixed(1)}KB, limit: ${MAX_CONTEXT_SIZE / 1024}KB)`
+            `上下文过大（${(contextSize / 1024).toFixed(1)}KB，限制：${MAX_CONTEXT_SIZE / 1024}KB）`
           );
-          console.warn(`Ignoring context field`);
+          console.warn(`忽略 context 字段`);
         } else {
           config.context = contextResult.data;
         }
       } else {
-        console.warn(`Invalid 'context' field in config (must be string)`);
+        console.warn(`配置中的 'context' 字段无效（必须是字符串）`);
       }
     }
 
@@ -134,12 +134,12 @@ export function readProjectConfig(projectRoot: string): ProjectConfig | null {
             }
             if (validRules.length < rulesArrayResult.data.length) {
               console.warn(
-                `Some rules for '${artifactId}' are empty strings, ignoring them`
+                `'${artifactId}' 的某些规则是空字符串，已忽略`
               );
             }
           } else {
             console.warn(
-              `Rules for '${artifactId}' must be an array of strings, ignoring this artifact's rules`
+              `'${artifactId}' 的规则必须是字符串数组，已忽略该产出物的规则`
             );
           }
         }
@@ -148,14 +148,14 @@ export function readProjectConfig(projectRoot: string): ProjectConfig | null {
           config.rules = parsedRules;
         }
       } else {
-        console.warn(`Invalid 'rules' field in config (must be object)`);
+        console.warn(`配置中的 'rules' 字段无效（必须是对象）`);
       }
     }
 
     // Return partial config even if some fields failed
     return Object.keys(config).length > 0 ? (config as ProjectConfig) : null;
   } catch (error) {
-    console.warn(`Failed to parse openspec/config.yaml:`, error);
+    console.warn(`解析 openspec/config.yaml 失败：`, error);
     return null;
   }
 }
@@ -181,8 +181,8 @@ export function validateConfigRules(
     if (!validArtifactIds.has(artifactId)) {
       const validIds = Array.from(validArtifactIds).sort().join(', ');
       warnings.push(
-        `Unknown artifact ID in rules: "${artifactId}". ` +
-          `Valid IDs for schema "${schemaName}": ${validIds}`
+        `规则中存在未知的产出物 ID："${artifactId}"。` +
+          `架构 "${schemaName}" 的有效 ID：${validIds}`
       );
     }
   }
@@ -237,28 +237,28 @@ export function suggestSchemas(
   const builtIn = availableSchemas.filter((s) => s.isBuiltIn).map((s) => s.name);
   const projectLocal = availableSchemas.filter((s) => !s.isBuiltIn).map((s) => s.name);
 
-  let message = `Schema '${invalidSchemaName}' not found in openspec/config.yaml\n\n`;
+  let message = `架构 '${invalidSchemaName}' 在 openspec/config.yaml 中未找到\n\n`;
 
   if (suggestions.length > 0) {
-    message += `Did you mean one of these?\n`;
+    message += `您是否想要其中之一？\n`;
     suggestions.forEach((s) => {
-      const type = s.isBuiltIn ? 'built-in' : 'project-local';
+      const type = s.isBuiltIn ? '内置' : '项目本地';
       message += `  - ${s.name} (${type})\n`;
     });
     message += '\n';
   }
 
-  message += `Available schemas:\n`;
+  message += `可用架构：\n`;
   if (builtIn.length > 0) {
-    message += `  Built-in: ${builtIn.join(', ')}\n`;
+    message += `  内置：${builtIn.join(', ')}\n`;
   }
   if (projectLocal.length > 0) {
-    message += `  Project-local: ${projectLocal.join(', ')}\n`;
+    message += `  项目本地：${projectLocal.join(', ')}\n`;
   } else {
-    message += `  Project-local: (none found)\n`;
+    message += `  项目本地：（未找到）\n`;
   }
 
-  message += `\nFix: Edit openspec/config.yaml and change 'schema: ${invalidSchemaName}' to a valid schema name`;
+  message += `\n修复方法：编辑 openspec/config.yaml，将 'schema: ${invalidSchemaName}' 改为有效的架构名称`;
 
   return message;
 }

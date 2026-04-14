@@ -132,7 +132,7 @@ export function loadTemplate(
   const schemaDir = getSchemaDir(schemaName, projectRoot);
   if (!schemaDir) {
     throw new TemplateLoadError(
-      `Schema '${schemaName}' not found`,
+      `架构 '${schemaName}' 未找到`,
       templatePath
     );
   }
@@ -141,7 +141,7 @@ export function loadTemplate(
 
   if (!fs.existsSync(fullPath)) {
     throw new TemplateLoadError(
-      `Template not found: ${fullPath}`,
+      `模板文件未找到：${fullPath}`,
       fullPath
     );
   }
@@ -151,7 +151,7 @@ export function loadTemplate(
   } catch (err) {
     const ioError = err instanceof Error ? err : new Error(String(err));
     throw new TemplateLoadError(
-      `Failed to read template: ${ioError.message}`,
+      `读取模板文件失败：${ioError.message}`,
       fullPath
     );
   }
