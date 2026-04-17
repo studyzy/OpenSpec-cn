@@ -296,9 +296,9 @@ openspec-cn list --json
 
 export function getOpsxExploreCommandTemplate(): CommandTemplate {
   return {
-    name: 'OPSX: 探索',
+    name: 'OPSX: Explore',
     description: '进入探索模式 - 构思想法、调查问题、澄清需求',
-    category: '工作流',
+    category: 'Workflow',
     tags: ['workflow', 'explore', 'experimental', 'thinking'],
     content: `进入探索模式。深入思考。自由可视化。跟随对话的发展。
 

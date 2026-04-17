@@ -565,9 +565,9 @@ openspec-cn archive "<name>"
 
 export function getOpsxOnboardCommandTemplate(): CommandTemplate {
   return {
-    name: 'OPSX: 入门',
+    name: 'OPSX: Onboard',
     description: '引导式入门 - 通过完整的OpenSpec工作流周期进行讲解',
-    category: '工作流',
+    category: 'Workflow',
     tags: ['workflow', 'onboarding', 'tutorial', 'learning'],
     content: getOnboardInstructions(),
   };

@@ -125,9 +125,9 @@ export function getContinueChangeSkillTemplate(): SkillTemplate {
 
 export function getOpsxContinueCommandTemplate(): CommandTemplate {
   return {
-    name: 'OPSX: 继续',
+    name: 'OPSX: Continue',
     description: '继续处理变更 - 创建下一个产出物（实验性）',
-    category: '工作流',
+    category: 'Workflow',
     tags: ['workflow', 'artifacts', 'experimental'],
     content: `通过创建下一个产出物继续处理变更。
 

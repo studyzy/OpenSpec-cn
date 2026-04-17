@@ -108,9 +108,9 @@ export function getFfChangeSkillTemplate(): SkillTemplate {
 
 export function getOpsxFfCommandTemplate(): CommandTemplate {
   return {
-    name: 'OPSX: 快进',
+    name: 'OPSX: Fast Forward',
     description: '一键创建变更并生成实现所需的所有产出物',
-    category: '工作流',
+    category: 'Workflow',
     tags: ['workflow', 'artifacts', 'experimental'],
     content: `快速完成产出物创建 - 生成开始实现所需的一切。
 

@@ -175,9 +175,9 @@ export function getVerifyChangeSkillTemplate(): SkillTemplate {
 
 export function getOpsxVerifyCommandTemplate(): CommandTemplate {
   return {
-    name: 'OPSX: 验证',
+    name: 'OPSX: Verify',
     description: '在归档前验证实现是否与变更产出物匹配',
-    category: '工作流',
+    category: 'Workflow',
     tags: ['workflow', 'verify', 'experimental'],
     content: `验证实现是否与变更产出物（规范、任务、设计）匹配。
 

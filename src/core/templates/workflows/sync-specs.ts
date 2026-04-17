@@ -145,9 +145,9 @@ export function getSyncSpecsSkillTemplate(): SkillTemplate {
 
 export function getOpsxSyncCommandTemplate(): CommandTemplate {
   return {
-    name: 'OPSX: 同步',
+    name: 'OPSX: Sync',
     description: '将变更中的增量规范同步到主规范',
-    category: '工作流',
+    category: 'Workflow',
     tags: ['workflow', 'specs', 'experimental'],
     content: `将变更中的增量规范同步到主规范。
 

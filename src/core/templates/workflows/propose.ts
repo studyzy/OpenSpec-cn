@@ -117,9 +117,9 @@ export function getOpsxProposeSkillTemplate(): SkillTemplate {
 
 export function getOpsxProposeCommandTemplate(): CommandTemplate {
   return {
-    name: 'OPSX: 提案',
+    name: 'OPSX: Propose',
     description: '提案新变更 - 一步创建并生成所有产出物',
-    category: '工作流',
+    category: 'Workflow',
     tags: ['workflow', 'artifacts', 'experimental'],
     content: `提案新变更 - 一步创建变更并生成所有产出物。
 

@@ -121,9 +121,9 @@ export function getArchiveChangeSkillTemplate(): SkillTemplate {
 
 export function getOpsxArchiveCommandTemplate(): CommandTemplate {
   return {
-    name: 'OPSX: 归档',
+    name: 'OPSX: Archive',
     description: '归档实验性工作流中已完成的变更',
-    category: '工作流',
+    category: 'Workflow',
     tags: ['workflow', 'archive', 'experimental'],
     content: `归档实验性工作流中已完成的变更。
 

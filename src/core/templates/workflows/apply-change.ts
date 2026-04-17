@@ -163,9 +163,9 @@ export function getApplyChangeSkillTemplate(): SkillTemplate {
 
 export function getOpsxApplyCommandTemplate(): CommandTemplate {
   return {
-    name: 'OPSX: 应用',
+    name: 'OPSX: Apply',
     description: '实现 OpenSpec 变更中的任务（实验性）',
-    category: '工作流',
+    category: 'Workflow',
     tags: ['workflow', 'artifacts', 'experimental'],
     content: `实现 OpenSpec 变更中的任务。
 

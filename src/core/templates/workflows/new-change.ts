@@ -82,9 +82,9 @@ export function getNewChangeSkillTemplate(): SkillTemplate {
 
 export function getOpsxNewCommandTemplate(): CommandTemplate {
   return {
-    name: 'OPSX: 新建',
+    name: 'OPSX: New',
     description: '使用实验性的产出物工作流 (OPSX) 启动新变更',
-    category: '工作流',
+    category: 'Workflow',
     tags: ['workflow', 'artifacts', 'experimental'],
     content: `使用实验性的产出物驱动方法启动新变更。
 

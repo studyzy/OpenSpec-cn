@@ -253,9 +253,9 @@ export function getBulkArchiveChangeSkillTemplate(): SkillTemplate {
 
 export function getOpsxBulkArchiveCommandTemplate(): CommandTemplate {
   return {
-    name: 'OPSX: 批量归档',
+    name: 'OPSX: Bulk Archive',
     description: '一次归档多个已完成的变更',
-    category: '工作流',
+    category: 'Workflow',
     tags: ['workflow', 'archive', 'experimental', 'bulk'],
     content: `在单个操作中归档多个已完成的变更。
 
