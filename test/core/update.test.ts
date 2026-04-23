@@ -633,7 +633,7 @@ Legacy content without generatedBy
 
       // Should show "unknown → version" in the update message - version info is in separate line
       expect(consoleSpy).toHaveBeenCalledWith(
-        expect.stringContaining('1.3.0')
+        expect.stringContaining('1.3.1')
       );
 
       consoleSpy.mockRestore();
@@ -663,7 +663,7 @@ Old version content
 
       // Should show version transition
       expect(consoleSpy).toHaveBeenCalledWith(
-        expect.stringContaining('0.1.0 → 1.3.0')
+        expect.stringContaining('0.1.0 → 1.3.1')
       );
 
       consoleSpy.mockRestore();

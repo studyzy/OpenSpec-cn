@@ -40,7 +40,7 @@ export function getVerifyChangeSkillTemplate(): SkillTemplate {
    openspec-cn instructions apply --change "<name>" --json
    \`\`\`
 
-   This returns the change directory and \`contextFiles\` (artifact ID -> array of concrete file paths). Read all available artifacts from \`contextFiles\`.
+   这会返回变更目录和 \`contextFiles\`（产出物 ID -> 具体文件路径数组）。从 \`contextFiles\` 读取所有可用产出物。
 
 4. **初始化验证报告结构**
 
@@ -53,13 +53,13 @@ export function getVerifyChangeSkillTemplate(): SkillTemplate {
 
 5. **验证完整性**
 
-   **Task Completion**:
-   - If \`contextFiles.tasks\` exists, read every file path in it
-   - Parse checkboxes: \`- [ ]\` (incomplete) vs \`- [x]\` (complete)
-   - Count complete vs total tasks
-   - If incomplete tasks exist:
-     - Add CRITICAL issue for each incomplete task
-     - Recommendation: "Complete task: <description>" or "Mark as done if already implemented"
+   **任务完成情况**：
+   - 如果 \`contextFiles.tasks\` 存在，读取其中的每个文件路径
+   - 解析复选框：\`- [ ]\`（未完成）vs \`- [x]\`（已完成）
+   - 统计已完成 vs 总任务数
+   - 如果存在未完成的任务：
+     - 为每个未完成任务添加 CRITICAL 问题
+     - 建议："完成任务：<描述>" 或 "如果已实现则标记为完成"
 
    **规范覆盖率**：
    - 如果 \`openspec/changes/<name>/specs/\` 中存在增量规范：
@@ -92,14 +92,14 @@ export function getVerifyChangeSkillTemplate(): SkillTemplate {
 
 7. **验证一致性**
 
-   **Design Adherence**:
-   - If \`contextFiles.design\` exists:
-     - Extract key decisions (look for sections like "Decision:", "Approach:", "Architecture:")
-     - Verify implementation follows those decisions
-     - If contradiction detected:
-       - Add WARNING: "Design decision not followed: <decision>"
-       - Recommendation: "Update implementation or revise design.md to match reality"
-   - If no design.md: Skip design adherence check, note "No design.md to verify against"
+   **设计遵循情况**：
+   - 如果 \`contextFiles.design\` 存在：
+     - 提取关键决策（查找 "Decision:"、"Approach:"、"Architecture:" 等部分）
+     - 验证实现是否遵循这些决策
+     - 如果检测到矛盾：
+       - 添加 WARNING："未遵循设计决策：<决策>"
+       - 建议："更新实现或修订 design.md 以匹配实际情况"
+   - 如果没有 design.md：跳过设计遵循检查，注明 "没有 design.md 可供验证"
 
    **代码模式一致性**：
    - 审查新代码与项目模式的一致性
@@ -209,7 +209,7 @@ export function getOpsxVerifyCommandTemplate(): CommandTemplate {
    openspec-cn instructions apply --change "<name>" --json
    \`\`\`
 
-   This returns the change directory and \`contextFiles\` (artifact ID -> array of concrete file paths). Read all available artifacts from \`contextFiles\`.
+   这会返回变更目录和 \`contextFiles\`（产出物 ID -> 具体文件路径数组）。从 \`contextFiles\` 读取所有可用产出物。
 
 4. **初始化验证报告结构**
 
@@ -222,13 +222,13 @@ export function getOpsxVerifyCommandTemplate(): CommandTemplate {
 
 5. **验证完整性**
 
-   **Task Completion**:
-   - If \`contextFiles.tasks\` exists, read every file path in it
-   - Parse checkboxes: \`- [ ]\` (incomplete) vs \`- [x]\` (complete)
-   - Count complete vs total tasks
-   - If incomplete tasks exist:
-     - Add CRITICAL issue for each incomplete task
-     - Recommendation: "Complete task: <description>" or "Mark as done if already implemented"
+   **任务完成情况**：
+   - 如果 \`contextFiles.tasks\` 存在，读取其中的每个文件路径
+   - 解析复选框：\`- [ ]\`（未完成）vs \`- [x]\`（已完成）
+   - 统计已完成 vs 总任务数
+   - 如果存在未完成的任务：
+     - 为每个未完成任务添加 CRITICAL 问题
+     - 建议："完成任务：<描述>" 或 "如果已实现则标记为完成"
 
    **规范覆盖率**：
    - 如果 \`openspec/changes/<name>/specs/\` 中存在增量规范：
@@ -261,14 +261,14 @@ export function getOpsxVerifyCommandTemplate(): CommandTemplate {
 
 7. **验证一致性**
 
-   **Design Adherence**:
-   - If \`contextFiles.design\` exists:
-     - Extract key decisions (look for sections like "Decision:", "Approach:", "Architecture:")
-     - Verify implementation follows those decisions
-     - If contradiction detected:
-       - Add WARNING: "Design decision not followed: <decision>"
-       - Recommendation: "Update implementation or revise design.md to match reality"
-   - If no design.md: Skip design adherence check, note "No design.md to verify against"
+   **设计遵循情况**：
+   - 如果 \`contextFiles.design\` 存在：
+     - 提取关键决策（查找 "Decision:"、"Approach:"、"Architecture:" 等部分）
+     - 验证实现是否遵循这些决策
+     - 如果检测到矛盾：
+       - 添加 WARNING："未遵循设计决策：<决策>"
+       - 建议："更新实现或修订 design.md 以匹配实际情况"
+   - 如果没有 design.md：跳过设计遵循检查，注明 "没有 design.md 可供验证"
 
    **代码模式一致性**：
    - 审查新代码与项目模式的一致性

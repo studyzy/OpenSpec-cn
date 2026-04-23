@@ -230,7 +230,7 @@ export async function buildUpdatedSpec(
       .map(issue => `line ${issue.line}: ${issue.message}`)
       .join('\n');
     throw new Error(
-      `${specName}: target spec is structurally invalid and cannot be updated until fixed:\n${details}`
+      `${specName}：目标规范结构无效，修复前无法更新：\n${details}`
     );
   }
 

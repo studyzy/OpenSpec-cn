@@ -608,12 +608,12 @@ The system SHALL do B differently.
       await archiveCommand.execute(changeName, { yes: true, noValidate: true });
 
       expect(console.log).toHaveBeenCalledWith(
-        expect.stringContaining('delta-target: target spec is structurally invalid and cannot be updated until fixed:')
+        expect.stringContaining('delta-target：目标规范结构无效，修复前无法更新：')
       );
       expect(console.log).toHaveBeenCalledWith(
-        expect.stringContaining('Requirement header "### Requirement: B" appears outside the main ## Requirements section.')
+        expect.stringContaining('需求标题 "### Requirement: B" 出现在主 ## Requirements 部分之外。')
       );
-      expect(console.log).toHaveBeenCalledWith('Aborted. No files were changed.');
+      expect(console.log).toHaveBeenCalledWith('已中止。未更改任何文件。');
 
       const still = await fs.readFile(path.join(mainSpecDir, 'spec.md'), 'utf-8');
       expect(still).toBe(malformedMain);
