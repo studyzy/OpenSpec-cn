@@ -39,11 +39,11 @@ export function getApplyChangeSkillTemplate(): SkillTemplate {
    openspec-cn instructions apply --change "<name>" --json
    \`\`\`
 
-   This returns:
-   - \`contextFiles\`: artifact ID -> array of concrete file paths (varies by schema - could be proposal/specs/design/tasks or spec/tests/implementation/docs)
-   - Progress (total, complete, remaining)
-   - Task list with status
-   - Dynamic instruction based on current state
+   这返回：
+   - \`contextFiles\`：产出物 ID -> 具体文件路径数组（因 Schema 而异，可能是 proposal/specs/design/tasks 或 spec/tests/implementation/docs）
+   - 进度（总计、完成、剩余）
+   - 带有状态的任务列表
+   - 基于当前状态的动态指令
 
    **处理状态：**
    - 如果 \`state: "blocked"\`（缺少产出物）：显示消息，建议使用 \`openspec-continue-change\`
@@ -52,8 +52,8 @@ export function getApplyChangeSkillTemplate(): SkillTemplate {
 
 4. **阅读上下文文件**
 
-   Read every file path listed under \`contextFiles\` from the apply instructions output.
-   The files depend on the schema being used:
+   阅读 apply instructions 输出中 \`contextFiles\` 列出的每个文件路径。
+   文件取决于正在使用的 Schema：
    - **spec-driven**: proposal, specs, design, tasks
    - 其他模式：遵循 CLI 输出中的 contextFiles
 
@@ -196,11 +196,11 @@ export function getOpsxApplyCommandTemplate(): CommandTemplate {
    openspec-cn instructions apply --change "<name>" --json
    \`\`\`
 
-   This returns:
-   - \`contextFiles\`: artifact ID -> array of concrete file paths (varies by schema)
-   - Progress (total, complete, remaining)
-   - Task list with status
-   - Dynamic instruction based on current state
+   这返回：
+   - \`contextFiles\`：产出物 ID -> 具体文件路径数组（因 Schema 而异）
+   - 进度（总计、完成、剩余）
+   - 带有状态的任务列表
+   - 基于当前状态的动态指令
 
    **处理状态：**
    - 如果 \`state: "blocked"\`（缺少产出物）：显示消息，建议使用 \`/opsx:continue\`
@@ -209,8 +209,8 @@ export function getOpsxApplyCommandTemplate(): CommandTemplate {
 
 4. **阅读上下文文件**
 
-   Read every file path listed under \`contextFiles\` from the apply instructions output.
-   The files depend on the schema being used:
+   阅读 apply instructions 输出中 \`contextFiles\` 列出的每个文件路径。
+   文件取决于正在使用的 Schema：
    - **spec-driven**: proposal, specs, design, tasks
    - 其他模式：遵循 CLI 输出中的 contextFiles
 

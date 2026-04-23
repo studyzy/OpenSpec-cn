@@ -279,10 +279,10 @@ The system SHALL do B.
 
       expect(report.valid).toBe(false);
       expect(
-        report.issues.some(i => i.level === 'ERROR' && i.message.includes('Main spec contains delta header'))
+        report.issues.some(i => i.level === 'ERROR' && i.message.includes('主规范包含增量标题'))
       ).toBe(true);
       expect(
-        report.issues.some(i => i.level === 'ERROR' && i.message.includes('Requirement header "### Requirement: B" appears outside'))
+        report.issues.some(i => i.level === 'ERROR' && i.message.includes('需求标题 "### Requirement: B" 出现在主'))
       ).toBe(true);
     });
 
@@ -317,7 +317,7 @@ The system SHALL do B.
 
       expect(report.valid).toBe(false);
       expect(
-        report.issues.some(i => i.level === 'ERROR' && i.message.includes('Requirement header "### Requirement: B" appears outside'))
+        report.issues.some(i => i.level === 'ERROR' && i.message.includes('需求标题 "### Requirement: B" 出现在主'))
       ).toBe(true);
     });
 
@@ -349,8 +349,8 @@ The system SHALL ...
       const report = await new Validator().validateSpec(specPath);
 
       expect(report.valid).toBe(true);
-      expect(report.issues.some(i => i.message.includes('Main spec contains delta header'))).toBe(false);
-      expect(report.issues.some(i => i.message.includes('appears outside the main ## Requirements section'))).toBe(false);
+      expect(report.issues.some(i => i.message.includes('主规范包含增量标题'))).toBe(false);
+      expect(report.issues.some(i => i.message.includes('出现在主 ## Requirements 部分之外'))).toBe(false);
     });
   });
 
