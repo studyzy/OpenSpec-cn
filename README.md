@@ -50,10 +50,6 @@
   关注 <a href="https://x.com/0xTab">X 上的 @0xTab</a> 获取更新 · 加入 <a href="https://discord.gg/YctCnvvshC">OpenSpec Discord</a> 获取帮助与答疑。
 </p>
 
-### 团队使用
-
-团队正在使用 OpenSpec？可 [发送邮件](mailto:teams@openspec.dev) 获取我们 Slack 频道的访问权限。
-
 <!-- TODO: 添加 /opsx:propose → /opsx:archive 工作流的 GIF 演示 -->
 
 ## 看看效果

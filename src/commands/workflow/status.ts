@@ -34,7 +34,7 @@ export interface StatusOptions {
 // -----------------------------------------------------------------------------
 
 export async function statusCommand(options: StatusOptions): Promise<void> {
-  const spinner = ora('正在加载变更状态...').start();
+  const spinner = options.json ? undefined : ora('正在加载变更状态...').start();
 
   try {
     const projectRoot = process.cwd();
@@ -44,7 +44,7 @@ export async function statusCommand(options: StatusOptions): Promise<void> {
     if (!options.change) {
       const available = await getAvailableChanges(projectRoot);
       if (available.length === 0) {
-        spinner.stop();
+        spinner?.stop();
         if (options.json) {
           console.log(JSON.stringify({ changes: [], message: '没有活跃的变更。' }, null, 2));
           return;
@@ -53,7 +53,7 @@ export async function statusCommand(options: StatusOptions): Promise<void> {
         return;
       }
       // Changes exist but --change not provided
-      spinner.stop();
+      spinner?.stop();
       throw new Error(
         `缺少必需选项 --change。可用的变更:\n  ${available.join('\n  ')}`
       );
@@ -70,7 +70,7 @@ export async function statusCommand(options: StatusOptions): Promise<void> {
     const context = loadChangeContext(projectRoot, changeName, options.schema);
     const status = formatChangeStatus(context);
 
-    spinner.stop();
+    spinner?.stop();
 
     if (options.json) {
       console.log(JSON.stringify(status, null, 2));
@@ -79,7 +79,7 @@ export async function statusCommand(options: StatusOptions): Promise<void> {
 
     printStatusText(status);
   } catch (error) {
-    spinner.stop();
+    spinner?.stop();
     throw error;
   }
 }
