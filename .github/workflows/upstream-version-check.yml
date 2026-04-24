@@ -1,0 +1,39 @@
+name: Upstream Version Check
+
+on:
+  schedule:
+    # 每天 UTC 08:00 (北京时间 16:00) 执行
+    - cron: '0 8 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  check-version:
+    name: Check upstream version
+    runs-on: ubuntu-latest
+    steps:
+      - name: Fetch and compare versions
+        run: |
+          UPSTREAM=$(npm view @fission-ai/openspec version 2>/dev/null || echo "")
+          LOCAL=$(npm view @studyzy/openspec-cn version 2>/dev/null || echo "")
+
+          if [ -z "$UPSTREAM" ] || [ -z "$LOCAL" ]; then
+            echo "::error::Failed to fetch versions: upstream=$UPSTREAM local=$LOCAL"
+            exit 1
+          fi
+
+          # 去掉 -xxx 后缀取基础版本
+          UPSTREAM_BASE=$(echo "$UPSTREAM" | sed 's/-.*//')
+          LOCAL_BASE=$(echo "$LOCAL" | sed 's/-.*//')
+
+          echo "Upstream: $UPSTREAM (base: $UPSTREAM_BASE)"
+          echo "Local:    $LOCAL (base: $LOCAL_BASE)"
+
+          if [ "$UPSTREAM_BASE" != "$LOCAL_BASE" ]; then
+            echo "::error::上游版本已更新! upstream=$UPSTREAM_BASE local=$LOCAL_BASE，请及时同步。"
+            exit 1
+          fi
+
+          echo "Versions match: $UPSTREAM_BASE"
