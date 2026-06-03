@@ -18,8 +18,8 @@ export function normalizeRequirementName(name: string): string {
 
 const REQUIREMENT_KEYWORD_PATTERN = '(?:Requirement|需求)';
 const REQUIREMENT_COLON_PATTERN = '[:：]';
-const REQUIREMENT_HEADER_REGEX = new RegExp(`^###\\s*${REQUIREMENT_KEYWORD_PATTERN}${REQUIREMENT_COLON_PATTERN}\\s*(.+)\\s*$`);
-const REQUIREMENT_HEADER_PREFIX = new RegExp(`^###\\s+${REQUIREMENT_KEYWORD_PATTERN}${REQUIREMENT_COLON_PATTERN}`);
+const REQUIREMENT_HEADER_REGEX = new RegExp(`^###\\s*${REQUIREMENT_KEYWORD_PATTERN}${REQUIREMENT_COLON_PATTERN}\\s*(.+)\\s*$`, 'i');
+const REQUIREMENT_HEADER_PREFIX = new RegExp(`^###\\s*${REQUIREMENT_KEYWORD_PATTERN}${REQUIREMENT_COLON_PATTERN}`, 'i');
 
 /**
  * Extracts the Requirements section from a spec file and parses requirement blocks.
@@ -28,7 +28,7 @@ export function extractRequirementsSection(content: string): RequirementsSection
 
   const normalized = normalizeLineEndings(content);
   const lines = normalized.split('\n');
-  const reqHeaderIndex = lines.findIndex(l => /^##\s+需求\s*$/i.test(l));
+  const reqHeaderIndex = lines.findIndex(l => /^##\s+(?:Requirements|需求)\s*$/i.test(l));
 
   if (reqHeaderIndex === -1) {
     // No requirements section; create an empty one at the end

@@ -6,6 +6,7 @@
 
 import ora from 'ora';
 import chalk from 'chalk';
+import { resolveCurrentPlanningHomeSync, getChangeDir } from '../../core/planning-home.js';
 import {
   loadChangeContext,
   formatChangeStatus,
@@ -37,12 +38,13 @@ export async function statusCommand(options: StatusOptions): Promise<void> {
   const spinner = options.json ? undefined : ora('正在加载变更状态...').start();
 
   try {
-    const projectRoot = process.cwd();
+    const planningHome = resolveCurrentPlanningHomeSync();
+    const projectRoot = planningHome.root;
 
     // Handle no-changes case gracefully — status is informational,
     // so "no changes" is a valid state, not an error.
     if (!options.change) {
-      const available = await getAvailableChanges(projectRoot);
+      const available = await getAvailableChanges(projectRoot, planningHome.changesDir);
       if (available.length === 0) {
         spinner?.stop();
         if (options.json) {
@@ -59,7 +61,11 @@ export async function statusCommand(options: StatusOptions): Promise<void> {
       );
     }
 
-    const changeName = await validateChangeExists(options.change, projectRoot);
+    const changeName = await validateChangeExists(
+      options.change,
+      projectRoot,
+      planningHome.changesDir
+    );
 
     // Validate schema if explicitly provided
     if (options.schema) {
@@ -67,7 +73,10 @@ export async function statusCommand(options: StatusOptions): Promise<void> {
     }
 
     // loadChangeContext will auto-detect schema from metadata if not provided
-    const context = loadChangeContext(projectRoot, changeName, options.schema);
+    const context = loadChangeContext(projectRoot, changeName, options.schema, {
+      changeDir: getChangeDir(planningHome, changeName),
+      planningHome,
+    });
     const status = formatChangeStatus(context);
 
     spinner?.stop();
@@ -90,6 +99,16 @@ export function printStatusText(status: ChangeStatus): void {
 
   console.log(`变更: ${status.changeName}`);
   console.log(`Schema: ${status.schemaName}`);
+  if (status.initiative) {
+    console.log(`Initiative: ${status.initiative.store}/${status.initiative.id}`);
+  }
+  if (status.planningHome) {
+    const label = status.planningHome.kind === 'workspace'
+      ? `工作区${status.planningHome.workspaceName ? ` (${status.planningHome.workspaceName})` : ''}`
+      : '仓库';
+    console.log(`规划主目录: ${label}`);
+    console.log(`变更根路径: ${status.changeRoot}`);
+  }
   console.log(`进度: ${doneCount}/${total} 个产出物已完成`);
   console.log();
 

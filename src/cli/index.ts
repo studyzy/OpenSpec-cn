@@ -2,6 +2,7 @@ import { Command } from 'commander';
 import { createRequire } from 'module';
 import ora from 'ora';
 import path from 'path';
+import { fileURLToPath } from 'url';
 import { promises as fs } from 'fs';
 import { AI_TOOLS } from '../core/config.js';
 import { UpdateCommand } from '../core/update.js';
@@ -17,18 +18,27 @@ import { FeedbackCommand } from '../commands/feedback.js';
 import { registerConfigCommand } from '../commands/config.js';
 import { registerSchemaCommand } from '../commands/schema.js';
 import {
+  registerWorkspaceCommand,
+  runWorkspaceUpdateForRoot,
+} from '../commands/workspace.js';
+import { registerContextStoreCommand } from '../commands/context-store.js';
+import { registerInitiativeCommand } from '../commands/initiative.js';
+import { findWorkspaceRoot } from '../core/workspace/index.js';
+import {
   statusCommand,
   instructionsCommand,
   applyInstructionsCommand,
   templatesCommand,
   schemasCommand,
   newChangeCommand,
+  setChangeCommand,
   DEFAULT_SCHEMA,
   type StatusOptions,
   type InstructionsOptions,
   type TemplatesOptions,
   type SchemasOptions,
   type NewChangeOptions,
+  type SetChangeOptions,
 } from '../commands/workflow/index.js';
 import { maybeShowTelemetryNotice, trackCommand, shutdown } from '../telemetry/index.js';
 
@@ -162,6 +172,12 @@ program
   .action(async (targetPath = '.', options?: { force?: boolean }) => {
     try {
       const resolvedPath = path.resolve(targetPath);
+      const workspaceRoot = await findWorkspaceRoot(resolvedPath);
+      if (workspaceRoot) {
+        await runWorkspaceUpdateForRoot(workspaceRoot, { force: options?.force });
+        return;
+      }
+
       const updateCommand = new UpdateCommand({ force: options?.force });
       await updateCommand.execute(resolvedPath);
     } catch (error) {
@@ -287,6 +303,9 @@ program
 registerSpecCommand(program);
 registerConfigCommand(program);
 registerSchemaCommand(program);
+registerWorkspaceCommand(program);
+registerContextStoreCommand(program);
+registerInitiativeCommand(program);
 
 // Top-level validate command
 program
@@ -498,7 +517,13 @@ newCmd
   .command('change <name>')
   .description('创建一个新的变更目录')
   .option('--description <text>', '添加到 README.md 的描述')
+  .option('--goal <text>', '与变更一起存储的工作区产品目标')
+  .option('--areas <names>', '逗号分隔的受影响工作区链接名称')
+  .option('--initiative <id>', '将本地仓库变更关联到计划')
+  .option('--store <id>', '--initiative 的上下文存储 ID')
+  .option('--store-path <path>', '--initiative 的现有本地上下文存储根路径')
   .option('--schema <name>', `要使用的工作流 Schema（默认：${DEFAULT_SCHEMA}）`)
+  .option('--json', '以 JSON 格式输出')
   .action(async (name: string, options: NewChangeOptions) => {
     try {
       await newChangeCommand(name, options);
@@ -509,4 +534,32 @@ newCmd
     }
   });
 
-program.parse();
+// Set command group
+const setCmd = program.command('set').description('设置已提交的 OpenSpec 元数据');
+
+setCmd
+  .command('change <name>')
+  .description('设置本地仓库变更元数据')
+  .option('--initiative <id>', '将本地仓库变更关联到计划')
+  .option('--store <id>', '--initiative 的上下文存储 ID')
+  .option('--store-path <path>', '--initiative 的现有本地上下文存储根路径')
+  .option('--json', '以 JSON 格式输出')
+  .action(async (name: string, options: SetChangeOptions) => {
+    try {
+      await setChangeCommand(name, options);
+    } catch (error) {
+      console.log();
+      ora().fail(`错误：${(error as Error).message}`);
+      process.exit(1);
+    }
+  });
+
+export { program };
+
+export function runCli(argv = process.argv): void {
+  program.parse(argv);
+}
+
+if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+  runCli();
+}

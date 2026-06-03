@@ -49,6 +49,129 @@ OpenSpec 将你的工作组织为两个主要区域：
 
 这种分离是关键。你可以并行处理多个变更而不会产生冲突。你可以在变更影响主规范之前进行审查。当你归档变更时，其增量会干净地合并到单一事实来源中。
 
+## 协调工作区（Coordination Workspaces）
+
+工作区支持处于 beta 阶段。以下本地视图模型是当前方向，但外部自动化、集成和长期工作流应仍将命令行为、状态文件和 JSON 输出视为可能变化的。
+
+以下命令提供了打开关联仓库或文件夹本地视图的首个设置流程。
+
+仓库本地 OpenSpec 项目是在一个仓库拥有规划、实施和归档流程时的正确默认选择。某些工作跨越多个仓库或文件夹。对于这种情况，OpenSpec 协调工作区是一个机器本地视图，将关联路径、打开器状态和 Agent 设置保存在一起。
+
+工作区心智模型：
+
+```text
+workspace（工作区）     = 覆盖上下文存储、initiative、仓库和文件夹的私有本地视图
+context store（上下文存储） = 持久化共享上下文容器
+initiative              = 上下文存储内的持久化协调上下文
+link（关联）             = 工作区可在本地解析的仓库或文件夹的稳定名称
+change（变更）           = 一个计划中的工作；实施属于拥有的仓库
+```
+
+工作区与仓库本地项目有不同的结构：
+
+```text
+getGlobalDataDir()/workspaces/<workspace-name>/
+├── workspace.yaml                 # 私有本地视图记录
+├── AGENTS.md                      # 生成的运行时指引
+└── <workspace-name>.code-workspace # 生成的编辑器工作区文件
+```
+
+仓库本地 OpenSpec 状态保持现有结构：
+
+```text
+repo-root/
+└── openspec/
+    ├── specs/
+    └── changes/
+```
+
+这个区别很重要。工作区文件夹是用于打开和检查关联仓库或文件夹的本地协调界面。每个仓库的 `openspec/` 目录仍然是仓库拥有的规范、仓库本地变更和实施规划的主目录。用户不需要在工作区文件夹内运行仓库本地 `openspec-cn init`。
+
+稳定关联名称是工作区引用仓库和文件夹的方式。私有工作区记录保持如 `api`、`web` 或 `checkout` 之类的名称，并将它们映射到当前运行时的本地路径。
+
+```yaml
+# workspace.yaml
+version: 1
+name: platform
+context: null
+links:
+  api: /repos/api
+  web: /repos/web
+```
+
+当工作区打开 initiative 时，`context` 记录选定的上下文存储绑定和 initiative ID。注册表选择的存储通过 ID 保持可移植性；路径选择的存储有意保留运行时本地路径，因为 `workspace.yaml` 是私有本地状态。
+
+```yaml
+context:
+  kind: initiative
+  store:
+    id: platform
+    selector:
+      kind: registry
+      id: platform
+  initiative:
+    id: billing-launch
+```
+
+关联路径可以是完整仓库、大型 monorepo 内的文件夹，或其他现有文件夹。它们不需要在参与工作区规划之前具有仓库本地 `openspec/` 状态。稍后的实施、验证或归档工作流可能需要更多的仓库就绪状态，但规划可见性从关联开始。
+
+```text
+多仓库：
+  api      -> /repos/api
+  web      -> /repos/web
+
+大型 monorepo：
+  billing  -> /repos/platform/services/billing
+  checkout -> /repos/platform/apps/checkout
+```
+
+受管工作区位于标准 OpenSpec 数据目录下：
+
+```text
+getGlobalDataDir()/workspaces
+```
+
+即设置了 `XDG_DATA_HOME` 时为 `$XDG_DATA_HOME/openspec/workspaces`，Unix 风格回退为 `~/.local/share/openspec/workspaces`，Windows 原生回退为 `%LOCALAPPDATA%\openspec\workspaces`。
+
+工作区可见性不等同于变更承诺。当 OpenSpec 应该知道哪些仓库或文件夹相关时设置工作区；当你准备好规划功能、修复、项目或其他工作时再创建变更。
+
+常用命令：
+
+```bash
+# 引导式设置
+openspec-cn workspace setup
+
+# 自动化友好的设置
+openspec-cn workspace setup --no-interactive --name platform --link /repos/api --link web=/repos/web
+openspec-cn workspace setup --no-interactive --name platform --link /repos/api --opener codex-cli
+
+# 查看本地注册表中已知的工作区
+openspec-cn workspace list
+openspec-cn workspace ls
+
+# 为选定的工作区添加或修复关联
+openspec-cn workspace link /repos/api
+openspec-cn workspace link api-service /repos/api
+openspec-cn workspace relink api-service /new/path/to/api
+
+# 检查此机器能解析什么
+openspec-cn workspace doctor
+openspec-cn workspace doctor --workspace platform
+
+# 刷新工作区本地指引和 Agent 技能
+openspec-cn workspace update
+openspec-cn workspace update --workspace platform --tools codex,claude
+
+# 打开关联的工作集
+openspec-cn workspace open
+openspec-cn workspace open platform --agent github-copilot
+openspec-cn workspace open --editor
+
+# 以本地工作区视图打开 initiative
+openspec-cn workspace open --initiative billing-launch --store platform
+openspec-cn workspace open --initiative billing-launch --store-path /repos/platform-context
+```
+
 ## 规范（Specs）
 
 规范使用结构化的需求和场景来描述系统的行为。

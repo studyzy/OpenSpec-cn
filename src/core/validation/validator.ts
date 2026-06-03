@@ -165,7 +165,7 @@ export class Validator {
           if (!requirementText) {
             issues.push({ level: 'ERROR', path: entryPath, message: `新增需求 "${block.name}" 缺少需求文本` });
           } else if (!this.containsShallOrMust(requirementText)) {
-            issues.push({ level: 'ERROR', path: entryPath, message: `新增需求 "${block.name}" 必须包含 SHALL、MUST、必须 或 禁止` });
+            issues.push({ level: 'ERROR', path: entryPath, message: this.buildMissingShallOrMustMessage('ADDED', block.name) });
           }
           const scenarioCount = this.countScenarios(block.raw);
           if (scenarioCount < 1) {
@@ -186,7 +186,7 @@ export class Validator {
           if (!requirementText) {
             issues.push({ level: 'ERROR', path: entryPath, message: `修改需求 "${block.name}" 缺少需求文本` });
           } else if (!this.containsShallOrMust(requirementText)) {
-            issues.push({ level: 'ERROR', path: entryPath, message: `修改需求 "${block.name}" 必须包含 SHALL、MUST、必须 或 禁止` });
+            issues.push({ level: 'ERROR', path: entryPath, message: this.buildMissingShallOrMustMessage('MODIFIED', block.name) });
           }
           const scenarioCount = this.countScenarios(block.raw);
           if (scenarioCount < 1) {
@@ -443,6 +443,25 @@ export class Validator {
 
   private containsShallOrMust(text: string): boolean {
     return /\b(SHALL|MUST|必须|禁止)\b/.test(text) || /(?:必须|禁止)/.test(text);
+  }
+
+  /**
+   * Build an error message for a requirement block whose body lacks SHALL/MUST.
+   *
+   * When the SHALL/MUST keyword already appears in the requirement header (e.g.
+   * `### Requirement: The system SHALL ...`) the original generic error
+   * ("must contain SHALL or MUST") is confusing because the keyword is visibly
+   * present in the spec. Per the OpenSpec conventions the keyword has to live
+   * on the requirement body line (the line right after the header), so we point
+   * the author at that exact fix when the keyword is found in the header only.
+   */
+  private buildMissingShallOrMustMessage(action: 'ADDED' | 'MODIFIED', blockName: string): string {
+    const actionText = action === 'ADDED' ? '新增' : '修改';
+    const base = `${actionText}需求 "${blockName}" 必须包含 SHALL、MUST、必须 或 禁止`;
+    if (this.containsShallOrMust(blockName)) {
+      return `${base}（在需求正文中，而不仅仅是标题中）。请将 SHALL/MUST 语句移到 "### 需求: ..." 标题的下一行。`;
+    }
+    return base;
   }
 
   private countScenarios(blockRaw: string): number {

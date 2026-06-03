@@ -31,6 +31,7 @@ export function getApplyChangeSkillTemplate(): SkillTemplate {
    \`\`\`
    解析 JSON 以了解：
    - \`schemaName\`：正在使用的工作流 Schema（例如："spec-driven"）
+   - \`planningHome\`、\`changeRoot\` 和 \`actionContext\`：规划范围和编辑约束
    - 哪个产出物包含任务（对于 spec-driven 通常是 "tasks"，检查其他产出物的状态）
 
 3. **获取应用指令**
@@ -49,6 +50,8 @@ export function getApplyChangeSkillTemplate(): SkillTemplate {
    - 如果 \`state: "blocked"\`（缺少产出物）：显示消息，建议使用 \`openspec-continue-change\`
    - 如果 \`state: "all_done"\`：祝贺，建议归档
    - 否则：继续实现
+
+   **工作区保护：** 如果状态 JSON 报告 \`actionContext.mode: "workspace-planning"\` 且 \`allowedEditRoots\` 为空，说明完整的工作区应用在此切片中不受支持。将链接的仓库和文件夹视为只读上下文，要求用户通过显式实现工作流选择受影响区域，并在编辑文件之前停止。
 
 4. **阅读上下文文件**
 
@@ -188,6 +191,7 @@ export function getOpsxApplyCommandTemplate(): CommandTemplate {
    \`\`\`
    解析 JSON 以了解：
    - \`schemaName\`：正在使用的工作流 Schema（例如："spec-driven"）
+   - \`planningHome\`、\`changeRoot\` 和 \`actionContext\`：规划范围和编辑约束
    - 哪个产出物包含任务（对于 spec-driven 通常是 "tasks"，检查其他产出物的状态）
 
 3. **获取应用指令**
@@ -206,6 +210,8 @@ export function getOpsxApplyCommandTemplate(): CommandTemplate {
    - 如果 \`state: "blocked"\`（缺少产出物）：显示消息，建议使用 \`/opsx:continue\`
    - 如果 \`state: "all_done"\`：祝贺，建议归档
    - 否则：继续实现
+
+   **工作区保护：** 如果状态 JSON 报告 \`actionContext.mode: "workspace-planning"\` 且 \`allowedEditRoots\` 为空，说明完整的工作区应用在此切片中不受支持。将链接的仓库和文件夹视为只读上下文，要求用户通过显式实现工作流选择受影响区域，并在编辑文件之前停止。
 
 4. **阅读上下文文件**
 

@@ -9,111 +9,120 @@ import type { SkillTemplate, CommandTemplate } from '../types.js';
 export function getSyncSpecsSkillTemplate(): SkillTemplate {
   return {
     name: 'openspec-sync-specs',
-    description: '将变更中的增量规范同步到主规范。当用户想要使用增量规范中的更改更新主规范，而不归档该变更时使用。',
+    description: '将变更中的增量规范同步到主规范。当用户想要用增量规范的变更更新主规范，而不归档变更时使用。',
     instructions: `将变更中的增量规范同步到主规范。
 
-这是一个 **Agent 驱动** 的操作 - 你将读取增量规范并直接编辑主规范以应用更改。这允许智能合并（例如，添加场景而不复制整个需求）。
+这是一个**代理驱动**的操作 - 你将读取增量规范并直接编辑主规范来应用变更。这允许智能合并（例如，添加一个场景而无需复制整个需求）。
 
-**输入**：可选指定变更名称。如果省略，检查是否可以从对话上下文中推断。如果模糊或不明确，你**必须**提示获取可用变更。
+**输入**：可选指定变更名称。如果省略，检查是否可以从对话上下文推断。如果模糊或不明确，你必须提示用户选择可用变更。
 
 **步骤**
 
-1. **如果没有提供变更名称，提示选择**
+1. **如果未提供变更名称，提示用户选择**
 
    运行 \`openspec-cn list --json\` 获取可用变更。使用 **AskUserQuestion tool** 让用户选择。
 
-   显示具有增量规范（在 \`specs/\` 目录下）的变更。
+   显示有增量规范的变更（在 \`specs/\` 目录下）。
 
-   **重要提示**：不要猜测或自动选择变更。始终让用户选择。
+   **重要**：不要猜测或自动选择变更。始终让用户选择。
 
-2. **查找增量规范**
+2. **解析变更上下文**
 
-   在 \`openspec/changes/<name>/specs/*/spec.md\` 中查找增量规范文件。
+   运行：
+   \`\`\`bash
+   openspec-cn status --change "<name>" --json
+   \`\`\`
 
-   每个增量规范文件包含如下部分：
-   - \`## 新增需求\` - 要添加的新需求
-   - \`## 修改需求\` - 对现有需求的更改
-   - \`## 移除需求\` - 要移除的需求
-   - \`## 重命名需求\` - 要重命名的需求（从/到 格式）
+   如果状态报告 \`actionContext.mode: "workspace-planning"\`，说明工作区规范同步在当前版本中不支持并停止。不要回退到仓库本地路径或编辑链接的仓库。
 
-   如果没有找到增量规范，通知用户并停止。
+3. **查找增量规范**
 
-3. **对于每个增量规范，将更改应用到主规范**
+   使用状态 JSON 中的 \`artifactPaths.specs.existingOutputPaths\` 作为增量规范文件列表。
 
-   对于在 \`openspec/changes/<name>/specs/<capability>/spec.md\` 处具有增量规范的每个 capability：
+   每个增量规范文件包含如下章节：
+   - \`## ADDED Requirements\` - 要添加的新需求
+   - \`## MODIFIED Requirements\` - 对现有需求的变更
+   - \`## REMOVED Requirements\` - 要删除的需求
+   - \`## RENAMED Requirements\` - 要重命名的需求（FROM:/TO: 格式）
 
-   a. **阅读增量规范** 以了解预期的更改
+   如果未找到增量规范，通知用户并停止。
 
-   b. **阅读主规范** 于 \`openspec/specs/<capability>/spec.md\`（可能尚不存在）
+4. **对每个增量规范，将变更应用到主规范**
 
-   c. **智能地应用更改**：
+   对 CLI 返回的每个仓库本地能力增量规范路径：
 
-      **新增需求：**
+   a. **读取增量规范** 了解预期的变更
+
+   b. **读取主规范** 位于 \`openspec/specs/<capability>/spec.md\`（可能尚不存在）
+
+   c. **智能应用变更**：
+
+      **新增需求（ADDED Requirements）：**
       - 如果需求在主规范中不存在 → 添加它
-      - 如果需求已存在 → 更新它以匹配（视为隐式 MODIFIED）
+      - 如果需求已存在 → 更新它以匹配（视为隐式修改）
 
-      **修改需求：**
+      **修改需求（MODIFIED Requirements）：**
       - 在主规范中找到该需求
-      - 应用更改 - 这可能是：
-        - 添加新场景（不需要复制现有场景）
+      - 应用变更 - 可以是：
+        - 添加新场景（不需要复制现有的）
         - 修改现有场景
         - 更改需求描述
-      - 保留增量中未提及的场景/内容
+      - 保留增量规范中未提及的场景/内容
 
-      **移除需求：**
-      - 从主规范中移除整个需求块
+      **删除需求（REMOVED Requirements）：**
+      - 从主规范中删除整个需求块
 
-      **重命名需求：**
+      **重命名需求（RENAMED Requirements）：**
       - 找到 FROM 需求，重命名为 TO
 
-   d. **创建新主规范** 如果 capability 尚不存在：
+   d. **创建新主规范** 如果能力还不存在：
       - 创建 \`openspec/specs/<capability>/spec.md\`
-      - 添加 目的 部分（可以简短，标记为 待定）
-      - 添加 需求 部分以及 新增需求
+      - 添加目的章节（可以简短，标记为待定）
+      - 添加需求章节，包含新增的需求
 
-4. **显示摘要**
+5. **显示摘要**
 
-   应用所有更改后，总结：
-   - 哪些 capability 已更新
-   - 做了什么更改（需求添加/修改/移除/重命名）
+   应用所有变更后，总结：
+   - 更新了哪些能力
+   - 做了什么变更（需求的新增/修改/删除/重命名）
 
 **增量规范格式参考**
 
 \`\`\`markdown
-## 新增需求
+## ADDED Requirements
 
-### 需求: 新功能
-系统 应当 实现新的能力。
+### Requirement: New Feature
+The system SHALL do something new.
 
-#### 场景: 基本场景
-- **当** 用户执行 X
-- **那么** 系统执行 Y
+#### Scenario: Basic case
+- **WHEN** user does X
+- **THEN** system does Y
 
-## 修改需求
+## MODIFIED Requirements
 
-### 需求: 现有功能
-#### 场景: 需要新增的场景
-- **当** 用户执行 A
-- **那么** 系统执行 B
+### Requirement: Existing Feature
+#### Scenario: New scenario to add
+- **WHEN** user does A
+- **THEN** system does B
 
-## 移除需求
+## REMOVED Requirements
 
-### 需求: 已废弃功能
+### Requirement: Deprecated Feature
 
-## 重命名需求
+## RENAMED Requirements
 
-- 从: \`### 需求: Old Name\`
-- 到: \`### 需求: New Name\`
+- FROM: \`### Requirement: Old Name\`
+- TO: \`### Requirement: New Name\`
 \`\`\`
 
-**关键原则：智能合并**
+**核心原则：智能合并**
 
-与程序化合并不同，你可以应用 **部分更新**：
-- 要添加场景，只需将该场景包含在 MODIFIED 下 - 不要复制现有场景
-- 增量代表 *意图*，而不是整体替换
-- 使用你的判断力合理地合并更改
+与程序化合并不同，你可以应用**部分更新**：
+- 要添加一个场景，只需在 MODIFIED 下包含该场景 - 不要复制现有场景
+- 增量规范代表*意图*，不是整体替换
+- 使用你的判断力合理地合并变更
 
-**成功时的输出**
+**成功输出**
 
 \`\`\`
 ## 规范已同步：<change-name>
@@ -121,24 +130,24 @@ export function getSyncSpecsSkillTemplate(): SkillTemplate {
 已更新主规范：
 
 **<capability-1>**：
-- 添加需求："新功能"
-- 修改需求："现有功能"（添加了 1 个场景）
+- 新增需求："New Feature"
+- 修改需求："Existing Feature"（添加了 1 个场景）
 
 **<capability-2>**：
 - 创建了新规范文件
-- 添加需求："另一个功能"
+- 新增需求："Another Feature"
 
-主规范现已更新。变更保持活动状态 - 在实现完成后归档。
+主规范已更新。变更仍为活跃状态 - 实现完成后再归档。
 \`\`\`
 
 **护栏**
-- 在进行更改之前阅读增量规范和主规范
-- 保留增量中未提及的现有内容
-- 如果不清楚，询问澄清
-- 在进行时显示你正在更改的内容
-- 操作应该是幂等的 - 运行两次应给出相同的结果`,
+- 修改前读取增量规范和主规范
+- 保留增量规范中未提及的现有内容
+- 如果有不清楚的地方，询问确认
+- 进行中展示你在修改什么
+- 操作应该是幂等的 - 运行两次应该得到相同结果`,
     license: 'MIT',
-    compatibility: '需要 openspec-cn CLI。',
+    compatibility: 'Requires openspec CLI.',
     metadata: { author: 'openspec', version: '1.0' },
   };
 }
@@ -151,108 +160,117 @@ export function getOpsxSyncCommandTemplate(): CommandTemplate {
     tags: ['workflow', 'specs', 'experimental'],
     content: `将变更中的增量规范同步到主规范。
 
-这是一个 **Agent 驱动** 的操作 - 你将读取增量规范并直接编辑主规范以应用更改。这允许智能合并（例如，添加场景而不复制整个需求）。
+这是一个**代理驱动**的操作 - 你将读取增量规范并直接编辑主规范来应用变更。这允许智能合并（例如，添加一个场景而无需复制整个需求）。
 
-**输入**：可选择在 \`/opsx:sync\` 后指定变更名称（例如，\`/opsx:sync add-auth\`）。如果省略，检查是否可以从对话上下文中推断出来。如果模糊或不明确，你必须提示可用的变更。
+**输入**：可选在 \`/opsx:sync\` 后指定变更名称（如 \`/opsx:sync add-auth\`）。如果省略，检查是否可以从对话上下文推断。如果模糊或不明确，你必须提示用户选择可用变更。
 
 **步骤**
 
-1. **如果没有提供变更名称，提示选择**
+1. **如果未提供变更名称，提示用户选择**
 
    运行 \`openspec-cn list --json\` 获取可用变更。使用 **AskUserQuestion tool** 让用户选择。
 
-   显示具有增量规范（在 \`specs/\` 目录下）的变更。
+   显示有增量规范的变更（在 \`specs/\` 目录下）。
 
-   **重要提示**：不要猜测或自动选择变更。始终让用户选择。
+   **重要**：不要猜测或自动选择变更。始终让用户选择。
 
-2. **查找增量规范**
+2. **解析变更上下文**
 
-   在 \`openspec/changes/<name>/specs/*/spec.md\` 中查找增量规范文件。
+   运行：
+   \`\`\`bash
+   openspec-cn status --change "<name>" --json
+   \`\`\`
 
-   每个增量规范文件包含如下部分：
-   - \`## 新增需求\` - 要添加的新需求
-   - \`## 修改需求\` - 对现有需求的更改
-   - \`## 移除需求\` - 要移除的需求
-   - \`## 重命名需求\` - 要重命名的需求（从/到 格式）
+   如果状态报告 \`actionContext.mode: "workspace-planning"\`，说明工作区规范同步在当前版本中不支持并停止。不要回退到仓库本地路径或编辑链接的仓库。
 
-   如果没有找到增量规范，通知用户并停止。
+3. **查找增量规范**
 
-3. **对于每个增量规范，将更改应用到主规范**
+   使用状态 JSON 中的 \`artifactPaths.specs.existingOutputPaths\` 作为增量规范文件列表。
 
-   对于在 \`openspec/changes/<name>/specs/<capability>/spec.md\` 处具有增量规范的每个 capability：
+   每个增量规范文件包含如下章节：
+   - \`## ADDED Requirements\` - 要添加的新需求
+   - \`## MODIFIED Requirements\` - 对现有需求的变更
+   - \`## REMOVED Requirements\` - 要删除的需求
+   - \`## RENAMED Requirements\` - 要重命名的需求（FROM:/TO: 格式）
 
-   a. **阅读增量规范** 以了解预期的更改
+   如果未找到增量规范，通知用户并停止。
 
-   b. **阅读主规范** 于 \`openspec/specs/<capability>/spec.md\`（可能尚不存在）
+4. **对每个增量规范，将变更应用到主规范**
 
-   c. **智能地应用更改**：
+   对 CLI 返回的每个仓库本地能力增量规范路径：
 
-      **新增需求：**
+   a. **读取增量规范** 了解预期的变更
+
+   b. **读取主规范** 位于 \`openspec/specs/<capability>/spec.md\`（可能尚不存在）
+
+   c. **智能应用变更**：
+
+      **新增需求（ADDED Requirements）：**
       - 如果需求在主规范中不存在 → 添加它
-      - 如果需求已存在 → 更新它以匹配（视为隐式 MODIFIED）
+      - 如果需求已存在 → 更新它以匹配（视为隐式修改）
 
-      **修改需求：**
+      **修改需求（MODIFIED Requirements）：**
       - 在主规范中找到该需求
-      - 应用更改 - 这可能是：
-        - 添加新场景（不需要复制现有场景）
+      - 应用变更 - 可以是：
+        - 添加新场景（不需要复制现有的）
         - 修改现有场景
         - 更改需求描述
-      - 保留增量中未提及的场景/内容
+      - 保留增量规范中未提及的场景/内容
 
-      **移除需求：**
-      - 从主规范中移除整个需求块
+      **删除需求（REMOVED Requirements）：**
+      - 从主规范中删除整个需求块
 
-      **重命名需求：**
+      **重命名需求（RENAMED Requirements）：**
       - 找到 FROM 需求，重命名为 TO
 
-   d. **创建新主规范** 如果 capability 尚不存在：
+   d. **创建新主规范** 如果能力还不存在：
       - 创建 \`openspec/specs/<capability>/spec.md\`
-      - 添加 目的 部分（可以简短，标记为 待定）
-      - 添加 需求 部分以及 新增需求
+      - 添加目的章节（可以简短，标记为待定）
+      - 添加需求章节，包含新增的需求
 
-4. **显示摘要**
+5. **显示摘要**
 
-   应用所有更改后，总结：
-   - 哪些 capability 已更新
-   - 做了什么更改（需求添加/修改/移除/重命名）
+   应用所有变更后，总结：
+   - 更新了哪些能力
+   - 做了什么变更（需求的新增/修改/删除/重命名）
 
 **增量规范格式参考**
 
 \`\`\`markdown
-## 新增需求
+## ADDED Requirements
 
-### 需求: 新功能
-系统 应当 实现新的能力。
+### Requirement: New Feature
+The system SHALL do something new.
 
-#### 场景: 基本场景
-- **当** 用户执行 X
-- **那么** 系统执行 Y
+#### Scenario: Basic case
+- **WHEN** user does X
+- **THEN** system does Y
 
-## 修改需求
+## MODIFIED Requirements
 
-### 需求: 现有功能
-#### 场景: 需要新增的场景
-- **当** 用户执行 A
-- **那么** 系统执行 B
+### Requirement: Existing Feature
+#### Scenario: New scenario to add
+- **WHEN** user does A
+- **THEN** system does B
 
-## 移除需求
+## REMOVED Requirements
 
-### 需求: 已废弃功能
+### Requirement: Deprecated Feature
 
-## 重命名需求
+## RENAMED Requirements
 
-- 从: \`### 需求: Old Name\`
-- 到: \`### 需求: New Name\`
+- FROM: \`### Requirement: Old Name\`
+- TO: \`### Requirement: New Name\`
 \`\`\`
 
-**关键原则：智能合并**
+**核心原则：智能合并**
 
-与程序化合并不同，你可以应用 **部分更新**：
-- 要添加场景，只需将该场景包含在 MODIFIED 下 - 不要复制现有场景
-- 增量代表 *意图*，而不是整体替换
-- 使用你的判断力合理地合并更改
+与程序化合并不同，你可以应用**部分更新**：
+- 要添加一个场景，只需在 MODIFIED 下包含该场景 - 不要复制现有场景
+- 增量规范代表*意图*，不是整体替换
+- 使用你的判断力合理地合并变更
 
-**成功时的输出**
+**成功输出**
 
 \`\`\`
 ## 规范已同步：<change-name>
@@ -260,21 +278,21 @@ export function getOpsxSyncCommandTemplate(): CommandTemplate {
 已更新主规范：
 
 **<capability-1>**：
-- 添加需求："新功能"
-- 修改需求："现有功能"（添加了 1 个场景）
+- 新增需求："New Feature"
+- 修改需求："Existing Feature"（添加了 1 个场景）
 
 **<capability-2>**：
 - 创建了新规范文件
-- 添加需求："另一个功能"
+- 新增需求："Another Feature"
 
-主规范现已更新。变更保持活动状态 - 在实现完成后归档。
+主规范已更新。变更仍为活跃状态 - 实现完成后再归档。
 \`\`\`
 
 **护栏**
-- 在进行更改之前阅读增量规范和主规范
-- 保留增量中未提及的现有内容
-- 如果不清楚，询问澄清
-- 在进行时显示你正在更改的内容
-- 操作应该是幂等的 - 运行两次应给出相同的结果`
+- 修改前读取增量规范和主规范
+- 保留增量规范中未提及的现有内容
+- 如果有不清楚的地方，询问确认
+- 进行中展示你在修改什么
+- 操作应该是幂等的 - 运行两次应该得到相同结果`
   };
 }

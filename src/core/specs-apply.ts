@@ -287,7 +287,7 @@ export async function buildUpdatedSpec(
       throw new Error(`${specName} 修改失败：未找到需求 "### 需求: ${mod.name}"`);
     }
     // Replace block with provided raw (ensure header line matches key)
-    const modHeaderMatch = mod.raw.split('\n')[0].match(new RegExp(`^###\\s*(?:Requirement|需求)[:：]\\s*(.+)\\s*$`));
+    const modHeaderMatch = mod.raw.split('\n')[0].match(new RegExp(`^###\\s*(?:Requirement|需求)[:：]\\s*(.+)\\s*$`, 'i'));
     if (!modHeaderMatch || normalizeRequirementName(modHeaderMatch[1]) !== key) {
       throw new Error(
         `${specName} 修改失败：内容中的标题不匹配 "### 需求: ${mod.name}"`

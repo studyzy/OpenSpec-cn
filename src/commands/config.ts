@@ -22,6 +22,11 @@ import {
 import { CORE_WORKFLOWS, ALL_WORKFLOWS, getProfileWorkflows } from '../core/profiles.js';
 import { OPENSPEC_DIR_NAME } from '../core/config.js';
 import { hasProjectConfigDrift } from '../core/profile-sync-drift.js';
+import {
+  findWorkspaceRoot,
+  hasWorkspaceSkillProfileDrift,
+  readOptionalWorkspaceViewState,
+} from '../core/workspace/index.js';
 
 type ProfileAction = 'both' | 'delivery' | 'workflows' | 'keep';
 
@@ -39,6 +44,11 @@ interface ProfileStateDiff {
 interface WorkflowPromptMeta {
   name: string;
   description: string;
+}
+
+interface WorkspaceConfigProfileContext {
+  root: string;
+  commandCwd: string;
 }
 
 const WORKFLOW_PROMPT_META: Record<string, WorkflowPromptMeta> = {
@@ -186,7 +196,21 @@ export function diffProfileState(before: ProfileState, after: ProfileState): Pro
   };
 }
 
-function maybeWarnConfigDrift(
+async function resolveWorkspaceConfigProfileContext(
+  cwd = process.cwd()
+): Promise<WorkspaceConfigProfileContext | null> {
+  const workspaceRoot = await findWorkspaceRoot(cwd);
+  if (!workspaceRoot) {
+    return null;
+  }
+
+  return {
+    root: workspaceRoot,
+    commandCwd: cwd,
+  };
+}
+
+function maybeWarnProjectConfigDrift(
   projectDir: string,
   state: ProfileState,
   colorize: (message: string) => string
@@ -199,6 +223,41 @@ function maybeWarnConfigDrift(
     return;
   }
   console.log(colorize('警告：全局配置未应用于此项目。请运行 `openspec-cn update` 来同步。'));
+}
+
+async function maybeWarnConfigDrift(
+  state: ProfileState,
+  colorize: (message: string) => string
+): Promise<void> {
+  const workspaceContext = await resolveWorkspaceConfigProfileContext();
+  if (workspaceContext) {
+    let viewState = null;
+    try {
+      viewState = await readOptionalWorkspaceViewState(workspaceContext.root);
+    } catch {
+      return;
+    }
+
+    if (hasWorkspaceSkillProfileDrift(viewState)) {
+      console.log(
+        colorize(
+          '警告：工作区本地代理技能与活跃的全局档案不同步。请运行 `openspec-cn workspace update` 来同步。'
+        )
+      );
+    }
+    return;
+  }
+
+  maybeWarnProjectConfigDrift(process.cwd(), state, colorize);
+}
+
+function printConfigProfileApplyGuidance(workspaceContext: WorkspaceConfigProfileContext | null): void {
+  if (workspaceContext) {
+    console.log('配置已更新。请运行 `openspec-cn workspace update` 以将其应用到工作区本地技能。');
+    return;
+  }
+
+  console.log('配置已更新。请在您的项目中运行 `openspec-cn update` 来应用。');
 }
 
 /**
@@ -461,7 +520,8 @@ export function registerConfigCommand(program: Command): void {
         config.workflows = [...CORE_WORKFLOWS];
         // Preserve delivery setting
         saveGlobalConfig(config);
-        console.log('配置已更新。请在您的项目中运行 `openspec-cn update` 来应用。');
+        const workspaceContext = await resolveWorkspaceConfigProfileContext();
+        printConfigProfileApplyGuidance(workspaceContext);
         return;
       }
 
@@ -521,7 +581,7 @@ export function registerConfigCommand(program: Command): void {
 
         if (action === 'keep') {
           console.log('没有配置更改。');
-          maybeWarnConfigDrift(process.cwd(), currentState, chalk.yellow);
+          await maybeWarnConfigDrift(currentState, chalk.yellow);
           return;
         }
 
@@ -596,7 +656,7 @@ export function registerConfigCommand(program: Command): void {
         const diff = diffProfileState(currentState, nextState);
         if (!diff.hasChanges) {
           console.log('没有配置更改。');
-          maybeWarnConfigDrift(process.cwd(), nextState, chalk.yellow);
+          await maybeWarnConfigDrift(nextState, chalk.yellow);
           return;
         }
 
@@ -610,6 +670,31 @@ export function registerConfigCommand(program: Command): void {
         config.delivery = nextState.delivery;
         config.workflows = nextState.workflows;
         saveGlobalConfig(config);
+
+        const workspaceContext = await resolveWorkspaceConfigProfileContext();
+        if (workspaceContext) {
+          const applyNow = await confirm({
+            message: '立即将更改应用到此工作区？',
+            default: true,
+          });
+
+          if (applyNow) {
+            try {
+              execSync('npx openspec-cn workspace update', {
+                stdio: 'inherit',
+                cwd: workspaceContext.commandCwd,
+              });
+              console.log('请在其他工作区中运行 `openspec-cn workspace update` 来应用。');
+            } catch {
+              console.error('`openspec-cn workspace update` 失败。请手动运行以应用档案变更。');
+              process.exitCode = 1;
+            }
+            return;
+          }
+
+          printConfigProfileApplyGuidance(workspaceContext);
+          return;
+        }
 
         // Check if inside an OpenSpec project
         const projectDir = process.cwd();
@@ -632,7 +717,7 @@ export function registerConfigCommand(program: Command): void {
           }
         }
 
-        console.log('配置已更新。请在您的项目中运行 `openspec-cn update` 来应用。');
+        printConfigProfileApplyGuidance(null);
       } catch (error) {
         if (isPromptCancellationError(error)) {
           console.log('档案配置已取消。');

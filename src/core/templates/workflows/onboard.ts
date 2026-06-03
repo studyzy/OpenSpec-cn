@@ -277,10 +277,8 @@ openspec-cn instructions proposal --change "<name>" --json
 
 **执行：** 创建规格说明文件：
 \`\`\`bash
-# Unix/macOS
-mkdir -p openspec/changes/<name>/specs/<capability-name>
-# Windows (PowerShell)
-# New-Item -ItemType Directory -Force -Path "openspec/changes/<name>/specs/<capability-name>"
+openspec instructions specs --change "<name>" --json
+# Use resolvedOutputPath from the JSON. If it is a glob, choose the concrete file path using the schema instruction and workspace planning context.
 \`\`\`
 
 起草规格说明内容：

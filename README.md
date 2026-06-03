@@ -124,6 +124,13 @@ openspec-cn init
 → **[自定义](docs/customization.md)**：打造你的版本
 
 
+## 社区 Schema
+
+通过独立仓库分发的第三方 Schema 包 —— 它们提供了将 OpenSpec 与其他工具集成的特定工作流，类似于 [github/spec-kit 的社区扩展目录](https://github.com/github/spec-kit/tree/main/extensions) 处理工具集成的方式。
+
+→ **[浏览目录](docs/customization.md#community-schemas)**，详见自定义文档。
+
+
 ## 为什么选择 OpenSpec？
 
 AI 编程助手很强大，但当需求只存在于聊天记录里时，结果往往难以预测。OpenSpec 增加了一层轻量的规范（spec）机制，让你在写任何代码前先对齐要做什么。
@@ -159,7 +166,7 @@ openspec-cn update
 
 ## 使用注意事项
 
-**模型选择**：OpenSpec 更适合高推理模型。我们推荐在规划与实现阶段都使用 Opus 4.5 和 GPT 5.2。
+**模型选择**：OpenSpec 更适合高推理模型。我们推荐在规划与实现阶段都使用 Codex 5.5 和 Opus 4.7。
 
 **上下文卫生**：OpenSpec 受益于更干净的上下文窗口。在开始实现前清理上下文，并在整个会话中保持良好的上下文卫生。
 

@@ -36,17 +36,18 @@ OPSX（流畅行动）：
 - `/opsx:propose`
 - `/opsx:explore`
 - `/opsx:apply`
+- `/opsx:sync`
 - `/opsx:archive`
 
 典型流程：
 
 ```text
-/opsx:propose ──► /opsx:apply ──► /opsx:archive
+/opsx:propose ──► /opsx:apply ──► /opsx:sync ──► /opsx:archive
 ```
 
 ### 扩展/完整工作流（自定义选择）
 
-如果你需要显式的脚手架与构建命令（`/opsx:new`、`/opsx:continue`、`/opsx:ff`、`/opsx:verify`、`/opsx:sync`、`/opsx:bulk-archive`、`/opsx:onboard`），可以通过以下方式启用：
+如果你需要显式的脚手架与构建命令（`/opsx:new`、`/opsx:continue`、`/opsx:ff`、`/opsx:verify`、`/opsx:bulk-archive`、`/opsx:onboard`），可以通过以下方式启用：
 
 ```bash
 openspec-cn config profile

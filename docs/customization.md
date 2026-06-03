@@ -337,6 +337,20 @@ openspec-cn schema fork spec-driven with-review
 
 ---
 
+## 社区 Schema
+
+OpenSpec 还支持通过独立仓库分发的社区维护 schema。这些 schema 提供了与其他工具或系统集成 OpenSpec 的定制化工作流，类似于 [github/spec-kit 的社区扩展目录](https://github.com/github/spec-kit/tree/main/extensions) 为 spec-kit 所做的事情。
+
+社区 schema 不会内置到 OpenSpec 核心中——它们存在于各自的仓库中，有各自的发布节奏。要使用某个社区 schema，将 schema 包复制到项目的 `openspec/schemas/<schema-name>/` 目录中（每个仓库的 README 有安装说明）。
+
+| Schema | 维护者 | 仓库 | 描述 |
+|--------|-----------|-----------|-------------|
+| `superpowers-bridge` | @JiangWay | [JiangWay/openspec-schemas](https://github.com/JiangWay/openspec-schemas/tree/main/superpowers-bridge) | 将 OpenSpec 的制品治理与 [obra/superpowers](https://github.com/obra/superpowers) 执行技能（头脑风暴、编写计划、通过子 Agent 的 TDD、代码审查、收尾）集成。添加了 Superpowers 原生不覆盖的证据优先 `retrospective` 制品。 |
+
+> 想要贡献社区 schema？请提交 issue 并附上仓库链接，或提交 PR 在此表格中添加一行。
+
+---
+
 ## 另请参阅
 
 - [CLI 参考：Schema 命令](cli.md#schema-commands) - 终端命令

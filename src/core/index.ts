@@ -3,6 +3,7 @@ export {
   GLOBAL_CONFIG_DIR_NAME,
   GLOBAL_CONFIG_FILE_NAME,
   GLOBAL_DATA_DIR_NAME,
+  type GlobalDataDirOptions,
   type GlobalConfig,
   getGlobalConfigDir,
   getGlobalConfigPath,
@@ -10,3 +11,8 @@ export {
   saveGlobalConfig,
   getGlobalDataDir
 } from './global-config.js';
+
+export * from './workspace/index.js';
+export * from './context-store/index.js';
+export * from './collections/index.js';
+export * from './planning-home.js';

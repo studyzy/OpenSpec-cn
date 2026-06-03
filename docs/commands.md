@@ -13,6 +13,7 @@
 | `/opsx:propose` | 一步创建变更并生成规划制品 |
 | `/opsx:explore` | 在提交变更前进行思路探索 |
 | `/opsx:apply` | 实施变更中的任务 |
+| `/opsx:sync` | 将增量规范合并到主规范中 |
 | `/opsx:archive` | 归档已完成的变更 |
 
 ### 扩展工作流命令（自定义工作流选择）
@@ -23,7 +24,6 @@
 | `/opsx:continue` | 根据依赖关系创建下一个制品 |
 | `/opsx:ff` | 快速前进：一次性创建所有规划制品 |
 | `/opsx:verify` | 验证实现是否与制品匹配 |
-| `/opsx:sync` | 将增量规范合并到主规范中 |
 | `/opsx:bulk-archive` | 批量归档多个变更 |
 | `/opsx:onboard` | 通过完整工作流的引导式教程 |
 
@@ -627,6 +627,7 @@ AI：欢迎使用 OpenSpec！
 | Cursor | `/opsx-propose`, `/opsx-apply` |
 | Windsurf | `/opsx-propose`, `/opsx-apply` |
 | Copilot (IDE) | `/opsx-propose`, `/opsx-apply` |
+| Kimi CLI | 基于技能的调用，如 `/skill:openspec-propose`、`/skill:openspec-apply-change`（不生成 `opsx-*` 命令文件） |
 | Trae | 基于技能的调用，如 `/openspec-propose`、`/openspec-apply-change`（不生成 `opsx-*` 命令文件） |
 
 各工具的意图相同，但命令的呈现方式可能因集成方式而异。
