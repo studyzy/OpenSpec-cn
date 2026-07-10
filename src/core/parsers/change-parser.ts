@@ -19,8 +19,8 @@ export class ChangeParser extends MarkdownParser {
 
   async parseChangeWithDeltas(name: string): Promise<Change> {
     const sections = this.parseSections();
-    const why = this.findSection(sections, 'Why')?.content || '';
-    const whatChanges = this.findSection(sections, 'What Changes')?.content || '';
+    const why = this.findSection(sections, 'Why')?.content || this.findSection(sections, '为什么')?.content || '';
+    const whatChanges = this.findSection(sections, 'What Changes')?.content || this.findSection(sections, '变更内容')?.content || '';
     
     if (!why) {
       throw new Error('Change 必须包含 Why 章节');
@@ -86,7 +86,7 @@ export class ChangeParser extends MarkdownParser {
     const sections = this.parseSectionsFromContent(content);
     
     // Parse ADDED requirements
-    const addedSection = this.findSection(sections, 'ADDED Requirements');
+    const addedSection = this.findSection(sections, 'ADDED Requirements') || this.findSection(sections, '新增需求');
     if (addedSection) {
       const requirements = this.parseRequirements(addedSection);
       requirements.forEach(req => {
@@ -102,7 +102,7 @@ export class ChangeParser extends MarkdownParser {
     }
     
     // Parse MODIFIED requirements
-    const modifiedSection = this.findSection(sections, 'MODIFIED Requirements');
+    const modifiedSection = this.findSection(sections, 'MODIFIED Requirements') || this.findSection(sections, '修改需求');
     if (modifiedSection) {
       const requirements = this.parseRequirements(modifiedSection);
       requirements.forEach(req => {
@@ -117,7 +117,7 @@ export class ChangeParser extends MarkdownParser {
     }
     
     // Parse REMOVED requirements
-    const removedSection = this.findSection(sections, 'REMOVED Requirements');
+    const removedSection = this.findSection(sections, 'REMOVED Requirements') || this.findSection(sections, '移除需求');
     if (removedSection) {
       const requirements = this.parseRequirements(removedSection);
       requirements.forEach(req => {
@@ -132,7 +132,7 @@ export class ChangeParser extends MarkdownParser {
     }
     
     // Parse RENAMED requirements
-    const renamedSection = this.findSection(sections, 'RENAMED Requirements');
+    const renamedSection = this.findSection(sections, 'RENAMED Requirements') || this.findSection(sections, '重命名需求');
     if (renamedSection) {
       const renames = this.parseRenames(renamedSection.content);
       renames.forEach(rename => {
@@ -153,10 +153,15 @@ export class ChangeParser extends MarkdownParser {
     const lines = ChangeParser.normalizeContent(content).split('\n');
     
     let currentRename: { from?: string; to?: string } = {};
-    
+    // Match both English ("Requirement") and Chinese ("需求") headers in FROM:/TO: lines.
+    const REQUIREMENT_KEYWORD_PATTERN = '(?:Requirement|需求)';
+    const REQUIREMENT_COLON_PATTERN = '[:：]';
+    const fromRegex = new RegExp(`^\\s*-?\\s*FROM:\\s*\`?###\\s*${REQUIREMENT_KEYWORD_PATTERN}${REQUIREMENT_COLON_PATTERN}\\s*(.+?)\`?\\s*$`);
+    const toRegex = new RegExp(`^\\s*-?\\s*TO:\\s*\`?###\\s*${REQUIREMENT_KEYWORD_PATTERN}${REQUIREMENT_COLON_PATTERN}\\s*(.+?)\`?\\s*$`);
+
     for (const line of lines) {
-      const fromMatch = line.match(/^\s*-?\s*FROM:\s*`?###\s*Requirement:\s*(.+?)`?\s*$/);
-      const toMatch = line.match(/^\s*-?\s*TO:\s*`?###\s*Requirement:\s*(.+?)`?\s*$/);
+      const fromMatch = line.match(fromRegex);
+      const toMatch = line.match(toRegex);
       
       if (fromMatch) {
         currentRename.from = fromMatch[1].trim();

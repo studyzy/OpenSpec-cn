@@ -441,7 +441,7 @@ export class Validator {
   }
 
   private containsShallOrMust(text: string): boolean {
-    return /\b(SHALL|MUST)\b/.test(text);
+    return /\b(SHALL|MUST)\b/.test(text) || /必须|禁止/.test(text);
   }
 
   /**

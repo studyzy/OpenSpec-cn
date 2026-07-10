@@ -16,7 +16,12 @@ export function normalizeRequirementName(name: string): string {
   return name.trim();
 }
 
-const REQUIREMENT_HEADER_REGEX = /^###\s*Requirement:\s*(.+)\s*$/i;
+// Match both English ("Requirement") and Chinese ("需求") requirement headers,
+// and both the ASCII colon (:) and the full-width Chinese colon (：).
+const REQUIREMENT_KEYWORD_PATTERN = '(?:Requirement|需求)';
+const REQUIREMENT_COLON_PATTERN = '[:：]';
+const REQUIREMENT_HEADER_REGEX = new RegExp(`^###\\s*${REQUIREMENT_KEYWORD_PATTERN}${REQUIREMENT_COLON_PATTERN}\\s*(.+)\\s*$`, 'i');
+const REQUIREMENT_HEADER_PREFIX = new RegExp(`^###\\s*${REQUIREMENT_KEYWORD_PATTERN}${REQUIREMENT_COLON_PATTERN}`, 'i');
 
 /**
  * Extracts the Requirements section from a spec file and parses requirement blocks.
@@ -24,7 +29,7 @@ const REQUIREMENT_HEADER_REGEX = /^###\s*Requirement:\s*(.+)\s*$/i;
 export function extractRequirementsSection(content: string): RequirementsSectionParts {
   const normalized = normalizeLineEndings(content);
   const lines = normalized.split('\n');
-  const reqHeaderIndex = lines.findIndex(l => /^##\s+Requirements\s*$/i.test(l));
+  const reqHeaderIndex = lines.findIndex(l => /^##\s+(?:Requirements|需求)\s*$/i.test(l));
 
   if (reqHeaderIndex === -1) {
     // No requirements section; create an empty one at the end
@@ -58,7 +63,7 @@ export function extractRequirementsSection(content: string): RequirementsSection
   let preambleLines: string[] = [];
 
   // Collect preamble lines until first requirement header
-  while (cursor < sectionBodyLines.length && !REQUIREMENT_HEADER_REGEX.test(sectionBodyLines[cursor])) {
+  while (cursor < sectionBodyLines.length && !REQUIREMENT_HEADER_PREFIX.test(sectionBodyLines[cursor])) {
     preambleLines.push(sectionBodyLines[cursor]);
     cursor++;
   }
@@ -76,7 +81,7 @@ export function extractRequirementsSection(content: string): RequirementsSection
     cursor++;
     // Gather lines until next requirement header or end of section
     const bodyLines: string[] = [headerLineCandidate];
-    while (cursor < sectionBodyLines.length && !REQUIREMENT_HEADER_REGEX.test(sectionBodyLines[cursor]) && !/^##\s+/.test(sectionBodyLines[cursor])) {
+    while (cursor < sectionBodyLines.length && !REQUIREMENT_HEADER_PREFIX.test(sectionBodyLines[cursor]) && !/^##\s+/.test(sectionBodyLines[cursor])) {
       bodyLines.push(sectionBodyLines[cursor]);
       cursor++;
     }
@@ -119,6 +124,8 @@ function normalizeLineEndings(content: string): string {
 export function parseDeltaSpec(content: string): DeltaPlan {
   const normalized = normalizeLineEndings(content);
   const sections = splitTopLevelSections(normalized);
+  // English keys are passed here; getSectionCaseInsensitive also accepts the
+  // Chinese equivalents (新增需求 / 修改需求 / 移除需求 / 重命名需求).
   const addedLookup = getSectionCaseInsensitive(sections, 'ADDED Requirements');
   const modifiedLookup = getSectionCaseInsensitive(sections, 'MODIFIED Requirements');
   const removedLookup = getSectionCaseInsensitive(sections, 'REMOVED Requirements');
@@ -163,8 +170,19 @@ function splitTopLevelSections(content: string): Record<string, string> {
 
 function getSectionCaseInsensitive(sections: Record<string, string>, desired: string): { body: string; found: boolean } {
   const target = desired.toLowerCase();
+  // Accept Chinese delta section titles as equivalents of the English headers.
+  const chineseAlternates: Record<string, string> = {
+    'added requirements': '新增需求',
+    'modified requirements': '修改需求',
+    'removed requirements': '移除需求',
+    'renamed requirements': '重命名需求',
+  };
+  const altTarget = chineseAlternates[target]?.toLowerCase();
   for (const [title, body] of Object.entries(sections)) {
-    if (title.toLowerCase() === target) return { body, found: true };
+    const lowerTitle = title.toLowerCase();
+    if (lowerTitle === target || (altTarget && lowerTitle === altTarget)) {
+      return { body, found: true };
+    }
   }
   return { body: '', found: false };
 }
@@ -176,7 +194,7 @@ function parseRequirementBlocksFromSection(sectionBody: string): RequirementBloc
   let i = 0;
   while (i < lines.length) {
     // Seek next requirement header
-    while (i < lines.length && !REQUIREMENT_HEADER_REGEX.test(lines[i])) i++;
+    while (i < lines.length && !REQUIREMENT_HEADER_PREFIX.test(lines[i])) i++;
     if (i >= lines.length) break;
     const headerLine = lines[i];
     const m = headerLine.match(REQUIREMENT_HEADER_REGEX);
@@ -184,7 +202,7 @@ function parseRequirementBlocksFromSection(sectionBody: string): RequirementBloc
     const name = normalizeRequirementName(m[1]);
     const buf: string[] = [headerLine];
     i++;
-    while (i < lines.length && !REQUIREMENT_HEADER_REGEX.test(lines[i]) && !/^##\s+/.test(lines[i])) {
+    while (i < lines.length && !REQUIREMENT_HEADER_PREFIX.test(lines[i]) && !/^##\s+/.test(lines[i])) {
       buf.push(lines[i]);
       i++;
     }
@@ -204,7 +222,9 @@ function parseRemovedNames(sectionBody: string): string[] {
       continue;
     }
     // Also support bullet list of headers
-    const bullet = line.match(/^\s*-\s*`?###\s*Requirement:\s*(.+?)`?\s*$/);
+    const bullet = line.match(new RegExp(
+      '^\\s*-\\s*`?###\\s*' + REQUIREMENT_KEYWORD_PATTERN + REQUIREMENT_COLON_PATTERN + '\\s*(.+?)`?\\s*$'
+    ));
     if (bullet) {
       names.push(normalizeRequirementName(bullet[1]));
     }
@@ -217,9 +237,15 @@ function parseRenamedPairs(sectionBody: string): Array<{ from: string; to: strin
   const pairs: Array<{ from: string; to: string }> = [];
   const lines = normalizeLineEndings(sectionBody).split('\n');
   let current: { from?: string; to?: string } = {};
+  const fromRegex = new RegExp(
+    '^\\s*-?\\s*FROM:\\s*`?###\\s*' + REQUIREMENT_KEYWORD_PATTERN + REQUIREMENT_COLON_PATTERN + '\\s*(.+?)`?\\s*$'
+  );
+  const toRegex = new RegExp(
+    '^\\s*-?\\s*TO:\\s*`?###\\s*' + REQUIREMENT_KEYWORD_PATTERN + REQUIREMENT_COLON_PATTERN + '\\s*(.+?)`?\\s*$'
+  );
   for (const line of lines) {
-    const fromMatch = line.match(/^\s*-?\s*FROM:\s*`?###\s*Requirement:\s*(.+?)`?\s*$/);
-    const toMatch = line.match(/^\s*-?\s*TO:\s*`?###\s*Requirement:\s*(.+?)`?\s*$/);
+    const fromMatch = line.match(fromRegex);
+    const toMatch = line.match(toRegex);
     if (fromMatch) {
       current.from = normalizeRequirementName(fromMatch[1]);
     } else if (toMatch) {
