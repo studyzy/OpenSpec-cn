@@ -72,7 +72,7 @@ metadata:
      - `skipped`/`warning`：当变更声明 skip_specs 且此产出物必须不创建时出现 - 选择另一个产出物
    - **Create the artifact file**:
      - Read any completed dependency files for context - always re-read them from disk, even if you saw them earlier in the conversation (the user may have edited them)
-     - If the `instruction` field delegates creation to a specific skill or command, invoke it to produce the artifact instead of writing the file yourself, then verify the artifact file exists at `resolvedOutputPath`
+     - 若 `instruction` 字段将创建委托给特定 skill 或命令，则调用它来生成产出物，而不是自己写入文件，然后验证产出物文件是否存在于 `resolvedOutputPath`
      - Otherwise use `template` as the structure - fill in its sections
      - Apply `context` and `rules` as constraints when writing - but do NOT copy them into the file
      - Write to the `resolvedOutputPath` specified in instructions. If it is a glob pattern, choose the concrete file path using the schema instruction and the change's context

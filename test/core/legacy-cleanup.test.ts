@@ -1096,8 +1096,8 @@ ${OPENSPEC_MARKERS.end}`);
       };
 
       const summary = formatDeferredGlobalPromptSummary(detection);
-      expect(summary).toContain('Deferred global prompts cleanup');
-      expect(summary).toContain('These global prompts will only be removed after matching replacement skills are installed');
+      expect(summary).toContain('延迟清理全局提示词');
+      expect(summary).toContain('这些全局提示词只有在安装对应的替代 skills 后才会被移除。');
       expect(summary).toContain(`codex: ${globalPrompt}`);
       expect(summary).toContain(globalPrompt);
     });

@@ -1051,7 +1051,7 @@ operations:
       expect(json.context).toBeUndefined();
       expect(json.operationGuidance).toBeUndefined();
       expect(textResult.stdout).toContain(
-        '未配置项目上下文或操作指引。'
+        '未配置项目上下文或操作指南。'
       );
     });
 

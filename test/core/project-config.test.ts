@@ -178,7 +178,7 @@ operations:
           context: 'Valid context',
         });
         expect(consoleWarnSpy).toHaveBeenCalledWith(
-          expect.stringContaining("Invalid 'operations' field")
+          expect.stringContaining("配置中的 'operations' 字段无效（必须是对象）")
         );
       });
 
@@ -212,7 +212,7 @@ githubCopilot:
         expect(config?.schema).toBe('spec-driven');
         expect(config?.githubCopilot).toBeUndefined();
         expect(consoleWarnSpy).toHaveBeenCalledWith(
-          expect.stringContaining("Invalid 'githubCopilot.cloudAgent' field")
+          expect.stringContaining("配置中的 'githubCopilot.cloudAgent' 字段无效（必须是布尔值）")
         );
       });
 
@@ -228,7 +228,7 @@ githubCopilot: true
 
         expect(readProjectConfig(tempDir)?.schema).toBe('spec-driven');
         expect(consoleWarnSpy).toHaveBeenCalledWith(
-          expect.stringContaining("Invalid 'githubCopilot' field")
+          expect.stringContaining("配置中的 'githubCopilot' 字段无效（必须是对象）")
         );
       });
 
@@ -250,7 +250,7 @@ operations:
           archive: { guidance: ['Keep the summary concise'] },
         });
         expect(consoleWarnSpy).toHaveBeenCalledWith(
-          expect.stringContaining("Invalid 'operations.apply' field")
+          expect.stringContaining("配置中的 'operations.apply' 字段无效（必须是对象）")
         );
       });
 
@@ -275,7 +275,7 @@ operations:
           apply: { guidance: ['Run tests'] },
         });
         expect(consoleWarnSpy).toHaveBeenCalledWith(
-          expect.stringContaining("Unknown operation ID 'deploy'")
+          expect.stringContaining("配置中的操作 ID 'deploy' 未知")
         );
         expect(consoleWarnSpy).toHaveBeenCalledWith(
           expect.stringContaining("Unknown field(s) in 'operations.apply': replacementInstruction")

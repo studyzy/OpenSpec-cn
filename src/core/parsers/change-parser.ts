@@ -93,7 +93,7 @@ export class ChangeParser extends MarkdownParser {
     return super.parseRequirements({
       ...section,
       children: section.children.filter((child) =>
-        /^Requirement:\s*\S/i.test(child.title.trim())
+        /^(?:Requirement|需求)[:：]\s*\S/i.test(child.title.trim())
       ),
     });
   }

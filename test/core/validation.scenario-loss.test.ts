@@ -397,6 +397,6 @@ describe('validate: MODIFIED blocks that would drop a main-spec scenario (#1477)
 
     expect(report.valid).toBe(false);
     expect(lossIssue(report)).toBeUndefined();
-    expect(report.issues.map((i) => i.message).join('\n')).toContain('MODIFIED references old name from RENAMED');
+    expect(report.issues.map((i) => i.message).join('\n')).toContain('MODIFIED 引用了 RENAMED 中的旧名称');
   });
 });

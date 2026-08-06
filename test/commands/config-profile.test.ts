@@ -386,8 +386,8 @@ describe('config profile interactive flow', () => {
     expect(getGlobalConfig().delivery).toBe('skills');
     expect(process.exitCode).toBeUndefined();
     expect(consoleErrorSpy).not.toHaveBeenCalled();
-    expect(consoleLogSpy).toHaveBeenCalledWith('No configured tools found.');
-    expect(consoleLogSpy).toHaveBeenCalledWith('Run `openspec-cn update` in your other projects to apply.');
+    expect(consoleLogSpy).toHaveBeenCalledWith('未找到已配置的工具。');
+    expect(consoleLogSpy).toHaveBeenCalledWith('请在您的其他项目中运行 `openspec-cn update` 来应用。');
   });
 
   it('confirmed project apply should report the update failure reason', async () => {
@@ -410,8 +410,8 @@ describe('config profile interactive flow', () => {
       executeSpy.mockRestore();
     }
 
-    expect(consoleErrorSpy).toHaveBeenCalledWith('`openspec update` failed: permission denied');
-    expect(consoleErrorSpy).toHaveBeenCalledWith('Please run it manually to apply the profile changes.');
+    expect(consoleErrorSpy).toHaveBeenCalledWith('`openspec-cn update` 失败：permission denied');
+    expect(consoleErrorSpy).toHaveBeenCalledWith('请手动运行以应用档案变更。');
     expect(process.exitCode).toBe(1);
   });
 

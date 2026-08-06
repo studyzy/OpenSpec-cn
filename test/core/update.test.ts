@@ -210,7 +210,7 @@ Outside content
         );
 
         await expect(updateCommand.execute(testDir)).rejects.toThrow(
-          'OpenSpec update failed for: MiniMax Code'
+          'OpenSpec 更新失败：MiniMax Code'
         );
 
         expect(await fs.readFile(skillFile, 'utf-8')).toBe(oldSkillContent);
@@ -250,7 +250,7 @@ Outside content
         );
 
         await expect(updateCommand.execute(testDir)).rejects.toThrow(
-          'OpenSpec update failed for: MiniMax Code'
+          'OpenSpec 更新失败：MiniMax Code'
         );
 
         expect(await fs.readFile(skillFile, 'utf-8')).toBe(oldSkillContent);
@@ -287,7 +287,7 @@ Outside content
         );
 
         await expect(updateCommand.execute(testDir)).rejects.toThrow(
-          'OpenSpec update failed for: Claude Code'
+          'OpenSpec 更新失败：Claude Code'
         );
 
         expect(await fs.readFile(skillFile, 'utf-8')).toBe(oldSkillContent);
@@ -328,7 +328,7 @@ metadata:
         );
 
         await expect(updateCommand.execute(testDir)).rejects.toThrow(
-          'OpenSpec update failed for: Claude Code'
+          'OpenSpec 更新失败：Claude Code'
         );
 
         await expect(fs.stat(skillFile)).resolves.toBeDefined();
@@ -352,7 +352,7 @@ metadata:
       const logCalls = consoleSpy.mock.calls.flat().map(String);
       expect(
         logCalls.some(
-          (entry) => entry.includes('Setup required for Hermes Agent') && entry.includes('skills.external_dirs'),
+          (entry) => entry.includes('需要配置 Hermes Agent') && entry.includes('skills.external_dirs'),
         ),
       ).toBe(true);
 
@@ -368,10 +368,10 @@ metadata:
       await updateCommand.execute(testDir);
 
       const logCalls = consoleSpy.mock.calls.flat().map(String);
-      expect(logCalls.some((entry) => entry.includes('up to date'))).toBe(true);
+      expect(logCalls.some((entry) => entry.includes('已是最新版本'))).toBe(true);
       expect(
         logCalls.some(
-          (entry) => entry.includes('Setup required for Hermes Agent') && entry.includes('skills.external_dirs'),
+          (entry) => entry.includes('需要配置 Hermes Agent') && entry.includes('skills.external_dirs'),
         ),
       ).toBe(true);
 
@@ -529,7 +529,7 @@ metadata:
       consoleSpy.mockClear();
       await updateCommand.execute(testDir);
       const secondRunLogs = consoleSpy.mock.calls.flat().map(String);
-      expect(secondRunLogs.some((entry) => entry.includes('up to date'))).toBe(true);
+      expect(secondRunLogs.some((entry) => entry.includes('已是最新版本'))).toBe(true);
       expect(secondRunLogs.some((entry) => entry.includes('Left 1 file in .codex/'))).toBe(false);
     });
 
@@ -565,7 +565,7 @@ metadata:
       const consoleSpy = vi.spyOn(console, 'log');
       await updateCommand.execute(testDir);
       expect(
-        consoleSpy.mock.calls.flat().map(String).some((entry) => entry.includes('up to date'))
+        consoleSpy.mock.calls.flat().map(String).some((entry) => entry.includes('已是最新版本'))
       ).toBe(true);
     });
 
@@ -581,11 +581,9 @@ metadata:
       );
       expect(proposeSkill).toContain('$openspec-apply-change');
       expect(proposeSkill).toContain('/openspec-apply-change');
-      expect(
-        consoleSpy.mock.calls.flat().map(String).some((entry) =>
-          entry.includes('Force updating 1 tool(s): codex')
-        )
-      ).toBe(true);
+      expect(consoleSpy).toHaveBeenCalledWith(
+        expect.stringContaining('强制更新 1 个工具：codex')
+      );
     });
 
     it('should keep an explicit agents target despite preserved legacy Codex skills', async () => {
@@ -1453,7 +1451,7 @@ metadata:
       });
 
       await expect(new UpdateCommand({ force: true }).execute(testDir)).rejects.toThrow(
-        'OpenSpec update failed for: Codex'
+        'OpenSpec 更新失败：Codex'
       );
       expect(await fs.readFile(legacySkill, 'utf-8')).toBe(legacyContent);
       expect(await FileSystemUtils.fileExists(prompt)).toBe(true);
@@ -1484,7 +1482,7 @@ metadata:
       const consoleSpy = vi.spyOn(console, 'log');
 
       await expect(updateCommand.execute(testDir)).rejects.toThrow(
-        'OpenSpec update failed for: Claude Code'
+        'OpenSpec 更新失败：Claude Code'
       );
 
       // Should report failure
@@ -1530,7 +1528,7 @@ metadata:
       const consoleSpy = vi.spyOn(console, 'log');
 
       await expect(updateCommand.execute(testDir)).rejects.toThrow(
-        'OpenSpec update failed for: Claude Code'
+        'OpenSpec 更新失败：Claude Code'
       );
 
       // Cursor should still be updated - check the actual format from ora spinner
@@ -2154,7 +2152,7 @@ ${OPENSPEC_MARKERS.end}
       await forceUpdateCommand.execute(testDir);
 
       expect(consoleSpy).toHaveBeenCalledWith(
-        expect.stringContaining('Deferred global prompts cleanup')
+        expect.stringContaining('延迟清理全局提示词')
       );
       expect(consoleSpy).toHaveBeenCalledWith(
         expect.stringContaining(`codex: ${managedPrompt}`)
@@ -2225,8 +2223,8 @@ ${OPENSPEC_MARKERS.end}
       const logCalls = consoleSpy.mock.calls.flat().map(String);
       consoleSpy.mockRestore();
 
-      expect(logCalls.some((entry) => entry.includes('Getting started'))).toBe(true);
-      const menuLines = logCalls.filter((entry) => entry.includes('Scaffold a change'));
+      expect(logCalls.some((entry) => entry.includes('开始使用：'))).toBe(true);
+      const menuLines = logCalls.filter((entry) => entry.includes('脚手架变更'));
       expect(menuLines).toHaveLength(1);
       expect(menuLines[0]).toContain('$openspec-new-change');
       expect(logCalls.some((entry) => entry.includes('/opsx:new'))).toBe(false);
@@ -2256,7 +2254,7 @@ ${OPENSPEC_MARKERS.end}
       const logCalls = consoleSpy.mock.calls.flat().map(String);
       consoleSpy.mockRestore();
 
-      const menuLines = logCalls.filter((entry) => entry.includes('Start a change'));
+      const menuLines = logCalls.filter((entry) => entry.includes('发起变更'));
       expect(menuLines).toHaveLength(1);
       expect(menuLines[0]).toContain('/opsx-propose');
       expect(logCalls.some((entry) => entry.includes('/opsx:propose'))).toBe(false);
@@ -2549,7 +2547,7 @@ More user content after markers.
       // Should show getting started message for newly configured tools,
       // limited to the commands the core profile installs (not new/continue)
       expect(consoleSpy).toHaveBeenCalledWith(
-        expect.stringContaining('入门指引')
+        expect.stringContaining('开始使用：')
       );
       expect(consoleSpy).toHaveBeenCalledWith(
         expect.stringContaining('/opsx:propose')
@@ -2691,7 +2689,7 @@ More user content after markers.
 
       // Should show "入门指引" for newly configured Cursor
       expect(consoleSpy).toHaveBeenCalledWith(
-        expect.stringContaining('入门指引')
+        expect.stringContaining('开始使用：')
       );
 
       consoleSpy.mockRestore();
@@ -2744,7 +2742,7 @@ More user content after markers.
         call.map(arg => String(arg)).join(' ')
       );
       const hasGettingStarted = calls.some(call =>
-        call.includes('入门指引')
+        call.includes('开始使用：')
       );
       expect(hasGettingStarted).toBe(false);
 
@@ -2889,12 +2887,12 @@ More user content after markers.
       const calls = consoleSpy.mock.calls.map(call =>
         call.map(arg => String(arg)).join(' ')
       );
-      expect(calls.some(call =>
-        call.includes('Your custom profile is missing 2 core workflows: update, sync')
-      )).toBe(true);
-      expect(calls.some(call =>
-        call.includes('openspec config profile core')
-      )).toBe(true);
+      expect(consoleSpy).toHaveBeenCalledWith(
+        expect.stringContaining('缺少 2 个核心个工作流：update, sync')
+      );
+      expect(consoleSpy).toHaveBeenCalledWith(
+        expect.stringContaining('openspec-cn config profile core')
+      );
 
       expect(await FileSystemUtils.fileExists(
         path.join(testDir, '.claude', 'skills', 'openspec-sync-specs', 'SKILL.md')
@@ -2924,12 +2922,12 @@ More user content after markers.
       const calls = consoleSpy.mock.calls.map(call =>
         call.map(arg => String(arg)).join(' ')
       );
-      expect(calls.some(call =>
-        call.includes('Your custom profile is missing 1 core workflow: update')
-      )).toBe(true);
-      expect(calls.some(call =>
-        call.includes('to add it, or')
-      )).toBe(true);
+      expect(consoleSpy).toHaveBeenCalledWith(
+        expect.stringContaining('缺少 1 个核心个工作流：update')
+      );
+      expect(consoleSpy).toHaveBeenCalledWith(
+        expect.stringContaining('添加它，或')
+      );
 
       consoleSpy.mockRestore();
     });
@@ -2953,7 +2951,7 @@ More user content after markers.
         call.map(arg => String(arg)).join(' ')
       );
       expect(calls.some(call =>
-        call.includes('Your custom profile is missing')
+        call.includes('你的自定义 profile 缺少')
       )).toBe(false);
 
       consoleSpy.mockRestore();
@@ -3048,8 +3046,8 @@ More user content after markers.
       await updateCommand.execute(testDir);
 
       const logCalls = consoleSpy.mock.calls.flat().map(String);
-      expect(logCalls.some((entry) => entry.includes('up to date'))).toBe(true);
-      expect(logCalls.some((entry) => entry.includes('Updating 1 tool(s)'))).toBe(false);
+      expect(logCalls.some((entry) => entry.includes('已是最新版本'))).toBe(true);
+      expect(logCalls.some((entry) => entry.includes('正在更新'))).toBe(false);
 
       consoleSpy.mockRestore();
     });
@@ -3097,10 +3095,10 @@ More user content after markers.
       await updateCommand.execute(testDir);
 
       expect(consoleSpy).toHaveBeenCalledWith(
-        expect.stringContaining('Updated: Codex')
+        expect.stringContaining('已更新：Codex')
       );
       expect(consoleSpy).toHaveBeenCalledWith(
-        expect.stringContaining('Commands skipped for: codex (uses skills)')
+        expect.stringContaining('已跳过命令：codex（使用 skills）')
       );
 
       consoleSpy.mockRestore();
@@ -3155,8 +3153,8 @@ More user content after markers.
       expect(await fs.readFile(skillFile, 'utf-8')).toBe('existing global skill');
       expect(await FileSystemUtils.directoryExists(path.join(testDir, '.minimax'))).toBe(false);
       const output = consoleSpy.mock.calls.flat().join('\n');
-      expect(output).toContain('up to date');
-      expect(output).not.toContain('Updated: MiniMax Code');
+      expect(output).toContain('已是最新版本');
+      expect(output).not.toContain('已更新：MiniMax Code');
       consoleSpy.mockRestore();
     });
 
@@ -3191,9 +3189,9 @@ More user content after markers.
       // The tool now has zero OpenSpec artifacts; the removal must not be
       // silent — update prints the same configuration correction init does.
       const logCalls = consoleSpy.mock.calls.flat().map(String);
-      const correction = logCalls.find((entry) => entry.includes('No skills or commands remain'));
+      const correction = logCalls.find((entry) => entry.includes('保留 skills 或命令'));
       expect(correction).toBeTruthy();
-      expect(correction).toContain("openspec config set delivery both");
+      expect(correction).toContain("openspec-cn config set delivery both");
     });
 
     it('should apply config sync when templates are up to date', async () => {

@@ -85,7 +85,7 @@ describe('generateApplyInstructions task list', () => {
     // rather than listing a blank row an agent cannot act on.
     expect(instructions.tasks).toEqual([]);
     expect(instructions.state).toBe('blocked');
-    expect(instructions.instruction).toContain('contains no tasks');
+    expect(instructions.instruction).toContain('没有可执行的任务');
   });
 
   it('counts a text-less checkbox toward progress even though it lists none', async () => {

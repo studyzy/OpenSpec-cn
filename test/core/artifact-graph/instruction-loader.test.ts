@@ -562,7 +562,7 @@ rules:
         generateInstructions(context, 'proposal', tempDir);
 
         expect(consoleWarnSpy).toHaveBeenCalledWith(
-          expect.stringContaining('rules 中未知的产出物 ID："invalid-artifact"')
+          expect.stringContaining('Unknown artifact ID in rules: "invalid-artifact"')
         );
       });
 
@@ -594,7 +594,7 @@ rules:
           // Note: We may have gotten warnings from other tests, so check that
           // the count didn't increase by more than 1 from the first call
           const callCount = consoleWarnSpy.mock.calls.filter(call =>
-            call[0]?.includes('rules 中未知的产出物 ID')
+            call[0]?.includes('Unknown artifact ID in rules:')
           ).length;
 
           expect(callCount).toBeGreaterThanOrEqual(1);

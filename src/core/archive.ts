@@ -462,7 +462,7 @@ async function moveDirectory(
     if (code === 'ENOTEMPTY' || code === 'EEXIST') {
       throw new ArchiveBlockedError(
         'archive_target_exists',
-        `Archive '${path.basename(dest)}' already exists.`
+        `归档 '${path.basename(dest)}' 已存在。`
       );
     }
     if (code === 'EPERM' || code === 'EXDEV') {
@@ -501,7 +501,7 @@ async function moveDirectory(
         if ((copyError as NodeJS.ErrnoException).code === 'EEXIST') {
           throw new ArchiveBlockedError(
             'archive_target_exists',
-            `Archive '${path.basename(dest)}' already exists.`
+            `归档 '${path.basename(dest)}' 已存在。`
           );
         }
         throw copyError;
@@ -549,7 +549,7 @@ async function assertArchiveDestinationAvailable(
     await fs.lstat(archivePath);
     throw new ArchiveBlockedError(
       'archive_target_exists',
-      `Archive '${archiveName}' already exists.`
+      `归档 '${archiveName}' 已存在。`
     );
   } catch (error: any) {
     if (error instanceof ArchiveBlockedError) throw error;
@@ -617,8 +617,7 @@ async function claimArchiveDestination(
     if ((error as NodeJS.ErrnoException).code === 'EEXIST') {
       throw new ArchiveBlockedError(
         'archive_target_exists',
-        `Archive '${archiveName}' is already being created. If no archive process is running, ` +
-          `remove the stale claim at ${claimPath} and rerun.`
+        `归档 '${archiveName}' 正在创建中。如果没有正在运行的归档进程，请删除 ${claimPath} 处残留的锁文件后重新运行。`
       );
     }
     throw error;
@@ -1097,7 +1096,7 @@ export class ArchiveCommand {
       } catch {
         throw new ArchiveBlockedError(
           'archive_path_outside_root',
-          `Refusing to archive through a path outside the OpenSpec root: ${managedDir}`
+          `拒绝通过 OpenSpec 根目录之外的路径进行归档：${managedDir}`
         );
       }
     }
@@ -1132,7 +1131,7 @@ export class ArchiveCommand {
       if (stat.isSymbolicLink()) {
         throw new ArchiveBlockedError(
           'archive_change_symlink',
-          `Change '${changeName}' is a symbolic link. Replace it with a real directory before archiving.`
+          `变更 '${changeName}' 是一个符号链接。请在归档前将其替换为真实的目录。`
         );
       }
       if (!stat.isDirectory()) {
@@ -1287,7 +1286,7 @@ export class ArchiveCommand {
           () =>
             new ArchiveBlockedError(
               'archive_confirmation_required',
-              'Skipping validation requires confirmation, and no answer could be read from stdin.',
+              '跳过验证需要确认，且无法从标准输入读取回答。',
               rerunCommand(root, changeName!, options)
             )
         );
@@ -1329,7 +1328,7 @@ export class ArchiveCommand {
           () =>
             new ArchiveBlockedError(
               'archive_tasks_incomplete',
-              `${incompleteTasks} incomplete task(s) found for change '${describeChangeName(changeName!)}', and no answer could be read from stdin.`,
+              `为变更 '${describeChangeName(changeName!)}' 找到 ${incompleteTasks} 个未完成的任务，且无法从标准输入读取回答。`,
               `Complete the tasks or rerun with ${rerunCommand(root, changeName!, options)}`
             )
         );
@@ -1451,7 +1450,7 @@ export class ArchiveCommand {
         }
         if (prepareError === undefined && !json) {
           for (const warning of specWarnings) {
-            console.log(chalk.yellow(`⚠️  Warning: ${warning}`));
+            console.log(chalk.yellow(`⚠️  警告：${warning}`));
           }
         }
 
@@ -1472,7 +1471,7 @@ export class ArchiveCommand {
             () =>
               new ArchiveBlockedError(
                 'archive_confirmation_required',
-                `Updating ${specUpdates.length} spec(s) requires confirmation, and no answer could be read from stdin.`,
+                `更新 ${specUpdates.length} 个 spec 需要确认，且无法从标准输入读取回答。`,
                 rerunCommand(root, changeName!, options)
               )
           );
@@ -1581,12 +1580,11 @@ export class ArchiveCommand {
                   p.counts.removed > 0 &&
                   (await isRetirementCandidate(p.update, p, false));
                 const retirementHint = retirementWouldFix
-                  ? `This change removes the last requirement '${specName}' has. To retire the` +
-                    ` capability and delete its spec, add \`retire_capabilities: true\` to the` +
-                    ` change's ${METADATA_FILENAME} (alongside its \`schema:\`, which that file` +
-                    ` requires), then rerun.` +
+                  ? `此变更移除了 '${specName}' 的最后一条需求。要废弃该功能并删除其 spec，` +
+                    `请在变更的 ${METADATA_FILENAME} 中添加 \`retire_capabilities: true\` ` +
+                    `（该文件需要与 \`schema:\` 并列），然后重新运行。` +
                     (retirementMarker.invalidReason
-                      ? ` The marker present now cannot be honored (${retirementMarker.invalidReason}).`
+                      ? ` 当前存在的标记无法生效（${retirementMarker.invalidReason}）。`
                       : '')
                   : undefined;
                 // The marker was set and retirement was still refused. Saying
@@ -1599,11 +1597,11 @@ export class ArchiveCommand {
                   retirementDeclared &&
                   p.unaccountedContent.length > 0 &&
                   (await isRetirableSpec(specName, p.rebuilt))
-                    ? `'${specName}' declares retire_capabilities, but the spec holds content the merge ` +
-                      `cannot safely account for and deleting the file would take with it: ` +
+                    ? `'${specName}' 声明了 retire_capabilities，但该 spec 包含合并无法安全处理的内容，` +
+                      `删除该文件会一并带走：` +
                       `${p.unaccountedContent.slice(0, 3).map((line) => `"${line}"`).join(', ')}` +
-                      `${p.unaccountedContent.length > 3 ? `, and ${p.unaccountedContent.length - 3} more line(s)` : ''}. ` +
-                      'Move it into `## Purpose` or a canonical requirement, or delete the spec by hand.'
+                      `${p.unaccountedContent.length > 3 ? `，以及另外 ${p.unaccountedContent.length - 3} 行` : ''}。` +
+                      '请将其移入 `## Purpose` 或规范需求中，或者手动删除该 spec。'
                     : undefined;
                 if (json) {
                   throw new ArchiveBlockedError(
@@ -1814,12 +1812,12 @@ export class ArchiveCommand {
               ? undefined
               : quoteForShell(`:(top)${deletedPath}`);
             const recovery = pasteablePath
-              ? `If it was committed, restore it with: git checkout HEAD -- ${pasteablePath}`
-              : `It was deleted from ${deletedPath}; if it was committed, restore it from that checkout's history.`;
+              ? `如果已提交，可通过以下命令恢复：git checkout HEAD -- ${pasteablePath}`
+              : `文件已从 ${deletedPath} 删除；如果已提交，可从该检出的历史中恢复。`;
             const retirementNote =
-              `${p.update.id} - capability retired; deleted the main spec (all requirements removed` +
-              `, declared by retire_capabilities) at ${deletedPath}` +
-              `. Its section(s) went with it: ${lost.join(', ')}. ` +
+              `${p.update.id} - 功能已废弃；已删除主 spec（所有需求已移除` +
+              `，由 retire_capabilities 声明）位于 ${deletedPath}` +
+              `。其关联段落已被一并移除：${lost.join(', ')}。` +
               recovery;
             specWarnings.push(retirementNote);
             // The "Retiring ..." line already told a human the file is gone; the
@@ -1838,8 +1836,8 @@ export class ArchiveCommand {
             );
             console.log(
               wroteAny
-                ? 'Specs updated successfully.'
-                : 'Specs already in sync; no files changed.'
+                ? 'Specs 更新成功。'
+                : 'Specs 已同步，未更改任何文件。'
             );
             }
 

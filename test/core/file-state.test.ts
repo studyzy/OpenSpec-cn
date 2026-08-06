@@ -168,7 +168,7 @@ describe('file-state', () => {
             code: 'store_registry_busy',
             message: 'Store 注册表正忙。',
             target: 'store.registry',
-            fix: `Retry shortly; if this persists, delete the stale lock file ${lockPath}.`,
+            fix: `请稍后重试；如果持续出现，请删除过期的锁文件 ${lockPath}。`,
           },
         });
         expect(Date.now() - started).toBeGreaterThanOrEqual(4900);

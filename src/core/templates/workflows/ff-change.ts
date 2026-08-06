@@ -97,8 +97,8 @@ After completing all artifacts, summarize:
 
 **产出物创建指南**
 
-- Follow the \`instruction\` field from \`openspec instructions\` for each artifact type - it is the authoritative guidance, even for familiar artifact names
-- If the \`instruction\` field directs you to use a specific skill or command to create the artifact, invoke it instead of writing the artifact directly
+- 遵循来自 \`openspec instructions\` 每个制品类型输出中的 \`instruction\` 字段 — 它是权威指导，即使产出物名称熟悉
+- 若 \`instruction\` 字段指示你使用特定 skill 或命令创建产出物，则调用它而非直接写入产出物
 - The schema defines what each artifact should contain - follow it
 - Read dependency artifacts for context before creating new ones
 - Use \`template\` as the structure for your output file - fill in its sections
@@ -210,8 +210,8 @@ After completing all artifacts, summarize:
 
 **产出物创建指南**
 
-- Follow the \`instruction\` field from \`openspec instructions\` for each artifact type - it is the authoritative guidance, even for familiar artifact names
-- If the \`instruction\` field directs you to use a specific skill or command to create the artifact, invoke it instead of writing the artifact directly
+- 遵循来自 \`openspec instructions\` 每个制品类型输出中的 \`instruction\` 字段 — 它是权威指导，即使产出物名称熟悉
+- 若 \`instruction\` 字段指示你使用特定 skill 或命令创建产出物，则调用它而非直接写入产出物
 - The schema defines what each artifact should contain - follow it
 - Read dependency artifacts for context before creating new ones
 - Use \`template\` as the structure for your output file - fill in its sections

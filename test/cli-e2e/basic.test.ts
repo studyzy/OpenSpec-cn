@@ -255,7 +255,7 @@ describe('openspec CLI e2e basics', () => {
       const output = `${result.stdout}${result.stderr}`;
       expect(result.exitCode).toBe(1);
       expect(output).not.toContain('force closed the prompt');
-      expect(output).toContain('no answer could be read from stdin');
+      expect(output).toContain('无法从标准输入读取回答');
       expect(output).toContain('openspec archive add-greeting --yes');
 
       // The change is untouched: nothing was archived or merged.
@@ -270,7 +270,7 @@ describe('openspec CLI e2e basics', () => {
       const output = `${result.stdout}${result.stderr}`;
       expect(result.exitCode).toBe(1);
       expect(output).not.toContain('force closed the prompt');
-      expect(output).toContain('1 incomplete task(s) found');
+      expect(output).toContain('个未完成的任务');
       expect(output).toContain('openspec archive add-greeting --yes');
     });
 
@@ -292,7 +292,7 @@ describe('openspec CLI e2e basics', () => {
       const output = `${result.stdout}${result.stderr}`;
       expect(result.exitCode).toBe(1);
       expect(output).not.toContain('force closed the prompt');
-      expect(output).toContain('Skipping validation requires confirmation');
+      expect(output).toContain('跳过验证需要确认');
       expect(output).toContain('openspec archive add-greeting --no-validate --yes');
     });
 

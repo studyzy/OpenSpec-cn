@@ -63,7 +63,7 @@ describe('global defaultStore fallback (#1359)', () => {
 
     const human = await runCLI(['status'], { cwd: scratch, env });
     expect(human.exitCode).toBe(0);
-    expect(human.stderr).toContain('Using OpenSpec root: team-context');
+    expect(human.stderr).toContain('使用 OpenSpec 根目录: team-context');
   }, 30_000);
 
   it('reports a stale default in the JSON failure payload with the clearing fix', async () => {

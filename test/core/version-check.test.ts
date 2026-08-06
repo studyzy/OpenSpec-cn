@@ -141,7 +141,7 @@ describe('getAvailableCliUpdate', () => {
 
     expect(requests).toHaveLength(1);
     expect(requests[0].method).toBe('GET');
-    expect(requests[0].url).toBe('/@fission-ai/openspec/latest');
+    expect(requests[0].url).toBe('/@studyzy/openspec-cn/latest');
     // npm serves application/vnd.npm.install-v1+json only on the full
     // packument; asking for it here returns 406 and silently disables the
     // whole check.
@@ -163,7 +163,7 @@ describe('getAvailableCliUpdate', () => {
     respond = (res) => {
       hop += 1;
       if (hop === 1) {
-        res.writeHead(302, { location: '/elsewhere/@fission-ai/openspec/latest' });
+        res.writeHead(302, { location: '/elsewhere/@studyzy/openspec-cn/latest' });
         res.end();
         return;
       }
@@ -172,7 +172,7 @@ describe('getAvailableCliUpdate', () => {
     };
 
     await expect(getAvailableCliUpdate()).resolves.toBe(bumpMajor(OPENSPEC_VERSION));
-    expect(requests[1].url).toBe('/elsewhere/@fission-ai/openspec/latest');
+    expect(requests[1].url).toBe('/elsewhere/@studyzy/openspec-cn/latest');
   });
 
   it('gives up rather than following a redirect loop', async () => {
@@ -225,7 +225,7 @@ describe('getAvailableCliUpdate', () => {
     respond = (res) => {
       hop += 1;
       if (hop === 1) {
-        res.writeHead(302, { location: '/mirror/@fission-ai/openspec/latest' });
+        res.writeHead(302, { location: '/mirror/@studyzy/openspec-cn/latest' });
         res.end();
         return;
       }
@@ -319,10 +319,10 @@ describe('getAvailableCliUpdate', () => {
       vi.spyOn(process, 'cwd').mockReturnValue(home);
       delete process.env.npm_config_registry;
 
-      expect(registryUrl()).toBe('https://registry.npmjs.org/@fission-ai/openspec/latest');
+      expect(registryUrl()).toBe('https://registry.npmjs.org/@studyzy/openspec-cn/latest');
 
       process.env.npm_config_registry = 'https://env.example.com';
-      expect(registryUrl()).toBe('https://env.example.com/@fission-ai/openspec/latest');
+      expect(registryUrl()).toBe('https://env.example.com/@studyzy/openspec-cn/latest');
     } finally {
       fs.rmSync(home, { recursive: true, force: true, maxRetries: 5, retryDelay: 100 });
     }
@@ -335,11 +335,11 @@ describe('getAvailableCliUpdate', () => {
     // must not depend on whatever the machine has configured there.
     for (const bogus of ['not-a-url', 'file:///etc/passwd', 'javascript:alert(1)']) {
       process.env.npm_config_registry = bogus;
-      expect(registryUrl()).toBe('https://registry.npmjs.org/@fission-ai/openspec/latest');
+      expect(registryUrl()).toBe('https://registry.npmjs.org/@studyzy/openspec-cn/latest');
     }
 
     process.env.npm_config_registry = 'https://npm.internal.example.com/';
-    expect(registryUrl()).toBe('https://npm.internal.example.com/@fission-ai/openspec/latest');
+    expect(registryUrl()).toBe('https://npm.internal.example.com/@studyzy/openspec-cn/latest');
   });
 });
 
@@ -744,7 +744,7 @@ describe('rerunUpdateWithUpgradedCli', () => {
     await expect(
       rerunUpdateWithUpgradedCli('.', { binPath: path.join(dir, 'not-installed') })
     ).resolves.toBe(1);
-    expect(lines.join('\n')).toContain('were not regenerated');
+    expect(lines.join('\n')).toContain('指令文件未被重新生成');
   }, 30000);
 });
 
@@ -770,7 +770,7 @@ describe('displayCliUpdateNote', () => {
     const output = capture(() => displayCliUpdateNote('9.9.9'));
 
     expect(output).toContain(`v${OPENSPEC_VERSION} → v9.9.9`);
-    expect(output).toContain('npm install -g @fission-ai/openspec@latest');
+    expect(output).toContain('npm install -g @studyzy/openspec-cn@latest');
     expect(output).toContain('Then run "openspec update" again');
     expect(output).toContain(`Running from: ${getInstallDir()}`);
   });
@@ -778,7 +778,7 @@ describe('displayCliUpdateNote', () => {
   it('picks the upgrade command that matches how the CLI was installed', () => {
     const globalDir = path.join(GLOBAL_ROOT, 'lib', 'node_modules', '@fission-ai', 'openspec');
     const globalLines = buildCliUpdateLines('9.9.9', globalDir, PROJECT_ROOT).join('\n');
-    expect(globalLines).toContain('npm install -g @fission-ai/openspec@latest');
+    expect(globalLines).toContain('npm install -g @studyzy/openspec-cn@latest');
 
     // Hoisted workspace layout: run from a sub-package, dependency at the root.
     const local = buildCliUpdateLines(
@@ -787,7 +787,7 @@ describe('displayCliUpdateNote', () => {
       path.join(PROJECT_ROOT, 'packages', 'app')
     ).join('\n');
     // No npm command: the project's own package manager owns its lockfile.
-    expect(local).toContain('Update the @fission-ai/openspec dependency in this project.');
+    expect(local).toContain('Update the @studyzy/openspec-cn dependency in this project.');
     expect(local).not.toContain('npm install');
 
     const npx = buildCliUpdateLines(
@@ -795,7 +795,7 @@ describe('displayCliUpdateNote', () => {
       path.join(GLOBAL_ROOT, '.npm', '_npx', 'abc123', 'node_modules', '@fission-ai', 'openspec'),
       PROJECT_ROOT
     ).join('\n');
-    expect(npx).toContain('npx @fission-ai/openspec@latest update');
+    expect(npx).toContain('npx @studyzy/openspec-cn@latest update');
     expect(npx).not.toContain('npm install -g');
   });
 
@@ -853,7 +853,7 @@ describe('displayCliUpdateNote', () => {
       path.join(HOME_ROOT, '.npm', '_npx', 'abc', 'node_modules', 'pkg'),
       PROJECT_ROOT
     );
-    expect(npx).toEqual(['  npx @fission-ai/openspec@latest update']);
+    expect(npx).toEqual(['  npx @studyzy/openspec-cn@latest update']);
 
     // Every other flavor does need the second pass.
     expect(buildUpgradeCommandLines(path.join(GLOBAL_ROOT, 'lib', 'node_modules', 'pkg'), PROJECT_ROOT))

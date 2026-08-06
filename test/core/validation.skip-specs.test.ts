@@ -38,8 +38,8 @@ describe('Validator skip_specs handling', () => {
 
     expect(report.valid).toBe(false);
     const msg = report.issues.map(i => i.message).join('\n');
-    expect(msg).toContain('Change must have at least one delta');
-    expect(msg).toContain('set "skip_specs: true"');
+    expect(msg).toContain('Change 必须至少有一个 delta');
+    expect(msg).toContain('设置 "skip_specs: true"');
   });
 
   it('accepts a zero-delta change that declares skip_specs', async () => {
@@ -154,7 +154,7 @@ describe('Validator skip_specs handling', () => {
     expect(report.valid).toBe(false);
     const msg = report.issues.map(i => i.message).join('\n');
     expect(msg).toContain('skip_specs is set but .openspec.yaml is not valid change metadata');
-    expect(msg).toContain('Change must have at least one delta');
+    expect(msg).toContain('Change 必须至少有一个 delta');
   });
 
   it('does not honor skip_specs when the schema does not resolve', async () => {
@@ -173,7 +173,7 @@ describe('Validator skip_specs handling', () => {
     const msg = report.issues.map(i => i.message).join('\n');
     expect(msg).toContain('skip_specs is set but .openspec.yaml is not valid change metadata');
     expect(msg).toContain("unknown schema 'does-not-exist'");
-    expect(msg).toContain('Change must have at least one delta');
+    expect(msg).toContain('Change 必须至少有一个 delta');
   });
 
   it('honors skip_specs when the marker names a project-local schema', async () => {
@@ -288,7 +288,7 @@ describe('Validator skip_specs handling', () => {
     expect(report.valid).toBe(false);
     const msg = report.issues.map(i => i.message).join('\n');
     expect(msg).not.toContain('skip_specs is set');
-    expect(msg).toContain('Change must have at least one delta');
+    expect(msg).toContain('Change 必须至少有一个 delta');
   });
 
   it('counts a symlinked file under specs/ as marker-conflicting content', async () => {
@@ -343,7 +343,7 @@ describe('Validator skip_specs handling', () => {
 
     expect(report.valid).toBe(false);
     const msg = report.issues.map(i => i.message).join('\n');
-    expect(msg).toContain('Change must have at least one delta');
+    expect(msg).toContain('Change 必须至少有一个 delta');
     expect(msg).toContain("unknown schema 'does-not-exist'");
   });
 
@@ -356,7 +356,7 @@ describe('Validator skip_specs handling', () => {
 
     expect(report.valid).toBe(false);
     const msg = report.issues.map(i => i.message).join('\n');
-    expect(msg).toContain('Change must have at least one delta');
+    expect(msg).toContain('Change 必须至少有一个 delta');
     // Both validate paths explain why the marker was not honored.
     expect(msg).toContain('skip_specs is set but .openspec.yaml is not valid change metadata');
   });
@@ -369,7 +369,7 @@ describe('Validator skip_specs handling', () => {
 
     expect(report.valid).toBe(false);
     const msg = report.issues.map(i => i.message).join('\n');
-    expect(msg).toContain('Change must have at least one delta');
+    expect(msg).toContain('Change 必须至少有一个 delta');
   });
 
   it('skip_specs must be exactly true - a truthy string is surfaced as unhonorable, not silently ignored', async () => {
@@ -395,7 +395,7 @@ describe('Validator skip_specs handling', () => {
     const validator = new Validator();
     const unmarked = await validator.validateChangeDeltaSpecs(testDir);
     expect(unmarked.valid).toBe(false);
-    expect(unmarked.issues.map(i => i.message).join('\n')).toContain('Change must have at least one delta');
+    expect(unmarked.issues.map(i => i.message).join('\n')).toContain('Change 必须至少有一个 delta');
 
     await fs.writeFile(
       path.join(testDir, '.openspec.yaml'),
@@ -433,7 +433,7 @@ describe('Validator skip_specs handling', () => {
     expect(report.valid).toBe(false);
     const msg = report.issues.map(i => i.message).join('\n');
     expect(msg).not.toContain('not valid change metadata');
-    expect(msg).toContain('Change must have at least one delta');
+    expect(msg).toContain('Change 必须至少有一个 delta');
   });
 
   it('validateChange drops the no-deltas error when skip_specs is declared', async () => {
@@ -448,6 +448,6 @@ describe('Validator skip_specs handling', () => {
 
     expect(report.valid).toBe(true);
     const msg = report.issues.map(i => i.message).join('\n');
-    expect(msg).not.toContain('Change must have at least one delta');
+    expect(msg).not.toContain('Change 必须至少有一个 delta');
   });
 });

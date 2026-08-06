@@ -53,9 +53,7 @@ ${STORE_SELECTION_GUIDANCE}
 
    Keep both fields separate from built-in steps, explicit user choices, resolved
    paths, CLI checks, and command contracts. If context conflicts with one of those
-   controlling inputs, report the conflict and preserve the controlling value. If
-   guidance is inapplicable or conflicts with a controlling input, do not follow it
-   and explain why. Do not infer replacement paths, skipped prompts, or flags from
+   controlling inputs, 报告冲突并保留控制值。若 guidance 不适用或与某个控制输入冲突，不要遵循它并解释原因。不要从这些字段推断替换路径、跳过的提示或标志。
    either field, and do not copy their text verbatim into specs, change artifacts,
    or archive summaries unless the user separately asks for it. These are
    prompt-level behavior contracts, not enforceable checks.
@@ -113,10 +111,8 @@ ${STORE_SELECTION_GUIDANCE}
    \`openspec instructions specs --change "<name>" --json\` once with the same
    selected-root flags. Require a zero exit status and valid artifact-instruction
    JSON. If the lookup fails or returns invalid JSON, report the error and stop
-   before writing any main spec or moving the change. A valid response with omitted
-   \`rules\` is the no-rules case. Apply returned \`rules\` only to the content and
-   form of main specs produced by this merge; do not use them as archive guidance,
-   change CLI behavior, or copy the rule text into any output file.
+   before writing any main spec or moving the change. 省略 \`rules\` 的有效响应表示未配置制品规则
+   — 这是无规则情况。仅将返回的 \`rules\` 应用于此合并生成的主 spec 的内容和形式；不要将其用于归档指导、更改 CLI 行为，或将规则文本复制到任何输出文件中。
 
    Then run the \`openspec-sync-specs\` workflow inline (agent-driven intelligent merge) for change '<name>', passing the delta spec analysis and the fetched specs-rule snapshot from above, and wait for it to finish. The inline sync must reuse that snapshot without fetching \`specs\` instructions again. Do not delegate it to a background task — step 5 would move \`changeRoot\` out from under a sync that is still reading it, leaving the change archived and the main specs never updated. If your agent can only run it by delegation, delegate synchronously and wait for the result.
 
@@ -135,7 +131,7 @@ ${STORE_SELECTION_GUIDANCE}
    mkdir -p "<planningHome.changesDir>/archive"
    \`\`\`
 
-   Generate the target name: use the change name as-is when it already starts with a \`YYYY-MM-DD-\` prefix; otherwise prepend the current date as \`YYYY-MM-DD-<change-name>\`. Never stack a second date (same rule as \`openspec archive\`).
+   Generate the target name: 若变更名已以 \`YYYY-MM-DD-\` 前缀开头则保持原样；否则将当前日期前置为 \`YYYY-MM-DD-<change-name>\`。绝不叠加第二个日期（与 \`openspec archive\` 相同的规则）。
 
    **检查目标是否已存在：**
    - 是：报错失败，建议重命名现有归档或使用不同日期
@@ -235,9 +231,7 @@ ${STORE_SELECTION_GUIDANCE}
 
    Keep both fields separate from built-in steps, explicit user choices, resolved
    paths, CLI checks, and command contracts. If context conflicts with one of those
-   controlling inputs, report the conflict and preserve the controlling value. If
-   guidance is inapplicable or conflicts with a controlling input, do not follow it
-   and explain why. Do not infer replacement paths, skipped prompts, or flags from
+   controlling inputs, 报告冲突并保留控制值。若 guidance 不适用或与某个控制输入冲突，不要遵循它并解释原因。不要从这些字段推断替换路径、跳过的提示或标志。
    either field, and do not copy their text verbatim into specs, change artifacts,
    or archive summaries unless the user separately asks for it. These are
    prompt-level behavior contracts, not enforceable checks.
@@ -295,10 +289,8 @@ ${STORE_SELECTION_GUIDANCE}
    \`openspec instructions specs --change "<name>" --json\` once with the same
    selected-root flags. Require a zero exit status and valid artifact-instruction
    JSON. If the lookup fails or returns invalid JSON, report the error and stop
-   before writing any main spec or moving the change. A valid response with omitted
-   \`rules\` is the no-rules case. Apply returned \`rules\` only to the content and
-   form of main specs produced by this merge; do not use them as archive guidance,
-   change CLI behavior, or copy the rule text into any output file.
+   before writing any main spec or moving the change. 省略 \`rules\` 的有效响应表示未配置制品规则
+   — 这是无规则情况。仅将返回的 \`rules\` 应用于此合并生成的主 spec 的内容和形式；不要将其用于归档指导、更改 CLI 行为，或将规则文本复制到任何输出文件中。
 
    Then run the \`/opsx:sync\` workflow inline (agent-driven intelligent merge) for change '<name>', passing the delta spec analysis and the fetched specs-rule snapshot from above, and wait for it to finish. The inline sync must reuse that snapshot without fetching \`specs\` instructions again. Do not delegate it to a background task — step 5 would move \`changeRoot\` out from under a sync that is still reading it, leaving the change archived and the main specs never updated. If your agent can only run it by delegation, delegate synchronously and wait for the result.
 
@@ -317,7 +309,7 @@ ${STORE_SELECTION_GUIDANCE}
    mkdir -p "<planningHome.changesDir>/archive"
    \`\`\`
 
-   Generate the target name: use the change name as-is when it already starts with a \`YYYY-MM-DD-\` prefix; otherwise prepend the current date as \`YYYY-MM-DD-<change-name>\`. Never stack a second date (same rule as \`openspec archive\`).
+   Generate the target name: 若变更名已以 \`YYYY-MM-DD-\` 前缀开头则保持原样；否则将当前日期前置为 \`YYYY-MM-DD-<change-name>\`。绝不叠加第二个日期（与 \`openspec archive\` 相同的规则）。
 
    **检查目标是否已存在：**
    - 是：报错失败，建议重命名现有归档或使用不同日期

@@ -60,7 +60,7 @@ describe('printInstructionsText for skip_specs changes', () => {
     const output = capture('design');
 
     expect(output).toContain('<task>');
-    expect(output).toContain('Create the design artifact for change "my-change".');
+    expect(output).toContain('为变更 "my-change" 创建 design 产出物。');
     expect(output).not.toContain('this artifact is skipped');
   });
 
@@ -95,8 +95,9 @@ describe('printInstructionsText for skip_specs changes', () => {
     vi.restoreAllMocks();
     const output = lines.join('\n');
 
-    expect(output).toContain('Progress: 1/3 artifacts complete (1 skipped)');
-    expect(output).toContain('[~] specs (skipped: change declares skip_specs)');
+    expect(output).toContain('进度：1/3 个制品已完成');
+    expect(output).toContain('(1 已跳过)');
+    expect(output).toContain('[~] specs (已跳过：变更声明了 skip_specs)');
     expect(output).toContain('[x] proposal');
   });
 });

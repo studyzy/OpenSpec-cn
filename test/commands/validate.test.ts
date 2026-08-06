@@ -107,7 +107,7 @@ describe('top-level validate command', () => {
 
     const result = await runCLI(['validate', 'plain-empty', '--type', 'change'], { cwd: testDir });
     expect(result.exitCode).toBe(1);
-    expect(result.stderr).toContain('Ensure change has deltas in specs/');
+    expect(result.stderr).toContain('确保变更在 specs/ 中有 deltas');
     expect(result.stderr).not.toContain('delete the files under specs/');
   });
 

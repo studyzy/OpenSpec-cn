@@ -82,7 +82,7 @@ describe('top-level show command', () => {
       { encoding: 'utf-8', cwd: testDir }
     );
     expect(res.status).toBe(0);
-    expect(res.stderr).toContain('Ignoring flags not applicable to change: scenarios');
+    expect(res.stderr).toContain('警告：忽略不适用于 change 的标志：scenarios');
   });
 
   it('auto-detects spec id and supports spec-only flags', () => {
@@ -139,7 +139,7 @@ describe('top-level show command', () => {
       const stderr = err.stderr.toString();
       // Resolved as a change, not rejected as an unknown item.
       expect(stderr).not.toContain('Unknown item');
-      expect(stderr).toContain('has no proposal.md yet');
+      expect(stderr).toContain('尚无 proposal.md');
       expect(stderr).toContain('openspec status --change scaffolded');
     } finally {
       process.chdir(originalCwd);
@@ -161,7 +161,7 @@ describe('top-level show command', () => {
       } catch (e) { err = e; }
       expect(err).toBeDefined();
       const stderr = err.stderr.toString();
-      expect(stderr).toContain('Available IDs:');
+      expect(stderr).toContain('可用ID：');
       expect(stderr).toContain('scaffolded');
     } finally {
       process.chdir(originalCwd);

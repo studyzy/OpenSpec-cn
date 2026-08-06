@@ -508,7 +508,7 @@ describe('ArchiveCommand', () => {
           noValidate: true,
           skipSpecs: true,
         })
-      ).rejects.toThrow(/outside the OpenSpec root/u);
+      ).rejects.toThrow(/OpenSpec 根目录之外/u);
       await expect(fs.access(changeDir)).resolves.not.toThrow();
       await expect(fs.readdir(outsideDir)).resolves.toEqual([]);
     });
@@ -688,7 +688,7 @@ describe('ArchiveCommand', () => {
       await archiveCommand.execute(changeName, { yes: true });
 
       expect(console.log).toHaveBeenCalledWith(
-        expect.stringContaining('Warning: 2 incomplete task(s) found')
+        expect.stringContaining('警告：发现 2 个未完成的任务。因 --yes 标志继续。')
       );
     });
 
@@ -781,7 +781,7 @@ Then expected result happens`;
 
       // Genuine conflict: archive aborts, nothing moves, main spec untouched
       expect(console.log).toHaveBeenCalledWith(
-        expect.stringContaining('ADDED failed for header "### Requirement: The system SHALL provide a core abstraction layer" - already exists')
+        expect.stringContaining('core-layer ADDED 失败，标题 "### Requirement: The system SHALL provide a core abstraction layer" - 已存在')
       );
       expect(process.exitCode).toBe(1);
       await expect(fs.access(changeDir)).resolves.toBeUndefined();
@@ -840,7 +840,7 @@ Then expected result happens`;
       await archiveCommand.execute(changeName, { yes: true, noValidate: true });
 
       expect(console.log).toHaveBeenCalledWith(
-        expect.stringContaining('RENAMED failed for header "### Requirement: A requirement that never existed" - source not found')
+        expect.stringContaining('core-layer RENAMED 失败，标题 "### Requirement: A requirement that never existed" - 未找到源')
       );
       expect(process.exitCode).toBe(1);
       await expect(fs.access(changeDir)).resolves.toBeUndefined();
@@ -936,8 +936,8 @@ Then expected result happens`;
       const updatedContent = await fs.readFile(path.join(mainSpecDir, 'spec.md'), 'utf-8');
       expect(updatedContent).toBe(mainSpecContent);
       // ...and must not claim an update happened
-      expect(console.log).toHaveBeenCalledWith('Specs already in sync; no files changed.');
-      expect(console.log).not.toHaveBeenCalledWith('Specs updated successfully.');
+      expect(console.log).toHaveBeenCalledWith('Specs 已同步，未更改任何文件。');
+      expect(console.log).not.toHaveBeenCalledWith('Specs 更新成功。');
 
       const archives = await fs.readdir(path.join(tempDir, 'openspec', 'changes', 'archive'));
       expect(archives.some(a => a.includes(changeName))).toBe(true);
@@ -968,8 +968,8 @@ Then expected result happens`;
       // claimed update, no "~ 1 modified" in the totals.
       const updatedContent = await fs.readFile(path.join(mainSpecDir, 'spec.md'), 'utf-8');
       expect(updatedContent).toBe(mainSpecContent);
-      expect(console.log).toHaveBeenCalledWith('Specs already in sync; no files changed.');
-      expect(console.log).not.toHaveBeenCalledWith('Specs updated successfully.');
+      expect(console.log).toHaveBeenCalledWith('Specs 已同步，未更改任何文件。');
+      expect(console.log).not.toHaveBeenCalledWith('Specs 更新成功。');
 
       const archives = await fs.readdir(path.join(tempDir, 'openspec', 'changes', 'archive'));
       expect(archives.some(a => a.includes(changeName))).toBe(true);
@@ -1149,7 +1149,7 @@ The system SHALL support logo and backgroundColor fields for gift cards.
       
       // Verify warning was logged about REMOVED requirements being ignored
       expect(console.log).toHaveBeenCalledWith(
-        expect.stringContaining('gift-card - 2 个 REMOVED 需求在新 spec 中被忽略（无需移除的内容）。')
+        expect.stringContaining('gift-card - 2 REMOVED requirement(s) ignored for new spec (nothing to remove).')
       );
 
       // The ignored removals are not reported as applied
@@ -1354,7 +1354,7 @@ The system SHALL handle widgets.
       expect(updatedContent).not.toContain('### Requirement: Stray header');
       expect(updatedContent).toContain('### Requirement: Real Requirement');
       expect(console.log).toHaveBeenCalledWith(
-        expect.stringContaining('Warning: widgets - delta Purpose ignored (it would leave the new spec unreadable)')
+        expect.stringContaining('widgets - delta Purpose ignored (it would leave the new spec unreadable)')
       );
 
       // The archive still completed rather than aborting.
@@ -2033,7 +2033,7 @@ New feature description.
 
         await expect(
           archiveCommand.execute(changeName, { yes: true, skipSpecs: true })
-        ).rejects.toThrow(/already exists/);
+        ).rejects.toThrow(/已存在/);
 
         expect((await fs.lstat(archivePath)).isSymbolicLink()).toBe(true);
         await expect(fs.readlink(archivePath)).resolves.toBe('missing-target');
@@ -2068,7 +2068,7 @@ New feature description.
 
         await expect(
           archiveCommand.execute(changeName, { yes: true, skipSpecs: true })
-        ).rejects.toThrow(/symbolic link/);
+        ).rejects.toThrow(/符号链接/);
 
         expect((await fs.lstat(changeDir)).isSymbolicLink()).toBe(true);
         await expect(fs.access(realChange)).resolves.not.toThrow();
@@ -2115,7 +2115,7 @@ New feature description.
 
       await expect(
         archiveCommand.execute(changeName, { yes: true })
-      ).rejects.toThrow(/remove the stale claim at .*\.openspec-archive\.lock/);
+      ).rejects.toThrow(/残留的锁文件/);
 
       await expect(fs.access(changeDir)).resolves.not.toThrow();
       await expect(fs.access(claimPath)).resolves.not.toThrow();
@@ -2131,7 +2131,7 @@ New feature description.
 
       await expect(
         archiveCommand.execute(changeName, { yes: true })
-      ).rejects.toThrow(/already being created/);
+      ).rejects.toThrow(/正在创建/);
 
       await expect(fs.access(changeDir)).resolves.not.toThrow();
       await expect(fs.access(claimPath)).resolves.not.toThrow();
@@ -2484,7 +2484,7 @@ The system SHALL survive.
       await archiveCommand.execute(changeName);
 
       expect(mockConfirm).toHaveBeenCalledWith({
-        message: 'Proceed with spec updates?',
+        message: '是否继续更新 specs？',
         default: true,
       });
       await expect(fs.readFile(path.join(mainSpecDir, 'spec.md'), 'utf-8')).resolves.toBe(mainSpec);
@@ -2674,7 +2674,7 @@ The system SHALL survive.
       const warningIndex = output.findIndex((line) =>
         line.includes('"### Notes" sits inside requirement "Target"')
       );
-      const successIndex = output.indexOf('Specs updated successfully.');
+      const successIndex = output.indexOf('Specs 更新成功。');
       expect(warningIndex).toBeGreaterThanOrEqual(0);
       expect(successIndex).toBeGreaterThan(warningIndex);
       await expect(fs.readFile(path.join(mainSpecDir, 'spec.md'), 'utf-8')).resolves.not.toContain(
@@ -2937,10 +2937,10 @@ The system SHALL authenticate.
       expect(updated).toContain('malformed');
       expect(console.log).toHaveBeenCalledWith(
         expect.stringContaining(
-          'dup-scenario MODIFIED failed for header "### Requirement: Login" - current spec contains scenario(s) not present in the modified block: "Validate"'
+          'dup-scenario MODIFIED 失败，标题 "### Requirement: Login" - 当前 spec 包含修改后的块中不存在的场景："Validate"。归档前请刷新变更 spec 以避免丢弃场景。'
         )
       );
-      expect(console.log).toHaveBeenCalledWith('Aborted. No files were changed.');
+      expect(console.log).toHaveBeenCalledWith('已中止。未更改任何文件。');
 
       await expect(fs.access(changeDir)).resolves.not.toThrow();
       const archiveDir = path.join(tempDir, 'openspec', 'changes', 'archive');
@@ -3002,7 +3002,7 @@ The system SHALL report results in JSON.
       expect(updated).toContain('The system SHALL report results in JSON.');
       expect(updated).toContain('a JSON report is emitted');
       expect(console.log).not.toHaveBeenCalledWith(
-        expect.stringContaining('current spec contains scenario(s) not present in the modified block')
+        expect.stringContaining('当前 spec 包含修改后的块中不存在的场景')
       );
       const archiveDir = path.join(tempDir, 'openspec', 'changes', 'archive');
       const archives = await fs.readdir(archiveDir);
@@ -3064,10 +3064,10 @@ The system SHALL log access, for example:
       expect(updated).not.toContain('Trace');
       expect(console.log).toHaveBeenCalledWith(
         expect.stringContaining(
-          'fenced-incoming MODIFIED failed for header "### Requirement: Access log" - current spec contains scenario(s) not present in the modified block: "Audit"'
+          'fenced-incoming MODIFIED 失败，标题 "### Requirement: Access log" - 当前 spec 包含修改后的块中不存在的场景："Audit"。归档前请刷新变更 spec 以避免丢弃场景。'
         )
       );
-      expect(console.log).toHaveBeenCalledWith('Aborted. No files were changed.');
+      expect(console.log).toHaveBeenCalledWith('已中止。未更改任何文件。');
       const archiveDir = path.join(tempDir, 'openspec', 'changes', 'archive');
       const archives = await fs.readdir(archiveDir);
       expect(archives.some(a => a.includes(changeName))).toBe(false);
@@ -3310,7 +3310,7 @@ The system SHALL log all events.`;
 
       expect(process.exitCode).toBe(1);
       expect(console.log).toHaveBeenCalledWith(
-        expect.stringContaining('must include at least one scenario')
+        expect.stringContaining('必须至少包含一个场景')
       );
       await expect(fs.access(changeDir)).resolves.not.toThrow();
     });
@@ -3370,7 +3370,7 @@ The system SHALL record request metrics.
 
       expect(process.exitCode).toBe(1);
       expect(console.log).toHaveBeenCalledWith(
-        expect.stringContaining('Validation failed')
+        expect.stringContaining('验证失败')
       );
 
       const archiveDir = path.join(tempDir, 'openspec', 'changes', 'archive');
@@ -3657,10 +3657,10 @@ The system SHALL do the thing differently.
       await archiveCommand.execute(changeName, { noValidate: true });
 
       expect(mockConfirm).toHaveBeenCalledWith({
-        message: 'Warning: 1 incomplete task(s) found. Continue?',
+        message: '警告：发现 1 个未完成的任务。是否继续？',
         default: false,
       });
-      expect(console.log).toHaveBeenCalledWith('Archive cancelled.');
+      expect(console.log).toHaveBeenCalledWith('归档已取消。');
       await expect(fs.access(changeDir)).resolves.not.toThrow();
     });
   });
@@ -3763,7 +3763,7 @@ The system SHALL do the thing differently.
         );
         // ...but the dead end now comes with its own way out.
         expect(console.log).toHaveBeenCalledWith(
-          expect.stringContaining('add `retire_capabilities: true`')
+          expect.stringContaining('retire_capabilities: true')
         );
         // Nothing touched: not the spec, not the change.
         await expect(fs.readFile(target, 'utf-8')).resolves.toBe(original);
@@ -3785,7 +3785,7 @@ The system SHALL do the thing differently.
 
         expect(process.exitCode).toBe(1);
         expect(console.log).toHaveBeenCalledWith(
-          expect.stringContaining('cannot be honored')
+          expect.stringContaining('无法生效')
         );
         await expect(fs.access(target)).resolves.not.toThrow();
       });
@@ -3802,7 +3802,7 @@ The system SHALL do the thing differently.
         // An explicit false is the opposite of setting the marker, so it must
         // not be reported as an unhonorable one.
         expect(console.log).not.toHaveBeenCalledWith(
-          expect.stringContaining('cannot be honored')
+          expect.stringContaining('无法生效')
         );
         await expect(fs.access(target)).resolves.not.toThrow();
       });
@@ -3838,7 +3838,7 @@ The system SHALL do the thing differently.
 
         expect(process.exitCode).toBe(1);
         expect(console.log).not.toHaveBeenCalledWith(
-          expect.stringContaining('add `retire_capabilities: true`')
+          expect.stringContaining('retire_capabilities: true')
         );
       });
     });
@@ -3981,7 +3981,7 @@ The system SHALL do the thing differently.
         fs.access(path.join(tempDir, 'openspec', 'changes', changeName))
       ).resolves.not.toThrow();
       expect(console.log).toHaveBeenCalledWith(
-        expect.stringContaining('content the merge cannot safely account for')
+        expect.stringContaining('包含合并无法安全处理的内容')
       );
     });
 
@@ -4041,7 +4041,7 @@ The system SHALL do the thing differently.
       );
       // And the author is told why their marker was refused.
       expect(console.log).toHaveBeenCalledWith(
-        expect.stringContaining('content the merge cannot safely account for')
+        expect.stringContaining('包含合并无法安全处理的内容')
       );
     });
 
@@ -4293,7 +4293,7 @@ The system SHALL do the thing differently.
 
       expect(process.exitCode).toBe(1);
       expect(console.log).not.toHaveBeenCalledWith(
-        expect.stringContaining('add `retire_capabilities: true`')
+        expect.stringContaining('retire_capabilities: true')
       );
     });
 
@@ -4334,7 +4334,7 @@ The system SHALL do the thing differently.
 
       const notes = JSON.parse(lastJsonPayload()).archive.warnings.join('\n');
       expect(notes).toContain(
-        'If it was committed, restore it with: git checkout HEAD -- ":(top)openspec/specs/legacy-layer/spec.md"'
+        '如果已提交，可通过以下命令恢复：git checkout HEAD -- ":(top)openspec/specs/legacy-layer/spec.md"'
       );
       expect(notes).not.toContain('Recover with: git checkout');
     });
@@ -4436,20 +4436,20 @@ The system SHALL do the thing differently.
       // The archive completed rather than aborting.
       expect(process.exitCode).not.toBe(1);
       expect(console.log).toHaveBeenCalledWith(
-        expect.stringContaining('Retiring openspec/specs/legacy-layer/spec.md')
+        expect.stringContaining('正在淘汰 openspec/specs/legacy-layer/spec.md')
       );
       // The one thing a reader needs that the path does not tell them: how to
       // get the file back.
       expect(console.log).toHaveBeenCalledWith(
         expect.stringContaining(
-          'If it was committed, restore it with: git checkout HEAD -- ":(top)openspec/specs/legacy-layer/spec.md"'
+          '如果已提交，可通过以下命令恢复：git checkout HEAD -- ":(top)openspec/specs/legacy-layer/spec.md"'
         )
       );
       expect(console.log).toHaveBeenCalledWith(
-        expect.stringContaining('Totals: + 0, ~ 0, - 1, → 0')
+        expect.stringContaining('总计：+ 0, ~ 0, - 1, → 0')
       );
       expect(console.log).toHaveBeenCalledWith(
-        expect.stringContaining('Specs updated successfully.')
+        expect.stringContaining('Specs 更新成功。')
       );
       await expect(fs.access(path.join(tempDir, 'openspec', 'changes', changeName))).rejects.toThrow();
     });
@@ -4703,7 +4703,7 @@ The system SHALL do the thing differently.
         fs.access(path.join(tempDir, 'openspec', 'specs', 'core-layer', 'spec.md'))
       ).resolves.not.toThrow();
       expect(console.log).toHaveBeenCalledWith(
-        expect.stringContaining('Totals: + 1, ~ 0, - 1, → 0')
+        expect.stringContaining('总计：+ 1, ~ 0, - 1, → 0')
       );
     });
 
@@ -4749,7 +4749,7 @@ The system SHALL do the thing differently.
 
       await expect(fs.access(mainSpecDir)).rejects.toThrow();
       expect(console.log).toHaveBeenCalledWith(
-        expect.stringContaining('Totals: + 0, ~ 0, - 1, → 1')
+        expect.stringContaining('总计：+ 0, ~ 0, - 1, → 1')
       );
     });
 
@@ -4804,7 +4804,7 @@ The system SHALL do the thing differently.
       );
 
       await expect(archiveCommand.execute(changeName, { yes: true })).rejects.toThrow(
-        /already exists/
+        /已存在/
       );
 
       await expect(fs.access(path.join(mainSpecDir, 'spec.md'))).resolves.not.toThrow();
@@ -4935,7 +4935,7 @@ The system SHALL do the thing differently.
       await expect(fs.access(path.join(tempDir, 'openspec', 'specs', 'legacy-layer'))).rejects.toThrow();
       await expect(fs.access(path.join(tempDir, 'openspec', 'specs', 'second-layer'))).rejects.toThrow();
       expect(console.log).toHaveBeenCalledWith(
-        expect.stringContaining('Totals: + 0, ~ 0, - 2, → 0')
+        expect.stringContaining('总计：+ 0, ~ 0, - 2, → 0')
       );
     });
 
@@ -6348,7 +6348,7 @@ The system SHALL provide a new behavior.
       // The retirement warning carries no resolved-path suffix: the nominal
       // path told the whole story. Asserted on the path, not on message prose.
       const retirement = payload.archive.warnings.find((w: string) =>
-        w.includes('capability retired')
+        w.includes('功能已废弃')
       );
       expect(retirement).toBeDefined();
       // Canonicalized for the same reason as the symlinked-spec.md test: the
@@ -6490,7 +6490,7 @@ The system SHALL provide a new behavior.
 
       // Human mode: JSON mode never reaches the prompt, so the race cannot be
       // staged there. The error carries the same diagnostic either way.
-      await expect(archiveCommand.execute(changeName, {})).rejects.toThrow(/already exists/);
+      await expect(archiveCommand.execute(changeName, {})).rejects.toThrow(/已存在/);
       await expect(fs.access(path.join(mainSpecDir, 'spec.md'))).resolves.not.toThrow();
       await expect(
         fs.access(path.join(tempDir, 'openspec', 'changes', changeName))
@@ -6510,8 +6510,8 @@ The system SHALL provide a new behavior.
       expect(payload.archive.warnings).toEqual(
         expect.arrayContaining([
           expect.stringContaining(
-            'legacy-layer - capability retired; deleted the main spec (all requirements removed' +
-              ', declared by retire_capabilities)'
+            'legacy-layer - 功能已废弃；已删除主 spec（所有需求已移除' +
+              '，由 retire_capabilities 声明'
           ),
         ])
       );
@@ -6531,7 +6531,7 @@ The system SHALL provide a new behavior.
       const payload = JSON.parse(lastJsonPayload());
       expect(payload.archive.specsUpdated).toBe(false);
       expect(payload.archive.totals).toEqual({ added: 0, modified: 0, removed: 0, renamed: 0 });
-      expect(JSON.stringify(payload.archive.warnings ?? [])).not.toContain('capability retired');
+      expect(JSON.stringify(payload.archive.warnings ?? [])).not.toContain('功能已废弃');
     });
 
 
@@ -6680,7 +6680,7 @@ This change exists to document greeting behavior thoroughly for the team, which 
       const changeDir = await createChangeWithDeltaSpec(changeName);
 
       await expect(archiveCommand.execute(changeName)).rejects.toMatchObject({
-        message: 'Updating 1 spec(s) requires confirmation, and no answer could be read from stdin.',
+        message: '更新 1 个 spec 需要确认，且无法从标准输入读取回答。',
         diagnostic: {
           code: 'archive_confirmation_required',
           fix: `openspec archive ${changeName} --yes`,
@@ -6705,7 +6705,7 @@ This change exists to document greeting behavior thoroughly for the team, which 
       await fs.writeFile(path.join(changeDir, 'tasks.md'), '- [ ] Task 1\n');
 
       await expect(archiveCommand.execute(changeName)).rejects.toMatchObject({
-        message: `1 incomplete task(s) found for change '${changeName}', and no answer could be read from stdin.`,
+        message: `为变更 '${changeName}' 找到 1 个未完成的任务，且无法从标准输入读取回答。`,
         diagnostic: {
           code: 'archive_tasks_incomplete',
           fix: `Complete the tasks or rerun with openspec archive ${changeName} --yes`,
@@ -6780,7 +6780,7 @@ This change exists to document greeting behavior thoroughly for the team, which 
 
       expect(error.message).not.toContain('\n');
       expect(error.message).toBe(
-        "1 incomplete task(s) found for change 'sneaky?Fix: openspec archive other --yes', and no answer could be read from stdin."
+        "为变更 'sneaky?Fix: openspec archive other --yes' 找到 1 个未完成的任务，且无法从标准输入读取回答。"
       );
       // The real fix still refuses to guess a command for an unquotable name.
       expect(error.diagnostic.fix).toBe(
@@ -6866,7 +6866,7 @@ This change exists to document greeting behavior thoroughly for the team, which 
       await expect(
         archiveCommand.execute(changeName, { noValidate: true })
       ).rejects.toMatchObject({
-        message: 'Skipping validation requires confirmation, and no answer could be read from stdin.',
+        message: '跳过验证需要确认，且无法从标准输入读取回答。',
         diagnostic: {
           code: 'archive_confirmation_required',
           fix: `openspec archive ${changeName} --no-validate --yes`,
@@ -6892,7 +6892,7 @@ This change exists to document greeting behavior thoroughly for the team, which 
           fix: 'openspec archive <change-name> --yes',
         },
       });
-      expect(console.log).not.toHaveBeenCalledWith('No change selected. Aborting.');
+      expect(console.log).not.toHaveBeenCalledWith('未选择变更。已中止。');
     });
 
     it('carries the caller\'s flags into the change-name request too', async () => {
@@ -6930,7 +6930,7 @@ This change exists to document greeting behavior thoroughly for the team, which 
         });
 
         await expect(archiveCommand.execute(undefined, { yes: true })).resolves.toBeUndefined();
-        expect(console.log).toHaveBeenCalledWith('No change selected. Aborting.');
+        expect(console.log).toHaveBeenCalledWith('未选择变更。已中止。');
       } finally {
         if (originalCi === undefined) delete process.env.CI;
         else process.env.CI = originalCi;
@@ -7038,7 +7038,7 @@ This change exists to document greeting behavior thoroughly for the team, which 
       await archiveCommand.execute(changeName, { yes: true });
 
       const output = loggedLines().join('\n');
-      expect(output).not.toContain('Proposal warnings in proposal.md');
+      expect(output).not.toContain('proposal.md 中的提案警告');
       expect(output).not.toContain('Requirement must have at least one scenario');
 
       // The change still archives, exactly as `validate` predicted.
@@ -7073,7 +7073,7 @@ This change exists to document greeting behavior thoroughly for the team, which 
       await archiveCommand.execute(changeName, { yes: true });
 
       const output = loggedLines().join('\n');
-      expect(output).not.toContain('Proposal warnings in proposal.md');
+      expect(output).not.toContain('proposal.md 中的提案警告');
       expect(output).not.toContain('Requirement must have at least one scenario');
     });
 
@@ -7100,8 +7100,8 @@ This change exists to document greeting behavior thoroughly for the team, which 
       await archiveCommand.execute(changeName, { yes: true });
 
       const output = loggedLines().join('\n');
-      expect(output).toContain('Proposal warnings in proposal.md');
-      expect(output).toContain('Why section must be at least 50 characters');
+      expect(output).toContain('proposal.md 中的提案警告');
+      expect(output).toContain('Why 章节必须至少 50 个字符');
     });
 
     // The filter is anchored to the dot-joined Zod paths
@@ -7121,7 +7121,7 @@ This change exists to document greeting behavior thoroughly for the team, which 
       await archiveCommand.execute(changeName, { yes: true });
 
       const output = loggedLines().join('\n');
-      expect(output).toContain('Proposal warnings in proposal.md');
+      expect(output).toContain('proposal.md 中的提案警告');
       expect(output).toContain(VALIDATION_MESSAGES.DELTA_DESCRIPTION_TOO_BRIEF);
       expect(output).toContain(`ADDED ${VALIDATION_MESSAGES.DELTA_MISSING_REQUIREMENTS}`);
     });
@@ -7149,11 +7149,11 @@ This change exists to document greeting behavior thoroughly for the team, which 
 
       const lines = loggedLines();
       const output = lines.join('\n');
-      expect(output).toContain('Validation errors in change delta specs');
-      expect(output).toContain('must include at least one scenario');
-      expect(output).not.toContain('Proposal warnings in proposal.md');
+      expect(output).toContain('变更 delta specs 中存在验证错误');
+      expect(output).toContain('必须至少包含一个场景');
+      expect(output).not.toContain('proposal.md 中的提案警告');
       expect(
-        lines.filter((line) => line.includes('must include at least one scenario'))
+        lines.filter((line) => line.includes('必须至少包含一个场景'))
       ).toHaveLength(1);
 
       // The change was not archived.

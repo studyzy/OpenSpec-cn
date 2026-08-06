@@ -388,7 +388,7 @@ describe('store git lifecycle', () => {
     expect(register.exitCode).toBe(1);
     const registerStatus = parseJson(register).status[0];
     expect(registerStatus.code).toBe('store_register_root_unhealthy');
-    expect(registerStatus.message).toContain('no commits');
+    expect(registerStatus.message).toContain('没有提交');
     expect(registerStatus.fix).toBe(
       '如果这是 store 克隆：提交并推送 origin store，拉取到此克隆中，然后重新运行 register。'
     );

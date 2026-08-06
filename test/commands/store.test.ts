@@ -1160,7 +1160,7 @@ describe('store command', () => {
     expect(mismatchFree.exitCode).toBe(1);
     const mismatchFreeStatus = parseJson(mismatchFree).status[0];
     expect(mismatchFreeStatus.code).toBe('store_metadata_id_mismatch');
-    expect(mismatchFreeStatus.fix).toContain('Use --id free-context');
+    expect(mismatchFreeStatus.fix).toContain('使用 --id free-context');
   });
 
   // Built by concatenation so the vocabulary sweep never matches this file.

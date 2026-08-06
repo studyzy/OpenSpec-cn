@@ -186,7 +186,7 @@ artifacts:
         issues: [
           {
             path: 'artifacts.proposal.template',
-            message: expect.stringContaining('outside the schema templates directory'),
+            message: expect.stringContaining('schema 模板目录之外'),
           },
         ],
       });
@@ -313,7 +313,7 @@ artifacts:
       expect(fs.existsSync(destinationDir)).toBe(false);
       const output = consoleLogSpy.mock.calls.at(-1)?.[0];
       expect(JSON.parse(output as string).error).toContain(
-        'Cannot fork schema with linked or unsupported entry'
+        '无法 Fork schema'
       );
       expect(JSON.parse(output as string).error).toContain('Path is outside the allowed directory');
     });
@@ -412,7 +412,7 @@ artifacts:
       expect(typeof output).toBe('string');
       expect(JSON.parse(output as string)).toEqual({
         created: false,
-        error: "Unknown artifact 'task'",
+        error: `未知 Artifact 'task'`,
         valid: ['proposal', 'specs', 'design', 'tasks'],
       });
       expect(fs.readFileSync(schemaPath, 'utf-8')).toBe(existingSchema);

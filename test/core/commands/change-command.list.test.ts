@@ -118,8 +118,8 @@ describe('ChangeCommand.list with a change that has no proposal.md', () => {
 
   it('--long reports the missing proposal and keeps task counts', async () => {
     const out = await capture(() => cmd.list({ long: true }));
-    expect(out).toContain('scaffolded: (no proposal.md yet)');
-    expect(out).toContain('[tasks 1/2]');
+    expect(out).toContain('scaffolded: (尚无 proposal.md)');
+    expect(out).toContain('[任务 1/2]');
     expect(out).not.toContain('(unable to read)');
   });
 

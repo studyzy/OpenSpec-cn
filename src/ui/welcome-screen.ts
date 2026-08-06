@@ -187,7 +187,7 @@ export async function showWelcomeScreen(
     // pre-selected tools sight-unseen. Without a TTY, drop the line instead.
     const staticLines = process.stdin.isTTY
       ? textLines
-      : textLines.filter((line) => !line.includes('Press Enter'));
+      : textLines.filter((line) => !line.includes('按 Enter'));
     const frame = WELCOME_ANIMATION.frames[3]; // Peak frame
     process.stdout.write('\n' + renderFrame(frame, staticLines) + '\n\n');
     await waitForEnter();

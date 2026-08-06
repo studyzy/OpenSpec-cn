@@ -121,7 +121,7 @@ describe('config command integration', () => {
 
     const { getGlobalConfig } = await import('../../src/core/global-config.js');
     expect(getGlobalConfig().defaultStore).toBe('team-plans');
-    expect(consoleLogSpy).toHaveBeenCalledWith('Set defaultStore = "team-plans"');
+    expect(consoleLogSpy).toHaveBeenCalledWith('已设置 defaultStore = "team-plans"');
 
     await runConfigCommand(['get', 'defaultStore']);
     expect(consoleLogSpy).toHaveBeenCalledWith('team-plans');
@@ -145,7 +145,7 @@ describe('config command integration', () => {
     );
 
     await runConfigCommand(['set', 'telemetry.enabled', 'false']);
-    expect(consoleLogSpy).toHaveBeenCalledWith('Set telemetry.enabled = false');
+    expect(consoleLogSpy).toHaveBeenCalledWith('已设置 telemetry.enabled = false');
     expect(getGlobalConfig().telemetry).toEqual({
       anonymousId: 'keep-id',
       noticeSeen: true,
@@ -170,7 +170,7 @@ describe('config command integration', () => {
       await runConfigCommand(['set', 'telemetry.anonymousId', 'x']);
       expect(process.exitCode).toBe(1);
       expect(consoleErrorSpy).toHaveBeenCalledWith(
-        expect.stringContaining('Invalid configuration key "telemetry.anonymousId"')
+        expect.stringContaining('无效的配置键 "telemetry.anonymousId"')
       );
     } finally {
       process.exitCode = previousExitCode;

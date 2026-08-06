@@ -132,7 +132,7 @@ Capture the artifact(s) the user requested without asking them to invoke another
 
 3. **当做出决定时提议记录**
 
-   \`<capability-path>\` is the spec directory relative to \`specs/\` (for example, \`user-auth\` or \`identity/user-auth\`). Preserve an existing capability's full path and follow the project's established organization for new capabilities.
+   \`<capability-path>\` 是相对于 \`specs/\` 的 spec 目录（例如 \`user-auth\` 或 \`identity/user-auth\`）。保留已有 capability 的完整路径，并遵循项目既有的组织方式创建新 capability。
 
     | 洞察类型             | 记录到哪                        |
     |----------------------------|-------------------------------------|
@@ -449,7 +449,7 @@ Capture the artifact(s) the user requested without asking them to invoke another
 
 3. **当做出决定时提议记录**
 
-   \`<capability-path>\` is the spec directory relative to \`specs/\` (for example, \`user-auth\` or \`identity/user-auth\`). Preserve an existing capability's full path and follow the project's established organization for new capabilities.
+   \`<capability-path>\` 是相对于 \`specs/\` 的 spec 目录（例如 \`user-auth\` 或 \`identity/user-auth\`）。保留已有 capability 的完整路径，并遵循项目既有的组织方式创建新 capability。
 
     | 洞察类型             | 记录到哪                        |
     |----------------------------|-------------------------------------|

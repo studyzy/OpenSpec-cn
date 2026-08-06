@@ -349,10 +349,10 @@ describe('FeedbackCommand', () => {
       // fallback (formatted text + pre-filled URL) is shown like the
       // missing-gh and unauthenticated flows.
       expect(consoleLogSpy).toHaveBeenCalledWith(
-        expect.stringContaining('Please submit your feedback manually:')
+        expect.stringContaining('请手动提交您的反馈：')
       );
       expect(consoleLogSpy).toHaveBeenCalledWith(
-        expect.stringContaining('github.com/Fission-AI/OpenSpec/issues/new')
+        expect.stringContaining('github.com/studyzy/OpenSpec-cn/issues/new')
       );
     });
 
@@ -439,7 +439,7 @@ describe('FeedbackCommand', () => {
       // The feedback still lands as an issue, and the user is told the label
       // was not applied
       expect(consoleLogSpy).toHaveBeenCalledWith(
-        expect.stringContaining('Feedback submitted successfully')
+        expect.stringContaining('反馈提交成功')
       );
       expect(consoleLogSpy).toHaveBeenCalledWith(
         expect.stringContaining(issueUrl)

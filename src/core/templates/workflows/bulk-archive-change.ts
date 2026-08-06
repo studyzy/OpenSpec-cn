@@ -57,10 +57,7 @@ ${STORE_SELECTION_GUIDANCE}
 
    Keep both fields separate from conflict analysis, explicit user choices,
    resolved paths, CLI checks, and command contracts. If context conflicts with one
-   of those controlling inputs, report the conflict and preserve the controlling
-   value. If guidance is inapplicable or conflicts with a controlling input, do not
-   follow it and explain why. Do not infer skipped prompts, replacement paths, or
-   flags from either field, and do not copy their text verbatim into specs, changes,
+   of those controlling inputs, 报告冲突并保留控制值。若 guidance 不适用或与某个控制输入冲突，不要遵循它并解释原因。不要从任何字段推断跳过的提示、替换路径或标志，也不将它们的文本逐字复制到 specs、changes、archive 目录或输出摘要中。
    or summaries. These are prompt-level behavior contracts, not enforceable checks.
 
 3. **批量校验 - 收集所有所选变更的状态**
@@ -78,11 +75,9 @@ ${STORE_SELECTION_GUIDANCE}
    c. **Delta specs** - 从状态 JSON 检查 \`artifactPaths.specs.existingOutputPaths\`
       - 列出存在哪些 capability spec
       - 对每个，提取需求名称（匹配 \`### Requirement: <name>\` 的行）
-      - Treat this list as the only delta-spec source. If the \`specs\` entry is
-        missing or the list is empty, perform no spec sync or specs-instruction
-        lookup for that change; do not infer deltas from unrelated artifacts.
-      - Evaluate this independently for every change, including mixed-schema
-        batches where some schemas have no \`specs\` artifact.
+      - 将此列表作为唯一的增量 spec 来源。若 \`specs\` 条目
+        缺失或列表为空，对该变更不执行 spec 同步或 specs-instruction 查找；不要从无关制品推断增量 spec。
+      - 对每个变更独立评估，包括某些 schema 没有 \`specs\` 制品的混合 schema 批次。当某个变更没有增量 spec 或其 schema 不含 specs 时，对该变更继续而不进行 spec 同步（与单个变更跳过相同）。
 4. **检测 spec 冲突**
 
    Build a map keyed by \`<capability-path>\`, the exact path relative to \`specs/\`:
@@ -172,14 +167,14 @@ ${STORE_SELECTION_GUIDANCE}
 8. **为每个确认的变更执行归档**
 
    Before processing, carry the recorded decisions from step 5 (after any step 7 re-derivation) into two per-delta sets:
-   - \`includedDeltas\`: all non-conflicting delta specs from confirmed changes plus conflict deltas selected for sync
-   - \`excludedDeltas\`: conflict deltas from confirmed changes excluded because their implementation is missing
-   - A single change can have both included and excluded delta specs. Keep the decision per delta; do not collapse it into a per-change sync flag.
-
+   - \`includedDeltas\`：来自已确认变更中所有无冲突的增量 spec，以及为解决冲突而选入同步的增量 spec
+   - \`excludedDeltas\`：来自已确认变更中因实现缺失而被排除的冲突增量 spec
+   - 单个变更可以同时拥有包含和排除的增量 spec。保持按 delta 决策，不要合并为按变更的同步标志。
+   
    Process changes in the determined order (respecting conflict resolution):
 
-   a. **Sync included delta specs**:
-      - Run the \`openspec-sync-specs\` workflow inline (agent-driven intelligent merge) only for changes with entries in \`includedDeltas\`, passing only the included delta paths and explicitly instructing it to ignore that change's \`excludedDeltas\`. Wait for it to finish.
+   a. **同步包含的增量 spec**：
+      - 仅为有条目在 \`includedDeltas\` 中的变更内联运行 \`openspec-sync-specs\` 工作流（智能驱动合并），仅传递包含的 delta 路径，并明确指示忽略该变更的 \`excludedDeltas\`。等待其完成。
       - For conflicts, apply in resolved order.
       - Pass that change's fetched specs-rule snapshot into inline sync; inline
         sync must reuse it without fetching instructions again
@@ -201,7 +196,7 @@ ${STORE_SELECTION_GUIDANCE}
 
    c. **Perform the archive**:
 
-      Target name: use the change name as-is when it already starts with a \`YYYY-MM-DD-\` prefix; otherwise prepend the current date as \`YYYY-MM-DD-<name>\` (same rule as \`openspec archive\`).
+      Target name: 若变更名已以 \`YYYY-MM-DD-\` 前缀开头则保持原样；否则将当前日期前置为 \`YYYY-MM-DD-<name>\`（与 \`openspec archive\` 相同的规则）。
 
       \`\`\`bash
       mkdir -p "<planningHome.changesDir>/archive"
@@ -322,10 +317,10 @@ Spec 同步汇总：
 - Never archive after the user cancels the confirmation — a cancelled batch archives nothing
 - Track and report all outcomes (success/skip/fail)
 - Preserve .openspec.yaml when moving to archive
-- Archive directory target uses current date: YYYY-MM-DD-<name>; a name that already starts with a \`YYYY-MM-DD-\` prefix is used as-is (never stack a second date)
+- Archive directory target uses current date: YYYY-MM-DD-<name>；已以 \`YYYY-MM-DD-\` 前缀开头的名称保持原样（绝不叠加第二个日期）
 - If archive target exists, fail that change but continue with others
 - If sync is requested, run the \`openspec-sync-specs\` workflow inline (agent-driven) for each change with included delta specs
-- Carry the per-delta \`includedDeltas\` and \`excludedDeltas\` decisions into execution; sync and verify only included deltas
+- 将每个 delta 的 \`includedDeltas\` 和 \`excludedDeltas\` 决策带入执行；仅同步和验证包含的 delta
 - Report every excluded delta as \`sync skipped\` without treating the archive itself as skipped
 - Never archive a change while a spec sync is still in flight — run the sync inline and verify main specs at \`<planningHome.root>/openspec/specs/<capability-path>/spec.md\` before moving \`changeRoot\`
 - Fetch archive inputs once per selected root before spec inspection or moves
@@ -396,10 +391,7 @@ ${STORE_SELECTION_GUIDANCE}
 
    Keep both fields separate from conflict analysis, explicit user choices,
    resolved paths, CLI checks, and command contracts. If context conflicts with one
-   of those controlling inputs, report the conflict and preserve the controlling
-   value. If guidance is inapplicable or conflicts with a controlling input, do not
-   follow it and explain why. Do not infer skipped prompts, replacement paths, or
-   flags from either field, and do not copy their text verbatim into specs, changes,
+   of those controlling inputs, 报告冲突并保留控制值。若 guidance 不适用或与某个控制输入冲突，不要遵循它并解释原因。不要从任何字段推断跳过的提示、替换路径或标志，也不将它们的文本逐字复制到 specs、changes、archive 目录或输出摘要中。
    or summaries. These are prompt-level behavior contracts, not enforceable checks.
 
 3. **批量校验 - 收集所有所选变更的状态**
@@ -509,14 +501,14 @@ ${STORE_SELECTION_GUIDANCE}
 8. **为每个确认的变更执行归档**
 
    Before processing, carry the recorded decisions from step 5 (after any step 7 re-derivation) into two per-delta sets:
-   - \`includedDeltas\`: all non-conflicting delta specs from confirmed changes plus conflict deltas selected for sync
-   - \`excludedDeltas\`: conflict deltas from confirmed changes excluded because their implementation is missing
-   - A single change can have both included and excluded delta specs. Keep the decision per delta; do not collapse it into a per-change sync flag.
+   - \`includedDeltas\`：来自已确认变更中所有无冲突的增量 spec，以及为解决冲突而选入同步的增量 spec
+   - \`excludedDeltas\`：来自已确认变更中因实现缺失而被排除的冲突增量 spec
+   - 单个变更可以同时拥有包含和排除的增量 spec。保持按 delta 决策，不要合并为按变更的同步标志。
 
    Process changes in the determined order (respecting conflict resolution):
 
-   a. **Sync included delta specs**:
-      - Run the \`/opsx:sync\` workflow inline (agent-driven intelligent merge) only for changes with entries in \`includedDeltas\`, passing only the included delta paths and explicitly instructing it to ignore that change's \`excludedDeltas\`. Wait for it to finish.
+   a. **同步包含的增量 spec**：
+      - 仅为有条目在 \`includedDeltas\` 中的变更内联运行 \`/opsx:sync\` 工作流（智能驱动合并），仅传递包含的 delta 路径，并明确指示忽略该变更的 \`excludedDeltas\`。等待其完成。
       - For conflicts, apply in resolved order.
       - Pass that change's fetched specs-rule snapshot into inline sync; inline
         sync must reuse it without fetching instructions again
@@ -538,7 +530,7 @@ ${STORE_SELECTION_GUIDANCE}
 
    c. **Perform the archive**:
 
-      Target name: use the change name as-is when it already starts with a \`YYYY-MM-DD-\` prefix; otherwise prepend the current date as \`YYYY-MM-DD-<name>\` (same rule as \`openspec archive\`).
+      Target name: 若变更名已以 \`YYYY-MM-DD-\` 前缀开头则保持原样；否则将当前日期前置为 \`YYYY-MM-DD-<name>\`（与 \`openspec archive\` 相同的规则）。
 
       \`\`\`bash
       mkdir -p "<planningHome.changesDir>/archive"
@@ -659,10 +651,10 @@ Spec 同步汇总：
 - Never archive after the user cancels the confirmation — a cancelled batch archives nothing
 - Track and report all outcomes (success/skip/fail)
 - Preserve .openspec.yaml when moving to archive
-- Archive directory target uses current date: YYYY-MM-DD-<name>; a name that already starts with a \`YYYY-MM-DD-\` prefix is used as-is (never stack a second date)
+- Archive directory target uses current date: YYYY-MM-DD-<name>；已以 \`YYYY-MM-DD-\` 前缀开头的名称保持原样（绝不叠加第二个日期）
 - If archive target exists, fail that change but continue with others
 - If sync is requested, run the \`/opsx:sync\` workflow inline (agent-driven) for each change with included delta specs
-- Carry the per-delta \`includedDeltas\` and \`excludedDeltas\` decisions into execution; sync and verify only included deltas
+- 将每个 delta 的 \`includedDeltas\` 和 \`excludedDeltas\` 决策带入执行；仅同步和验证包含的 delta
 - Report every excluded delta as \`sync skipped\` without treating the archive itself as skipped
 - Never archive a change while a spec sync is still in flight — run the sync inline and verify main specs at \`<planningHome.root>/openspec/specs/<capability-path>/spec.md\` before moving \`changeRoot\`
 - Fetch archive inputs once per selected root before spec inspection or moves

@@ -29,8 +29,8 @@ export function foldRequirementName(name: string): string {
   return normalizeRequirementName(name).toLowerCase().replace(/\s+/g, ' ');
 }
 
-/** The canonical requirement header the delta reader recognizes. */
-const REQUIREMENT_HEADER_REGEX = /^###\s*Requirement:\s*(.+)\s*$/i;
+/** The canonical requirement header the delta reader recognizes (English + Chinese). */
+const REQUIREMENT_HEADER_REGEX = /^###\s*(?:Requirement|需求)[:：]\s*(.+)\s*$/i;
 
 /**
  * Extracts the Requirements section from a spec file and parses requirement blocks.
@@ -225,13 +225,23 @@ function splitTopLevelSections(lines: string[], fenceMask: boolean[]): Record<st
 
 const EMPTY_SECTION_BODY: SectionBody = { lines: [], fenceMask: [], bodyStartLine: 0 };
 
+// 中文 delta section 标题到英文 key 的映射
+const CN_DELTA_SECTION_ALIASES: Record<string, string[]> = {
+  'added requirements': ['新增需求'],
+  'modified requirements': ['修改需求'],
+  'removed requirements': ['移除需求'],
+  'renamed requirements': ['重命名需求'],
+};
+
 function getSectionCaseInsensitive(
   sections: Record<string, SectionBody>,
   desired: string
 ): { title: string; body: SectionBody; bodyStartLine: number; found: boolean } {
   const target = desired.toLowerCase();
+  const cnAliases = CN_DELTA_SECTION_ALIASES[target] ?? [];
   for (const [title, body] of Object.entries(sections)) {
-    if (title.toLowerCase() === target) {
+    const lowerTitle = title.toLowerCase();
+    if (lowerTitle === target || cnAliases.some(a => a === lowerTitle)) {
       return { title, body, bodyStartLine: body.bodyStartLine, found: true };
     }
   }
@@ -307,9 +317,9 @@ function parseRemovedNames(sectionBody: SectionBody): string[] {
       names.push(normalizeRequirementName(m[1]));
       continue;
     }
-    // Also support bullet list of headers
+    // Also support bullet list of headers (English + Chinese)
     const bullet = line.match(new RegExp(
-      '^\\s*-\\s*`?###\\s*Requirement:\\s*(.+?)`?\\s*$'
+      '^\\s*-\\s*`?###\\s*(?:Requirement|需求)[:：]\\s*(.+?)`?\\s*$'
     ));
     if (bullet) {
       names.push(normalizeRequirementName(bullet[1]));
@@ -326,8 +336,8 @@ function parseRenamedPairs(sectionBody: SectionBody): Array<{ from: string; to: 
   for (let i = 0; i < lines.length; i++) {
     if (fenceMask[i]) continue;
     const line = lines[i];
-    const fromMatch = line.match(/^\s*-?\s*FROM:\s*`?###\s*Requirement:\s*(.+?)`?\s*$/);
-    const toMatch = line.match(/^\s*-?\s*TO:\s*`?###\s*Requirement:\s*(.+?)`?\s*$/);
+    const fromMatch = line.match(/^\s*-?\s*FROM:\s*`?###\s*(?:Requirement|需求)[:：]\s*(.+?)`?\s*$/);
+    const toMatch = line.match(/^\s*-?\s*TO:\s*`?###\s*(?:Requirement|需求)[:：]\s*(.+?)`?\s*$/);
     if (fromMatch) {
       current.from = normalizeRequirementName(fromMatch[1]);
     } else if (toMatch) {

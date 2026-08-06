@@ -126,8 +126,8 @@ Regular text that should be ignored
       const listCommand = new ListCommand();
       await listCommand.execute(tempDir, 'changes');
 
-      expect(logOutput.some(line => line.includes('1/2 tasks'))).toBe(true);
-      expect(logOutput.some(line => line.includes('✓ Complete'))).toBe(false);
+      expect(logOutput.some(line => line.includes('1/2 任务'))).toBe(true);
+      expect(logOutput.some(line => line.includes('✓ 完成'))).toBe(false);
     });
 
     it('should handle changes without tasks.md', async () => {

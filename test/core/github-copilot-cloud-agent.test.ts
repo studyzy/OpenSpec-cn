@@ -277,7 +277,7 @@ describe('GitHub Copilot Cloud Agent', () => {
       await fs.writeFile(generatedAgentPath, 'custom generated-path agent\n');
 
       await expect(writeCopilotCloudFiles(tempDir)).rejects.toThrow(
-        'Conflicting Copilot agent profiles'
+        'Copilot 代理配置文件冲突：'
       );
 
       await expect(fs.stat(setupStepsPath)).rejects.toMatchObject({ code: 'ENOENT' });
@@ -295,7 +295,7 @@ describe('GitHub Copilot Cloud Agent', () => {
       await fs.mkdir(agentPath, { recursive: true });
 
       await expect(writeCopilotCloudFiles(tempDir)).rejects.toThrow(
-        'Managed Copilot path is not a regular file'
+        '受管理的 Copilot 路径不是常规文件：'
       );
 
       await expect(fs.stat(setupStepsPath)).rejects.toMatchObject({ code: 'ENOENT' });
