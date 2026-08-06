@@ -65,7 +65,7 @@ openspec-cn init
 
 这会在 `.claude/skills/`（或等效位置）创建 skills，AI 编程助手会自动检测它们。
 
-默认情况下，OpenSpec 使用 `core` 工作流 profile（`propose`、`explore`、`apply`、`sync`、`archive`）。如果你想要扩展工作流命令（`new`、`continue`、`ff`、`verify`、`bulk-archive`、`onboard`），用 `openspec-cn config profile` 配置它们，并用 `openspec-cn update` 应用。
+默认情况下，OpenSpec 使用 `core` 工作流 profile（`propose`、`explore`、`apply`、`update`, `sync`、`archive`）。如果你想要扩展工作流命令（`new`、`continue`、`ff`、`verify`、`bulk-archive`、`onboard`），用 `openspec-cn config profile` 配置它们，并用 `openspec-cn update` 应用。
 
 在设置过程中，你会被提示创建一个**项目配置**（`openspec/config.yaml`）。这是可选的，但推荐。
 
@@ -419,7 +419,7 @@ rules:
 │                    ▼                                                        │
 │   Skill Files (.claude/skills/openspec-*/SKILL.md)                          │
 │                                                                             │
-│   • Cross-editor compatible (Claude Code, Cursor, Windsurf)                 │
+│   • Cross-editor compatible (Claude Code, Cursor, Devin)                    │
 │   • Skills query CLI for structured data                                    │
 │   • Fully customizable via schema files                                     │
 │                                                                             │
@@ -478,7 +478,7 @@ rules:
   │  • Create proposal.md                   │
   │  • Create tasks.md                      │
   │  • Create design.md                     │
-  │  • Create specs/<capability>/spec.md    │
+  │  • Create delta spec files              │
   │                                         │
   │  No awareness of what exists or         │
   │  dependencies between artifacts         │
@@ -504,7 +504,8 @@ rules:
   │  │      {"id": "proposal", "status": "done"},                         │  │
   │  │      {"id": "specs", "status": "ready"},      ◄── First ready      │  │
   │  │      {"id": "design", "status": "ready"},                          │  │
-  │  │      {"id": "tasks", "status": "blocked", "missingDeps": ["specs"]}│  │
+  │  │      {"id": "tasks", "status": "blocked",                          │  │
+  │  │       "missingDeps": ["specs", "design"]}                          │  │
   │  │    ]                                                               │  │
   │  │  }                                                                 │  │
   │  └────────────────────────────────────────────────────────────────────┘  │

@@ -24,6 +24,8 @@ AI CHAT      /opsx:archive                    (specs 已更新，变更已归档
 
 两步终端操作完成设置，然后你就在聊天里了。本指南的其余部分将拆解每个步骤做了什么，以及你会看到什么。
 
+**Don't want to do the terminal part yourself?** Paste the [setup prompt](installation.md#install-with-your-ai-assistant) into your assistant and it handles both lines, then reports what it created.
+
 > **还不确定要构建什么？从 `/opsx:explore` 开始。** 它是一个零负担的思考伙伴，会阅读你的代码库、权衡选项，并在任何制品或代码诞生之前把一个模糊的想法打磨成具体计划。当画面清晰时，它交接给 `/opsx:propose`。这是与一个否则会自信地构建出错误东西的 AI 共事时，单个最佳习惯。请参阅[探索指南](explore.md)。
 
 ## 它如何运作
@@ -45,7 +47,7 @@ OpenSpec 帮助你和你的 AI 编程助手在动笔写任何代码之前，就"
 /opsx:new ──► /opsx:ff or /opsx:continue ──► /opsx:apply ──► /opsx:verify ──► /opsx:archive
 ```
 
-默认的全局 profile 是 `core`，包含 `propose`、`explore`、`apply`、`sync` 和 `archive`。你可以用 `openspec-cn config profile` 启用扩展工作流命令，然后用 `openspec-cn update` 应用。
+默认的全局 profile 是 `core`，包含 `propose`、`explore`、`apply`、`update`, `sync` 和 `archive`。你可以用 `openspec-cn config profile` 启用扩展工作流命令，然后用 `openspec-cn update` 应用。
 
 ## OpenSpec 创建了什么
 

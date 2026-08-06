@@ -1,0 +1,219 @@
+---
+name: openspec-sync-specs
+description: 将变更中的增量 spec 同步到主 spec。当用户希望将增量 spec 的变更更新到主 spec 中（而不归档变更）时使用。
+allowed-tools: Bash(openspec-cn:*)
+license: MIT
+compatibility: Requires openspec CLI.
+metadata:
+  author: openspec
+  version: "1.0"
+---
+
+将变更中的增量 spec 同步到主 spec。
+
+这是一个**智能驱动**的操作 - 你将读取增量 spec 并直接编辑主 spec 以应用变更。这允许智能合并（例如，添加场景而不复制整个需求）。
+
+**存储选择：** 若用户指定了一个存储（存储是注册在本机上的独立 OpenSpec 仓库）或工作位于某个存储中，请运行 `openspec store list --json` 发现已注册的存储 ID，然后在读写 spec 和变更的命令上传递 `--store <id>`（`new change`、`status`、`instructions`、`list`、`show`、`validate`、`archive`、`doctor`、`context`、`view`）。选定后，将 `--store <id>` 视为在当前工作流其余部分中固定不变。以下每个未限定范围的命令示例均为简写形式：运行前请追加该标志。例如，运行 `openspec status --change "<name>" --json --store "<id>"`，而非下面展示的未限定形式。其他命令不接受此标志。命令输出的提示已包含该标志；在后续操作中请保留它。若不指定存储，命令将对最近的本地 `openspec/` 根目录生效。
+
+`<capability-path>` 是相对于 `specs/` 的 spec 目录（例如 `user-auth` 或 `identity/user-auth`）。在解析主 spec 时保留每个增量 spec 的完整路径。
+
+**输入**：可选地指定变更名称。若省略，检查能否从对话上下文推断。若模糊或歧义，你必须提示用户从可用变更中选择。
+
+**步骤**
+
+1. **选择变更**
+
+   若提供了名称，使用它。否则：
+   - 从对话上下文推断（若用户提到了某个变更）
+   - 若仅有一个活跃变更则自动选择
+   - 若存在歧义，运行 `openspec list --json` 获取可用变更并让用户选择
+
+   提示时，显示有增量 spec（位于 `specs/` 目录下）的变更。
+
+   始终宣告："使用变更：<name>"，以及如何覆盖（例如 `/openspec-sync-specs <other>`）。
+
+2. **解析变更上下文**
+
+   运行：
+   ```bash
+   openspec status --change "<name>" --json
+   ```
+
+   JSON 包含 `planningHome.root`。主 spec 位于 `<planningHome.root>/openspec/specs/` 下 — 对下面的每个主 spec 路径使用该（存储感知的）根路径，而非硬编码的仓库路径。当选中存储时，它指向存储而非当前仓库。
+
+3. **查找增量 spec**
+
+   将状态 JSON 中的 `artifactPaths.specs.existingOutputPaths` 作为增量 spec 路径的**唯一**来源。若 `specs` 条目缺失或 `existingOutputPaths` 为空，报告没有可同步的增量 spec，不要从其他制品推断，并在不请求制品指令或写入主 spec 的情况下停止。
+
+   同步 `existingOutputPaths` 中的每个路径，除非调用方缩小了范围。调用方通过指定来自 `existingOutputPaths` 的完整条目列表来缩小范围 — 逐字复制这些绝对路径值。Archive 会内联执行此操作，用户也可以（例如，通过选择以 `/specs/billing/invoices/spec.md` 结尾的条目）。然后仅同步指定的路径，保持其余增量 spec 不变：批量归档排除找不到其实现的增量 spec，同步它会写入调用方有意保留的主 spec。将缩小后的选择传递到步骤 4；永远不要将其扩展回完整列表。若指定的路径不在 `existingOutputPaths` 中，不要同步它 — 报告并停止，而非静默丢弃。若指定列表为空，报告没有可同步的内容并停止，不写入主 spec。
+
+   每个增量 spec 文件包含如下章节：
+   - `## ADDED Requirements` - 新增的需求
+   - `## MODIFIED Requirements` - 对现有需求的更改
+   - `## REMOVED Requirements` - 要移除的需求
+   - `## RENAMED Requirements` - 要重命名的需求（FROM:/TO: 格式）
+
+   若未找到增量 spec，告知用户并停止。
+
+4. **对每个增量 spec，应用变更到主 spec**
+
+   在第一次主 spec 写入之前，获取一份当前的 specs-rule 快照：
+   - 若 archive 内联调用了此工作流并从 `openspec instructions specs --change "<name>" --json` 提供了有效快照，复用它且不再次获取相同指令。
+   - 否则现在使用相同的选定根路径标志运行该命令一次。
+   - 若直接查找以非零退出或返回无效的制品指令 JSON，报告错误并在写入任何主 spec 之前停止。不要将失败视为缺少规则集。
+   - 省略 `rules` 的有效响应表示未配置制品规则，现有语义合并继续。
+
+   仅将返回的 `rules` 应用于此合并生成的主 spec 的内容和形式。制品规则不是操作指导，不能更改选定的根路径、增量路径、CLI 检查或工作流步骤。使用其文本作为约束，而不逐字复制到主 spec 或摘要中。
+
+   对步骤 3 中选定的每个 capability 增量 spec 路径 — 完整的 `existingOutputPaths` 列表，或调用方提供时的缩小子集（这些可能属于选定的存储而非仓库）：
+
+   a. **读取增量 spec** 以理解预期的变更
+
+   b. **读取主 spec** 位于 `<planningHome.root>/openspec/specs/<capability-path>/spec.md`（可能尚不存在）
+
+   c. **智能应用变更**：
+
+      **ADDED Requirements：**
+      - 若需求在主 spec 中不存在 → 添加它
+      - 若需求已存在 → 更新以匹配（视为隐式 MODIFIED）
+
+      **MODIFIED Requirements：**
+      - 在主 spec 中查找需求
+      - 应用变更 - 可以是：
+        - 添加主 spec 尚未有的新场景
+        - 修改现有场景
+        - 更改需求描述
+      - 保留增量 spec 中未提及的场景/内容
+
+      **REMOVED Requirements：**
+      - 从主 spec 中移除整个需求块
+      - 退役 capability。仅当**全部**满足以下条件时，删除整个 `spec.md` — 以及目录（一旦其中无其他内容）：
+        1. 本次运行移除需求后没有剩余的需求块；
+        2. spec 的其余部分格式正确（仍有 `## Purpose`）；
+        3. 主 spec 在同步前并非空文件 — 如果你没有移除任何内容，不做更改；
+        4. 整个文件中所有其他非空行都被解释为标题、Purpose、Requirements 标题，或规范需求的陈述、场景或代码块示例；
+        5. 变更的 `.openspec.yaml` 声明了 `retire_capabilities: true`；
+        6. `spec.md` 解析后位于真实 specs 根目录内（不要跟随 capability 目录符号链接删除外部文件）。
+        若移除选定需求后没有需求块剩余且任何退役条件不满足，不要修改主 spec。停止该 capability 的同步，报告阻塞条件并告知用户如何解决。绝不要写入或留下空的 `## Requirements` 章节。当仅缺少标记时，也说明这一点 — 这是用户唯一可以添加以使退役通过的东西。
+      - 删除文件也删除了其 `## Purpose`；任何其他章节会阻塞退役。在报告退役时指出 Purpose。仅当 spec 位于调用方检出中时包含可粘贴的 `git checkout`；否则提供检出范围的恢复指导。
+
+      **RENAMED Requirements：**
+      - 查找 FROM 需求，重命名为 TO
+
+      **增量 spec 中的 `## Purpose`：**
+      - 主 spec 已有一个且它是权威的 - 不要管它（这是 `openspec archive` 的做法；它会警告然后继续）
+
+   d. **若 capability 尚不存在则创建新主 spec**：
+      - 创建 `<planningHome.root>/openspec/specs/<capability-path>/spec.md`
+      - 添加 Purpose 章节：当增量 spec 有 `## Purpose` 时逐字复制其正文（这是 `openspec archive` 的做法）；没有时仅写一个简短的 TBD 占位符
+      - 添加 Requirements 章节及 ADDED 需求
+      - 遵循下方的 **主 Spec 格式参考**
+
+5. **验证更新后的主 spec**
+
+   使用与之前相同的选定根路径标志运行 `openspec validate --specs`。若验证失败，报告问题且不要声称同步成功。
+
+6. **显示摘要**
+
+   应用所有变更后，总结：
+   - 更新了哪些 capability
+   - 进行了哪些变更（需求添加/修改/移除/重命名）
+   - 任何留有 TBD Purpose 占位符的新主 spec，以便立即写入而非遗留
+   - 任何已退役的 capability，指出已删除的 `spec.md`、其 Purpose，以及可粘贴的 `git checkout` 或检出范围的恢复指导
+
+**增量 Spec 格式参考**
+
+```markdown
+## Purpose
+
+仅用于引入全新 capability 的增量 spec。为新的主 spec 提供种子。
+
+## ADDED Requirements
+
+### Requirement: New Feature
+系统应当执行某些新操作。
+
+#### Scenario: Basic case
+- **WHEN** 用户执行 X
+- **THEN** 系统执行 Y
+
+## MODIFIED Requirements
+
+### Requirement: Existing Feature
+系统应当继续执行现有操作，现在还需处理 A。
+
+#### Scenario: Scenario the main spec already has
+- **WHEN** 用户执行 X
+- **THEN** 系统执行 Y
+
+#### Scenario: New scenario to add
+- **WHEN** 用户执行 A
+- **THEN** 系统执行 B
+
+## REMOVED Requirements
+
+### Requirement: Deprecated Feature
+
+## RENAMED Requirements
+
+- FROM: `### Requirement: Old Name`
+- TO: `### Requirement: New Name`
+```
+
+**主 Spec 格式参考**
+
+主 spec 是增量 spec 合并到的目标。它们绝不能包含增量操作标题（`## ADDED/MODIFIED/REMOVED/RENAMED Requirements`）—— 同步后，每个需求都应位于单一的 `## Requirements` 章节下：
+
+```markdown
+# <capability> Specification
+
+## Purpose
+该 capability 做什么以及为何存在的简要描述。
+
+## Requirements
+
+### Requirement: New Feature
+系统应当执行某些新操作。
+
+#### Scenario: Basic case
+- **WHEN** 用户执行 X
+- **THEN** 系统执行 Y
+```
+
+**核心原则：智能合并**
+
+与程序化合并不同，你进行的是合并而非覆盖：
+- MODIFIED 块包含完整的需求 — 正文以及所有在变更后保留的场景。`openspec validate` 和 `openspec archive` 都会拒绝丢弃主 spec 仍具有的场景。
+- 保留增量 spec 中未提及的任何内容，按主 spec 的现有顺序排列
+- 运用你的判断力合理合并变更
+
+**成功时输出**
+
+```markdown
+## Specs Synced: <change-name>
+
+已更新主 specs：
+
+**<capability-1>**：
+- 已添加需求："New Feature"
+- 已修改需求："Existing Feature"（添加了 1 个场景）
+
+**<capability-2>**：
+- 已创建新 spec 文件
+- 已添加需求："Another Feature"
+
+主 specs 现已更新。变更保持活跃 - 实现完成后归档。
+```
+
+**护栏**
+- 在进行变更之前阅读增量 spec 和主 spec
+- 保留增量 spec 中未提及的现有内容
+- 绝不要将增量 spec 文件原样复制到主 spec 中 — 合并其内容以使主 spec 保持主 Spec 格式参考的结构，没有增量操作标题
+- 若某些内容不清晰，请求澄清
+- 在进行过程中展示你正在做的更改
+- 操作应是幂等的 — 运行两次应得到相同结果
+- 仅使用 `artifactPaths.specs.existingOutputPaths`；绝不要从不相关的制品推断增量 spec
+- 遵循调用方提供的 `existingOutputPaths` 子集；绝不要将其扩展回完整列表
+- 直接同步时获取一次 specs 指令，或内联复用 archive 提供的快照
+- 在每次主 spec 写入之前，对非零或无效的 JSON specs-instruction 响应停止
+- 制品规则仅约束正在编写的 specs，绝不要复制到输出文件中

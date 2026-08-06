@@ -52,7 +52,7 @@
 
 **CLI.** 你在终端运行的 `openspec` 程序。它用于搭建项目、列出并校验变更、打开仪表盘。
 
-## 安装与交付
+**Profile.** The set of slash commands installed in your project. **Core** (the default) is `propose`, `explore`, `apply`, `update`, `sync`, `archive`. The **expanded** set adds `new`, `continue`, `ff`, `verify`, `bulk-archive`, `onboard`. Change it with `openspec config profile`.
 
 **Delivery（交付）.** OpenSpec 安装的是 skills、命令文件还是两者皆有。全局配置，由 `openspec-cn update` 应用。
 

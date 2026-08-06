@@ -21,8 +21,8 @@ ${STORE_SELECTION_GUIDANCE}
 
 1. **如果没有提供明确的输入，询问他们想要构建什么**
 
-   使用 **AskUserQuestion tool**（开放式，无预设选项）询问：
-   > "您想要处理什么变更？请描述您想要构建或修复的内容。"
+   询问用户（开放式，不设预设选项）：
+   > "你想做什么变更？描述一下你想构建或修复的内容。"
 
    根据他们的描述，推导出一个 kebab-case 名称（例如："add user authentication" → \`add-user-auth\`）。
 
@@ -39,13 +39,13 @@ ${STORE_SELECTION_GUIDANCE}
    openspec-cn status --change "<name>" --json
    \`\`\`
    解析 JSON 以获取：
-   - \`applyRequires\`：实现前所需的产出物 ID 数组（例如：\`["tasks"]\`）
-   - \`artifacts\`：所有产出物及其状态和依赖项的列表
-   - \`planningHome\`、\`changeRoot\`、\`artifactPaths\` 和 \`actionContext\`：路径和范围上下文。使用这些而不是假设仓库本地路径。
+   - \`applyRequires\`：实现前所需的产出物 ID 数组（例如 \`["tasks"]\`）
+   - \`artifacts\`：所有产出物列表，每个包含其 \`status\` 和 \`requires\` 边（它直接依赖的产出物 ID）
+   - \`planningHome\`、\`changeRoot\`、\`artifactPaths\` 和 \`actionContext\`：路径和作用域上下文。请使用这些值而非假设仓库本地路径。
 
-4. **按顺序创建产出物直到准备好应用**
+4. **创建所需集合中的每个产出物**
 
-   使用 **TodoWrite tool** 跟踪产出物的进度。
+   使用待办清单跟踪产出物进度。
 
    按依赖顺序循环遍历产出物（没有待处理依赖项的产出物优先）：
 
@@ -54,25 +54,32 @@ ${STORE_SELECTION_GUIDANCE}
         \`\`\`bash
         openspec-cn instructions <artifact-id> --change "<name>" --json
         \`\`\`
-      - 指令 JSON 包括：
-        - \`context\`：项目背景（对你的约束 - 不要包含在输出中）
-        - \`rules\`：产出物特定规则（对你的约束 - 不要包含在输出中）
-        - \`template\`：用于输出文件的结构
-        - \`instruction\`：此产出物类型的 Schema 特定指导
-        - \`resolvedOutputPath\`：已解析的写入产出物的路径或模式
-        - \`dependencies\`：已完成的产出物，用于读取上下文
-      - 读取任何已完成的依赖文件以获取上下文
-      - 使用 \`template\` 作为结构创建产出物文件，写入 \`resolvedOutputPath\`
-      - 应用 \`context\` 和 \`rules\` 作为约束 - 但不要将它们复制到文件中
-      - 显示简短进度："✓ 已创建 <artifact-id>"
+      - 指令 JSON 包含：
+        - \`context\`：项目背景（给你的约束 - 不要包含在输出中）
+        - \`rules\`：产出物特定规则（给你的约束 - 不要包含在输出中）
+        - \`template\`：输出文件使用的结构
+        - \`instruction\`：此产出物类型的 schema 特定指导
+        - \`skipped\`/\`warning\`：当变更声明 skip_specs 且此产出物必须不创建时出现 - 停止并选择另一个产出物
+        - \`resolvedOutputPath\`：写入产出物的已解析路径或模式
+        - \`dependencies\`：已完成的需要读取以获取上下文的产出物
+      - 读取所有已完成的依赖文件以获取上下文 - 始终从磁盘重新读取，即使在对话中之前已看到（用户可能已编辑过）
+      - 若 \`instruction\` 字段将创建委托给特定 skill 或命令，则调用它来生成产出物，而不是自己写入文件，然后验证产出物文件是否存在于 \`resolvedOutputPath\`
+      - 否则，使用 \`template\` 作为结构创建产出物文件，并写入 \`resolvedOutputPath\`。若 \`resolvedOutputPath\` 是一个 glob，遵循 \`instruction\` 选择具体文件路径
+      - 将 \`context\` 和 \`rules\` 作为约束应用 - 但不要将它们复制到文件中
+      - 显示简要进度："已创建 <artifact-id>"
 
-   b. **继续直到所有 \`applyRequires\` 产出物完成**
-      - 创建每个产出物后，重新运行 \`openspec-cn status --change "<name>" --json\`
-      - 检查 \`applyRequires\` 中的每个产出物 ID 在 artifacts 数组中是否具有 \`status: "done"\`
-      - 当所有 \`applyRequires\` 产出物完成时停止
+   b. **持续创建直到所需集合中的每个产出物都存在（不仅仅是 \`apply.requires\`）**
+      - 创建每个产出物后，重新运行 \`openspec status --change "<name>" --json\`
+      - 所需集合是 \`applyRequires\` 加上通过跟踪 \`status --json\` 中的 \`requires\` 边从这些产出物可达的每个产出物 - 传递地遍历它们（spec-driven 涵盖 proposal、specs、design、tasks）。不要触碰此集合之外的产出物
+      - \`status\` 仅基于文件存在性，因此一个显示 \`done\` 的 \`applyRequires\` 产出物并不意味着其依赖项存在 - 过早写入 \`tasks.md\` 会标记 \`tasks\` 为 done，但 \`specs\` 从未写入。使用每个产出物的 \`requires\` 边而非其 \`status\` 来构建所需集合：一个 \`done\` 产出物仍然列出其依赖项
+      - 已显示 \`status: "skipped"\` 的产出物即已满足：变更在 \`.openspec.yaml\` 中声明了 \`skip_specs\`，因此其文件必须不存在。永远不要尝试创建它
+      - 创建所需集合中缺失的每个产出物，然后重新检查 - 创建一个可能会解锁其他产出物
+      - 仅当 \`status\` 已报告为 \`skipped\`，或其自身 \`instruction\` 表明是条件性的时才跳过：运行 \`openspec instructions <artifact-id> --change "<name>" --json\`，仅当其 \`instruction\` 字段标记为可选时才跳过（例如 "create only if..."）。spec-driven 的 \`design.md\` 符合此条件；\`specs\` 仅通过上述 \`skipped\` 状态符合，绝不能凭你的判断。告知用户，且不要重新考虑
+      - 依赖项是使能因素而非关卡：若一个必需产出物仍 \`blocked\` 仅因为你跳过了条件性依赖项，照样写入
+      - 当所需集合中的每个产出物为 \`done\`、\`skipped\` 或已被有意跳过时停止
 
-   c. **如果产出物需要用户输入**（上下文不清楚）：
-      - 使用 **AskUserQuestion tool** 进行澄清
+   c. **若某个产出物需要用户输入**（上下文不清）：
+      - 请求用户澄清
       - 然后继续创建
 
 5. **显示最终状态**
@@ -82,28 +89,29 @@ ${STORE_SELECTION_GUIDANCE}
 
 **输出**
 
-完成所有产出物后，总结：
-- 变更名称和位置
-- 已创建产出物的列表及简要描述
-- 准备就绪："所有产出物已创建！准备好实现。"
-- 提示："运行 \`/opsx:apply\` 或要求我实现以开始处理任务。"
+After completing all artifacts, summarize:
+- Change name and location
+- List of artifacts created with brief descriptions, plus any conditional artifact you skipped and why
+- What's ready: "All artifacts needed for implementation are ready."
+- Prompt: "Run \`/opsx:apply\` or ask me to implement to start working on the tasks."
 
 **产出物创建指南**
 
-- 遵循每个产出物类型的 \`openspec-cn instructions\` 中的 \`instruction\` 字段
-- Schema 定义了每个产出物应包含的内容，遵循它
-- 在创建新产出物之前阅读依赖产出物以获取上下文
-- 使用 \`template\` 作为输出文件的结构 - 填充其各个部分
-- **重要提示**：\`context\` 和 \`rules\` 是对你的约束，而不是文件内容
-  - 不要将 \`<context>\`、\`<rules>\`、\`<project_context>\` 块复制到产出物中
-  - 这些引导你编写内容，但不应出现在输出中
+- Follow the \`instruction\` field from \`openspec instructions\` for each artifact type - it is the authoritative guidance, even for familiar artifact names
+- If the \`instruction\` field directs you to use a specific skill or command to create the artifact, invoke it instead of writing the artifact directly
+- The schema defines what each artifact should contain - follow it
+- Read dependency artifacts for context before creating new ones
+- Use \`template\` as the structure for your output file - fill in its sections
+- **IMPORTANT**: \`context\` and \`rules\` are constraints for YOU, not content for the file
+  - Do NOT copy \`<context>\`, \`<rules>\`, \`<project_context>\` blocks into the artifact
+  - These guide what you write, but should never appear in the output
 
-**护栏**
-- 创建实现所需的所有产出物（由 Schema 的 \`apply.requires\` 定义）
-- 在创建新产出物之前始终阅读依赖产出物
-- 如果上下文极其不清楚，询问用户 - 但倾向于做出合理的决定以保持势头
-- 如果同名变更已存在，建议继续处理该变更
-- 在继续下一个之前，验证写入后每个产出物文件是否存在`,
+**Guardrails**
+- Create every artifact the apply phase transitively depends on, not just the ids listed in \`apply.requires\`
+- Always read dependency artifacts before creating a new one - re-read from disk, not from conversation memory (files may have changed since you last saw them)
+- If context is critically unclear, ask the user - but prefer making reasonable decisions to keep momentum
+- If a change with that name already exists, suggest continuing that change instead
+- Verify each artifact file exists after writing before proceeding to next`,
     license: 'MIT',
     compatibility: '需要 openspec-cn CLI。',
     metadata: { author: 'openspec', version: '1.0' },
@@ -126,8 +134,8 @@ ${STORE_SELECTION_GUIDANCE}
 
 1. **如果没有提供输入，询问他们想要构建什么**
 
-   使用 **AskUserQuestion tool**（开放式，无预设选项）询问：
-   > "您想要处理什么变更？请描述您想要构建或修复的内容。"
+   询问用户（开放式，不设预设选项）：
+   > "你想做什么变更？描述一下你想构建或修复的内容。"
 
    根据他们的描述，推导出一个 kebab-case 名称（例如："add user authentication" → \`add-user-auth\`）。
 
@@ -144,13 +152,13 @@ ${STORE_SELECTION_GUIDANCE}
    openspec-cn status --change "<name>" --json
    \`\`\`
    解析 JSON 以获取：
-   - \`applyRequires\`：实现前所需的产出物 ID 数组（例如：\`["tasks"]\`）
-   - \`artifacts\`：所有产出物及其状态和依赖项的列表
-   - \`planningHome\`、\`changeRoot\`、\`artifactPaths\` 和 \`actionContext\`：路径和范围上下文。使用这些而不是假设仓库本地路径。
+   - \`applyRequires\`：实现前所需的产出物 ID 数组（例如 \`["tasks"]\`）
+   - \`artifacts\`：所有产出物列表，每个包含其 \`status\` 和 \`requires\` 边（它直接依赖的产出物 ID）
+   - \`planningHome\`、\`changeRoot\`、\`artifactPaths\` 和 \`actionContext\`：路径和作用域上下文。请使用这些值而非假设仓库本地路径。
 
-4. **按顺序创建产出物直到准备好应用**
+4. **创建所需集合中的每个产出物**
 
-   使用 **TodoWrite tool** 跟踪产出物的进度。
+   使用待办清单跟踪产出物进度。
 
    按依赖顺序循环遍历产出物（没有待处理依赖项的产出物优先）：
 
@@ -159,25 +167,32 @@ ${STORE_SELECTION_GUIDANCE}
         \`\`\`bash
         openspec-cn instructions <artifact-id> --change "<name>" --json
         \`\`\`
-      - 指令 JSON 包括：
-        - \`context\`：项目背景（对你的约束 - 不要包含在输出中）
-        - \`rules\`：产出物特定规则（对你的约束 - 不要包含在输出中）
-        - \`template\`：用于输出文件的结构
-        - \`instruction\`：此产出物类型的 Schema 特定指导
-        - \`resolvedOutputPath\`：已解析的写入产出物的路径或模式
-        - \`dependencies\`：已完成的产出物，用于读取上下文
-      - 读取任何已完成的依赖文件以获取上下文
-      - 使用 \`template\` 作为结构创建产出物文件，写入 \`resolvedOutputPath\`
-      - 应用 \`context\` 和 \`rules\` 作为约束 - 但不要将它们复制到文件中
-      - 显示简短进度："✓ 已创建 <artifact-id>"
+      - 指令 JSON 包含：
+        - \`context\`：项目背景（给你的约束 - 不要包含在输出中）
+        - \`rules\`：产出物特定规则（给你的约束 - 不要包含在输出中）
+        - \`template\`：输出文件使用的结构
+        - \`instruction\`：此产出物类型的 schema 特定指导
+        - \`skipped\`/\`warning\`：当变更声明 skip_specs 且此产出物必须不创建时出现 - 停止并选择另一个产出物
+        - \`resolvedOutputPath\`：写入产出物的已解析路径或模式
+        - \`dependencies\`：已完成的需要读取以获取上下文的产出物
+      - 读取所有已完成的依赖文件以获取上下文 - 始终从磁盘重新读取，即使在对话中之前已看到（用户可能已编辑过）
+      - 若 \`instruction\` 字段将创建委托给特定 skill 或命令，则调用它来生成产出物，而不是自己写入文件，然后验证产出物文件是否存在于 \`resolvedOutputPath\`
+      - 否则，使用 \`template\` 作为结构创建产出物文件，并写入 \`resolvedOutputPath\`。若 \`resolvedOutputPath\` 是一个 glob，遵循 \`instruction\` 选择具体文件路径
+      - 将 \`context\` 和 \`rules\` 作为约束应用 - 但不要将它们复制到文件中
+      - 显示简要进度："已创建 <artifact-id>"
 
-   b. **继续直到所有 \`applyRequires\` 产出物完成**
-      - 创建每个产出物后，重新运行 \`openspec-cn status --change "<name>" --json\`
-      - 检查 \`applyRequires\` 中的每个产出物 ID 在 artifacts 数组中是否具有 \`status: "done"\`
-      - 当所有 \`applyRequires\` 产出物完成时停止
+   b. **持续创建直到所需集合中的每个产出物都存在（不仅仅是 \`apply.requires\`）**
+      - 创建每个产出物后，重新运行 \`openspec status --change "<name>" --json\`
+      - 所需集合是 \`applyRequires\` 加上通过跟踪 \`status --json\` 中的 \`requires\` 边从这些产出物可达的每个产出物 - 传递地遍历它们（spec-driven 涵盖 proposal、specs、design、tasks）。不要触碰此集合之外的产出物
+      - \`status\` 仅基于文件存在性，因此一个显示 \`done\` 的 \`applyRequires\` 产出物并不意味着其依赖项存在 - 过早写入 \`tasks.md\` 会标记 \`tasks\` 为 done，但 \`specs\` 从未写入。使用每个产出物的 \`requires\` 边而非其 \`status\` 来构建所需集合：一个 \`done\` 产出物仍然列出其依赖项
+      - 已显示 \`status: "skipped"\` 的产出物即已满足：变更在 \`.openspec.yaml\` 中声明了 \`skip_specs\`，因此其文件必须不存在。永远不要尝试创建它
+      - 创建所需集合中缺失的每个产出物，然后重新检查 - 创建一个可能会解锁其他产出物
+      - 仅当 \`status\` 已报告为 \`skipped\`，或其自身 \`instruction\` 表明是条件性的时才跳过：运行 \`openspec instructions <artifact-id> --change "<name>" --json\`，仅当其 \`instruction\` 字段标记为可选时才跳过（例如 "create only if..."）。spec-driven 的 \`design.md\` 符合此条件；\`specs\` 仅通过上述 \`skipped\` 状态符合，绝不能凭你的判断。告知用户，且不要重新考虑
+      - 依赖项是使能因素而非关卡：若一个必需产出物仍 \`blocked\` 仅因为你跳过了条件性依赖项，照样写入
+      - 当所需集合中的每个产出物为 \`done\`、\`skipped\` 或已被有意跳过时停止
 
-   c. **如果产出物需要用户输入**（上下文不清楚）：
-      - 使用 **AskUserQuestion tool** 进行澄清
+   c. **若某个产出物需要用户输入**（上下文不清）：
+      - 请求用户澄清
       - 然后继续创建
 
 5. **显示最终状态**
@@ -187,27 +202,28 @@ ${STORE_SELECTION_GUIDANCE}
 
 **输出**
 
-完成所有产出物后，总结：
-- 变更名称和位置
-- 已创建产出物的列表及简要描述
-- 准备就绪："所有产出物已创建！准备好实现。"
-- 提示："运行 \`/opsx:apply\` 以开始实现。"
+After completing all artifacts, summarize:
+- Change name and location
+- List of artifacts created with brief descriptions, plus any conditional artifact you skipped and why
+- What's ready: "All artifacts needed for implementation are ready."
+- Prompt: "Run \`/opsx:apply\` to start implementing."
 
 **产出物创建指南**
 
-- 遵循每个产出物类型的 \`openspec-cn instructions\` 中的 \`instruction\` 字段
-- Schema 定义了每个产出物应包含的内容，遵循它
-- 在创建新产出物之前阅读依赖产出物以获取上下文
-- 使用 \`template\` 作为输出文件的结构 - 填充其各个部分
-- **重要提示**：\`context\` 和 \`rules\` 是对你的约束，而不是文件内容
-  - 不要将 \`<context>\`、\`<rules>\`、\`<project_context>\` 块复制到产出物中
-  - 这些引导你编写内容，但不应出现在输出中
+- Follow the \`instruction\` field from \`openspec instructions\` for each artifact type - it is the authoritative guidance, even for familiar artifact names
+- If the \`instruction\` field directs you to use a specific skill or command to create the artifact, invoke it instead of writing the artifact directly
+- The schema defines what each artifact should contain - follow it
+- Read dependency artifacts for context before creating new ones
+- Use \`template\` as the structure for your output file - fill in its sections
+- **IMPORTANT**: \`context\` and \`rules\` are constraints for YOU, not content for the file
+  - Do NOT copy \`<context>\`, \`<rules>\`, \`<project_context>\` blocks into the artifact
+  - These guide what you write, but should never appear in the output
 
-**护栏**
-- 创建实现所需的所有产出物（由 Schema 的 \`apply.requires\` 定义）
-- 在创建新产出物之前始终阅读依赖产出物
-- 如果上下文极其不清楚，询问用户 - 但倾向于做出合理的决定以保持势头
-- 如果同名变更已存在，询问用户是否要继续处理它或创建一个新的
-- 在继续下一个之前，验证写入后每个产出物文件是否存在`
+**Guardrails**
+- Create every artifact the apply phase transitively depends on, not just the ids listed in \`apply.requires\`
+- Always read dependency artifacts before creating a new one - re-read from disk, not from conversation memory (files may have changed since you last saw them)
+- If context is critically unclear, ask the user - but prefer making reasonable decisions to keep momentum
+- If a change with that name already exists, ask if user wants to continue it or create a new one
+- Verify each artifact file exists after writing before proceeding to next`
   };
 }

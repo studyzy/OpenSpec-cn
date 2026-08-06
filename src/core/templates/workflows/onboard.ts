@@ -220,6 +220,8 @@ Proposal 捕获我们**为什么**做这个变更以及高层面上涉及**什�
 
 **做：** 起草 proposal 内容（先不保存）：
 
+\`<capability-path>\` 是相对于 \`specs/\` 的 spec 目录（例如 \`user-auth\` 或 \`identity/user-auth\`）。对于已修改的 capability，使用确切的现有路径。对于新 capability，遵循项目既有的 spec 组织方式。
+
 \`\`\`
 这是草稿 proposal：
 
@@ -236,14 +238,15 @@ Proposal 捕获我们**为什么**做这个变更以及高层面上涉及**什�
 ## Capabilities
 
 ### New Capabilities
-- \`<capability-name>\`: [简要描述]
+- \`<capability-path>\`: [简要描述]
 
 ### Modified Capabilities
 <!-- 若修改现有行为 -->
+- \`<existing-capability-path>\`：[简要描述]
 
 ## Impact
 
-- \`src/path/to/file.ts\`: [什么变化]
+- \`src/path/to/file.ts\`：[什么变化]
 - [其他文件（如适用）]
 
 ---
@@ -440,14 +443,14 @@ Design 捕获我们**怎么**构建它——技术决策、权衡、方法。
 归档的变更成为你项目的决策历史——你随时可以稍后找到它们以理解某东西为什么那样构建。
 \`\`\`
 
-**做：**
+**做：** 归档变更（\`--yes\` 回答确认提示，你无法从工具调用中回答）：
 \`\`\`bash
-openspec-cn archive "<name>"
+openspec-cn archive "<name>" --yes
 \`\`\`
 
 **展示：**
 \`\`\`
-已归档到：\`<planningHome.changesDir>/archive/YYYY-MM-DD-<name>/\`
+已归档到：\`<planningHome.changesDir>/archive/<target-name>/\`（目标名称前面加上今天的日期，除非名称已以 \`YYYY-MM-DD-\` 前缀开头 — 则保持原样，不加第二个日期）
 
 变更现在是你项目历史的一部分。代码在你的代码库中，决策记录已保存。
 \`\`\`
@@ -485,7 +488,7 @@ openspec-cn archive "<name>"
  | \`/opsx:apply\`   | 从变更中实现任务              |
  | \`/opsx:archive\` | 归档已完成的变更                 |
 
-**其他命令：**
+**Additional commands** (only if installed - availability depends on your profile):
 
  | 命令               | 作用                                             |
  |--------------------|----------------------------------------------------------|
@@ -512,9 +515,9 @@ openspec-cn archive "<name>"
 \`\`\`
 没问题！你的变更保存在 \`openspec-cn status --change "<name>" --json\` 报告的 \`changeRoot\`。
 
-稍后从我们离开的地方继续：
-- \`/opsx:continue <name>\` - 恢复产出物创建
-- \`/opsx:apply <name>\` - 跳到实现（若存在任务）
+稍后从我们停下的地方继续：
+- \`/opsx:continue <name>\` - 恢复制品创建（若已安装；否则 \`openspec status --change "<name>" --json\` 显示下一个制品）
+- \`/opsx:apply <name>\` - 跳到实现（若任务存在）
 
 工作不会丢失。随时回来。
 \`\`\`
@@ -537,7 +540,7 @@ openspec-cn archive "<name>"
  | \`/opsx:apply <name>\`   | 实现任务                            |
  | \`/opsx:archive <name>\` | 完成后归档                          |
 
-**其他命令：**
+**Additional commands** (only if installed - availability depends on your profile):
 
  | 命令                      | 作用                        |
  |---------------------------|-------------------------------------|

@@ -38,7 +38,7 @@ Explore 是一场**对话**，而非生成器。
 
 ## 它已安装
 
-好消息：`/opsx:explore` 随默认的 **core** profile 提供，就在一旁与 `propose`、`apply`、`sync`、`archive` 并列。你无需启用任何东西。只要 OpenSpec 在项目里配置好，explore 就在你的 AI 聊天中就绪。（与所有 `/opsx:*` 命令一样，你把它输入助手的聊天框，而非终端。请参阅[命令如何运作](how-commands-work.md)。）
+好消息：`/opsx:explore` 随默认的 **core** profile 提供，就在一旁与 `propose`、`apply`、`update`, `sync`、`archive` 并列。你无需启用任何东西。只要 OpenSpec 在项目里配置好，explore 就在你的 AI 聊天中就绪。（与所有 `/opsx:*` 命令一样，你把它输入助手的聊天框，而非终端。请参阅[命令如何运作](how-commands-work.md)。）
 
 ## 一个完整示例
 

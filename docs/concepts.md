@@ -187,11 +187,11 @@ OpenSpec 力求避免官僚主义。使用仍能令变更可验证的最轻量�
 
 ```
 openspec/changes/add-dark-mode/
-├── proposal.md           # 为何做、做什么
-├── design.md             # 如何做（技术方案）
-├── tasks.md              # 实现清单
-├── .openspec.yaml        # 变更元数据（可选）
-└── specs/                # 增量规范
+├── proposal.md           # Why and what
+├── design.md             # How (technical approach)
+├── tasks.md              # Implementation checklist
+├── .openspec.yaml        # Change metadata (optional): schema, created, skip_specs, retire_capabilities
+└── specs/                # Delta specs
     └── ui/
         └── spec.md       # ui/spec.md 中正在变化的内容
 ```
@@ -390,9 +390,10 @@ The system MUST expire sessions after 15 minutes of inactivity.
 
 | 小节 | 含义 | 归档时发生什么 |
 |---------|---------|------------------------|
-| `## ADDED Requirements` | 新行为 | 追加到主 spec |
-| `## MODIFIED Requirements` | 已改变的行为 | 替换既有需求 |
-| `## REMOVED Requirements` | 已废弃的行为 | 从主 spec 删除 |
+| `## ADDED Requirements` | New behavior | Appended to main spec |
+| `## MODIFIED Requirements` | Changed behavior | Replaces existing requirement |
+| `## REMOVED Requirements` | Deprecated behavior | Deleted from main spec; removing the last requirement retires the capability and deletes its spec file, when the change declares `retire_capabilities: true` |
+| `## Purpose` | What a brand-new capability is for | Seeds the Purpose of the main spec being created; ignored when the spec already exists |
 
 ### 为何用增量而非完整 Spec
 

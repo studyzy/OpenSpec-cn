@@ -21,8 +21,8 @@ ${STORE_SELECTION_GUIDANCE}
 
 1. **如果没有提供明确的输入，询问他们想要构建什么**
 
-   使用 **AskUserQuestion tool**（开放式，无预设选项）询问：
-   > "您想要处理什么变更？请描述您想要构建或修复的内容。"
+   询问用户（开放式，不设预设选项）：
+   > "你想做什么变更？描述一下你想构建或修复的内容。"
 
    根据他们的描述，推导出一个 kebab-case 名称（例如："add user authentication" → \`add-user-auth\`）。
 
@@ -98,8 +98,8 @@ ${STORE_SELECTION_GUIDANCE}
 
 1. **如果没有提供输入，询问他们想要构建什么**
 
-   使用 **AskUserQuestion tool**（开放式，无预设选项）询问：
-   > "您想要处理什么变更？请描述您想要构建或修复的内容。"
+   询问用户（开放式，不设预设选项）：
+   > "你想做什么变更？描述一下你想构建或修复的内容。"
 
    根据他们的描述，推导出一个 kebab-case 名称（例如："add user authentication" → \`add-user-auth\`）。
 

@@ -56,7 +56,9 @@ The system SHALL expire a session after 30 minutes of inactivity.
 - **`## MODIFIED Requirements`** —— 已存在并正在改变的行为。包含完整的新版本；一行关于改了什么的小注能帮审阅者。
 - **`## REMOVED Requirements`** —— 正在消失的行为，附一行说明原因。
 
-归档时，ADDED 会追加到主 spec，MODIFIED 替换旧版本，REMOVED 被删除。如果你把一个真实变更标成 ADDED，你会得到两个互相竞争的需求；如果你把新行为描述成 MODIFIED，却没有可替换的东西。拿不准时，打开当前 spec 看看那个需求是否已经在那儿。
+On archive, ADDED gets appended to the main spec, MODIFIED replaces the old version, and REMOVED is dropped from it. Remove the last requirement a capability has and you retire it: rather than leave a spec with nothing in it, archive deletes `openspec/specs/<capability>/spec.md`. Because that is the one archive step that removes a file, it has to be asked for — add `retire_capabilities: true` to the change's `.openspec.yaml`, alongside the `schema:` that file already needs. Without it the archive aborts and tells you so. For a spec in the caller's checkout, the archive output also names the `git checkout` that restores a committed file; selected stores receive checkout-scoped recovery guidance instead. If you mark a real change as ADDED, you end up with two competing requirements; if you describe new behavior as MODIFIED, there's nothing to replace. When in doubt, open the current spec and see whether the requirement is already there.
+
+One more section is worth knowing about. When your delta creates a capability that doesn't exist yet, open it with `## Purpose` — a sentence or two on what the capability is for. Archive uses it as the Purpose of the main spec it creates; skip it and you get a `TBD` placeholder to fill in by hand. An existing spec already has a Purpose, so a delta's is ignored there — edit `openspec/specs/<capability-path>/spec.md` directly to change one. Here, `<capability-path>` is the directory relative to `specs/`, such as `user-auth` in a flat project or `identity/user-auth` in a project organized by domain.
 
 ## 合理控制变更规模
 

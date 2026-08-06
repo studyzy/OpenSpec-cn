@@ -85,6 +85,29 @@ AI：已归档至 openspec/changes/archive/2025-01-23-add-dark-mode/
 ```
 
 <details>
+<summary><strong>What do the specs actually look like?</strong></summary>
+
+Plain Markdown — requirements with concrete scenarios, no special syntax to learn. Here's what goes in the `specs/` folder created above:
+
+```markdown
+## ADDED Requirements
+
+### Requirement: Theme selection
+The app SHALL let users switch between light and dark themes,
+defaulting to the system preference.
+
+#### Scenario: User toggles dark mode
+- **WHEN** the user clicks the theme toggle
+- **THEN** the app switches to dark mode and persists the choice
+```
+
+Your AI writes these; you review the plan before any code is written.
+
+OpenSpec is built with OpenSpec — browse this repo's live [specs](openspec/specs) and in-flight [changes](openspec/changes) for real examples at scale.
+
+</details>
+
+<details>
 <summary><strong>OpenSpec 仪表盘</strong></summary>
 
 <p align="center">
@@ -122,15 +145,19 @@ cd your-project
 openspec-cn init
 ```
 
-现在告诉你的 AI：
+> **Want your AI to do it?** Paste the [setup prompt](docs/installation.md#install-with-your-ai-assistant) into your coding assistant — it installs the CLI, runs `openspec init`, and verifies the result.
+
+Now talk to your AI:
 
 - **还不确定要构建什么？** 先用 `/opsx:explore`，一个无风险的思考伙伴，它会阅读你的代码、权衡方案、在写任何东西之前帮你理清思路。（[探索指南](docs/explore.md)）
 - **已经知道自己想要什么？** 直接用 `/opsx:propose <你想要构建的内容>`。
 
 这两者都在默认 profile 中。如果你想要扩展工作流（`/opsx:new`、`/opsx:continue`、`/opsx:ff`、`/opsx:verify`、`/opsx:bulk-archive`、`/opsx:onboard`），请通过 `openspec-cn config profile` 选择，然后运行 `openspec-cn update` 应用。
 
+`/opsx:propose` is the canonical name; your tool may spell it `/opsx-propose` (Cursor, GitHub Copilot), `@opsx-propose` (Amazon Q) or `$openspec-propose` (Codex). `openspec init` prints the right form for the tools you picked — see [How To Invoke](docs/supported-tools.md#how-to-invoke).
+
 > [!NOTE]
-> 不确定你的工具是否支持？[查看完整列表](docs/supported-tools.md) – 我们支持 25+ 种工具且持续增加。
+> Not sure if your tool is supported? [View the full list](docs/supported-tools.md) – we support 30+ tools and growing.
 >
 > 同样支持 pnpm、yarn、bun 和 nix。可查看 [安装选项](docs/installation.md)。
 
@@ -231,7 +258,9 @@ OpenSpec 会收集匿名使用统计。
 
 我们只收集命令名与版本号，用于理解使用模式；不会收集参数、路径、内容或任何个人信息。CI 中会自动禁用。
 
-**退出（Opt-out）：** `export OPENSPEC_TELEMETRY=0` 或 `export DO_NOT_TRACK=1`
+**Opt-out (any one is enough):**
+- `openspec config set telemetry.enabled false` (global config; unset means on)
+- `export OPENSPEC_TELEMETRY=0` or `export DO_NOT_TRACK=1` (env overrides config)
 
 </details>
 

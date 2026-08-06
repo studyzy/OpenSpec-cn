@@ -13,7 +13,9 @@ npm install -g @fission-ai/openspec@latest
 openspec --version
 ```
 
-如果装了但仍找不到，你的全局 npm bin 目录很可能不在 `PATH` 上。运行 `npm bin -g` 查看全局二进制所在位置，并确保该路径在你的 shell 配置文件中。
+If it installed but still isn't found, your global npm bin directory probably isn't on your `PATH`. Run `npm prefix -g` to see where global packages live: on macOS and Linux the binaries are in that directory's `bin/`, and on Windows they sit directly in it. Make sure that path is on your `PATH`. (`npm bin -g` was removed in npm 9.)
+
+If you used the [AI-assisted install](installation.md#install-with-your-ai-assistant), this is the expected hand-off point: that prompt tells your assistant to show you the `PATH` change rather than edit your shell startup files itself.
 
 ### "Requires Node.js 20.19.0 or higher"
 
@@ -49,13 +51,15 @@ openspec-cn init --tools claude,cursor
 
    这会为每一个你配置过的工具重写 skill 和 command 文件。
 
+   Instruction files come from the *installed* CLI, so an outdated CLI reports everything up to date without ever writing the newer workflows. `openspec update` now checks for that and offers to upgrade — take the offer if you see it.
+
 3. **重启你的助手。** 多数工具在启动时就扫描 skill 和命令。开一个新窗口常常就好。
 
 4. **确认文件存在。** 对于 Claude Code，检查 `.claude/skills/` 是否包含 `openspec-*` 文件夹。其他工具有自己的目录，都列在 [Supported Tools](supported-tools.md)。
 
 5. **确认你初始化了这个项目。** Skill 是按项目写入的。如果你克隆了仓库或切换了文件夹，在那里运行 `openspec-cn init`（或 `openspec-cn update`）。
 
-6. **确认你的工具支持 command 文件。** 少数工具（Kimi CLI、ForgeCode、Mistral Vibe）不会生成 `opsx-*` 命令文件；它们改用基于 skill 的调用。形式因工具而异：见 [Supported Tools](supported-tools.md) 和 [How Commands Work](how-commands-work.md#slash-command-syntax-by-tool)。
+6. **Confirm your tool supports command files.** Codex, CodeArts, ForgeCode, Hermes, Kimi Code, Mistral Vibe and the shared `.agents` target don't get generated `opsx-*` command files; they use skill-based invocations instead, so `/opsx` will never autocomplete for them. Type `$openspec-propose` in Codex, `/skill:openspec-propose` in Kimi Code, and `/openspec-propose` in the rest. The shared `.agents` target is vendor-neutral, so `/openspec-propose` is the common form rather than a guaranteed one — if your assistant does not answer to it, check its own docs for how it invokes a skill. Amazon Q does get command files, but loads them into its prompt library rather than its slash menu — type `@opsx-propose` there, not `/opsx`. Every tool's form is listed in [How To Invoke](supported-tools.md#how-to-invoke).
 
 ## 使用变更时
 
@@ -92,6 +96,14 @@ openspec-cn validate --all --strict   # 更严格的检查，适合 CI
 
 常见原因是缺失必需小节（如没有场景的 spec）或畸形的增量头部。修复文件后重跑。输出格式见 [CLI reference](cli.md#openspec-validate)。
 
+One message deserves its own note:
+
+```text
+MODIFIED "<requirement>" omits scenario(s) the current spec still has: "<scenario>"
+```
+
+A `MODIFIED` requirement replaces the whole requirement block, so it has to carry every scenario that survives the change, not only the ones you edited. Copy the named scenarios from `openspec/specs/<capability-path>/spec.md` back into the delta, preserving any domain directories in the path. This often appears on an older change after someone else's change added a scenario to the same requirement — archive refuses that change either way, and validation now says so before you implement it.
+
 ### AI 创建了不完整或错误的制品
 
 AI 没有足够的上下文。几个杠杆有用：
@@ -105,7 +117,19 @@ AI 没有足够的上下文。几个杠杆有用：
 
 归档不会因任务未完成而*阻塞*，但会警告你，因为归档通常意味着工作已完成。如果任务是故意留下的（你在归档一个部分变更），继续即可。否则先完成任务。归档还会在你尚未同步时，提供把增量规范并入主 specs 的选项；除非你有理由不这么做，否则选是。
 
-## 配置
+### "User force closed the prompt with 0 null"
+
+Something ran `openspec archive` where nothing can answer a question — an AI agent calling it from a tool, a CI job, or any shell with stdin closed. Archive asks up to three confirmations, and an unanswerable one used to fail with that raw message.
+
+Pass `--yes` to answer them up front:
+
+```bash
+openspec archive <change-name> --yes
+```
+
+Keep any flags you were already passing — `--skip-specs` and `--no-validate` change what archive does, so a bare `--yes` rerun is not the same command. Current versions name the flag for you and print a `Fix:` line you can paste. If you meant to pick from a list, pass the change name explicitly: the picker needs an answer too.
+
+## Configuration
 
 ### 我的 `config.yaml` 没有被应用
 
@@ -148,6 +172,8 @@ openspec-cn schema init <name>         # 创建一个自定义 schema
 ```bash
 openspec-cn init --force
 ```
+
+For Codex, OpenSpec may detect old managed prompt files in `$CODEX_HOME/prompts` or `~/.codex/prompts`. That cleanup is limited to OpenSpec's allowlisted legacy Codex prompt filenames, and non-interactive `openspec init` removes only the files whose replacement `.agents/skills/openspec-*` skills exist. Non-interactive `openspec update` leaves all legacy cleanup untouched unless you pass `--force`.
 
 ### 迁移后命令没出现
 

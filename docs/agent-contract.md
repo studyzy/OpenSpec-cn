@@ -25,12 +25,18 @@
 
 诊断出现在两个位置：**status 数组**（`status: StoreDiagnostic[]`，顶层每个条目）用于健康检查结果，**抛出的错误**在命令失败时被转换为单元素 `status` 数组。
 
-## 3. 根选择 `RootOutput`
+All root-resolving commands (`list`, `show`, `validate`, `status`, `instructions`, `instructions apply`, `instructions archive`, `new change`, `archive`, `doctor`, `context`) resolve one OpenSpec root with one precedence:
 
-所有需要解析根目录的命令（`list`、`show`、`validate`、`status`、`instructions`、`new change`）在 JSON 模式下都返回：
+1. `--store <id>` → the registered store's root (`source: "store"`).
+2. Otherwise, nearest ancestor with `openspec/`: planning shape → `source: "nearest"` (a `store:` pointer is ignored with a stderr warning); config-only dir with a valid `store:` pointer → that store, `source: "declared"`.
+3. No nearest root + global `defaultStore` set (`openspec config set defaultStore <id>`) → that store, `source: "global_default"`; a stale id fails with the underlying store error and a `fix` naming `openspec config unset defaultStore`.
+4. No nearest root, no default + registered stores exist → error `no_root_with_registered_stores`.
+5. No root, no default, no stores: scaffolding commands treat the cwd as `source: "implicit"`; diagnostic commands (`doctor`, `context`) fail with `no_openspec_root` instead — they inspect, never scaffold.
+
+Successful JSON payloads embed the root:
 
 ```json
-{ "path", "source": "cwd|store|config", "store_id"?, "role": "openspec_root", "isStore": false, "instructionBehavior": "only when store-selected" }
+"root": { "path": "/abs/path", "source": "store" | "declared" | "global_default" | "nearest" | "implicit", "store_id": "id (only when store-selected)" }
 ```
 
 **根失败契约**：在 JSON 模式下，解析失败会在 stdout 打印 `{ ...commandNullShape, "status": [diagnostic] }` 并退出 1。
@@ -50,40 +56,40 @@
 `{ "items": [ { "id", "type": "change"|"spec", "valid", "issues": [ { "level", "path", "message", "line"?, "column"? } ], "durationMs" } ], "summary": { "totals": {items,passed,failed}, "byType": {...} }, "version": "1.0", "root" }`。任一 item 失败时退出 1。
 
 ### 4.4 `status --json`
-
-`{ "changeName", "schemaName", "planningHome"?: { "kind", "root", "changesDir", "defaultSchema" }, "changeRoot", "artifactPaths": { "<id>": {outputPath, resolvedOutputPath, existingOutputPaths} }, "nextSteps": ["..."], "actionContext": { "mode": "repo-local", "sourceOfTruth": "repo", "planningArtifacts", "linkedContext", "allowedEditRoots", "requiresAffectedAreaSelection", "constraints" }, "isComplete", "applyRequires", "artifacts": [ {id, outputPath, status: "done"|"ready"|"blocked", missingDeps?} ], "root" }`。无活跃变更时：`{ "changes": [], "message", "root" }`，退出 0。
+`{ "changeName", "schemaName", "planningHome"?: { "kind", "root", "changesDir", "defaultSchema" }, "changeRoot", "artifactPaths": { "<id>": {outputPath, resolvedOutputPath, existingOutputPaths} }, "nextSteps": ["..."], "actionContext": { "mode": "repo-local", "sourceOfTruth": "repo", "planningArtifacts", "linkedContext", "allowedEditRoots", "requiresAffectedAreaSelection", "constraints" }, "isPlanningComplete", "isComplete", "applyRequires", "artifacts": [ {id, outputPath, status: "done"|"skipped"|"ready"|"blocked", requires, missingDeps?} ], "root" }`. `isPlanningComplete` means every non-skipped planning artifact exists; skipped artifacts count as satisfied without being created. It does not mean implementation tasks are complete. `isComplete` is retained as a compatibility alias with the same value. Each artifact's `requires` is its direct dependency ids (present for every status, so the transitive required set is computable even when the artifact is `done`); `missingDeps` appears only when `blocked`. The `artifacts` array is in dependency order, with the schema's `artifacts:` declaration order breaking ties between artifacts that become ready at the same time (never alphabetical), so the first `ready` entry is the artifact to write next; `missingDeps` uses that same order. `"skipped"` marks an artifact whose `generates` path is under `specs/` in a change whose `.openspec.yaml` declares `skip_specs: true`; it satisfies dependencies but must not be created. No active changes: `{ "changes": [], "message", "root" }`, exit 0.
 
 ### 4.5 `instructions <artifact> --json`
+`{ "changeName", "artifactId", "schemaName", "changeDir", "planningHome"?, "outputPath", "resolvedOutputPath", "existingOutputPaths", "description", "instruction"?, "context"?, "rules"?, "references"?: ReferenceIndexEntry[], "skipped"?, "warning"?, "template", "dependencies": [{id,done,path,description,skipped?}], "unlocks", "root" }`. `unlocks` lists the artifacts this one makes ready, in the schema's declaration order (the same order `status` recommends them). `"skipped": true` (with `"warning"`) appears when the change declares `skip_specs: true` and this artifact is skipped — do not create its files. A dependency entry with `skipped: true` is satisfied without files — do not try to read its paths.
 
 `{ "changeName", "artifactId", "schemaName", "changeDir", "planningHome"?, "outputPath", "resolvedOutputPath", "existingOutputPaths", "description", "instruction"?, "context"?, "rules"?, "references"?: ReferenceIndexEntry[], "template", "dependencies": [{id,done,path,description}], "unlocks", "root" }`。
 
 `ReferenceIndexEntry`：`{ "store_id", "root"?, "specs"?: [{id,summary}], "fetch"?, "status": [] }` —— 已解析的条目携带 root/specs/fetch；未解析的条目携带 store_id + 警告状态。索引上限 50KB（`reference_index_truncated`）。
 
 ### 4.6 `instructions apply --json`
+`{ "changeName", "changeDir", "schemaName", "contextFiles": { "<artifactId>": ["/abs", ...] }, "progress": {total,complete,remaining}, "tasks": [{id,description,done}], "state": "blocked"|"all_done"|"ready", "missingArtifacts"?, "instruction", "references"?, "context"?, "operationGuidance"?, "root" }`. Both optional fields are read from the selected root on every invocation. `context` is a required prompt-level input whose relevant project facts, conventions, and constraints must be applied; `operationGuidance` is advisory input whose entries are followed only when applicable and compatible with the built-in workflow. Both remain separate from state, tasks, progress, context files, and the built-in instruction.
 
-`{ "changeName", "changeDir", "schemaName", "contextFiles": { "<artifactId>": ["/abs", ...] }, "progress": {total,complete,remaining}, "tasks": [{id,description,done}], "state": "blocked"|"all_done"|"ready", "missingArtifacts"?, "instruction", "references"?, "root" }`。
+### 4.7 `instructions archive --json`
+`{ "changeName", "context"?, "operationGuidance"?, "root" }`. Requires a valid `--change` in the resolved repo/store root and uses the same required-context/advisory-guidance semantics as apply. This is a read-only runtime-input surface: it does not return the static archive workflow, inspect or merge delta specs, write main specs, or move the change.
 
-### 4.7 `new change <name> --json`
+### 4.8 `new change <name> --json`
 
 成功：`{ "change": { "id", "path", "metadataPath", "schema" }, "root" }`。失败：`{ "change": null, "status": [d] }`，退出 1。
 
-### 4.8 `archive <name> --json`
+### 4.9 `archive <name> --json`
+Success: `{ "archive": { "change", "archivedAs": "YYYY-MM-DD-name", "path", "specsUpdated", "totals"?, "warnings"? }, "root" }`. Failure: `{ "archive": null, "root"?, "status": [d] }`, exit 1. `specsUpdated` is true only when at least one spec file was written or retired (a capability whose last requirement the change removed has its spec deleted, which requires `retire_capabilities: true` in the change's `.openspec.yaml`; every retirement is named in `warnings`, with a pasteable Git recovery command only when the spec lived in the caller's checkout); an already-synced change archives with all-zero totals and the skips listed in `warnings`. JSON mode is strictly non-interactive: every prompt point becomes an `archive_*` code.
 
-成功：`{ "archive": { "change", "archivedAs": "YYYY-MM-DD-name", "path", "specsUpdated", "totals"? }, "root" }`。失败：`{ "archive": null, "root"?, "status": [d] }`，退出 1。JSON 模式严格非交互：每个提示点都会变成 `archive_*` 代码。
+### 4.10 `doctor --json`
+`{ "root": { "path", "source", "store_id"?, "healthy", "status": [] }, "store": { "id", "metadata": {present,valid,remote?}, "origin_url"?, "drift"?: {ahead,behind}, "status": [] } | null, "references": [...], "status": [] }`. `drift` (present only for a git-backed store checkout that has an upstream tracking ref) is ahead/behind counts against the last-fetched upstream, not the live remote. Health findings of any severity exit 0. Failure payload: `{ "root": null, "store": null, "references": [], "status": [d] }`, exit 1.
 
-### 4.9 `doctor --json`
-
-`{ "root": { "path", "source", "store_id"?, "healthy", "status": [] }, "store": { "id", "metadata": {present,valid,remote?}, "origin_url"?, "status": [] } | null, "references": [...], "status": [] }`。任意严重程度的健康检查结果正常退出 0。失败载荷：`{ "root": null, "store": null, "references": [], "status": [d] }`，退出 1。
-
-### 4.10 `context --json`
+### 4.11 `context --json`
 
 `{ "root": { "path", "source", "store_id"?, "role": "openspec_root" }, "members": [ { "role": "referenced_store", "id", "path"?, "remote"?, "fetch"?, "status": [] } ], "status": [] }`。AVAILABLE = 路径存在且 status 为空。`--code-workspace <path>` 写入 `{folders:[{name,path}]}`（仅含可用的被引用 store，带 `ref:` 前缀）；在 JSON 模式下写入操作先于打印执行，因此即使写入失败 stdout 也恰好持有一个文档。失败：`{ "root": null, "members": [], "status": [d] }`，退出 1。
 
-### 4.11 `store ... --json`
+### 4.12 `store ... --json`
 
 setup/register：`{ "store": {id, root, metadata_path?}, "registry": {path, registered, already_registered}, "git": {is_repository, initialized, committed}, "created_files": [], "status": [] }`。unregister/remove：`{ "store", "registry": {path, removed}, "files": {deleted, deleted_path, left_on_disk}, "status": [] }`。list：`{ "stores": [{id, root}], "status": [] }`。doctor：`{ "stores": [ { id, root, metadata_path?, openspec_root: {...healthy, status}, metadata: {present, valid, id?, remote}, git: {is_repository, has_commits, has_uncommitted_changes, has_remote, origin_url}, status } ], "status": [] }`（`null` = 未知/未探测）。健康检查结果退出 0；失败退出 1 并返回对应的 null 结构。提示取消退出 130。
 
-### 4.12 `schemas --json` / `templates --json`
+### 4.13 `schemas --json` / `templates --json`
 
 `schemas`：裸数组 `[ {name, description, artifacts, source} ]`。`templates`：键控对象 `{ "<artifactId>": {path, source} }`。两者都基于 cwd，没有 root/status 键。
 
@@ -115,20 +121,13 @@ setup/register：`{ "store": {id, root, metadata_path?}, "registry": {path, regi
 `store_setup_id_required`, `store_setup_path_required`, `store_setup_path_not_directory`, `store_setup_inside_git_repo`, `store_setup_non_empty_directory`, `store_setup_cancelled`, `store_path_required`, `store_path_missing`, `store_path_not_directory`, `store_root_pointer_declared`, `store_register_root_unhealthy`, `store_register_identity_confirmation_required`, `store_register_cancelled`, `store_remote_empty`, `store_remote_requires_hand_edit`, `store_remove_confirmation_required`, `store_remove_cancelled`, `store_remove_path_not_directory`, `store_remove_metadata_missing`, `store_root_missing`（在 remove 中为 warning，在 doctor 中为 error）, `store_root_not_directory`。
 
 ### Store git
-
-`store_git_init_failed`, `store_git_identity_missing`, `store_git_commit_failed`, `store_git_no_commits`（warning）, `store_clone_fragile_directories`（warning）, `store_remote_divergence`（info, doctor）。
-
-### 引用（warning）
-
-`reference_invalid_id`, `reference_registry_unreadable`, `reference_unresolved`, `reference_root_unhealthy`, `reference_index_truncated`。
-
-### 关系（warning；doctor；context 仅保留注册表那一条）
+`store_git_init_failed`, `store_git_identity_missing`, `store_git_commit_failed`, `store_git_no_commits` (warning), `store_clone_fragile_directories` (warning), `store_remote_divergence` (info, doctor), `store_checkout_drift` (info, doctor).
 
 `relationship_registry_unreadable`, `root_pointer_ignored`, `root_pointer_invalid`, `pointer_declarations_inert`。
 
 ### 归档（JSON 模式）
 
-`archive_change_name_required`, `archive_change_not_found`, `archive_validation_failed`, `archive_confirmation_required`, `archive_tasks_incomplete`, `archive_spec_update_failed`, `archive_spec_validation_failed`, `archive_target_exists`, `archive_error`。
+`archive_change_name_required`, `archive_change_not_found`, `archive_change_symlink`, `archive_validation_failed`, `archive_confirmation_required`, `archive_tasks_incomplete`, `archive_spec_update_failed`, `archive_spec_validation_failed`, `archive_target_exists`, `archive_error`。
 
 ### 上下文写入
 

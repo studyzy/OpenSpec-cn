@@ -17,6 +17,8 @@ export function getBulkArchiveChangeSkillTemplate(): SkillTemplate {
 
 ${STORE_SELECTION_GUIDANCE}
 
+\`<capability-path>\` 是相对于 \`specs/\` 的 spec 目录（例如 \`user-auth\` 或 \`identity/user-auth\`）。在解析主 spec 时保留每个增量 spec 的完整路径。
+
 **输入**：无需输入（通过提示选择）
 
 **步骤**
@@ -29,12 +31,37 @@ ${STORE_SELECTION_GUIDANCE}
 
 2. **提示选择变更**
 
-   使用 **AskUserQuestion tool** 的多选模式让用户选择变更：
+   请用户选择变更（多选）：
    - 展示每个变更及其 schema
-   - 提供"全部变更"选项
-   - 允许任意数量的选择（1+ 即可，2+ 是典型场景）
+   - 包含"全部变更"选项
+   - 允许任意数量的选择（1+ 可以，2+ 是典型用例）
 
    **重要提示**：切勿自动选择。始终由用户选择。
+
+   **Load current archive inputs once for the selected root before batch validation:**
+
+   Choose one selected change from this root and run
+   \`openspec instructions archive --change "<selected-change>" --json\` with the
+   same selected-root flags. This lookup is advisory and optional: it only supplies
+   extra prompt inputs, so it must never block the batch. If it fails or returns
+   invalid JSON — for example on an older CLI that does not support this command
+   yet — continue the batch with no context and no operation guidance. Do not
+   report an error and do not stop.
+
+   A valid response may omit \`context\` and \`operationGuidance\`. Treat
+   \`context\` as a required prompt-level input across the batch: read and consider
+   it, and apply relevant project facts, conventions, and constraints. Treat
+   \`operationGuidance\` as optional additive advice: read and consider every
+   entry, and follow entries that are applicable and compatible with the built-in
+   batch workflow.
+
+   Keep both fields separate from conflict analysis, explicit user choices,
+   resolved paths, CLI checks, and command contracts. If context conflicts with one
+   of those controlling inputs, report the conflict and preserve the controlling
+   value. If guidance is inapplicable or conflicts with a controlling input, do not
+   follow it and explain why. Do not infer skipped prompts, replacement paths, or
+   flags from either field, and do not copy their text verbatim into specs, changes,
+   or summaries. These are prompt-level behavior contracts, not enforceable checks.
 
 3. **批量校验 - 收集所有所选变更的状态**
 
@@ -51,17 +78,21 @@ ${STORE_SELECTION_GUIDANCE}
    c. **Delta specs** - 从状态 JSON 检查 \`artifactPaths.specs.existingOutputPaths\`
       - 列出存在哪些 capability spec
       - 对每个，提取需求名称（匹配 \`### Requirement: <name>\` 的行）
-
+      - Treat this list as the only delta-spec source. If the \`specs\` entry is
+        missing or the list is empty, perform no spec sync or specs-instruction
+        lookup for that change; do not infer deltas from unrelated artifacts.
+      - Evaluate this independently for every change, including mixed-schema
+        batches where some schemas have no \`specs\` artifact.
 4. **检测 spec 冲突**
 
-   构建 \`capability -> [触及它的变更]\` 的映射：
+   Build a map keyed by \`<capability-path>\`, the exact path relative to \`specs/\`:
 
-   \`\`\`
-   auth -> [change-a, change-b]  <- 冲突（2+ 个变更）
-   api  -> [change-c]            <- 正常（仅 1 个变更）
+   \`\`\`text
+   identity/user-auth -> [change-a, change-b]  <- CONFLICT (2+ changes)
+   billing/user-auth  -> [change-c]            <- OK (different full path)
    \`\`\`
 
-   当 2+ 个所选变更对同一 capability 都有 delta spec 时即存在冲突。
+   A conflict exists when 2+ selected changes have delta specs for the exact same \`<capability-path>\`.
 
 5. **主动解决冲突**
 
@@ -78,39 +109,40 @@ ${STORE_SELECTION_GUIDANCE}
       - 若两者都已实现 -> 按时间顺序应用（先旧后新，新者覆盖）
       - 若两者都未实现 -> 跳过 spec 同步，警告用户
 
-   d. **记录解决方案**（每个冲突）：
-      - 应用哪个变更的 specs
-      - 顺序（若两者都应用）
+   d. **记录每个冲突的解决方案**：
+      - 对每个增量 spec 的包含或排除决策，按变更和 \`<capability-path>\` 索引
+      - 要应用哪些包含的增量 spec 以及按什么顺序
+      - 哪些增量 spec 因实现缺失而从同步中排除
       - 理由（在代码库中发现了什么）
 
 6. **展示汇总状态表**
 
    展示一个汇总所有变更的表格：
 
-   \`\`\`
+   \`\`\`markdown
    | 变更               | 产出物 | 任务 | Specs   | 冲突      | 状态   |
    |---------------------|-----------|-------|---------|-----------|--------|
    | schema-management   | 完成      | 5/5   | 2 delta | 无        | 就绪   |
    | project-config      | 完成      | 3/3   | 1 delta | 无        | 就绪   |
-   | add-oauth           | 完成      | 4/4   | 1 delta | auth (!)  | 就绪*  |
+   | add-oauth           | 完成      | 4/4   | 1 delta | identity/user-auth (!) | 就绪*  |
    | add-verify-skill    | 剩余 1    | 2/5   | 无      | 无        | 警告   |
    \`\`\`
 
    对冲突，展示解决方案：
-   \`\`\`
+   \`\`\`text
    * 冲突解决：
-     - auth spec：将先应用 add-oauth 再应用 add-jwt（两者都已实现，按时间顺序）
+     - identity/user-auth spec：将先应用 add-oauth 再应用 add-jwt（两者都已实现，按时间顺序）
    \`\`\`
 
    对未完成的变更，展示警告：
-   \`\`\`
+   \`\`\`text
    警告：
    - add-verify-skill：1 个未完成产出物，3 个未完成任务
    \`\`\`
 
 7. **确认批量操作**
 
-   使用 **AskUserQuestion tool** 进行单次确认：
+   询问用户单个确认问题：
 
    - "归档 N 个变更？" 选项依据状态而定
    - 选项可能包括：
@@ -120,31 +152,73 @@ ${STORE_SELECTION_GUIDANCE}
 
    若存在未完成变更，明确说明它们将带警告归档。
 
+   Route on the answer by intent, not by exact label — you wrote these labels,
+   so match what the user picked rather than the wording above:
+   - "Cancel" — stop, do not archive. Report that nothing was archived and skip the remaining steps.
+   - The archive-everything option — proceed with every selected change
+   - The ready-only option — proceed with only the changes the step 6 table marks \`Ready\` or \`Ready*\`, and record the rest as Skipped in step 8d. If a \`Ready*\` change's conflict partner is skipped, re-derive that conflict's resolution using only the changes being archived.
+   - Anything else — ask again rather than archiving
+
+   Before step 8 writes the first main spec or moves any change, fetch every
+   required specs-rule snapshot for the confirmed batch. For each change that will
+   sync concrete \`artifactPaths.specs.existingOutputPaths\`, run
+   \`openspec instructions specs --change "<name>" --json\` exactly once with the
+   same selected-root flags. Obtain all snapshots before the first write or move.
+   If any lookup exits non-zero or returns invalid artifact-instruction JSON,
+   identify the affected change, report the error, and stop the whole batch before
+   any main-spec write or change move. Do not treat lookup failure as omitted
+   rules. A valid response without \`rules\` is the no-rules case.
+
 8. **为每个确认的变更执行归档**
 
-   按确定的顺序处理变更（遵循冲突解决方案）：
+   Before processing, carry the recorded decisions from step 5 (after any step 7 re-derivation) into two per-delta sets:
+   - \`includedDeltas\`: all non-conflicting delta specs from confirmed changes plus conflict deltas selected for sync
+   - \`excludedDeltas\`: conflict deltas from confirmed changes excluded because their implementation is missing
+   - A single change can have both included and excluded delta specs. Keep the decision per delta; do not collapse it into a per-change sync flag.
 
-   a. **同步 specs**（若存在 delta specs）：
-      - 使用 openspec-sync-specs 方式（代理驱动的智能合并）
-      - 对冲突，按解决顺序应用
-      - 跟踪是否已完成同步
+   Process changes in the determined order (respecting conflict resolution):
 
-   b. **执行归档**：
+   a. **Sync included delta specs**:
+      - Run the \`openspec-sync-specs\` workflow inline (agent-driven intelligent merge) only for changes with entries in \`includedDeltas\`, passing only the included delta paths and explicitly instructing it to ignore that change's \`excludedDeltas\`. Wait for it to finish.
+      - For conflicts, apply in resolved order.
+      - Pass that change's fetched specs-rule snapshot into inline sync; inline
+        sync must reuse it without fetching instructions again
+      - Apply artifact rules only to main specs produced by that change. They do
+        not change conflict resolution, archive behavior, or CLI contracts, and
+        their text is not copied into an output file
+      - Do not delegate to a background task — step 8c would move \`changeRoot\` out from under a sync that is still reading it.
+      - If a change has no included delta specs, do not run the sync workflow for it.
+
+   b. **Verify included delta specs before moving changeRoot**:
+      - Re-run the comparison only for delta specs in \`includedDeltas\` against main spec at \`<planningHome.root>/openspec/specs/<capability-path>/spec.md\` (use the store-aware \`planningHome.root\` from step 3 status JSON, not a hardcoded repo path).
+      - Verify that main specs are updated:
+        - ADDED requirements present
+        - MODIFIED requirements carrying scenario and description changes named in the delta, with their other scenarios intact
+        - REMOVED requirements gone — and where this sync retired a capability (removed its last requirement, leaving \`## Requirements\` empty), its main spec deleted rather than left empty; a spec the sync deliberately kept and reported is also a match
+        - RENAMED requirements present under the new name and absent under the old one
+      - Do not verify delta specs in \`excludedDeltas\`; they are intentionally left unsynced.
+      - If sync failed or any capability does not match verification, report what differs and fail/skip moving that change's \`changeRoot\` — do not archive that change. \`changeRoot\` remains intact.
+
+   c. **Perform the archive**:
+
+      Target name: use the change name as-is when it already starts with a \`YYYY-MM-DD-\` prefix; otherwise prepend the current date as \`YYYY-MM-DD-<name>\` (same rule as \`openspec archive\`).
+
       \`\`\`bash
       mkdir -p "<planningHome.changesDir>/archive"
-      mv "<changeRoot>" "<planningHome.changesDir>/archive/YYYY-MM-DD-<name>"
+      mv "<changeRoot>" "<planningHome.changesDir>/archive/<target-name>"
       \`\`\`
 
-   c. **跟踪每个变更的结果**：
-      - 成功：归档成功
-      - 失败：归档过程中出错（记录错误）
-      - 跳过：用户选择不归档（如适用）
+   d. **Track outcome** for each change:
+      - Success: archived successfully
+      - Failed: error during archive or spec verification (record error)
+      - Skipped: user chose not to archive (if applicable)
+      - Sync skipped: for every delta in \`excludedDeltas\`, report \`sync skipped\` with the change, \`<capability-path>\`, and recorded reason. This is distinct from skipping the archive.
 
 9. **展示汇总**
 
    展示最终结果：
 
-   \`\`\`
+   \`\`\`markdown
    ## 批量归档完成
 
    已归档 3 个变更：
@@ -155,22 +229,23 @@ ${STORE_SELECTION_GUIDANCE}
    跳过 1 个变更：
    - add-verify-skill（用户选择不归档未完成项）
 
-   Spec 同步汇总：
-   - 4 个 delta spec 已同步到主 specs
-   - 1 个冲突已解决（auth：按时间顺序应用两者）
+   Spec sync summary:
+   - 4 个增量 spec 已同步到主 specs
+   - 1 个增量 spec 同步已跳过（add-jwt，identity/user-auth：未找到实现）
+   - 1 个冲突已解决（identity/user-auth：已同步 add-oauth，已跳过 add-jwt）
    \`\`\`
 
    若有失败：
-   \`\`\`
+   \`\`\`text
    失败 1 个变更：
    - some-change：归档目录已存在
    \`\`\`
 
 **冲突解决示例**
 
-示例 1：仅一个已实现
-\`\`\`
-冲突：specs/auth/spec.md 被 [add-oauth, add-jwt] 触及
+Example 1: 仅一个已实现
+\`\`\`text
+Conflict: <planningHome.root>/openspec/specs/auth/spec.md touched by [add-oauth, add-jwt]
 
 检查 add-oauth：
 - Delta 新增 "OAuth Provider Integration" 需求
@@ -183,9 +258,9 @@ ${STORE_SELECTION_GUIDANCE}
 解决方案：仅 add-oauth 已实现。将仅同步 add-oauth specs。
 \`\`\`
 
-示例 2：两者都已实现
-\`\`\`
-冲突：specs/api/spec.md 被 [add-rest-api, add-graphql] 触及
+Example 2: 两者都已实现
+\`\`\`text
+Conflict: <planningHome.root>/openspec/specs/api/spec.md touched by [add-rest-api, add-graphql]
 
 检查 add-rest-api（创建于 2026-01-10）：
 - Delta 新增 "REST Endpoints" 需求
@@ -201,12 +276,12 @@ ${STORE_SELECTION_GUIDANCE}
 
 **成功时输出**
 
-\`\`\`
+\`\`\`markdown
 ## 批量归档完成
 
 已归档 N 个变更：
-- <change-1> -> archive/YYYY-MM-DD-<change-1>/
-- <change-2> -> archive/YYYY-MM-DD-<change-2>/
+- <change-1> -> archive/<target-name-1>/
+- <change-2> -> archive/<target-name-2>/
 
 Spec 同步汇总：
 - N 个 delta spec 已同步到主 specs
@@ -215,11 +290,11 @@ Spec 同步汇总：
 
 **部分成功时输出**
 
-\`\`\`
+\`\`\`markdown
 ## 批量归档完成（部分）
 
 已归档 N 个变更：
-- <change-1> -> archive/YYYY-MM-DD-<change-1>/
+- <change-1> -> archive/<target-name-1>/
 
 跳过 M 个变更：
 - <change-2>（用户选择不归档未完成项）
@@ -230,24 +305,39 @@ Spec 同步汇总：
 
 **无变更时输出**
 
-\`\`\`
+\`\`\`markdown
 ## 无可归档的变更
 
 未找到活跃的变更。创建一个新变更即可开始。
 \`\`\`
 
-**护栏**
-- 允许任意数量的变更（1+ 即可，2+ 是典型场景）
-- 始终提示选择，从不自动选择
-- 尽早检测 spec 冲突，通过检查代码库解决
-- 当两个变更都已实现时，按时间顺序应用 specs
-- 仅当实现缺失时跳过 spec 同步（警告用户）
-- 确认前展示清晰的逐变更状态
-- 对整批使用单次确认
-- 跟踪并报告所有结果（成功/跳过/失败）
-- 移动到归档时保留 .openspec.yaml
-- 归档目录目标使用当前日期：YYYY-MM-DD-<name>
-- 若归档目标已存在，该变更失败但继续处理其他变更`,
+**Guardrails**
+- Allow any number of changes (1+ is fine, 2+ is the typical use case)
+- Always prompt for selection, never auto-select
+- Detect spec conflicts early and resolve by checking codebase
+- When both changes are implemented, apply specs in chronological order
+- Skip spec sync only when implementation is missing (warn user)
+- Show clear per-change status before confirming
+- Use single confirmation for entire batch
+- Never archive after the user cancels the confirmation — a cancelled batch archives nothing
+- Track and report all outcomes (success/skip/fail)
+- Preserve .openspec.yaml when moving to archive
+- Archive directory target uses current date: YYYY-MM-DD-<name>; a name that already starts with a \`YYYY-MM-DD-\` prefix is used as-is (never stack a second date)
+- If archive target exists, fail that change but continue with others
+- If sync is requested, run the \`openspec-sync-specs\` workflow inline (agent-driven) for each change with included delta specs
+- Carry the per-delta \`includedDeltas\` and \`excludedDeltas\` decisions into execution; sync and verify only included deltas
+- Report every excluded delta as \`sync skipped\` without treating the archive itself as skipped
+- Never archive a change while a spec sync is still in flight — run the sync inline and verify main specs at \`<planningHome.root>/openspec/specs/<capability-path>/spec.md\` before moving \`changeRoot\`
+- Fetch archive inputs once per selected root before spec inspection or moves
+- Fetch all required specs-rule snapshots before the batch's first main-spec write or move
+- A failed archive-inputs lookup never blocks the batch; it proceeds with no context or guidance
+- A failed specs instruction lookup stops the whole batch atomically
+- Changes without concrete \`artifactPaths.specs.existingOutputPaths\` continue without spec sync
+- Apply relevant runtime context across the batch and report conflicts
+- Operation guidance remains advisory; consider every entry and explain rejected advice
+- Keep runtime inputs, conflict analysis, CLI-derived values, and artifact rules separate
+- Artifact rules constrain only written specs
+- Never copy runtime input or artifact-rule text verbatim into output files`,
     license: 'MIT',
     compatibility: '需要 openspec-cn CLI。',
     metadata: { author: 'openspec', version: '1.0' },
@@ -266,6 +356,8 @@ export function getOpsxBulkArchiveCommandTemplate(): CommandTemplate {
 
 ${STORE_SELECTION_GUIDANCE}
 
+\`<capability-path>\` 是相对于 \`specs/\` 的 spec 目录（例如 \`user-auth\` 或 \`identity/user-auth\`）。在解析主 spec 时保留每个增量 spec 的完整路径。
+
 **输入**：无需输入（通过提示选择）
 
 **步骤**
@@ -278,12 +370,37 @@ ${STORE_SELECTION_GUIDANCE}
 
 2. **提示选择变更**
 
-   使用 **AskUserQuestion tool** 的多选模式让用户选择变更：
+   请用户选择变更（多选）：
    - 展示每个变更及其 schema
-   - 提供"全部变更"选项
-   - 允许任意数量的选择（1+ 即可，2+ 是典型场景）
+   - 包含"全部变更"选项
+   - 允许任意数量的选择（1+ 可以，2+ 是典型用例）
 
    **重要提示**：切勿自动选择。始终由用户选择。
+
+   **Load current archive inputs once for the selected root before batch validation:**
+
+   Choose one selected change from this root and run
+   \`openspec instructions archive --change "<selected-change>" --json\` with the
+   same selected-root flags. This lookup is advisory and optional: it only supplies
+   extra prompt inputs, so it must never block the batch. If it fails or returns
+   invalid JSON — for example on an older CLI that does not support this command
+   yet — continue the batch with no context and no operation guidance. Do not
+   report an error and do not stop.
+
+   A valid response may omit \`context\` and \`operationGuidance\`. Treat
+   \`context\` as a required prompt-level input across the batch: read and consider
+   it, and apply relevant project facts, conventions, and constraints. Treat
+   \`operationGuidance\` as optional additive advice: read and consider every
+   entry, and follow entries that are applicable and compatible with the built-in
+   batch workflow.
+
+   Keep both fields separate from conflict analysis, explicit user choices,
+   resolved paths, CLI checks, and command contracts. If context conflicts with one
+   of those controlling inputs, report the conflict and preserve the controlling
+   value. If guidance is inapplicable or conflicts with a controlling input, do not
+   follow it and explain why. Do not infer skipped prompts, replacement paths, or
+   flags from either field, and do not copy their text verbatim into specs, changes,
+   or summaries. These are prompt-level behavior contracts, not enforceable checks.
 
 3. **批量校验 - 收集所有所选变更的状态**
 
@@ -300,17 +417,19 @@ ${STORE_SELECTION_GUIDANCE}
    c. **Delta specs** - 从状态 JSON 检查 \`artifactPaths.specs.existingOutputPaths\`
       - 列出存在哪些 capability spec
       - 对每个，提取需求名称（匹配 \`### Requirement: <name>\` 的行）
+      - 将此列表作为唯一的增量 spec 来源。若 \`specs\` 条目缺失或列表为空，对该变更不执行 spec 同步或 specs-instruction 查找；不要从无关制品推断增量 spec。
+      - 对每个变更独立评估，包括某些 schema 没有 \`specs\` 制品的混合 schema 批次。
 
 4. **检测 spec 冲突**
 
-   构建 \`capability -> [触及它的变更]\` 的映射：
+   Build a map keyed by \`<capability-path>\`, the exact path relative to \`specs/\`:
 
-   \`\`\`
-   auth -> [change-a, change-b]  <- 冲突（2+ 个变更）
-   api  -> [change-c]            <- 正常（仅 1 个变更）
+   \`\`\`text
+   identity/user-auth -> [change-a, change-b]  <- CONFLICT (2+ changes)
+   billing/user-auth  -> [change-c]            <- OK (different full path)
    \`\`\`
 
-   当 2+ 个所选变更对同一 capability 都有 delta spec 时即存在冲突。
+   A conflict exists when 2+ selected changes have delta specs for the exact same \`<capability-path>\`.
 
 5. **主动解决冲突**
 
@@ -327,39 +446,40 @@ ${STORE_SELECTION_GUIDANCE}
       - 若两者都已实现 -> 按时间顺序应用（先旧后新，新者覆盖）
       - 若两者都未实现 -> 跳过 spec 同步，警告用户
 
-   d. **记录解决方案**（每个冲突）：
-      - 应用哪个变更的 specs
-      - 顺序（若两者都应用）
+   d. **记录每个冲突的解决方案**：
+      - 对每个增量 spec 的包含或排除决策，按变更和 \`<capability-path>\` 索引
+      - 要应用哪些包含的增量 spec 以及按什么顺序
+      - 哪些增量 spec 因实现缺失而从同步中排除
       - 理由（在代码库中发现了什么）
 
 6. **展示汇总状态表**
 
    展示一个汇总所有变更的表格：
 
-   \`\`\`
+   \`\`\`markdown
    | 变更               | 产出物 | 任务 | Specs   | 冲突      | 状态   |
    |---------------------|-----------|-------|---------|-----------|--------|
    | schema-management   | 完成      | 5/5   | 2 delta | 无        | 就绪   |
    | project-config      | 完成      | 3/3   | 1 delta | 无        | 就绪   |
-   | add-oauth           | 完成      | 4/4   | 1 delta | auth (!)  | 就绪*  |
+   | add-oauth           | 完成      | 4/4   | 1 delta | identity/user-auth (!) | 就绪*  |
    | add-verify-skill    | 剩余 1    | 2/5   | 无      | 无        | 警告   |
    \`\`\`
 
    对冲突，展示解决方案：
-   \`\`\`
+   \`\`\`text
    * 冲突解决：
-     - auth spec：将先应用 add-oauth 再应用 add-jwt（两者都已实现，按时间顺序）
+     - identity/user-auth spec：将先应用 add-oauth 再应用 add-jwt（两者都已实现，按时间顺序）
    \`\`\`
 
    对未完成的变更，展示警告：
-   \`\`\`
+   \`\`\`text
    警告：
    - add-verify-skill：1 个未完成产出物，3 个未完成任务
    \`\`\`
 
 7. **确认批量操作**
 
-   使用 **AskUserQuestion tool** 进行单次确认：
+   询问用户单个确认问题：
 
    - "归档 N 个变更？" 选项依据状态而定
    - 选项可能包括：
@@ -369,31 +489,73 @@ ${STORE_SELECTION_GUIDANCE}
 
    若存在未完成变更，明确说明它们将带警告归档。
 
+   Route on the answer by intent, not by exact label — you wrote these labels,
+   so match what the user picked rather than the wording above:
+   - "Cancel" — stop, do not archive. Report that nothing was archived and skip the remaining steps.
+   - The archive-everything option — proceed with every selected change
+   - The ready-only option — proceed with only the changes the step 6 table marks \`Ready\` or \`Ready*\`, and record the rest as Skipped in step 8d. If a \`Ready*\` change's conflict partner is skipped, re-derive that conflict's resolution using only the changes being archived.
+   - Anything else — ask again rather than archiving
+
+   Before step 8 writes the first main spec or moves any change, fetch every
+   required specs-rule snapshot for the confirmed batch. For each change that will
+   sync concrete \`artifactPaths.specs.existingOutputPaths\`, run
+   \`openspec instructions specs --change "<name>" --json\` exactly once with the
+   same selected-root flags. Obtain all snapshots before the first write or move.
+   If any lookup exits non-zero or returns invalid artifact-instruction JSON,
+   identify the affected change, report the error, and stop the whole batch before
+   any main-spec write or change move. Do not treat lookup failure as omitted
+   rules. A valid response without \`rules\` is the no-rules case.
+
 8. **为每个确认的变更执行归档**
 
-   按确定的顺序处理变更（遵循冲突解决方案）：
+   Before processing, carry the recorded decisions from step 5 (after any step 7 re-derivation) into two per-delta sets:
+   - \`includedDeltas\`: all non-conflicting delta specs from confirmed changes plus conflict deltas selected for sync
+   - \`excludedDeltas\`: conflict deltas from confirmed changes excluded because their implementation is missing
+   - A single change can have both included and excluded delta specs. Keep the decision per delta; do not collapse it into a per-change sync flag.
 
-   a. **同步 specs**（若存在 delta specs）：
-      - 使用 openspec-sync-specs 方式（代理驱动的智能合并）
-      - 对冲突，按解决顺序应用
-      - 跟踪是否已完成同步
+   Process changes in the determined order (respecting conflict resolution):
 
-   b. **执行归档**：
+   a. **Sync included delta specs**:
+      - Run the \`/opsx:sync\` workflow inline (agent-driven intelligent merge) only for changes with entries in \`includedDeltas\`, passing only the included delta paths and explicitly instructing it to ignore that change's \`excludedDeltas\`. Wait for it to finish.
+      - For conflicts, apply in resolved order.
+      - Pass that change's fetched specs-rule snapshot into inline sync; inline
+        sync must reuse it without fetching instructions again
+      - Apply artifact rules only to main specs produced by that change. They do
+        not change conflict resolution, archive behavior, or CLI contracts, and
+        their text is not copied into an output file
+      - Do not delegate to a background task — step 8c would move \`changeRoot\` out from under a sync that is still reading it.
+      - If a change has no included delta specs, do not run the sync workflow for it.
+
+   b. **Verify included delta specs before moving changeRoot**:
+      - Re-run the comparison only for delta specs in \`includedDeltas\` against main spec at \`<planningHome.root>/openspec/specs/<capability-path>/spec.md\` (use the store-aware \`planningHome.root\` from step 3 status JSON, not a hardcoded repo path).
+      - Verify that main specs are updated:
+        - ADDED requirements present
+        - MODIFIED requirements carrying scenario and description changes named in the delta, with their other scenarios intact
+        - REMOVED requirements gone — and where this sync retired a capability (removed its last requirement, leaving \`## Requirements\` empty), its main spec deleted rather than left empty; a spec the sync deliberately kept and reported is also a match
+        - RENAMED requirements present under the new name and absent under the old one
+      - Do not verify delta specs in \`excludedDeltas\`; they are intentionally left unsynced.
+      - If sync failed or any capability does not match verification, report what differs and fail/skip moving that change's \`changeRoot\` — do not archive that change. \`changeRoot\` remains intact.
+
+   c. **Perform the archive**:
+
+      Target name: use the change name as-is when it already starts with a \`YYYY-MM-DD-\` prefix; otherwise prepend the current date as \`YYYY-MM-DD-<name>\` (same rule as \`openspec archive\`).
+
       \`\`\`bash
       mkdir -p "<planningHome.changesDir>/archive"
-      mv "<changeRoot>" "<planningHome.changesDir>/archive/YYYY-MM-DD-<name>"
+      mv "<changeRoot>" "<planningHome.changesDir>/archive/<target-name>"
       \`\`\`
 
-   c. **跟踪每个变更的结果**：
-      - 成功：归档成功
-      - 失败：归档过程中出错（记录错误）
-      - 跳过：用户选择不归档（如适用）
+   d. **Track outcome** for each change:
+      - Success: archived successfully
+      - Failed: error during archive or spec verification (record error)
+      - Skipped: user chose not to archive (if applicable)
+      - Sync skipped: for every delta in \`excludedDeltas\`, report \`sync skipped\` with the change, \`<capability-path>\`, and recorded reason. This is distinct from skipping the archive.
 
 9. **展示汇总**
 
    展示最终结果：
 
-   \`\`\`
+   \`\`\`markdown
    ## 批量归档完成
 
    已归档 3 个变更：
@@ -404,22 +566,23 @@ ${STORE_SELECTION_GUIDANCE}
    跳过 1 个变更：
    - add-verify-skill（用户选择不归档未完成项）
 
-   Spec 同步汇总：
-   - 4 个 delta spec 已同步到主 specs
-   - 1 个冲突已解决（auth：按时间顺序应用两者）
+   Spec sync summary:
+   - 4 个增量 spec 已同步到主 specs
+   - 1 个增量 spec 同步已跳过（add-jwt，identity/user-auth：未找到实现）
+   - 1 个冲突已解决（identity/user-auth：已同步 add-oauth，已跳过 add-jwt）
    \`\`\`
 
    若有失败：
-   \`\`\`
+   \`\`\`text
    失败 1 个变更：
    - some-change：归档目录已存在
    \`\`\`
 
 **冲突解决示例**
 
-示例 1：仅一个已实现
-\`\`\`
-冲突：specs/auth/spec.md 被 [add-oauth, add-jwt] 触及
+Example 1: 仅一个已实现
+\`\`\`text
+Conflict: <planningHome.root>/openspec/specs/auth/spec.md touched by [add-oauth, add-jwt]
 
 检查 add-oauth：
 - Delta 新增 "OAuth Provider Integration" 需求
@@ -432,9 +595,9 @@ ${STORE_SELECTION_GUIDANCE}
 解决方案：仅 add-oauth 已实现。将仅同步 add-oauth specs。
 \`\`\`
 
-示例 2：两者都已实现
-\`\`\`
-冲突：specs/api/spec.md 被 [add-rest-api, add-graphql] 触及
+Example 2: 两者都已实现
+\`\`\`text
+Conflict: <planningHome.root>/openspec/specs/api/spec.md touched by [add-rest-api, add-graphql]
 
 检查 add-rest-api（创建于 2026-01-10）：
 - Delta 新增 "REST Endpoints" 需求
@@ -450,12 +613,12 @@ ${STORE_SELECTION_GUIDANCE}
 
 **成功时输出**
 
-\`\`\`
+\`\`\`markdown
 ## 批量归档完成
 
 已归档 N 个变更：
-- <change-1> -> archive/YYYY-MM-DD-<change-1>/
-- <change-2> -> archive/YYYY-MM-DD-<change-2>/
+- <change-1> -> archive/<target-name-1>/
+- <change-2> -> archive/<target-name-2>/
 
 Spec 同步汇总：
 - N 个 delta spec 已同步到主 specs
@@ -464,11 +627,11 @@ Spec 同步汇总：
 
 **部分成功时输出**
 
-\`\`\`
+\`\`\`markdown
 ## 批量归档完成（部分）
 
 已归档 N 个变更：
-- <change-1> -> archive/YYYY-MM-DD-<change-1>/
+- <change-1> -> archive/<target-name-1>/
 
 跳过 M 个变更：
 - <change-2>（用户选择不归档未完成项）
@@ -479,23 +642,38 @@ Spec 同步汇总：
 
 **无变更时输出**
 
-\`\`\`
+\`\`\`markdown
 ## 无可归档的变更
 
 未找到活跃的变更。创建一个新变更即可开始。
 \`\`\`
 
-**护栏**
-- 允许任意数量的变更（1+ 即可，2+ 是典型场景）
-- 始终提示选择，从不自动选择
-- 尽早检测 spec 冲突，通过检查代码库解决
-- 当两个变更都已实现时，按时间顺序应用 specs
-- 仅当实现缺失时跳过 spec 同步（警告用户）
-- 确认前展示清晰的逐变更状态
-- 对整批使用单次确认
-- 跟踪并报告所有结果（成功/跳过/失败）
-- 移动到归档时保留 .openspec.yaml
-- 归档目录目标使用当前日期：YYYY-MM-DD-<name>
-- 若归档目标已存在，该变更失败但继续处理其他变更`
+**Guardrails**
+- Allow any number of changes (1+ is fine, 2+ is the typical use case)
+- Always prompt for selection, never auto-select
+- Detect spec conflicts early and resolve by checking codebase
+- When both changes are implemented, apply specs in chronological order
+- Skip spec sync only when implementation is missing (warn user)
+- Show clear per-change status before confirming
+- Use single confirmation for entire batch
+- Never archive after the user cancels the confirmation — a cancelled batch archives nothing
+- Track and report all outcomes (success/skip/fail)
+- Preserve .openspec.yaml when moving to archive
+- Archive directory target uses current date: YYYY-MM-DD-<name>; a name that already starts with a \`YYYY-MM-DD-\` prefix is used as-is (never stack a second date)
+- If archive target exists, fail that change but continue with others
+- If sync is requested, run the \`/opsx:sync\` workflow inline (agent-driven) for each change with included delta specs
+- Carry the per-delta \`includedDeltas\` and \`excludedDeltas\` decisions into execution; sync and verify only included deltas
+- Report every excluded delta as \`sync skipped\` without treating the archive itself as skipped
+- Never archive a change while a spec sync is still in flight — run the sync inline and verify main specs at \`<planningHome.root>/openspec/specs/<capability-path>/spec.md\` before moving \`changeRoot\`
+- Fetch archive inputs once per selected root before spec inspection or moves
+- Fetch all required specs-rule snapshots before the batch's first main-spec write or move
+- A failed archive-inputs lookup never blocks the batch; it proceeds with no context or guidance
+- A failed specs instruction lookup stops the whole batch atomically
+- Changes without concrete \`artifactPaths.specs.existingOutputPaths\` continue without spec sync
+- Apply relevant runtime context across the batch and report conflicts
+- Operation guidance remains advisory; consider every entry and explain rejected advice
+- Keep runtime inputs, conflict analysis, CLI-derived values, and artifact rules separate
+- Artifact rules constrain only written specs
+- Never copy runtime input or artifact-rule text verbatim into output files`
   };
 }

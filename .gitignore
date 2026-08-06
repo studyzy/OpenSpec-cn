@@ -166,3 +166,6 @@ graphify-out/
 
 # Trae
 .trae/
+
+# Cursor
+.cursor/

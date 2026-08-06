@@ -123,20 +123,26 @@ export async function statusCommand(options: StatusOptions): Promise<void> {
 
 export function printStatusText(status: ChangeStatus): void {
   const doneCount = status.artifacts.filter((a) => a.status === 'done').length;
-  const total = status.artifacts.length;
+  const skippedCount = status.artifacts.filter((a) => a.status === 'skipped').length;
+  const total = status.artifacts.length - skippedCount;
 
   console.log(`变更：${status.changeName}`);
   console.log(`Schema：${status.schemaName}`);
   if (status.changeRoot) {
     console.log(`变更根目录：${status.changeRoot}`);
   }
-  console.log(`进度：${doneCount}/${total} 个产出物已完成`);
+  const skippedSuffix = skippedCount > 0 ? ` (${skippedCount} 已跳过)` : '';
+  console.log(`进度：${doneCount}/${total} 个制品已完成${skippedSuffix}`);
   console.log();
 
   for (const artifact of status.artifacts) {
     const indicator = getStatusIndicator(artifact.status);
     const color = getStatusColor(artifact.status);
     let line = `${indicator} ${artifact.id}`;
+
+    if (artifact.status === 'skipped') {
+      line += color(' (已跳过：变更声明了 skip_specs)');
+    }
 
     if (artifact.status === 'blocked' && artifact.missingDeps && artifact.missingDeps.length > 0) {
       line += color(`（被阻塞：${artifact.missingDeps.join(', ')}）`);
@@ -145,8 +151,8 @@ export function printStatusText(status: ChangeStatus): void {
     console.log(line);
   }
 
-  if (status.isComplete) {
+  if (status.isPlanningComplete) {
     console.log();
-    console.log(chalk.green('所有产出物已完成！'));
+    console.log(chalk.green('所有规划制品已完成！'));
   }
 }

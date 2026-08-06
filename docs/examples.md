@@ -1,6 +1,6 @@
 # 示例与配方
 
-真实的变更，从开始到结束。每个配方展示你会输入的命令以及你会看到的返回，这样你可以对照自己的情况套用模式直接复制。默认使用 **core** 命令（`propose`、`explore`、`apply`、`sync`、`archive`）；在扩展命令集更有帮助的地方会特别注明。
+真实的变更，从开始到结束。每个配方展示你会输入的命令以及你会看到的返回，这样你可以对照自己的情况套用模式直接复制。默认使用 **core** 命令（`propose`、`explore`、`apply`、`update`, `sync`、`archive`）；在扩展命令集更有帮助的地方会特别注明。
 
 开始前的提醒：像 `/opsx:propose` 这样的 slash command 输入到你的 **AI 助手的聊天框**，`openspec` 命令输入到你的 **终端**。如果这是新概念，请先阅读 [How Commands Work](how-commands-work.md)。在下面的对话记录中，`You:` 和 `AI:` 是聊天内容，带 `$` 的行是终端命令。
 
@@ -132,7 +132,16 @@ AI:  Created the change. The proposal states the goal (split the
      Ready for implementation.
 ```
 
-当你归档一个不触及 specs 的变更时，可以告诉终端命令跳过 spec 步骤：
+Declare the empty delta explicitly by setting `skip_specs: true` in the change's `.openspec.yaml`:
+
+```yaml
+schema: spec-driven
+skip_specs: true
+```
+
+Without the marker, `openspec validate` rejects a change with zero deltas (so a forgotten specs phase still gets caught); with it, validation passes and `openspec status` shows the specs stage as explicitly skipped rather than pending. If the refactor turns out to change behavior after all, remove `skip_specs` from `.openspec.yaml` and write the delta specs — validate treats the marker plus spec files as a conflict, so the stale marker can't linger silently.
+
+Archiving a marked change needs no extra flags (there are no deltas to merge). Independently, the `--skip-specs` flag tells the terminal command to skip the spec step explicitly:
 
 ```bash
 $ openspec-cn archive refactor-payment-module --skip-specs

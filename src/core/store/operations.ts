@@ -202,7 +202,7 @@ async function readStoreMetadataForOperation(storeRoot: string) {
       'invalid_store_metadata',
       {
         target: 'store.metadata',
-        fix: `Repair ${getStoreMetadataPath(storeRoot)}.`,
+        fix: `修复 ${getStoreMetadataPath(storeRoot)}。`,
       }
     );
   }
@@ -217,7 +217,7 @@ function alreadyRegisteredDiagnostic(id: string): StoreDiagnostic {
   return makeStoreDiagnostic(
     'info',
     'store_already_registered',
-    `Store '${id}' is already registered at this path.`,
+    `Store '${id}' 已经在此路径下注册。`,
     {
       target: 'store.registry',
     }
@@ -230,18 +230,18 @@ function assertNotConfigOnlyPointerRoot(storeRoot: string): void {
 
   if (pointer.malformed) {
     throw new StoreError(
-      `The store declaration in ${pointer.filePath} is invalid (${storePointerProblem(pointer.malformed)}).`,
+      `${pointer.filePath} 中的 store 声明无效 (${storePointerProblem(pointer.malformed)})。`,
       'invalid_store_pointer',
       {
         target: 'store.pointer',
-        fix: `Fix or remove the store: line in ${pointer.filePath} before registering this path as a store.`,
+        fix: `修复或移除 ${pointer.filePath} 中的 store: 行，然后再将此路径注册为 store。`,
       }
     );
   }
 
   if (pointer.value !== undefined) {
     throw new StoreError(
-      `This repo's planning is externalized to store '${pointer.value}' (${pointer.filePath}); it is not itself a store root.`,
+      `此仓库的规划已外部化到 store '${pointer.value}' (${pointer.filePath})；它自身不是 store 根目录。`,
       'store_root_pointer_declared',
       {
         target: 'store.pointer',
@@ -429,11 +429,11 @@ function mutationPayload(
 
 function remoteRequiresHandEditError(id: string, storeRoot: string): StoreError {
   return new StoreError(
-    `Store '${id}' already has an identity file; --remote cannot change it.`,
+    `Store '${id}' 已有身份文件；--remote 无法更改它。`,
     'store_remote_requires_hand_edit',
     {
       target: 'store.metadata',
-      fix: `Edit ${getStoreMetadataPath(storeRoot)} and commit it.`,
+      fix: `编辑 ${getStoreMetadataPath(storeRoot)} 并提交。`,
     }
   );
 }
@@ -500,7 +500,7 @@ async function prepareSetupPlan(
           'store_metadata_id_mismatch',
           {
             target: 'store.metadata',
-            fix: `Use id '${metadata.id}' or choose a different setup path.`,
+            fix: `使用 id '${metadata.id}' 或选择其他 setup 路径。`,
           }
         );
       }
@@ -772,7 +772,7 @@ export async function registerExistingStore(
       (await isGitRepositoryAtRoot(storeRoot)) &&
       (await gitHasCommits(storeRoot)) === false;
     const emptyCloneHint = isEmptyCloneSuspect
-      ? ' This folder is a Git repository with no commits — if it is a clone, the origin store needs an initial commit before the clone has any files.'
+      ? ' 此文件夹是一个没有提交的 Git 仓库——如果它是克隆，则源 store 需要有初始提交，克隆才能获得任何文件。'
       : '';
 
     throw new StoreError(
@@ -805,7 +805,7 @@ export async function registerExistingStore(
         target: 'store.id',
         fix: registeredElsewhere
           ? `每个 store id 仅支持一个检出，'${metadata.id}' 已注册。请先运行 openspec-cn store unregister ${metadata.id} 再注册此检出。`
-          : `Use --id ${metadata.id} or register a different folder.`,
+          : `使用 --id ${metadata.id} 或注册其他文件夹。`,
       }
     );
   }
@@ -1070,7 +1070,7 @@ async function inspectStore(entry: {
       'Store 位置不存在。',
       {
         target: 'store.root',
-        fix: `Run openspec-cn store register /path/to/${entry.id} --id ${entry.id}.`,
+        fix: `运行 openspec-cn store register /path/to/${entry.id} --id ${entry.id}。`,
       }
     ));
   } else if (kind !== 'directory') {
@@ -1097,7 +1097,7 @@ async function inspectStore(entry: {
           'Store 元数据缺失。',
           {
             target: 'store.metadata',
-            fix: `Create ${metadataPath} or rerun store register.`,
+            fix: `创建 ${metadataPath} 或重新运行 store register。`,
           }
         ));
       } else if (parsed.id !== entry.id) {
@@ -1125,7 +1125,7 @@ async function inspectStore(entry: {
         error,
         'store_metadata_invalid',
         'store.metadata',
-        `Repair ${metadataPath}.`
+        `修复 ${metadataPath}。`
       ));
     }
 

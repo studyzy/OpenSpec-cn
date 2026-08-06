@@ -5,8 +5,18 @@ import ora from 'ora';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { promises as fs } from 'fs';
-import { AI_TOOLS } from '../core/config.js';
+import { AI_TOOLS, TOOL_ID_ALIASES } from '../core/config.js';
 import { UpdateCommand } from '../core/update.js';
+import {
+  getAvailableCliUpdate,
+  displayCliUpdateNote,
+  shouldOfferUpgrade,
+  getInstallDir,
+  offerCliUpgrade,
+  rerunUpdateWithUpgradedCli,
+  displayUpgradeCommand,
+  isSourceCheckout,
+} from '../core/version-check.js';
 import { ListCommand } from '../core/list.js';
 import { ArchiveCommand, type ArchiveOptions } from '../core/archive.js';
 import { ViewCommand } from '../core/view.js';
@@ -27,6 +37,7 @@ import {
   statusCommand,
   instructionsCommand,
   applyInstructionsCommand,
+  archiveInstructionsCommand,
   templatesCommand,
   schemasCommand,
   newChangeCommand,
@@ -39,6 +50,7 @@ import {
 } from '../commands/workflow/index.js';
 import { maybeShowTelemetryNotice, trackCommand, shutdown } from '../telemetry/index.js';
 import { COMMON_FLAGS } from '../core/completions/shared-flags.js';
+import { isInteractive } from '../utils/interactive.js';
 
 const STORE_OPTION_DESCRIPTION = COMMON_FLAGS.store.description;
 
@@ -74,7 +86,7 @@ function failWithError(
   // Resolution and store errors carry a pasteable fix - never drop it.
   const fix = (error as { diagnostic?: { fix?: string } }).diagnostic?.fix;
   if (fix) {
-    console.error(`Fix: ${fix}`);
+    console.error(`修复：${fix}`);
   }
   process.exitCode = process.exitCode ?? 1;
 }
@@ -137,8 +149,13 @@ program.hook('postAction', async () => {
   await shutdown();
 });
 
-const availableToolIds = AI_TOOLS.filter((tool) => tool.skillsDir).map((tool) => tool.value);
-const toolsOptionDescription = `非交互式配置AI工具。使用 "all"、"none" 或逗号分隔的列表：${availableToolIds.join(', ')}`;
+const availableToolIds = AI_TOOLS
+  .filter((tool) => tool.skillsDir || tool.globalSkillsDir)
+  .map((tool) => tool.value);
+const toolAliasNote = Object.entries(TOOL_ID_ALIASES)
+  .map(([retired, current]) => `${retired} (now ${current})`)
+  .join(', ');
+const toolsOptionDescription = `非交互式配置AI工具。使用 "all"、"none" 或逗号分隔的列表：${availableToolIds.join(', ')}。同时接受：${toolAliasNote}`;
 
 program
   .command('init [path]')
@@ -146,7 +163,10 @@ program
   .option('--tools <tools>', toolsOptionDescription)
   .option('--force', '自动清理旧文件而不提示')
   .option('--profile <profile>', '覆盖全局配置档案（core 或 custom）')
-  .action(async (targetPath = '.', options?: { tools?: string; force?: boolean; profile?: string }) => {
+  .option('--no-animation', '显示静态欢迎屏而非动画版')
+  .option('--copilot-cloud', '无需提示直接配置 GitHub Copilot 云端 coding-agent 文件')
+  .option('--no-copilot-cloud', '无需提示跳过 GitHub Copilot 云端 coding-agent 文件')
+  .action(async (targetPath = '.', options?: { tools?: string; force?: boolean; profile?: string; animation?: boolean; copilotCloud?: boolean }) => {
     try {
       // Validate that the path is a valid directory
       const resolvedPath = path.resolve(targetPath);
@@ -172,6 +192,8 @@ program
         tools: options?.tools,
         force: options?.force,
         profile: options?.profile,
+        animation: options?.animation,
+        copilotCloud: options?.copilotCloud,
       });
       await initCommand.execute(targetPath);
     } catch (error) {
@@ -207,8 +229,59 @@ program
   .option('--force', '即使工具已是最新也强制更新')
   .action(async (targetPath = '.', options?: { force?: boolean }) => {
     try {
+      const installDir = getInstallDir();
+      // Running from a clone: the version is whatever the branch says, so any
+      // upgrade advice would be noise. Decided before the request, so a
+      // contributor never waits on an answer that gets thrown away.
+      const latestVersion = isSourceCheckout(installDir) ? null : await getAvailableCliUpdate();
+      const announce = latestVersion !== null;
+      // Offer to upgrade first: this process generates files from its own
+      // templates, so upgrading afterwards would leave the old ones on disk.
+      // Both streams must be a terminal — with stdout redirected the question
+      // lands in the file and the user waits at a blank screen forever.
+      const canOffer =
+        announce &&
+        shouldOfferUpgrade({
+          installDir,
+          projectPath: targetPath,
+          interactive: isInteractive(),
+          stdoutIsTty: Boolean(process.stdout.isTTY),
+        });
+
+      let declined = false;
+      if (latestVersion && canOffer) {
+        displayCliUpdateNote(latestVersion, targetPath, { withCommand: false });
+        const outcome = await offerCliUpgrade(latestVersion);
+
+        // Set the code and return rather than process.exit: exiting here would
+        // skip commander's postAction hook, killing the telemetry flush
+        // mid-request.
+        if (outcome === 'cancelled') {
+          // Ctrl-C means stop the command, not fall through to more prompts.
+          process.exitCode = 130;
+          return;
+        }
+        if (outcome === 'upgraded') {
+          process.exitCode = await rerunUpdateWithUpgradedCli(targetPath, {
+            force: options?.force,
+          });
+          return;
+        }
+        // Declined, failed, or upgraded-but-unreachable: fall through to the
+        // update, then leave the command on screen underneath it.
+        declined = true;
+      }
+
       const updateCommand = new UpdateCommand({ force: options?.force });
       await updateCommand.execute(targetPath);
+
+      if (declined) {
+        // The headline was printed before the prompt; only the manual route is
+        // still owed, and it belongs where the user is looking now.
+        displayUpgradeCommand(targetPath);
+      } else if (latestVersion) {
+        displayCliUpdateNote(latestVersion, targetPath);
+      }
     } catch (error) {
       failWithError(error);
       process.exit(1);
@@ -254,10 +327,19 @@ program
 program
   .command('view')
   .description('显示规范和更改的交互式仪表板')
-  .action(async () => {
+  .option('--store <id>', STORE_OPTION_DESCRIPTION)
+  .addOption(hiddenStorePathOption())
+  .action(async (options?: { store?: string; storePath?: string }) => {
     try {
+      // Implicit cwd fallback stays enabled so `view` keeps accepting the same
+      // directories as `list`/`status` — notably pre-config.yaml `openspec/`
+      // dirs. ViewCommand still reports a missing openspec/ directory itself.
+      const root = await resolveRootForCommand(options ?? {});
+      if (!root) {
+        return;
+      }
       const viewCommand = new ViewCommand();
-      await viewCommand.execute('.');
+      await viewCommand.execute(root.path);
     } catch (error) {
       failWithError(error);
       process.exit(1);
@@ -286,7 +368,7 @@ changeCmd
       const changeCommand = new ChangeCommand();
       await changeCommand.show(changeName, options);
     } catch (error) {
-      console.error(`Error: ${(error as Error).message}`);
+      console.error(`错误：${(error as Error).message}`);
       process.exitCode = 1;
     }
   });
@@ -302,7 +384,7 @@ changeCmd
       const changeCommand = new ChangeCommand();
       await changeCommand.list(options);
     } catch (error) {
-      console.error(`Error: ${(error as Error).message}`);
+      console.error(`错误：${(error as Error).message}`);
       process.exitCode = 1;
     }
   });
@@ -321,7 +403,7 @@ changeCmd
         process.exit(process.exitCode);
       }
     } catch (error) {
-      console.error(`Error: ${(error as Error).message}`);
+      console.error(`错误：${(error as Error).message}`);
       process.exitCode = 1;
     }
   });
@@ -507,7 +589,7 @@ program
 // Instructions command
 program
   .command('instructions [artifact]')
-  .description('输出用于创建产出物或应用任务的丰富指令')
+  .description('输出制品、apply 或 archive 的增强指令')
   .option('--change <id>', '变更名称')
   .option('--schema <name>', 'Schema 覆盖（从 config.yaml 自动检测）')
   .option('--json', '以 JSON 格式输出')
@@ -515,9 +597,11 @@ program
   .addOption(hiddenStorePathOption())
   .action(async (artifactId: string | undefined, options: InstructionsOptions) => {
     try {
-      // Special case: "apply" is not an artifact, but a command to get apply instructions
+      // Workflow instruction surfaces are reserved command branches, not artifacts.
       if (artifactId === 'apply') {
         await applyInstructionsCommand(options);
+      } else if (artifactId === 'archive') {
+        await archiveInstructionsCommand(options);
       } else {
         await instructionsCommand(artifactId, options);
       }

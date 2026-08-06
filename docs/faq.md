@@ -2,7 +2,7 @@
 
 人们最常问的问题的快速解答。如果你的问题其实是"某东西坏了"，[故障排查](troubleshooting.md)是更合适的页面。如果你想查某个术语的定义，见 [术语表](glossary.md)。
 
-## 基础
+No. OpenSpec works with 30+ assistants, including Claude Code, Cursor, Devin Desktop, GitHub Copilot, Gemini CLI, Codex, and more. The full list and per-tool details are in [Supported Tools](supported-tools.md).
 
 ### 用一句话说，OpenSpec 是什么？
 
@@ -16,11 +16,11 @@
 
 不。把它用在对齐重要的地方，也就是大多数非平凡的工作中。对于一个单字符的拼写修正，这套流程可能不值得，那没关系。
 
-### 我能用在大型既有代码库上吗，还是只能用于新项目？
+Most likely you typed it in the terminal instead of your AI chat, you used a spelling your tool doesn't register, or the commands aren't installed yet. If the files are missing — or you never set the tool up — run `openspec init`; `openspec update` only refreshes files that already exist. Then restart your assistant and use the form printed under "Getting started" — see [How To Invoke](supported-tools.md#how-to-invoke). [Troubleshooting](troubleshooting.md#commands-dont-show-up) has the full checklist.
 
 既有代码库正是主战场。OpenSpec 是 brownfield-first（先适配既有项目）的：你不需要在一开始就把整个应用都文档化。你只为每个变更触及的部分写 spec，spec 会围绕你实际做的工作逐渐补全。有一份专门指南：[在既有项目中使用 OpenSpec](existing-projects.md)。
 
-### 它绑定某一个 AI 工具吗？
+Each AI tool surfaces custom commands a little differently, and OpenSpec spells them the way your tool loads the file it wrote. A command file named `opsx-propose.md` is typed `/opsx-propose`; one filed under `commands/opsx/` is typed `/opsx:propose`. Tools that take skills instead of commands use the skill name — Codex needs `$openspec-propose`, Kimi Code `/skill:openspec-propose`. The `openspec init` "Getting started" line already prints the right form for the tools you picked; the full table is in [How To Invoke](supported-tools.md#how-to-invoke).
 
 不。OpenSpec 可用于 25+ 种助手，包括 Claude Code、Cursor、Windsurf、GitHub Copilot、Gemini CLI、Codex 等。完整列表和每种工具的细节见 [支持的工具](supported-tools.md)。
 
@@ -44,7 +44,7 @@
 
 ## 工作流
 
-### 如果我不确定要构建什么，应该从哪里开始？
+A profile decides which slash commands get installed. **Core** (the default) gives you `propose`, `explore`, `apply`, `update`, `sync`, `archive`. The **expanded** set adds `new`, `continue`, `ff`, `verify`, `bulk-archive`, and `onboard` for finer control. Switch with `openspec config profile`, then apply with `openspec update`.
 
 从 `/opsx:explore` 开始。它是一个零风险的思考伙伴，会阅读代码库、列出方案、把模糊的问题变成具体的计划，这一切都发生在任何变更或代码存在之前。它在默认 profile 里，随时可用。当计划清晰了，就交给 `/opsx:propose`。
 
@@ -86,7 +86,7 @@
 
 Spec 描述可观察的行为：系统做什么、输入、输出、错误条件。Design 描述你将如何构建它：技术方法、架构决策、文件改动。如果实现方式变了但对外可见的行为没变，那它就属于 design，不属于 spec。[概念](concepts.md#what-a-spec-is-and-is-not)有更深入的说明。
 
-### 什么是 delta spec？
+To `openspec/changes/archive/YYYY-MM-DD-<name>/`, with all change artifacts preserved. The change moves out of your active list. A change that explicitly declares `retire_capabilities: true` can also delete a main capability spec when it removes that capability's final requirement.
 
 一种只描述正在变化之处的 spec，使用 `ADDED`、`MODIFIED`、`REMOVED` 小节，而不是重述整个 spec。这是让 OpenSpec 能干净地编辑既有系统的机制。详见 [概念](concepts.md#delta-specs)。
 

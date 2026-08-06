@@ -8,7 +8,7 @@ OPSX 用流动的、基于动作的方式取代了旧的、阶段锁定的工作
 
 | 方面 | 旧版 | OPSX |
 |--------|--------|------|
-| **命令** | `/openspec:proposal`、`/openspec:apply`、`/openspec:archive` | 默认:`/opsx:propose`、`/opsx:apply`、`/opsx:sync`、`/opsx:archive`(扩展工作流命令可选) |
+| **命令** | `/openspec:proposal`、`/openspec:apply`、`/openspec:archive` | 默认:`/opsx:propose`、`/opsx:explore`, `/opsx:apply`、`/opsx:update`, `/opsx:sync`、`/opsx:archive`(扩展工作流命令可选) |
 | **工作流** | 一次性创建所有制品 | 增量创建或一次性创建——由你选择 |
 | **回退** | 尴尬的阶段关卡 | 自然——随时更新任何制品 |
 | **自定义** | 固定结构 | schema 驱动,可完全改写 |
@@ -43,11 +43,12 @@ OPSX 用流动的、基于动作的方式取代了旧的、阶段锁定的工作
 
 - Claude Code: `.claude/commands/openspec/`
 - Cursor: `.cursor/commands/openspec-*.md`
-- Windsurf: `.windsurf/workflows/openspec-*.md`
+- Devin Desktop, formerly Windsurf: `.windsurf/workflows/openspec-*.md`
 - Cline: `.clinerules/workflows/openspec-*.md`
 - Roo: `.roo/commands/openspec-*.md`
-- GitHub Copilot: `.github/prompts/openspec-*.prompt.md`(仅 IDE 扩展;Copilot CLI 不支持)
-- 以及其他(Augment、Continue、Amazon Q 等)
+- GitHub Copilot: `.github/prompts/openspec-*.prompt.md` (IDE extensions only; not supported in Copilot CLI)
+- Codex: OpenSpec now uses the canonical `.agents/skills/openspec-*` path. OpenSpec-managed `SKILL.md` files under the former `.codex/skills` path are reconciled only after replacements exist; custom files and divergent copies stay in place. If an unmarked `.agents` tree already contains OpenSpec skills, OpenSpec preserves its existing Codex (`$openspec-*`) or generic (`/openspec-*`) rendering instead of guessing from the legacy directory. Select `codex` explicitly with `openspec init` to switch ownership. Legacy prompt cleanup still targets only OpenSpec's allowlisted filenames in `$CODEX_HOME/prompts` or `~/.codex/prompts`.
+- And others (Augment, Continue, Amazon Q, etc.)
 
 迁移会检测你配置了哪些工具并清理它们的旧版文件。
 
@@ -84,7 +85,7 @@ OPSX 用流动的、基于动作的方式取代了旧的、阶段锁定的工作
 
 `openspec-cn init` 和 `openspec-cn update` 都会检测旧版文件,并引导你完成相同的清理流程。根据你的处境任选其一:
 
-- 全新安装默认使用 profile `core`(`propose`、`explore`、`apply`、`sync`、`archive`)。
+- 全新安装默认使用 profile `core`(`propose`、`explore`、`apply`、`update`, `sync`、`archive`)。
 - 迁移后的安装会在需要时写入 `custom` profile,以保留你之前安装的工作流。
 
 ### 使用 `openspec-cn init`
@@ -155,6 +156,8 @@ openspec-cn init --force --tools claude
 ```
 
 `--force` 标志会跳过提示并自动接受清理。
+
+This includes cleanup of OpenSpec-managed Codex prompt files in the global Codex prompt directory. Cleanup only targets OpenSpec's allowlisted legacy Codex prompt filenames, removes them only after replacement `.agents/skills/openspec-*` skills exist, and preserves all other files.
 
 ---
 
@@ -287,19 +290,20 @@ AI 会帮你识别哪些是必需的、哪些可以精简。
 | `/opsx:propose` | 一步创建变更并生成规划制品 |
 | `/opsx:explore` | 无结构地梳理想法 |
 | `/opsx:apply` | 实现 tasks.md 中的任务 |
+| `/opsx:update` | Revise a change's planning artifacts and keep them coherent |
+| `/opsx:sync` | Merge delta specs into main specs |
 | `/opsx:archive` | 定稿并归档变更 |
 
 **扩展工作流(自定义选择):**
 
 | 命令 | 用途 |
 |---------|---------|
-| `/opsx:new` | 启动一个新的变更脚手架 |
-| `/opsx:continue` | 创建下一个制品(一次一个) |
-| `/opsx:ff` | 快进——一次性创建规划制品 |
-| `/opsx:verify` | 验证实现是否与 specs 匹配 |
-| `/opsx:sync` | 将增量规范(delta spec)合并进主 specs |
-| `/opsx:bulk-archive` | 一次性归档多个变更 |
-| `/opsx:onboard` | 引导式端到端入门工作流 |
+| `/opsx:new` | Start a new change scaffold |
+| `/opsx:continue` | Create the next artifact (one at a time) |
+| `/opsx:ff` | Fast-forward—create planning artifacts at once |
+| `/opsx:verify` | Validate implementation matches specs |
+| `/opsx:bulk-archive` | Archive multiple changes at once |
+| `/opsx:onboard` | Guided end-to-end onboarding workflow |
 
 用 `openspec-cn config profile` 启用扩展命令,然后运行 `openspec-cn update`。
 
@@ -406,6 +410,8 @@ OPSX 使用新兴的 **skills** 标准:
 ```
 
 Skills 被多种 AI 编程工具识别,并提供更丰富的元数据。
+
+Codex is skills-only in OPSX. OpenSpec no longer generates Codex custom prompt files; use the generated `.agents/skills/openspec-*` directories instead.
 
 ---
 
@@ -561,7 +567,9 @@ project/
 │       ├── openspec-propose/     # 默认 core profile
 │       ├── openspec-explore/
 │       ├── openspec-apply-change/
+│       ├── openspec-update-change/
 │       ├── openspec-sync-specs/
+│       ├── openspec-archive-change/
 │       └── ...                   # expanded profile 添加 new/continue/ff 等
 ├── CLAUDE.md                     # OpenSpec 标记已移除,你的内容保留
 └── AGENTS.md                     # OpenSpec 标记已移除,你的内容保留

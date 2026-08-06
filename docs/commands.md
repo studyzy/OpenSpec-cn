@@ -1,8 +1,13 @@
 # 命令参考
 
-这是 OpenSpec 斜杠命令的参考文档。这些命令在你使用的 AI 编程助手的聊天界面中调用(例如 Claude Code、Cursor、Windsurf)。
+This is the reference for OpenSpec's slash commands. These commands are invoked in your AI coding assistant's chat interface (e.g., Claude Code, Cursor, Devin Desktop).
 
 关于工作流模式以及何时使用各命令,见 [Workflows](workflows.md)。CLI 命令见 [CLI](cli.md)。
+
+These pages use `/opsx:<command>` as the canonical name. Some tools spell it
+differently — Cursor and GitHub Copilot register `/opsx-propose`, Codex uses
+`$openspec-propose` — so check [How To Invoke](supported-tools.md#how-to-invoke)
+for your tool. The files OpenSpec generates already use the right form.
 
 ## 快速参考
 
@@ -205,7 +210,7 @@ AI:  Change: add-dark-mode
      ✓ proposal    (done)
      ◆ specs       (ready)
      ◆ design      (ready)
-     ○ tasks       (blocked - needs: specs)
+     ○ tasks       (blocked - needs: specs, design)
 
      Creating specs...
 
@@ -213,7 +218,7 @@ AI:  Change: add-dark-mode
 
      ✓ Created openspec/changes/add-dark-mode/specs/ui/spec.md
 
-     Now available: tasks
+     Now available: design
      Run /opsx:continue to create the next artifact.
 ```
 
@@ -664,17 +669,20 @@ AI:  Welcome to OpenSpec!
 
 不同的 AI 工具使用略有不同的命令语法。使用与你的工具匹配的格式:
 
-| 工具 | 语法示例 |
-|------|----------------|
-| Claude Code | `/opsx:propose`, `/opsx:apply` |
-| Cursor | `/opsx-propose`, `/opsx-apply` |
-| Windsurf | `/opsx-propose`, `/opsx-apply` |
-| Copilot (IDE) | `/opsx-propose`, `/opsx-apply` |
-| Oh My Pi | `/opsx-propose`, `/opsx-apply` |
-| Kimi CLI | 基于 skill 的调用,如 `/skill:openspec-propose`、`/skill:openspec-apply-change`(不生成 `opsx-*` 命令文件) |
-| Trae | `/opsx-propose`, `/opsx-apply` |
+| Your tool's command file | Syntax example | Example tools |
+|--------------------------|----------------|---------------|
+| `.../commands/opsx/<id>.*` | `/opsx:propose`, `/opsx:apply` | Claude Code, Gemini CLI, Crush |
+| `.../opsx-<id>.*` | `/opsx-propose`, `/opsx-apply` | Cursor, Devin Desktop, Copilot (IDE), Trae, Oh My Pi |
+| none — skills only | `/openspec-propose`, `/openspec-apply-change` | CodeArts, ForgeCode, Hermes, MiniMax Code, Mistral Vibe, shared `.agents` |
+| none — Kimi Code | `/skill:openspec-propose` | Kimi Code |
+| none — Codex CLI | `$openspec-propose` | Codex |
 
-意图在各工具间相同,但命令如何呈现可能因集成而异。
+> **Devin Desktop vs Devin Local:** the `.devin/workflows/opsx-*.md` files give
+> Devin Desktop `/opsx-propose`. Devin Local has no workflows — use the skills
+> OpenSpec writes to `.devin/skills/`, e.g. `/openspec-propose`, which work on
+> both agents.
+
+The intent is the same across tools, but how commands are surfaced can differ by integration. [How To Invoke](supported-tools.md#how-to-invoke) lists every supported tool; this table shows only examples of each shape.
 
 > **注意:** GitHub Copilot 命令(`.github/prompts/*.prompt.md`)仅在 IDE 扩展(VS Code、JetBrains、Visual Studio)中可用。GitHub Copilot CLI 目前不支持自定义 prompt 文件——详见 [Supported Tools](supported-tools.md)。
 

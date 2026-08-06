@@ -423,7 +423,14 @@ describe('standalone store lifecycle journey', () => {
       { env: machineB, cwd: base }
     );
     expect(status.exitCode).toBe(0);
-    expect(status.stdout).toContain('所有产出物已完成！');
+    expect(status.stdout).toContain('所有规划制品已完成！');
+
+    const statusJson = await runCLI(
+      ['status', '--change', changeId, '--store', STORE_ID, '--json'],
+      { env: machineB, cwd: base }
+    );
+    expect(statusJson.exitCode).toBe(0);
+    expect(JSON.parse(statusJson.stdout).nextSteps[0]).toContain(`--store ${STORE_ID}`);
 
     const validated = await runCLI(
       ['validate', changeId, '--store', STORE_ID],

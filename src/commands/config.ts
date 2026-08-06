@@ -1,5 +1,5 @@
 import { Command } from 'commander';
-import { spawn, execSync } from 'node:child_process';
+import { spawn } from 'node:child_process';
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import {
@@ -16,13 +16,15 @@ import {
   coerceValue,
   formatValueYaml,
   validateConfigKeyPath,
+  hasUnsafeKeySegment,
   validateConfig,
   DEFAULT_CONFIG,
 } from '../core/config-schema.js';
 import { CORE_WORKFLOWS, ALL_WORKFLOWS, getProfileWorkflows } from '../core/profiles.js';
 import { OPENSPEC_DIR_NAME } from '../core/config.js';
 import { hasProjectConfigDrift } from '../core/profile-sync-drift.js';
-import { isPromptCancellationError } from './shared-output.js';
+import { UpdateCommand } from '../core/update.js';
+import { asErrorMessage, isPromptCancellationError } from './shared-output.js';
 
 type ProfileAction = 'both' | 'delivery' | 'workflows' | 'keep';
 
@@ -295,11 +297,15 @@ export function registerConfigCommand(program: Command): void {
     .action((key: string, value: string, options: { string?: boolean; allowUnknown?: boolean }) => {
       const allowUnknown = Boolean(options.allowUnknown);
       const keyValidation = validateConfigKeyPath(key);
-      if (!keyValidation.valid && !allowUnknown) {
+      // --allow-unknown relaxes the known-key check, but never the prototype-safety check.
+      const unsafeKey = hasUnsafeKeySegment(key);
+      if (!keyValidation.valid && (!allowUnknown || unsafeKey)) {
         const reason = keyValidation.reason ? ` ${keyValidation.reason}。` : '';
         console.error(`错误：无效的配置键 "${key}"。${reason}`);
         console.error('使用 "openspec-cn config list" 查看可用的键。');
-        console.error('传递 --allow-unknown 可跳过此检查。');
+        if (!allowUnknown && !unsafeKey) {
+          console.error('传递 --allow-unknown 可跳过此检查。');
+        }
         process.exitCode = 1;
         return;
       }
@@ -486,10 +492,10 @@ export function registerConfigCommand(program: Command): void {
         const currentState = resolveCurrentProfileState(config);
 
         console.log(chalk.bold('\n当前档案设置'));
-        console.log(`  Delivery: ${currentState.delivery}`);
-        console.log(`  Workflows: ${formatWorkflowSummary(currentState.workflows, currentState.profile)}`);
-        console.log(chalk.dim('  Delivery = 工作流的安装位置（skills、命令或两者）'));
-        console.log(chalk.dim('  Workflows = 可用的工作流动作（propose、explore、apply 等）'));
+        console.log(`  交付方式: ${currentState.delivery}`);
+        console.log(`  工作流: ${formatWorkflowSummary(currentState.workflows, currentState.profile)}`);
+        console.log(chalk.dim('  交付方式 = 工作流的安装位置（skills、命令或两者）'));
+        console.log(chalk.dim('  工作流 = 可用的工作流动作（propose、explore、apply 等）'));
         console.log();
 
         const action = await select<ProfileAction>({
@@ -621,10 +627,11 @@ export function registerConfigCommand(program: Command): void {
 
           if (applyNow) {
             try {
-              execSync('npx openspec-cn update', { stdio: 'inherit', cwd: projectDir });
-              console.log('请在其他项目中运行 `openspec-cn update` 来应用。');
-            } catch {
-              console.error('`openspec-cn update` 失败。请手动运行以应用档案变更。');
+              await new UpdateCommand().execute(projectDir);
+              console.log('请在您的其他项目中运行 `openspec-cn update` 来应用。');
+            } catch (error) {
+              console.error(`\`openspec-cn update\` 失败：${asErrorMessage(error)}`);
+              console.error('请手动运行以应用档案变更。');
               process.exitCode = 1;
             }
             return;

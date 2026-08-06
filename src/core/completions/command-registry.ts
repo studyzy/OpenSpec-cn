@@ -23,6 +23,18 @@ export const COMMAND_REGISTRY: CommandDefinition[] = [
         takesValue: true,
         values: ['core', 'custom'],
       },
+      {
+        name: 'no-animation',
+        description: '显示静态欢迎屏而非动画版',
+      },
+      {
+        name: 'copilot-cloud',
+        description: '生成 GitHub Copilot 云端 coding-agent 文件（需主动选择；默认：提示确认）',
+      },
+      {
+        name: 'no-copilot-cloud',
+        description: '跳过生成 GitHub Copilot 云端 coding-agent 文件',
+      },
     ],
   },
   {
@@ -63,7 +75,9 @@ export const COMMAND_REGISTRY: CommandDefinition[] = [
   {
     name: 'view',
     description: '显示规范和更改的交互式仪表板',
-    flags: [],
+    flags: [
+      COMMON_FLAGS.store,
+    ],
   },
   {
     name: 'validate',
@@ -178,7 +192,7 @@ export const COMMAND_REGISTRY: CommandDefinition[] = [
   },
   {
     name: 'instructions',
-    description: '输出用于创建产出物或应用任务的丰富指令',
+    description: '输出制品、apply 或 archive 的增强指令',
     acceptsPositional: true,
     positionals: [{ name: 'artifact', optional: true }],
     flags: [
@@ -288,7 +302,7 @@ export const COMMAND_REGISTRY: CommandDefinition[] = [
         flags: [
           {
             name: 'id',
-            description: 'Store id',
+            description: 'Store ID',
             takesValue: true,
           },
           {
