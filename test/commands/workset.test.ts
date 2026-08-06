@@ -564,10 +564,10 @@ describe('openspec workset (7.1)', () => {
 
       expect(unavailable.exitCode).toBe(1);
       expect(unavailable.stderr).toContain(
-        "Error: Cursor（'cursor'）不在 PATH 中。"
+        "错误：Cursor（'cursor'）不在 PATH 中。"
       );
       expect(unavailable.stderr).toContain(
-        "Fix: 安装 'cursor' 或运行：openspec-cn workset open platform --tool code"
+        "修复：安装 'cursor' 或运行：openspec-cn workset open platform --tool code"
       );
       expect(unavailable.stderr).toContain('手动打开：');
       const generated = getWorksetCodeWorkspacePath('platform', pathOptions());
@@ -757,7 +757,7 @@ describe('openspec workset (7.1)', () => {
       expect(result.exitCode).toBe(1);
       expect(result.stderr).toContain('无法启动 Claude Code');
       expect(result.stderr).toContain(
-        'Fix: 运行：openspec-cn workset open platform --tool code'
+        '修复：运行：openspec-cn workset open platform --tool code'
       );
       expect(result.stderr).toContain('手动打开：');
     });
@@ -1054,7 +1054,7 @@ describe('interactive compose cancellation (in-process)', () => {
     });
 
     expect(process.exitCode).toBe(1);
-    expect(errorSpy).toHaveBeenCalledWith('Error: Workset 删除已取消。');
+    expect(errorSpy).toHaveBeenCalledWith('错误：Workset 删除已取消。');
     expect(
       fs.existsSync(
         path.join(process.env.XDG_DATA_HOME!, 'openspec', 'worksets', 'worksets.yaml')

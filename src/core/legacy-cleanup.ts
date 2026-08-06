@@ -622,17 +622,17 @@ export function formatCleanupSummary(result: CleanupResult): string {
       const replacementLabel = result.deletedFileReplacementLabels?.[file]
         ?? getManagedGlobalLegacyPromptMetadata(file)?.replacementLabel;
       const replacement = replacementLabel
-        ? ` (replaced by ${replacementLabel})`
+        ? `（已由 ${replacementLabel} 取代）`
         : '';
-      lines.push(`  ✓ Removed ${file}${replacement}`);
+      lines.push(`  ✓ 已移除 ${file}${replacement}`);
     }
 
     for (const dir of result.deletedDirs) {
-      lines.push(`  ✓ Removed ${dir}/ (replaced by OpenSpec skills and commands)`);
+      lines.push(`  ✓ 已移除 ${dir}/（已由 OpenSpec skills 与命令取代）`);
     }
 
     for (const file of result.modifiedFiles) {
-      lines.push(`  ✓ Removed OpenSpec markers from ${file}`);
+      lines.push(`  ✓ 已从 ${file} 移除 OpenSpec 标记`);
     }
   }
 
@@ -671,25 +671,25 @@ function buildRemovalsList(detection: LegacyDetectionResult): Array<{ path: stri
   for (const dir of detection.slashCommandDirs) {
     // Split on both forward and backward slashes for Windows compatibility
     const toolDir = dir.split(/[\/\\]/)[0];
-    removals.push({ path: dir + '/', explanation: `replaced by ${toolDir}/skills/` });
+    removals.push({ path: dir + '/', explanation: `已由 ${toolDir}/skills/ 取代` });
   }
 
   // Slash command files (these are 100% OpenSpec-managed)
   for (const file of detection.slashCommandFiles) {
-    removals.push({ path: file, explanation: 'replaced by skills/' });
+    removals.push({ path: file, explanation: '已由 skills/ 取代' });
   }
 
   // Managed global slash command files
   for (const prompt of getLegacyGlobalPromptMatches(detection)) {
     const explanation = prompt.toolId
-      ? `replaced by .${prompt.toolId}/skills/`
-      : 'replaced by skills/';
+      ? `已由 .${prompt.toolId}/skills/ 取代`
+      : '已由 skills/ 取代';
     removals.push({ path: prompt.path, explanation });
   }
 
   // openspec/AGENTS.md (inside openspec/, it's OpenSpec-managed)
   if (detection.hasOpenspecAgents) {
-    removals.push({ path: 'openspec/AGENTS.md', explanation: 'obsolete workflow file' });
+    removals.push({ path: 'openspec/AGENTS.md', explanation: '已废弃的工作流文件' });
   }
 
   // Note: Config files (CLAUDE.md, AGENTS.md, etc.) are NEVER in the removals list
@@ -710,7 +710,7 @@ function buildUpdatesList(detection: LegacyDetectionResult): Array<{ path: strin
 
   // All config files with markers get updated (markers removed, file preserved)
   for (const file of detection.configFilesToUpdate) {
-    updates.push({ path: file, explanation: 'removing OpenSpec markers' });
+    updates.push({ path: file, explanation: '移除 OpenSpec 标记' });
   }
 
   return updates;
@@ -937,13 +937,13 @@ export function formatProjectMdMigrationHint(): string {
   const lines: string[] = [];
   lines.push(chalk.yellow.bold('需要您注意'));
   lines.push('  • openspec/project.md');
-  lines.push(chalk.dim('    We won\'t delete this file. It may contain useful project context.'));
+  lines.push(chalk.dim('    我们不会删除此文件。它可能包含有用的项目上下文。'));
   lines.push('');
-  lines.push(chalk.dim('    The new openspec/config.yaml has a "context:" section for planning'));
-  lines.push(chalk.dim('    context. This is included in every OpenSpec request and works more'));
-  lines.push(chalk.dim('    reliably than the old project.md approach.'));
+  lines.push(chalk.dim('    新的 openspec/config.yaml 有一个 "context:" 章节用于存放规划'));
+  lines.push(chalk.dim('    上下文。它会被包含进每一次 OpenSpec 请求，比旧的 project.md'));
+  lines.push(chalk.dim('    方式更可靠。'));
   lines.push('');
-  lines.push(chalk.dim('    Review project.md, move any useful content to config.yaml\'s context'));
-  lines.push(chalk.dim('    section, then delete the file when ready.'));
+  lines.push(chalk.dim('    请检查 project.md，把有用的内容移到 config.yaml 的 context'));
+  lines.push(chalk.dim('    章节，然后在合适的时候删除该文件。'));
   return lines.join('\n');
 }

@@ -11,7 +11,7 @@ metadata:
 
 快速推进产出物创建 - 一次性生成开始实现所需的所有内容。
 
-**存储选择：** 若用户指定了一个存储（存储是注册在本机上的独立 OpenSpec 仓库）或工作位于某个存储中，请运行 `openspec store list --json` 发现已注册的存储 ID，然后在读写 spec 和变更的命令上传递 `--store <id>`（`new change`、`status`、`instructions`、`list`、`show`、`validate`、`archive`、`doctor`、`context`、`view`）。选定后，将 `--store <id>` 视为在当前工作流其余部分中固定不变。以下每个未限定范围的命令示例均为简写形式：运行前请追加该标志。例如，运行 `openspec status --change "<name>" --json --store "<id>"`，而非下面展示的未限定形式。其他命令不接受此标志。命令输出的提示已包含该标志；在后续操作中请保留它。若不指定存储，命令将对最近的本地 `openspec/` 根目录生效。
+**存储选择：** 若用户指定了一个存储（存储是注册在本机上的独立 OpenSpec 仓库）或工作位于某个存储中，请运行 `openspec-cn store list --json` 发现已注册的存储 ID，然后在读写 spec 和变更的命令上传递 `--store <id>`（`new change`、`status`、`instructions`、`list`、`show`、`validate`、`archive`、`doctor`、`context`、`view`）。选定后，将 `--store <id>` 视为在当前工作流其余部分中固定不变。以下每个未限定范围的命令示例均为简写形式：运行前请追加该标志。例如，运行 `openspec-cn status --change "<name>" --json --store "<id>"`，而非下面展示的未限定形式。其他命令不接受此标志。命令输出的提示已包含该标志；在后续操作中请保留它。若不指定存储，命令将对最近的本地 `openspec/` 根目录生效。
 
 **输入**：用户的请求应当包含变更名（kebab-case）或对想要构建内容的描述。
 
@@ -67,12 +67,12 @@ metadata:
       - 显示简要进度："已创建 <artifact-id>"
 
    b. **持续创建直到所需集合中的每个产出物都存在（不仅仅是 `apply.requires`）**
-      - 创建每个产出物后，重新运行 `openspec status --change "<name>" --json`
+      - 创建每个产出物后，重新运行 `openspec-cn status --change "<name>" --json`
       - 所需集合是 `applyRequires` 加上通过跟踪 `status --json` 中的 `requires` 边从这些产出物可达的每个产出物 - 传递地遍历它们（spec-driven 涵盖 proposal、specs、design、tasks）。不要触碰此集合之外的产出物
       - `status` 仅基于文件存在性，因此一个显示 `done` 的 `applyRequires` 产出物并不意味着其依赖项存在 - 过早写入 `tasks.md` 会标记 `tasks` 为 done，但 `specs` 从未写入。使用每个产出物的 `requires` 边而非其 `status` 来构建所需集合：一个 `done` 产出物仍然列出其依赖项
       - 已显示 `status: "skipped"` 的产出物即已满足：变更在 `.openspec.yaml` 中声明了 `skip_specs`，因此其文件必须不存在。永远不要尝试创建它
       - 创建所需集合中缺失的每个产出物，然后重新检查 - 创建一个可能会解锁其他产出物
-      - 仅当 `status` 已报告为 `skipped`，或其自身 `instruction` 表明是条件性的时才跳过：运行 `openspec instructions <artifact-id> --change "<name>" --json`，仅当其 `instruction` 字段标记为可选时才跳过（例如 "create only if..."）。spec-driven 的 `design.md` 符合此条件；`specs` 仅通过上述 `skipped` 状态符合，绝不能凭你的判断。告知用户，且不要重新考虑
+      - 仅当 `status` 已报告为 `skipped`，或其自身 `instruction` 表明是条件性的时才跳过：运行 `openspec-cn instructions <artifact-id> --change "<name>" --json`，仅当其 `instruction` 字段标记为可选时才跳过（例如 "create only if..."）。spec-driven 的 `design.md` 符合此条件；`specs` 仅通过上述 `skipped` 状态符合，绝不能凭你的判断。告知用户，且不要重新考虑
       - 依赖项是使能因素而非关卡：若一个必需产出物仍 `blocked` 仅因为你跳过了条件性依赖项，照样写入
       - 当所需集合中的每个产出物为 `done`、`skipped` 或已被有意跳过时停止
 
@@ -95,7 +95,7 @@ After completing all artifacts, summarize:
 
 **产出物创建指南**
 
-- 遵循来自 `openspec instructions` 每个制品类型输出中的 `instruction` 字段 — 它是权威指导，即使产出物名称熟悉
+- 遵循来自 `openspec-cn instructions` 每个制品类型输出中的 `instruction` 字段 — 它是权威指导，即使产出物名称熟悉
 - 若 `instruction` 字段指示你使用特定 skill 或命令创建产出物，则调用它而非直接写入产出物
 - The schema defines what each artifact should contain - follow it
 - Read dependency artifacts for context before creating new ones

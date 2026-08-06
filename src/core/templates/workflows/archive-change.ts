@@ -26,7 +26,7 @@ ${STORE_SELECTION_GUIDANCE}
    若提供了名称，使用它。否则：
    - 从对话上下文推断（若用户提到了某个变更）
    - 若仅有一个活跃变更则自动选择
-   - 若存在歧义，运行 \`openspec list --json\` 获取可用变更并让用户选择
+   - 若存在歧义，运行 \`openspec-cn list --json\` 获取可用变更并让用户选择
 
    提示时，仅显示活跃变更（非已归档）。
    若可用，包含每个变更使用的 schema。
@@ -37,7 +37,7 @@ ${STORE_SELECTION_GUIDANCE}
 
    After resolving the selected change and planning root, run:
    \`\`\`bash
-   openspec instructions archive --change "<name>" --json
+   openspec-cn instructions archive --change "<name>" --json
    \`\`\`
    Keep the same selected-root flags on this command. This lookup is advisory and
    optional: it only supplies extra prompt inputs, so it must never block archiving.
@@ -108,7 +108,7 @@ ${STORE_SELECTION_GUIDANCE}
    - Anything else — ask again rather than archiving
 
    Before a selected sync writes any main spec, run
-   \`openspec instructions specs --change "<name>" --json\` once with the same
+   \`openspec-cn instructions specs --change "<name>" --json\` once with the same
    selected-root flags. Require a zero exit status and valid artifact-instruction
    JSON. If the lookup fails or returns invalid JSON, report the error and stop
    before writing any main spec or moving the change. 省略 \`rules\` 的有效响应表示未配置制品规则
@@ -131,7 +131,7 @@ ${STORE_SELECTION_GUIDANCE}
    mkdir -p "<planningHome.changesDir>/archive"
    \`\`\`
 
-   Generate the target name: 若变更名已以 \`YYYY-MM-DD-\` 前缀开头则保持原样；否则将当前日期前置为 \`YYYY-MM-DD-<change-name>\`。绝不叠加第二个日期（与 \`openspec archive\` 相同的规则）。
+   Generate the target name: 若变更名已以 \`YYYY-MM-DD-\` 前缀开头则保持原样；否则将当前日期前置为 \`YYYY-MM-DD-<change-name>\`。绝不叠加第二个日期（与 \`openspec-cn archive\` 相同的规则）。
 
    **检查目标是否已存在：**
    - 是：报错失败，建议重命名现有归档或使用不同日期
@@ -165,7 +165,7 @@ ${STORE_SELECTION_GUIDANCE}
 
 **Guardrails**
 - Announce the selected change; prompt for selection when it is ambiguous
-- Use artifact graph (openspec status --json) for completion checking
+- Use artifact graph (openspec-cn status --json) for completion checking
 - Don't block archive on warnings - just inform and confirm
 - Preserve .openspec.yaml when moving to archive (it moves with the directory)
 - Show clear summary of what happened
@@ -204,7 +204,7 @@ ${STORE_SELECTION_GUIDANCE}
    若提供了名称，使用它。否则：
    - 从对话上下文推断（若用户提到了某个变更）
    - 若仅有一个活跃变更则自动选择
-   - 若存在歧义，运行 \`openspec list --json\` 获取可用变更并让用户选择
+   - 若存在歧义，运行 \`openspec-cn list --json\` 获取可用变更并让用户选择
 
    提示时，仅显示活跃变更（非已归档）。
    若可用，包含每个变更使用的 schema。
@@ -215,7 +215,7 @@ ${STORE_SELECTION_GUIDANCE}
 
    After resolving the selected change and planning root, run:
    \`\`\`bash
-   openspec instructions archive --change "<name>" --json
+   openspec-cn instructions archive --change "<name>" --json
    \`\`\`
    Keep the same selected-root flags on this command. This lookup is advisory and
    optional: it only supplies extra prompt inputs, so it must never block archiving.
@@ -286,7 +286,7 @@ ${STORE_SELECTION_GUIDANCE}
    - Anything else — ask again rather than archiving
 
    Before a selected sync writes any main spec, run
-   \`openspec instructions specs --change "<name>" --json\` once with the same
+   \`openspec-cn instructions specs --change "<name>" --json\` once with the same
    selected-root flags. Require a zero exit status and valid artifact-instruction
    JSON. If the lookup fails or returns invalid JSON, report the error and stop
    before writing any main spec or moving the change. 省略 \`rules\` 的有效响应表示未配置制品规则
@@ -309,7 +309,7 @@ ${STORE_SELECTION_GUIDANCE}
    mkdir -p "<planningHome.changesDir>/archive"
    \`\`\`
 
-   Generate the target name: 若变更名已以 \`YYYY-MM-DD-\` 前缀开头则保持原样；否则将当前日期前置为 \`YYYY-MM-DD-<change-name>\`。绝不叠加第二个日期（与 \`openspec archive\` 相同的规则）。
+   Generate the target name: 若变更名已以 \`YYYY-MM-DD-\` 前缀开头则保持原样；否则将当前日期前置为 \`YYYY-MM-DD-<change-name>\`。绝不叠加第二个日期（与 \`openspec-cn archive\` 相同的规则）。
 
    **检查目标是否已存在：**
    - 是：报错失败，建议重命名现有归档或使用不同日期
@@ -390,7 +390,7 @@ ${STORE_SELECTION_GUIDANCE}
 
 **Guardrails**
 - Announce the selected change; prompt for selection when it is ambiguous
-- Use artifact graph (openspec status --json) for completion checking
+- Use artifact graph (openspec-cn status --json) for completion checking
 - Don't block archive on warnings - just inform and confirm
 - Preserve .openspec.yaml when moving to archive (it moves with the directory)
 - Show clear summary of what happened

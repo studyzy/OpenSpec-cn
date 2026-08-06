@@ -1721,7 +1721,7 @@ metadata:
       await updateCommand.execute(testDir);
 
       await expect(fs.readFile(setupStepsPath, 'utf8')).resolves.toContain('copilot-setup-steps:');
-      await expect(fs.readFile(agentPath, 'utf8')).resolves.toContain('# OpenSpec Agent');
+      await expect(fs.readFile(agentPath, 'utf8')).resolves.toContain('# OpenSpec 智能体');
     });
 
     it('should refresh managed legacy Copilot files and preserve custom files during force update', async () => {
@@ -1819,7 +1819,7 @@ metadata:
       await updateCommand.execute(testDir);
 
       expect(warnSpy).toHaveBeenCalledWith(
-        expect.stringContaining('failed to sync Copilot cloud agent files')
+        expect.stringContaining('同步 Copilot 云端 agent 文件失败')
       );
     });
 
@@ -2103,7 +2103,7 @@ ${OPENSPEC_MARKERS.end}
 
       // Should show marker removal message (config files are never deleted, only have markers removed)
       expect(consoleSpy).toHaveBeenCalledWith(
-        expect.stringContaining('Removed OpenSpec markers from CLAUDE.md')
+        expect.stringContaining('已从 CLAUDE.md 移除 OpenSpec 标记')
       );
 
       // Config file should still exist (never deleted)
@@ -2158,7 +2158,7 @@ ${OPENSPEC_MARKERS.end}
         expect.stringContaining(`codex: ${managedPrompt}`)
       );
       expect(consoleSpy).toHaveBeenCalledWith(
-        expect.stringContaining(`Removed ${managedPrompt} (replaced by Codex skills)`)
+        expect.stringContaining(`已移除 ${managedPrompt}（已由 Codex skills 取代）`)
       );
       expect(await FileSystemUtils.fileExists(managedPrompt)).toBe(false);
       expect(await FileSystemUtils.fileExists(legacyPrompt)).toBe(true);
@@ -2386,7 +2386,7 @@ ${OPENSPEC_MARKERS.end}
 
       // Should show cleanup message for directory
       expect(consoleSpy).toHaveBeenCalledWith(
-        expect.stringContaining('Removed .claude/commands/openspec/')
+        expect.stringContaining('已移除 .claude/commands/openspec/')
       );
 
       // Legacy directory should be deleted
@@ -2421,7 +2421,7 @@ ${OPENSPEC_MARKERS.end}
 
       // Should show cleanup message
       expect(consoleSpy).toHaveBeenCalledWith(
-        expect.stringContaining('Removed openspec/AGENTS.md')
+        expect.stringContaining('已移除 openspec/AGENTS.md')
       );
 
       // Legacy file should be deleted
@@ -2494,7 +2494,7 @@ More user content after markers.
 
       // Should show marker removal message
       expect(consoleSpy).toHaveBeenCalledWith(
-        expect.stringContaining('Removed OpenSpec markers from CLAUDE.md')
+        expect.stringContaining('已从 CLAUDE.md 移除 OpenSpec 标记')
       );
 
       // File should still exist
@@ -2630,7 +2630,7 @@ More user content after markers.
 
       // Legacy cleanup should happen
       expect(consoleSpy).toHaveBeenCalledWith(
-        expect.stringContaining('Removed .claude/commands/openspec/')
+        expect.stringContaining('已移除 .claude/commands/openspec/')
       );
 
       // Should NOT show "从旧版制品中检测到的工具" because claude is already configured

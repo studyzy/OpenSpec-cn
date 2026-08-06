@@ -66,7 +66,7 @@ describe('worksets core', () => {
     it('accepts kebab names and rejects everything else', () => {
       expect(validateWorksetName('platform-2')).toBe('platform-2');
       expect(() => validateWorksetName('My Stuff')).toThrowError(
-        /must be kebab-case/
+        /必须是 kebab-case/
       );
       try {
         validateWorksetName('My Stuff');
@@ -80,10 +80,10 @@ describe('worksets core', () => {
     it('rejects empty, dotted, and separator-bearing labels', () => {
       expect(memberLabelProblem('web-app')).toBeNull();
       expect(memberLabelProblem('Web App')).toBeNull();
-      expect(memberLabelProblem('')).toMatch(/must not be empty/);
-      expect(memberLabelProblem('.')).toMatch(/must not be '\.'/);
-      expect(memberLabelProblem('a/b')).toMatch(/path separators/);
-      expect(memberLabelProblem('a\\b')).toMatch(/path separators/);
+      expect(memberLabelProblem('')).toMatch(/不能为空/);
+      expect(memberLabelProblem('.')).toMatch(/不能是 '\.'/);
+      expect(memberLabelProblem('a/b')).toMatch(/路径分隔符/);
+      expect(memberLabelProblem('a\\b')).toMatch(/路径分隔符/);
     });
 
     it('rejects empty lists, duplicate labels, and relative paths', () => {
@@ -127,7 +127,7 @@ describe('worksets core', () => {
         },
         {
           content: `version: 1\nworksets:\n  Bad Name:\n    members:\n      - name: a\n        path: ${tempDir}\n`,
-          problem: /must be kebab-case/,
+          problem: /必须是 kebab-case/,
         },
         {
           content: 'version: 1\nworksets:\n  empty:\n    members: []\n',

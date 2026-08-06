@@ -40,12 +40,12 @@ async function resolveMemberFlag(raw: string): Promise<WorksetMember> {
   const rawPath = separator > 0 ? raw.slice(separator + 1) : raw;
 
   if (rawPath.length === 0) {
-    throw memberInvalidError(`'${raw}' has no path`);
+    throw memberInvalidError(`'${raw}' 没有指定路径`);
   }
 
   const resolvedPath = path.resolve(expandUserPath(rawPath));
   if (!(await pathIsDirectory(resolvedPath))) {
-    throw memberInvalidError(`'${rawPath}' is not an existing folder`);
+    throw memberInvalidError(`'${rawPath}' 不是一个已存在的文件夹`);
   }
 
   const name = label ?? path.basename(resolvedPath);

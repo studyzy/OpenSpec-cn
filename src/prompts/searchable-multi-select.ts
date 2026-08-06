@@ -129,7 +129,7 @@ async function createSearchableMultiSelect(): Promise<
       const names = selectedValues
         .map((v) => choiceMap.get(v)?.name ?? v)
         .join(', ');
-      return `${prefix} ${chalk.bold(message)} ${chalk.cyan(names || '(none)')}`;
+      return `${prefix} ${chalk.bold(message)} ${chalk.cyan(names || '（无）')}`;
     }
 
     // Render active state
@@ -142,22 +142,22 @@ async function createSearchableMultiSelect(): Promise<
         ? selectedValues
             .map((v) => chalk.bgCyan.black(` ${choiceMap.get(v)?.name} `))
             .join(' ')
-        : chalk.dim('(none selected)');
-    lines.push(`  Selected: ${chips}`);
+        : chalk.dim('（未选择）');
+    lines.push(`  已选择：${chips}`);
 
     // Search box
     lines.push(
-      `  Search: ${chalk.yellow('[')}${searchText || chalk.dim('type to filter')}${chalk.yellow(']')}`
+      `  搜索：${chalk.yellow('[')}${searchText || chalk.dim('输入以筛选')}${chalk.yellow(']')}`
     );
 
     // Instructions
     lines.push(
-      `  ${chalk.cyan('↑↓')} navigate • ${chalk.cyan('Space')} toggle • ${chalk.cyan('Backspace')} remove • ${chalk.cyan('Enter')} confirm`
+      `  ${chalk.cyan('↑↓')} 移动 • ${chalk.cyan('Space')} 切换选中 • ${chalk.cyan('Backspace')} 移除 • ${chalk.cyan('Enter')} 确认`
     );
 
     // List
     if (filteredChoices.length === 0) {
-      lines.push(chalk.yellow('  No matches'));
+      lines.push(chalk.yellow('  无匹配项'));
     } else {
       // Calculate pagination
       const startIndex = Math.max(
@@ -178,13 +178,13 @@ async function createSearchableMultiSelect(): Promise<
         const isRefresh = selected && item.configured;
         const statusLabel = !selected
           ? item.configured
-            ? ' (configured)'
+            ? ' （已配置）'
             : item.detected
-              ? ' (detected)'
+              ? ' （已检测到）'
               : ''
           : '';
         const suffix = selected
-          ? chalk.dim(isRefresh ? ' (refresh)' : ' (selected)')
+          ? chalk.dim(isRefresh ? ' （刷新）' : ' （已选择）')
           : chalk.dim(statusLabel);
         lines.push(`  ${arrow} ${icon} ${name}${suffix}`);
       }

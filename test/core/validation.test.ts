@@ -473,7 +473,7 @@ Then result`;
 
       expect(report.valid).toBe(false);
       const msg = report.issues.map((i) => i.message).join('\n');
-      expect(msg).toContain('Requirement present in both RENAMED and REMOVED: "Old name"');
+      expect(msg).toContain('需求同时存在于 RENAMED 和 REMOVED： "Old name"');
     });
 
     it('rejects a case/whitespace variant of the renamed FROM header in REMOVED', async () => {
@@ -501,8 +501,8 @@ Then result`;
 
       expect(report.valid).toBe(false);
       const msg = report.issues.map((i) => i.message).join('\n');
-      expect(msg).toContain('Requirement present in both RENAMED and REMOVED: "Old Name"');
-      expect(msg).toContain('(REMOVED spells it "old   name")');
+      expect(msg).toContain('需求同时存在于 RENAMED 和 REMOVED： "Old Name"');
+      expect(msg).toContain('（REMOVED 中写作 "old   name"）');
     });
 
     it('should validate requirement with metadata before SHALL/MUST text', async () => {
@@ -589,7 +589,7 @@ The system SHALL record request metrics.
 
       expect(report.valid).toBe(false);
       const rootDeltaIssue = report.issues.find(
-        i => i.message.includes('Delta spec found at specs/spec.md')
+        i => i.message.includes('在 specs/spec.md 处发现了增量规范')
       );
       expect(rootDeltaIssue).toBeDefined();
       expect(rootDeltaIssue?.message).toContain('specs/<capability-path>/spec.md');
@@ -678,7 +678,7 @@ The system will log all events.
       expect(report.summary.warnings).toBe(1);
       expect(
         report.issues.some(
-          i => i.level === 'WARNING' && i.message.includes('should contain SHALL or MUST')
+          i => i.level === 'WARNING' && i.message.includes('包含 SHALL 或 MUST')
         )
       ).toBe(true);
     });
@@ -739,9 +739,9 @@ Error handling logic goes here.
       const report = await validator.validateChangeDeltaSpecs(changeDir);
 
       expect(report.valid).toBe(false);
-      const shallMessage = report.issues.find(i => i.message.includes('should contain SHALL or MUST'));
+      const shallMessage = report.issues.find(i => i.message.includes('包含 SHALL 或 MUST'));
       expect(shallMessage?.level).toBe('WARNING');
-      expect(shallMessage?.message).toContain('not only in the header');
+      expect(shallMessage?.message).toContain('不是只出现在标题里');
       expect(shallMessage?.message).toContain('### Requirement:');
     });
 
@@ -769,9 +769,9 @@ Please describe how validation should work here.
       const report = await validator.validateChangeDeltaSpecs(changeDir);
 
       expect(report.valid).toBe(false);
-      const shallMessage = report.issues.find(i => i.message.includes('should contain SHALL or MUST'));
+      const shallMessage = report.issues.find(i => i.message.includes('包含 SHALL 或 MUST'));
       expect(shallMessage?.level).toBe('WARNING');
-      expect(shallMessage?.message).toContain('not only in the header');
+      expect(shallMessage?.message).toContain('不是只出现在标题里');
       expect(shallMessage?.message).toContain('### Requirement:');
     });
 
@@ -799,9 +799,9 @@ The system will log all events.
       const report = await validator.validateChangeDeltaSpecs(changeDir);
 
       expect(report.valid).toBe(false);
-      const shallMessage = report.issues.find(i => i.message.includes('should contain SHALL or MUST'));
+      const shallMessage = report.issues.find(i => i.message.includes('包含 SHALL 或 MUST'));
       expect(shallMessage?.level).toBe('WARNING');
-      expect(shallMessage?.message).not.toContain('not only in the header');
+      expect(shallMessage?.message).not.toContain('不是只出现在标题里');
     });
 
     it('should handle requirements without metadata fields', async () => {
@@ -965,7 +965,7 @@ The system MUST support mixed case delta headers.
   // actionable sentence byte-identical to the change-delta path, emitted once.
   describe('main-spec SHALL/MUST body-keyword hint (#1156)', () => {
     const ACTIONABLE_SENTENCE =
-      'should contain SHALL or MUST in the requirement body, not only in the header. Move the SHALL/MUST statement to the line immediately after the "### Requirement: ..." header. (RFC 2119 best practice for English specs)';
+      '且需出现在需求正文中，而不是只出现在标题里。请把 SHALL/MUST 语句移到 "### Requirement: ..." 标题的下一行。（RFC 2119 针对英文 spec 的最佳实践）';
 
     const buildSpec = (requirementBlock: string): string =>
       [
@@ -980,7 +980,7 @@ The system MUST support mixed case delta headers.
       ].join('\n');
 
   const shallIssues = (issues: { message: string }[]) =>
-    issues.filter(i => i.message.includes('SHALL or MUST'));
+    issues.filter(i => i.message.includes('SHALL 或 MUST'));
 
     it('emits the targeted hint when the keyword is in the header only (with a body line)', async () => {
       const content = buildSpec(
@@ -989,7 +989,7 @@ The system MUST support mixed case delta headers.
       const report = await new Validator().validateSpecContent('demo', content);
       const issues = shallIssues(report.issues);
       expect(issues).toHaveLength(1); // exactly one, no duplicate generic
-      expect(issues[0].message).toContain('in the requirement body, not only in the header');
+      expect(issues[0].message).toContain('且需出现在需求正文中，而不是只出现在标题里');
       expect(issues[0].message).toContain(ACTIONABLE_SENTENCE);
     });
 
@@ -1021,7 +1021,7 @@ The system MUST support mixed case delta headers.
       const report = await new Validator().validateSpecContent('demo', content);
       const issues = shallIssues(report.issues);
       expect(issues).toHaveLength(1);
-      expect(issues[0].message).not.toContain('in the requirement body, not only in the header');
+      expect(issues[0].message).not.toContain('且需出现在需求正文中，而不是只出现在标题里');
     });
 
     it('allows non-English requirement text with Chinese normative keywords in normal mode', async () => {
@@ -1029,7 +1029,7 @@ The system MUST support mixed case delta headers.
         '### Requirement: 事件记录\n系统必须记录应用程序中的重要事件。\n\n#### Scenario: 事件发生\n- **WHEN** 应用程序生成重要事件\n- **THEN** 系统保存该事件'
       );
       const report = await new Validator().validateSpecContent('demo', content);
-      const issues = report.issues.filter(i => i.message.includes('SHALL or MUST'));
+      const issues = report.issues.filter(i => i.message.includes('SHALL 或 MUST'));
 
       expect(report.valid).toBe(true);
       expect(report.summary.errors).toBe(0);
@@ -1063,7 +1063,7 @@ The system MUST support mixed case delta headers.
       expect(report.summary.warnings).toBe(0);
       expect(issues).toHaveLength(1);
       expect(issues[0].level).toBe('ERROR');
-      expect(issues[0].message).toContain('in the requirement body, not only in the header');
+      expect(issues[0].message).toContain('且需出现在需求正文中，而不是只出现在标题里');
     });
 
     it('does not subject RENAMED requirements to the hint (byte-for-byte unchanged)', async () => {
@@ -1075,7 +1075,7 @@ The system MUST support mixed case delta headers.
         '## RENAMED Requirements\n\n- FROM: `### Requirement: Old name`\n- TO: `### Requirement: The system SHALL do the new thing`\n'
       );
       const report = await new Validator().validateChangeDeltaSpecs(changeDir);
-      expect(report.issues.some(i => i.message.includes('in the requirement body, not only in the header'))).toBe(false);
+      expect(report.issues.some(i => i.message.includes('且需出现在需求正文中，而不是只出现在标题里'))).toBe(false);
     });
   });
 
@@ -1304,7 +1304,7 @@ ${body}`;
       // the missing keyword, not missing text.
       expect(
         report.issues.some(
-          i => i.level === 'WARNING' && i.message.includes('should contain SHALL or MUST')
+          i => i.level === 'WARNING' && i.message.includes('包含 SHALL 或 MUST')
         )
       ).toBe(true);
     });
@@ -1349,7 +1349,7 @@ ${body}`;
       const changeReport = await new Validator(true).validateChangeDeltaSpecs(changeDir);
       expect(changeReport.valid).toBe(false);
       expect(
-        changeReport.issues.some(i => i.message.includes('in the requirement body, not only in the header'))
+        changeReport.issues.some(i => i.message.includes('且需出现在需求正文中，而不是只出现在标题里'))
       ).toBe(true);
 
       const spec = `# Test Spec
@@ -1364,7 +1364,7 @@ ${body}`;
       const specReport = await new Validator(true).validateSpec(specPath);
       expect(specReport.valid).toBe(false);
       expect(
-        specReport.issues.some(i => i.message.includes('in the requirement body, not only in the header'))
+        specReport.issues.some(i => i.message.includes('且需出现在需求正文中，而不是只出现在标题里'))
       ).toBe(true);
     });
 
@@ -1393,7 +1393,7 @@ These notes explain that the system MUST NOT be read as requirement text.
       expect(report.valid).toBe(false);
       expect(
         report.issues.some(
-          i => i.level === 'WARNING' && i.message.includes('should contain SHALL or MUST')
+          i => i.level === 'WARNING' && i.message.includes('包含 SHALL 或 MUST')
         )
       ).toBe(true);
       expect(

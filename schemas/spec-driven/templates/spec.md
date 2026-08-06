@@ -1,11 +1,11 @@
 ## Purpose
-<!-- New capabilities only: one or two sentences (50+ characters) on what this capability is for. Delete this section for an existing capability. -->
+<!-- 仅限新能力：用一到两句话（50 个字符以上）说明该能力的用途。若为既有能力，请删除本章节。 -->
 
 ## ADDED Requirements
 
-### Requirement: <!-- requirement name -->
-<!-- requirement text -->
+### Requirement: <!-- 需求名称 -->
+<!-- 需求正文 -->
 
-#### Scenario: <!-- scenario name -->
-- **WHEN** <!-- condition -->
-- **THEN** <!-- expected outcome -->
+#### Scenario: <!-- 场景名称 -->
+- **WHEN** <!-- 条件 -->
+- **THEN** <!-- 预期结果 -->

@@ -102,7 +102,7 @@ export class ChangeCommand {
       if (isChangeDirectory) {
         throw new Error(
           `变更 "${changeName}" 尚无 proposal.md。` +
-            `运行 "openspec status --change ${changeName}" 查看下一个制品的创建顺序。`
+            `运行 "openspec-cn status --change ${changeName}" 查看下一个制品的创建顺序。`
         );
       }
       throw new Error(`在 ${proposalPath} 未找到变更 "${changeName}"`);
@@ -308,11 +308,11 @@ if (!isChangeDirectoryName(changesPath, changeDir)) {
       i.message.includes(VALIDATION_MESSAGES.CHANGE_SKIP_SPECS_INVALID_METADATA)
     );
     if (conflictIssue) {
-      bullets.push('- This change declares skip_specs (no spec deltas): delete the files under specs/, or remove skip_specs from .openspec.yaml if requirements do change');
-      bullets.push('- skip_specs is only honored when .openspec.yaml is valid change metadata (schema: <name> is required)');
+      bullets.push('- 此变更声明了 skip_specs（无 spec deltas）：请删除 specs/ 下的文件；如果需求确实发生了变化，则从 .openspec.yaml 中移除 skip_specs');
+      bullets.push('- 只有当 .openspec.yaml 是有效的变更元数据时，skip_specs 才会生效（必须包含 schema: <name>）');
     } else if (invalidMarkerIssue) {
-      bullets.push('- Fix .openspec.yaml so the skip_specs marker can be honored (schema: <name> is required)');
-      bullets.push('- Or remove skip_specs from .openspec.yaml and add delta specs instead');
+      bullets.push('- 请修复 .openspec.yaml，使 skip_specs 标记能够生效（必须包含 schema: <name>）');
+      bullets.push('- 或者从 .openspec.yaml 中移除 skip_specs，改为添加 delta specs');
     } else {
       bullets.push('- 确保变更在 specs/ 中有 deltas：使用 ## ADDED/MODIFIED/REMOVED/RENAMED Requirements 标题');
       bullets.push('- 每个需求必须包含至少一个 #### Scenario: 块');

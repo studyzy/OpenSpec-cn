@@ -55,7 +55,7 @@ describe('openspec validate reports scenarios a MODIFIED block would drop (#1477
     const result = await runCLI(['validate', '--type', 'change', 'drops-a-scenario'], { cwd: projectDir });
 
     expect(result.exitCode).toBe(1);
-    expect(result.stderr).toContain('MODIFIED "Widget state" omits scenario(s)');
+    expect(result.stderr).toContain('遗漏了当前 spec 中仍存在的场景');
     expect(result.stderr).toContain('"Second scenario"');
   });
 
@@ -68,7 +68,7 @@ describe('openspec validate reports scenarios a MODIFIED block would drop (#1477
     expect(result.exitCode).toBe(1);
     const report = JSON.parse(result.stdout);
     const issue = report.items[0].issues.find((i: { message: string }) =>
-      i.message.includes('omits scenario(s)')
+      i.message.includes('遗漏了')
     );
     expect(issue.level).toBe('ERROR');
     expect(issue.path).toBe('widgets/spec.md');
@@ -90,7 +90,7 @@ describe('openspec validate reports scenarios a MODIFIED block would drop (#1477
     const result = await runCLI(['change', 'validate', 'drops-a-scenario'], { cwd: projectDir });
 
     expect(result.exitCode).toBe(1);
-    expect(result.stderr).toContain('omits scenario(s)');
+    expect(result.stderr).toContain('遗漏了当前 spec 中仍存在的场景');
   });
 
   it('leaves a change that carries every scenario over passing', async () => {

@@ -9,9 +9,9 @@ OpenSpec 可配合许多 AI 编程助手使用。当你运行 `openspec-cn init`
 1. **Skills**(若交付方式包含 skills):`.../skills/openspec-*/SKILL.md`
 2. **Commands**(若交付方式包含 commands):各工具特定的 `opsx-*` 命令文件
 
-Codex is skills-only: OpenSpec installs `.agents/skills/openspec-*/SKILL.md` for Codex even when delivery is set to `commands`, and it does not generate Codex custom prompt files. Existing OpenSpec-managed skills under the legacy `.codex/skills` path are reconciled after their replacements are written; custom and divergent files are preserved.
+Codex 仅支持 skills：即使交付方式设为 `commands`，OpenSpec 也会为 Codex 安装 `.agents/skills/openspec-*/SKILL.md`，并且不会生成 Codex 的自定义提示词文件。位于旧版 `.codex/skills` 路径下、由 OpenSpec 管理的既有 skills，会在其替代文件写入后被协调处理；自定义文件和有差异的文件会被保留。
 
-By default, OpenSpec uses the `core` profile, which includes:
+默认情况下，OpenSpec 使用 `core` profile，它包含：
 - `propose`
 - `explore`
 - `apply`
@@ -21,46 +21,36 @@ By default, OpenSpec uses the `core` profile, which includes:
 
 你可以通过 `openspec-cn config profile` 启用扩展工作流(`new`、`continue`、`ff`、`verify`、`bulk-archive`、`onboard`),然后运行 `openspec-cn update`。
 
-## How To Invoke
+<a id="how-to-invoke"></a>
 
-These docs use `/opsx:propose` as the canonical name, but each tool spells it the
-way it loads the file OpenSpec wrote. Find your tool's command path in the
-[Tool Directory Reference](#tool-directory-reference) below, then match its shape here.
+## 如何调用
 
-| Command file OpenSpec writes | You type | Tools |
+本文档统一使用 `/opsx:propose` 作为标准名称，但每个工具会按它加载 OpenSpec 所写文件的方式来拼写它。请在下方的[工具目录参考](#tool-directory-reference)中找到你的工具的命令路径，然后在这里对应上它的形态。
+
+| OpenSpec 写入的命令文件 | 你要输入 | 工具 |
 |------------------------------|----------|-------|
-| `.../commands/opsx/<id>.*` — an `opsx/` folder namespaces it | `/opsx:<id>` | Claude Code, CodeBuddy, Crush, Gemini CLI, Lingma, Qoder, ZCode |
-| `.../opsx-<id>.*` — the filename is the command | `/opsx-<id>` | Every other tool with generated command files, except Amazon Q and Devin |
-| `.devin/workflows/opsx-<id>.md` — read by only one of Devin's two agents | `/opsx-<id>` on Devin Desktop, `/openspec-<skill>` on Devin Local | Devin Desktop\*\*\*\* |
-| `.amazonq/prompts/opsx-<id>.md` — a prompt, not a command | `@opsx-<id>` | Amazon Q Developer |
-| none — skills only | `/openspec-<skill>` | CodeArts, ForgeCode, Hermes, MiniMax Code, Mistral Vibe, shared `.agents` |
-| none — Kimi Code | `/skill:openspec-<skill>` | Kimi Code |
-| none — Codex CLI | `$openspec-<skill>` | Codex ([`/openspec-<skill>` is not recognized](https://github.com/openai/codex/issues/11817)) |
+| `.../commands/opsx/<id>.*` —— `opsx/` 文件夹为其提供了命名空间 | `/opsx:<id>` | Claude Code、CodeBuddy、Crush、Gemini CLI、Lingma、Qoder、ZCode |
+| `.../opsx-<id>.*` —— 文件名即命令名 | `/opsx-<id>` | 其余所有会生成命令文件的工具，Amazon Q 和 Devin 除外 |
+| `.devin/workflows/opsx-<id>.md` —— Devin 的两个 Agent 中只有一个会读取它 | 在 Devin Desktop 上是 `/opsx-<id>`，在 Devin Local 上是 `/openspec-<skill>` | Devin Desktop\*\*\*\* |
+| `.amazonq/prompts/opsx-<id>.md` —— 这是提示词，不是命令 | `@opsx-<id>` | Amazon Q Developer |
+| 无 —— 仅 skills | `/openspec-<skill>` | CodeArts、ForgeCode、Hermes、MiniMax Code、Mistral Vibe、共享 `.agents` |
+| 无 —— Kimi Code | `/skill:openspec-<skill>` | Kimi Code |
+| 无 —— Codex CLI | `$openspec-<skill>` | Codex（[`/openspec-<skill>` 不被识别](https://github.com/openai/codex/issues/11817)） |
 
-So `/opsx:propose` is `/opsx-propose` in Cursor, `@opsx-propose` in Amazon Q, and
-`$openspec-propose` in Codex.
+因此 `/opsx:propose` 在 Cursor 里是 `/opsx-propose`，在 Amazon Q 里是 `@opsx-propose`，在 Codex 里是 `$openspec-propose`。
 
-Two things vary independently, which is why the rows do not collapse:
+有两个因素各自独立变化，这就是这些行无法合并的原因：
 
-- **The name.** Rows 1–2 differ only in how the file names the command, and the
-  `opsx-<id>` / `opsx:<id>` stem is the same for every tool with generated
-  command files.
-- **The wrapper.** Amazon Q loads its files into a prompt library invoked with
-  `@`. Skills-only tools generate no command files at all, so their last three
-  rows use *skill* names — listed under
-  [Generated Skill Names](#generated-skill-names) — which do not map one-to-one
-  onto command ids (`/opsx:apply` is the `openspec-apply-change` skill).
+- **名称。** 第 1–2 行的差别仅在于文件如何为命令命名，而对每个会生成命令文件的工具来说，`opsx-<id>` / `opsx:<id>` 这个词干都是相同的。
+- **外壳。** Amazon Q 把它的文件加载进一个用 `@` 调用的提示词库。仅支持 skills 的工具根本不生成命令文件，因此最后三行用的是 *skill* 名称 —— 列在[生成的 Skill 名称](#generated-skill-names)之下 —— 它们与命令 id 并非一一对应（`/opsx:apply` 对应的是 `openspec-apply-change` skill）。
 
-The command path patterns above are extension-neutral (`.*`) on purpose: the
-extension is the tool's (`.toml` for Gemini CLI, `.prompt` for Continue,
-`.prompt.md` for Kiro and GitHub Copilot), and a few tools show the name with
-its extension in the picker. Match the directory shape, not the extension.
+上面的命令路径模式刻意不带扩展名（写成 `.*`）：扩展名由工具自己决定（Gemini CLI 用 `.toml`，Continue 用 `.prompt`，Kiro 和 GitHub Copilot 用 `.prompt.md`），而且少数工具会在选择器里连扩展名一起显示。请对照目录形态，而不是扩展名。
 
-The files OpenSpec generates, and the "Getting started" hint printed after setup,
-already use the right form for the tools you selected — so the fastest answer is
-to read the hint.
+OpenSpec 生成的文件，以及设置完成后打印的 "Getting started" 提示，已经为你所选的工具采用了正确的形式 —— 所以最快的答案就是去读那条提示。
 
-## Tool Directory Reference
+<a id="tool-directory-reference"></a>
+
+## 工具目录参考
 
 | 工具 (ID) | Skills 路径模式 | Command 路径模式 |
 |-----------|---------------------|----------------------|
@@ -70,9 +60,9 @@ to read the hint.
 | IBM Bob Shell (`bob`) | `.bob/skills/openspec-*/SKILL.md` | `.bob/commands/opsx-<id>.md` |
 | Claude Code (`claude`) | `.claude/skills/openspec-*/SKILL.md` | `.claude/commands/opsx/<id>.md` |
 | Cline (`cline`) | `.cline/skills/openspec-*/SKILL.md` | `.clinerules/workflows/opsx-<id>.md` |
-| CodeArts (`codeartsagent`) | `.codeartsdoer/skills/openspec-*/SKILL.md` | Not generated (no command adapter; use skill-based `/openspec-*` invocations) |
+| CodeArts (`codeartsagent`) | `.codeartsdoer/skills/openspec-*/SKILL.md` | 不生成（无命令适配器；使用基于 skill 的 `/openspec-*` 调用） |
 | CodeBuddy (`codebuddy`) | `.codebuddy/skills/openspec-*/SKILL.md` | `.codebuddy/commands/opsx/<id>.md` |
-| Codex (`codex`) | `.agents/skills/openspec-*/SKILL.md` | Not generated (skills-only; use `$openspec-*`) |
+| Codex (`codex`) | `.agents/skills/openspec-*/SKILL.md` | 不生成（仅 skills；使用 `$openspec-*`） |
 | Devin Desktop, formerly Windsurf (`devin`) | `.devin/skills/openspec-*/SKILL.md` | `.devin/workflows/opsx-<id>.md`\*\*\*\* |
 | ForgeCode (`forgecode`) | `.forge/skills/openspec-*/SKILL.md` | 不生成(无命令适配器;使用基于 skill 的 `/openspec-*` 调用) |
 | Continue (`continue`) | `.continue/skills/openspec-*/SKILL.md` | `.continue/prompts/opsx-<id>.prompt` |
@@ -82,103 +72,80 @@ to read the hint.
 | Factory Droid (`factory`) | `.factory/skills/openspec-*/SKILL.md` | `.factory/commands/opsx-<id>.md` |
 | Gemini CLI (`gemini`) | `.gemini/skills/openspec-*/SKILL.md` | `.gemini/commands/opsx/<id>.toml` |
 | GitHub Copilot (`github-copilot`) | `.github/skills/openspec-*/SKILL.md` | `.github/prompts/opsx-<id>.prompt.md`\*\* |
-| Hermes Agent (`hermes`) | `.hermes/skills/openspec-*/SKILL.md`\*\*\* | Not generated (no command adapter; use skill-based `/openspec-*` invocations) |
+| Hermes Agent (`hermes`) | `.hermes/skills/openspec-*/SKILL.md`\*\*\* | 不生成（无命令适配器；使用基于 skill 的 `/openspec-*` 调用） |
 | iFlow (`iflow`) | `.iflow/skills/openspec-*/SKILL.md` | `.iflow/commands/opsx-<id>.md` |
 | Junie (`junie`) | `.junie/skills/openspec-*/SKILL.md` | `.junie/commands/opsx-<id>.md` |
 | Kilo Code (`kilocode`) | `.kilocode/skills/openspec-*/SKILL.md` | `.kilocode/workflows/opsx-<id>.md` |
 | Kimi Code (`kimi`) | `.kimi-code/skills/openspec-*/SKILL.md` | 不生成(无命令适配器;使用基于 skill 的 `/skill:openspec-*` 调用) |
 | Kiro (`kiro`) | `.kiro/skills/openspec-*/SKILL.md` | `.kiro/prompts/opsx-<id>.prompt.md` |
 | Lingma (`lingma`) | `.lingma/skills/openspec-*/SKILL.md` | `.lingma/commands/opsx-<id>.md` |
-| MiniMax Code (`minimax-code`) | `~/.minimax/skills/openspec-*/SKILL.md` | Not generated (no command adapter; use MiniMax Code skills) |
+| MiniMax Code (`minimax-code`) | `~/.minimax/skills/openspec-*/SKILL.md` | 不生成（无命令适配器；使用 MiniMax Code 的 skills） |
 | Mistral Vibe (`vibe`) | `.vibe/skills/openspec-*/SKILL.md` | 不生成(无命令适配器;使用基于 skill 的 `/openspec-*` 调用) |
 | Oh My Pi (`oh-my-pi`) | `.omp/skills/openspec-*/SKILL.md` | `.omp/commands/opsx-<id>.md` |
 | OpenCode (`opencode`) | `.opencode/skills/openspec-*/SKILL.md` | `.opencode/commands/opsx-<id>.md` |
 | Pi (`pi`) | `.pi/skills/openspec-*/SKILL.md` | `.pi/prompts/opsx-<id>.md` |
 | Qoder (`qoder`) | `.qoder/skills/openspec-*/SKILL.md` | `.qoder/commands/opsx-<id>.md` |
 | Qwen Code (`qwen`) | `.qwen/skills/openspec-*/SKILL.md` | `.qwen/commands/opsx-<id>.md` |
-| [Rovo Dev CLI](https://support.atlassian.com/rovo/docs/use-rovo-dev-cli/) (`rovodev`) | `.rovodev/skills/openspec-*/SKILL.md` | Not generated. Rovo has no slash-command surface — it matches skills automatically or by prompt (e.g. "use the openspec-propose skill"); `/skills` only manages them. Generated content references skills by name, never as `/openspec-*` commands. |
+| [Rovo Dev CLI](https://support.atlassian.com/rovo/docs/use-rovo-dev-cli/) (`rovodev`) | `.rovodev/skills/openspec-*/SKILL.md` | 不生成。Rovo 没有斜杠命令入口 —— 它会自动匹配 skills，或通过提示词匹配（例如"使用 openspec-propose skill"）；`/skills` 只用于管理它们。生成的内容按名称引用 skills，绝不会写成 `/openspec-*` 命令。 |
 | [Zoo Code](https://github.com/Zoo-Code-Org/Zoo-Code) (`roocode`) | `.roo/skills/openspec-*/SKILL.md` | `.roo/commands/opsx-<id>.md` |
 | Trae (`trae`) | `.trae/skills/openspec-*/SKILL.md` | `.trae/commands/opsx-<id>.md` |
 | ZCode (`zcode`) | `.zcode/skills/openspec-*/SKILL.md` | `.zcode/commands/opsx/<id>.md` |
-| Shared `.agents` skills (`agents`) | `.agents/skills/openspec-*/SKILL.md` | Not generated (no command adapter; use skill-based `/openspec-*` invocations) |
+| 共享 `.agents` skills (`agents`) | `.agents/skills/openspec-*/SKILL.md` | 不生成（无命令适配器；使用基于 skill 的 `/openspec-*` 调用） |
 
-\*\* GitHub Copilot prompt files are recognized as custom slash commands in IDE extensions (VS Code, JetBrains, Visual Studio). Copilot CLI does not currently consume `.github/prompts/*.prompt.md` directly. Selecting `github-copilot` can also set up the GitHub-hosted **cloud coding agent** — see [GitHub Copilot cloud coding agent](#github-copilot-cloud-coding-agent) below.
+\*\* GitHub Copilot 的提示词文件在 IDE 扩展（VS Code、JetBrains、Visual Studio）中会被识别为自定义斜杠命令。Copilot CLI 目前不会直接消费 `.github/prompts/*.prompt.md`。选择 `github-copilot` 还可以配置 GitHub 托管的**云端编程 Agent** —— 参见下文的 [GitHub Copilot 云端编程 Agent](#github-copilot-cloud-coding-agent)。
 
-\*\*\* Hermes loads skills from `~/.hermes/skills/` by default. To use project-local OpenSpec skills, add the project `.hermes/skills/` directory to `skills.external_dirs` in `~/.hermes/config.yaml`; Hermes then exposes skills with user-facing slash invocations such as `/openspec-propose`.
+\*\*\* Hermes 默认从 `~/.hermes/skills/` 加载 skills。若要使用项目本地的 OpenSpec skills，请把项目的 `.hermes/skills/` 目录加入 `~/.hermes/config.yaml` 中的 `skills.external_dirs`；此后 Hermes 会以面向用户的斜杠调用形式暴露这些 skills，例如 `/openspec-propose`。
 
-\*\*\*\* Windsurf was [rebranded to Devin Desktop](https://docs.devin.ai/desktop/devin-desktop-faq) on June 2, 2026, and its config directory moved: `.devin/` is the preferred read + write location, `.windsurf/` a legacy read-only fallback. OpenSpec follows the rename — the tool id is `devin`, and `--tools windsurf` still resolves to it so existing setup scripts keep working. A project still holding OpenSpec files in `.windsurf/` is offered the move on the next `openspec update`; declining leaves them in place, and files you wrote yourself are never touched. Workflows are invoked by filename, so `.devin/workflows/opsx-apply.md` is `/opsx-apply`. The [Devin Local agent does not support workflows](https://docs.devin.ai/desktop/devin-local) — only skills, and it does not read `.windsurf/` at all — so whenever OpenSpec writes Devin skills it keeps their bodies, and the getting-started hint, on `/openspec-*` skill invocations, which work on both agents. Under commands-only delivery no skills are written and both fall back to `/opsx-*`.
+\*\*\*\* Windsurf 已于 2026 年 6 月 2 日[更名为 Devin Desktop](https://docs.devin.ai/desktop/devin-desktop-faq)，其配置目录也随之迁移：`.devin/` 是首选的读写位置，`.windsurf/` 则是仅可读的旧版回退位置。OpenSpec 跟进了这次更名 —— 工具 id 为 `devin`，而 `--tools windsurf` 仍会解析到它，以便既有的配置脚本继续可用。如果某个项目的 OpenSpec 文件仍留在 `.windsurf/` 中，下一次 `openspec-cn update` 时会提示你迁移；拒绝则原样保留，而你自己写的文件永远不会被触碰。工作流按文件名调用，因此 `.devin/workflows/opsx-apply.md` 对应 `/opsx-apply`。[Devin Local Agent 不支持工作流](https://docs.devin.ai/desktop/devin-local) —— 它只支持 skills，且完全不读取 `.windsurf/` —— 因此每当 OpenSpec 写入 Devin skills 时，都会让它们的正文以及 getting-started 提示保持使用 `/openspec-*` 这种 skill 调用形式，这在两个 Agent 上都能用。在仅 commands 的交付模式下不会写入任何 skills，两者都回退到 `/opsx-*`。
 
-MiniMax Code is a global skills-only integration. OpenSpec writes only its
-`openspec-*` directories under `~/.minimax/skills/`; it does not create
-repo-local `.minimax` or `.mavis` directories. Commands-only delivery leaves
-existing global MiniMax Code skills untouched so one project's delivery setting
-cannot remove skills used by another project.
+MiniMax Code 是一个全局的、仅支持 skills 的集成。OpenSpec 只会在
+`~/.minimax/skills/` 下写入它的 `openspec-*` 目录；它不会创建仓库本地的
+`.minimax` 或 `.mavis` 目录。仅 commands 的交付模式不会改动已有的全局 MiniMax
+Code skills，这样一个项目的交付设置就不会移除另一个项目正在使用的 skills。
 
-### GitHub Copilot cloud coding agent
+<a id="github-copilot-cloud-coding-agent"></a>
 
-GitHub's [Copilot coding agent](https://docs.github.com/en/copilot/using-github-copilot/coding-agent) runs on GitHub in a GitHub Actions environment — separate from Copilot in your editor. OpenSpec can set it up to use the OpenSpec CLI by generating two files:
+### GitHub Copilot 云端编程 Agent
 
-- `.github/workflows/copilot-setup-steps.yml` — installs `@fission-ai/openspec` in the agent's environment
-- `.github/agents/openspec.agent.md` — tells the agent how to drive OpenSpec
+GitHub 的 [Copilot coding agent](https://docs.github.com/en/copilot/using-github-copilot/coding-agent) 运行在 GitHub 的 GitHub Actions 环境中 —— 与你编辑器中的 Copilot 是相互独立的。OpenSpec 可以通过生成两个文件把它配置为使用 OpenSpec CLI：
 
-Because this writes a GitHub Actions workflow into your repository, it is **opt-in**:
+- `.github/workflows/copilot-setup-steps.yml` —— 在该 Agent 的环境中安装 `@studyzy/openspec-cn`
+- `.github/agents/openspec.agent.md` —— 告诉该 Agent 如何驱动 OpenSpec
 
-| How | Behavior |
+由于这会往你的仓库里写入一个 GitHub Actions 工作流，因此它是**需要主动选择启用的**：
+
+| 方式 | 行为 |
 |-----|----------|
-| `openspec init` (interactive) | Asks whether to set up cloud files. Default is **No**. |
-| `openspec init --copilot-cloud` | Sets them up without prompting (for scripts/CI). |
-| `openspec init --no-copilot-cloud` | Skips them without prompting, and removes any previously generated ones. |
-| `openspec update` | Never prompts. Refreshes the files only if you opted in (or the project already has them). If you opted out, it removes OpenSpec-managed cloud files. |
+| `openspec-cn init`（交互式） | 询问是否配置云端文件。默认是**否**。 |
+| `openspec-cn init --copilot-cloud` | 不询问直接配置（适用于脚本/CI）。 |
+| `openspec-cn init --no-copilot-cloud` | 不询问直接跳过，并移除此前已生成的文件。 |
+| `openspec-cn update` | 从不询问。仅当你已选择启用（或项目中已有这些文件）时才刷新它们。若你选择了不启用，它会移除由 OpenSpec 管理的云端文件。 |
 
-Your choice is saved in `openspec/config.yaml` as `githubCopilot.cloudAgent: true|false`, so non-interactive updates honor it. OpenSpec only ever writes or removes files whose content it generated — if you customize `copilot-setup-steps.yml` or `openspec.agent.md`, or already have your own, it is left untouched (and `init`/`update` tell you so).
+你的选择会以 `githubCopilot.cloudAgent: true|false` 的形式保存在 `openspec/config.yaml` 中，因此非交互式的更新也会遵循它。OpenSpec 只会写入或移除内容由它自己生成的文件 —— 如果你自定义了 `copilot-setup-steps.yml` 或 `openspec.agent.md`，或者你本来就有自己的版本，它们会被原样保留（并且 `init`/`update` 会告知你这一点）。
 
-### When to pick the shared `.agents` target
+### 何时选择共享 `.agents` 目标
 
-`agents` is the vendor-neutral option: it writes skills to `.agents/skills/`, the
-shared root many agent tools read, instead of a tool-specific directory.
+`agents` 是与厂商无关的选项：它把 skills 写入 `.agents/skills/` —— 许多 Agent 工具都会读取的共享根目录 —— 而不是某个工具专属的目录。
 
-| Situation | Pick |
+| 场景 | 选择 |
 |-----------|------|
-| Your tool has its own row above | Its own ID — you get that tool's integration, including slash commands where it supports them |
-| Several agents on one repo, all reading `.agents/skills` | `agents` — one skill tree instead of one per tool |
-| Your tool isn't listed yet but reads `.agents/skills` | `agents` |
+| 你的工具在上表中有自己的一行 | 用它自己的 ID —— 你会获得该工具的集成，包括在它支持的情况下提供斜杠命令 |
+| 同一个仓库上有多个 Agent，且都读取 `.agents/skills` | `agents` —— 只需一棵 skill 树，而不是每个工具一棵 |
+| 你的工具尚未被列出，但它会读取 `.agents/skills` | `agents` |
 
-Selecting it alongside a tool-specific ID is fine; each normally writes to its
-own root. Codex is the exception because it uses the same canonical `.agents`
-root. If both `codex` and `agents` are selected, OpenSpec keeps one
-Codex-led tree. Its handoffs name both `$openspec-*` for Codex and
-`/openspec-*` for other agents, so `--tools all` and existing multi-agent
-setups keep working without two writers overwriting the same files.
-OpenSpec also offers it automatically once a project has a `.agents/skills/`
-directory — a bare `.agents/` is not enough, since tools use that root for rules
-and subagent definitions too. Note `.agents` is not `.agent`: the singular
-directory belongs to Antigravity.
+把它和某个工具专属 ID 一起选中是没问题的；通常各自会写入自己的根目录。Codex 是个例外，因为它使用的正是同一个规范的 `.agents` 根目录。如果 `codex` 和 `agents` 同时被选中，OpenSpec 会只保留一棵以 Codex 为主导的树。它的交接说明中会同时给出面向 Codex 的 `$openspec-*` 和面向其他 Agent 的 `/openspec-*`，因此 `--tools all` 以及既有的多 Agent 配置都能继续工作，而不会出现两个写入方覆盖同一批文件的情况。
+一旦项目中存在 `.agents/skills/` 目录，OpenSpec 也会自动提供该选项 —— 仅有一个空的 `.agents/` 是不够的，因为工具也会把那个根目录用于规则和子 Agent 定义。请注意 `.agents` 不是 `.agent`：单数形式的目录属于 Antigravity。
 
-Two things to know:
+有两点需要了解：
 
-- **Skills only.** No command adapter exists, so no `opsx-*` command files are
-  written; with a commands-inclusive delivery mode `openspec init` lists `agents`
-  among the tools it reports under `Commands skipped for: … (no adapter)`.
-  Invoke the workflows by skill name —
-  most assistants that read `.agents/skills` spell that `/openspec-propose`, the form
-  OpenSpec's setup hint prints. The target is vendor-neutral, so check your
-  assistant's own docs if it uses another form.
-- **No `AGENTS.md` is created or edited.** The target is the `.agents/` directory.
-  If your root `AGENTS.md` still carries OpenSpec marker blocks from an older
-  version, `openspec update` strips them — see the [Migration Guide](migration-guide.md).
+- **仅 skills。** 不存在命令适配器，因此不会写入任何 `opsx-*` 命令文件；在包含 commands 的交付模式下，`openspec-cn init` 会把 `agents` 列在它以 `Commands skipped for: … (no adapter)` 报告的工具之中。
+  请按 skill 名称调用这些工作流 —— 大多数读取 `.agents/skills` 的助手把它写作 `/openspec-propose`，这也是 OpenSpec 设置提示所打印的形式。该目标与厂商无关，因此如果你的助手使用别的形式，请查阅它自己的文档。
+- **不会创建或修改任何 `AGENTS.md`。** 目标是 `.agents/` 目录。
+  如果你根目录的 `AGENTS.md` 中仍带有旧版本留下的 OpenSpec 标记块，`openspec-cn update` 会将其清除 —— 参见[迁移指南](migration-guide.md)。
 
-Because `.agents/skills/` is shared, it is worth knowing what OpenSpec claims there:
-it writes, refreshes, and removes only the `openspec-*` skill directories for your
-selected workflows, plus an `.openspec-target` marker that records whether Codex
-or the vendor-neutral target rendered that shared tree. Anything else in that
-directory is left alone. Treat the `openspec-*` names and marker as OpenSpec's —
-edits inside them are replaced on the next `openspec update`, the same as for
-every other tool.
+由于 `.agents/skills/` 是共享的，有必要了解 OpenSpec 在其中主张归属的内容：它只会为你所选的工作流写入、刷新和移除 `openspec-*` skill 目录，外加一个 `.openspec-target` 标记文件，用于记录那棵共享树是由 Codex 还是由厂商无关目标渲染的。该目录中的其他任何内容都不会被动。请把 `openspec-*` 这些名称和该标记视为 OpenSpec 所有 —— 对它们内部的修改会在下一次 `openspec-cn update` 时被替换掉，这一点与其他所有工具一致。
 
-For pre-marker projects, OpenSpec infers ownership from managed skill references:
-`$openspec-*` means Codex and `/openspec-*` means the vendor-neutral target. A
-generic canonical tree alongside legacy `.codex/skills` is treated as an older
-dual-target install and consolidated into the compatible shared tree.
+对于早于该标记机制的项目，OpenSpec 会从受管 skill 的引用形式推断归属：`$openspec-*` 表示 Codex，`/openspec-*` 表示厂商无关目标。若一棵通用的规范树与旧版 `.codex/skills` 并存，则会被视为更早的双目标安装，并被合并到兼容的共享树中。
 
 ## 非交互式安装
 
@@ -198,17 +165,19 @@ openspec-cn init --tools none
 openspec-cn init --profile core
 ```
 
-**可用工具 ID(`--tools`)** — `windsurf` is also accepted, as an alias for `devin`: `amazon-q`, `antigravity`, `auggie`, `bob`, `claude`, `cline`, `codeartsagent`, `codex`, `devin`, `forgecode`, `codebuddy`, `continue`, `costrict`, `crush`, `cursor`, `factory`, `gemini`, `github-copilot`, `hermes`, `iflow`, `junie`, `kilocode`, `kimi`, `kiro`, `lingma`, `minimax-code`, `vibe`, `oh-my-pi`, `opencode`, `pi`, `qoder`, `qwen`, `roocode`, `trae`, `zcode`, `agents`
+**可用工具 ID(`--tools`)** —— `windsurf` 也可接受，作为 `devin` 的别名：`amazon-q`, `antigravity`, `auggie`, `bob`, `claude`, `cline`, `codeartsagent`, `codex`, `devin`, `forgecode`, `codebuddy`, `continue`, `costrict`, `crush`, `cursor`, `factory`, `gemini`, `github-copilot`, `hermes`, `iflow`, `junie`, `kilocode`, `kimi`, `kiro`, `lingma`, `minimax-code`, `vibe`, `oh-my-pi`, `opencode`, `pi`, `qoder`, `qwen`, `roocode`, `trae`, `zcode`, `agents`
 
 ## 依赖工作流的安装
 
 OpenSpec 根据所选工作流安装工作流制品:
 
-- **Core profile(默认):** `propose`、`explore`、`apply`、`update`, `sync`、`archive`
+- **Core profile(默认):** `propose`、`explore`、`apply`、`update`、`sync`、`archive`
 - **自定义选择:** 所有工作流 ID 的任意子集:
-  `propose`、`explore`、`new`、`continue`、`apply`、`update`, `ff`、`sync`、`archive`、`bulk-archive`、`verify`、`onboard`
+  `propose`、`explore`、`new`、`continue`、`apply`、`update`、`ff`、`sync`、`archive`、`bulk-archive`、`verify`、`onboard`
 
 换言之,skill/命令的数量取决于 profile 和交付方式,而非固定不变。
+
+<a id="generated-skill-names"></a>
 
 ## 生成的 Skill 名称
 
@@ -227,10 +196,10 @@ OpenSpec 根据所选工作流安装工作流制品:
 - `openspec-verify-change`
 - `openspec-onboard`
 
-命令行为见 [Commands](commands.md),`init`/`update` 选项见 [CLI](cli.md)。
+命令行为见[命令](commands.md),`init`/`update` 选项见 [CLI](cli.md)。
 
 ## 相关文档
 
-- [CLI Reference](cli.md) — 终端命令
-- [Commands](commands.md) — Slash command 与 skills
-- [Getting Started](getting-started.md) — 首次设置
+- [CLI 参考](cli.md) —— 终端命令
+- [命令](commands.md) —— 斜杠命令与 skills
+- [快速上手](getting-started.md) —— 首次设置

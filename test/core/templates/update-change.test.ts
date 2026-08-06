@@ -21,7 +21,7 @@ describe('update-change templates', () => {
     expect(skill.name).toBe('openspec-update-change');
     expect(skill.description).toContain('绝不要编辑代码');
     expect(skill.license).toBe('MIT');
-    expect(skill.compatibility).toBe('Requires openspec CLI.');
+    expect(skill.compatibility).toBe('需要 openspec-cn CLI。');
     expect(skill.metadata).toEqual({ author: 'openspec', version: '1.0' });
 
     expect(command.name).toBe('OPSX: Update');
@@ -31,9 +31,9 @@ describe('update-change templates', () => {
 
     for (const [label, body] of bodies) {
       expect(body, label).toContain(STORE_SELECTION_GUIDANCE);
-      expect(body, label).toContain('openspec list --json');
-      expect(body, label).toContain('openspec status --change "<name>" --json');
-      expect(body, label).toContain('openspec instructions "<artifact-id>" --change "<name>" --json');
+      expect(body, label).toContain('openspec-cn list --json');
+      expect(body, label).toContain('openspec-cn status --change "<name>" --json');
+      expect(body, label).toContain('openspec-cn instructions "<artifact-id>" --change "<name>" --json');
     }
   });
 
@@ -91,10 +91,10 @@ describe('update-change templates', () => {
       expect(body.indexOf('`/opsx:continue`'), label).toBe(availabilityGuidance);
       expect(firstSuggestion, label).toBeGreaterThan(availabilityGuidance);
       expect(body, label).toContain(
-        '若不可用，`openspec status --change "<name>" --json` 显示下一个制品'
+        '若不可用，`openspec-cn status --change "<name>" --json` 显示下一个制品'
       );
       expect(body, label).toContain(
-        '`openspec instructions "<artifact-id>" --change "<name>" --json` 解释如何创建它'
+        '`openspec-cn instructions "<artifact-id>" --change "<name>" --json` 解释如何创建它'
       );
     }
   });
@@ -106,8 +106,8 @@ describe('update-change templates', () => {
       expect(body, label).toContain('重新开始');
       expect(body, label).toContain('更新 vs 重新开始');
       expect(body, label).toContain('请求一个不同的未使用变更名称');
-      expect(body, label).toContain('openspec new change "<new-change-name>"');
-      expect(body, label).not.toContain('openspec new change "<name>"');
+      expect(body, label).toContain('openspec-cn new change "<new-change-name>"');
+      expect(body, label).not.toContain('openspec-cn new change "<name>"');
 
       const newAvailabilityCheck = body.indexOf(
         '首先验证扩展 profile `/opsx:new` 工作流是否可用'

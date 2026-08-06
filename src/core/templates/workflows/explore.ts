@@ -110,10 +110,10 @@ openspec-cn list --json
 
 若用户要求你将探索内容捕获为新变更，无缝过渡到所请求的捕获操作：
 
-1. 在创建任何制品之前运行 \`openspec new change "<name>"\`（适用时加上 \`--store <id>\`）。绝不要手动在 \`openspec/changes/\` 下创建新变更目录；CLI 脚手架会创建必需的元数据，如 \`.openspec.yaml\`。在后续每个适用的 \`status\` 和 \`instructions\` 命令上保留选定的 \`--store <id>\`。
-2. 运行 \`openspec status --change "<name>" --json\`（仅对注册的独立存储追加确认的 \`--store "<id>"\`），然后按依赖顺序处理请求的制品。对每个处于 \`ready\` 状态的请求制品，运行 \`openspec instructions "<artifact-id>" --change "<name>" --json\`（仅对注册的独立存储追加确认的 \`--store "<id>"\`）。在创建请求的制品之前，根据探索出的变更评估其自身 \`instruction\` 中的任何条件；若条件不适用则记录为有意跳过。若请求的制品被用户未请求的直接前置制品阻塞，对该前置制品运行 \`openspec instructions "<prerequisite-id>" --change "<name>" --json\`（仅对注册的独立存储追加确认的 \`--store "<id>"\`），无论它是 \`ready\` 还是 \`blocked\`。若其自身 \`instruction\` 声明了条件，根据探索出的变更评估该条件，仅当条件不适用时记录为有意跳过。若条件适用，或前置制品非条件性，将其视为正常前置制品并在扩展捕获范围前询问。未经用户批准不要创建未请求的前置制品。
+1. 在创建任何制品之前运行 \`openspec-cn new change "<name>"\`（适用时加上 \`--store <id>\`）。绝不要手动在 \`openspec/changes/\` 下创建新变更目录；CLI 脚手架会创建必需的元数据，如 \`.openspec.yaml\`。在后续每个适用的 \`status\` 和 \`instructions\` 命令上保留选定的 \`--store <id>\`。
+2. 运行 \`openspec-cn status --change "<name>" --json\`（仅对注册的独立存储追加确认的 \`--store "<id>"\`），然后按依赖顺序处理请求的制品。对每个处于 \`ready\` 状态的请求制品，运行 \`openspec-cn instructions "<artifact-id>" --change "<name>" --json\`（仅对注册的独立存储追加确认的 \`--store "<id>"\`）。在创建请求的制品之前，根据探索出的变更评估其自身 \`instruction\` 中的任何条件；若条件不适用则记录为有意跳过。若请求的制品被用户未请求的直接前置制品阻塞，对该前置制品运行 \`openspec-cn instructions "<prerequisite-id>" --change "<name>" --json\`（仅对注册的独立存储追加确认的 \`--store "<id>"\`），无论它是 \`ready\` 还是 \`blocked\`。若其自身 \`instruction\` 声明了条件，根据探索出的变更评估该条件，仅当条件不适用时记录为有意跳过。若条件适用，或前置制品非条件性，将其视为正常前置制品并在扩展捕获范围前询问。未经用户批准不要创建未请求的前置制品。
 3. 遵循返回的 \`template\` 和 \`instruction\` 字段。读取 \`dependencies\` 中列出的已完成依赖文件，并应用 \`context\` 和 \`rules\` 作为约束而不复制到制品中。若指令将创建委托给特定 skill 或命令，调用它；否则将制品写入 \`resolvedOutputPath\`，当它是 glob 时使用指令选择具体路径。验证选定的具体输出存在。
-4. 创建每个制品后，重新运行 \`openspec status --change "<name>" --json\`（仅对注册的独立存储追加确认的 \`--store "<id>"\`）并持续到每个请求的制品为 \`done\`、\`skipped\`，或因自身 \`instruction\` 声明的条件不适用而被有意跳过。告知用户关于有意的条件性跳过，记住它且不要重新考虑。依赖项是使能因素而非关卡：若请求的制品仍 \`blocked\` 仅因为你故意跳过了条件性前置制品，尽管被阻塞也运行 \`openspec instructions "<artifact-id>" --change "<name>" --json\`（仅对注册的独立存储追加确认的 \`--store "<id>"\`），然后仅当这些记录的条件性跳过是其唯一缺失的依赖项时使用步骤 3 创建它。若请求的制品被用户未要求捕获的前置制品阻塞且无法条件性跳过，解释该依赖项并在扩展捕获范围前询问。
+4. 创建每个制品后，重新运行 \`openspec-cn status --change "<name>" --json\`（仅对注册的独立存储追加确认的 \`--store "<id>"\`）并持续到每个请求的制品为 \`done\`、\`skipped\`，或因自身 \`instruction\` 声明的条件不适用而被有意跳过。告知用户关于有意的条件性跳过，记住它且不要重新考虑。依赖项是使能因素而非关卡：若请求的制品仍 \`blocked\` 仅因为你故意跳过了条件性前置制品，尽管被阻塞也运行 \`openspec-cn instructions "<artifact-id>" --change "<name>" --json\`（仅对注册的独立存储追加确认的 \`--store "<id>"\`），然后仅当这些记录的条件性跳过是其唯一缺失的依赖项时使用步骤 3 创建它。若请求的制品被用户未要求捕获的前置制品阻塞且无法条件性跳过，解释该依赖项并在扩展捕获范围前询问。
 
 Capture the artifact(s) the user requested without asking them to invoke another workflow command. If they asked only to start a change, stop after scaffolding and show its status.
 
@@ -303,7 +303,7 @@ Capture the artifact(s) the user requested without asking them to invoke another
 - **不要仓促** - 探索是思考时间，不是任务时间
 - **不要强加结构** - 让模式自然浮现
 - **不要自动捕获** - 提议保存洞察，而非擅自保存
-- **不要手动搭建变更脚手架** - 绝不要手动在 \`openspec/changes/\` 下创建新变更目录。始终使用 \`openspec new change "<name>"\`（适用时加上 \`--store <id>\`），以便在写入制品前创建必需的元数据如 \`.openspec.yaml\`。
+- **不要手动搭建变更脚手架** - 绝不要手动在 \`openspec/changes/\` 下创建新变更目录。始终使用 \`openspec-cn new change "<name>"\`（适用时加上 \`--store <id>\`），以便在写入制品前创建必需的元数据如 \`.openspec.yaml\`。
 - **务必可视化** - 一个好图胜过很多段落
 - **务必探索代码库** - 让讨论基于现实
 - **务必质疑假设** - 包括用户的和自己的`,
@@ -427,10 +427,10 @@ If the user mentioned a specific change name, read its artifacts for context.
 
 若用户要求你将探索内容捕获为新变更，无缝过渡到所请求的捕获操作：
 
-1. 在创建任何制品之前运行 \`openspec new change "<name>"\`（适用时加上 \`--store <id>\`）。绝不要手动在 \`openspec/changes/\` 下创建新变更目录；CLI 脚手架会创建必需的元数据，如 \`.openspec.yaml\`。在后续每个适用的 \`status\` 和 \`instructions\` 命令上保留选定的 \`--store <id>\`。
-2. 运行 \`openspec status --change "<name>" --json\`（仅对注册的独立存储追加确认的 \`--store "<id>"\`），然后按依赖顺序处理请求的制品。对每个处于 \`ready\` 状态的请求制品，运行 \`openspec instructions "<artifact-id>" --change "<name>" --json\`（仅对注册的独立存储追加确认的 \`--store "<id>"\`）。在创建请求的制品之前，根据探索出的变更评估其自身 \`instruction\` 中的任何条件；若条件不适用则记录为有意跳过。若请求的制品被用户未请求的直接前置制品阻塞，对该前置制品运行 \`openspec instructions "<prerequisite-id>" --change "<name>" --json\`（仅对注册的独立存储追加确认的 \`--store "<id>"\`），无论它是 \`ready\` 还是 \`blocked\`。若其自身 \`instruction\` 声明了条件，根据探索出的变更评估该条件，仅当条件不适用时记录为有意跳过。若条件适用，或前置制品非条件性，将其视为正常前置制品并在扩展捕获范围前询问。未经用户批准不要创建未请求的前置制品。
+1. 在创建任何制品之前运行 \`openspec-cn new change "<name>"\`（适用时加上 \`--store <id>\`）。绝不要手动在 \`openspec/changes/\` 下创建新变更目录；CLI 脚手架会创建必需的元数据，如 \`.openspec.yaml\`。在后续每个适用的 \`status\` 和 \`instructions\` 命令上保留选定的 \`--store <id>\`。
+2. 运行 \`openspec-cn status --change "<name>" --json\`（仅对注册的独立存储追加确认的 \`--store "<id>"\`），然后按依赖顺序处理请求的制品。对每个处于 \`ready\` 状态的请求制品，运行 \`openspec-cn instructions "<artifact-id>" --change "<name>" --json\`（仅对注册的独立存储追加确认的 \`--store "<id>"\`）。在创建请求的制品之前，根据探索出的变更评估其自身 \`instruction\` 中的任何条件；若条件不适用则记录为有意跳过。若请求的制品被用户未请求的直接前置制品阻塞，对该前置制品运行 \`openspec-cn instructions "<prerequisite-id>" --change "<name>" --json\`（仅对注册的独立存储追加确认的 \`--store "<id>"\`），无论它是 \`ready\` 还是 \`blocked\`。若其自身 \`instruction\` 声明了条件，根据探索出的变更评估该条件，仅当条件不适用时记录为有意跳过。若条件适用，或前置制品非条件性，将其视为正常前置制品并在扩展捕获范围前询问。未经用户批准不要创建未请求的前置制品。
 3. 遵循返回的 \`template\` 和 \`instruction\` 字段。读取 \`dependencies\` 中列出的已完成依赖文件，并应用 \`context\` 和 \`rules\` 作为约束而不复制到制品中。若指令将创建委托给特定 skill 或命令，调用它；否则将制品写入 \`resolvedOutputPath\`，当它是 glob 时使用指令选择具体路径。验证选定的具体输出存在。
-4. 创建每个制品后，重新运行 \`openspec status --change "<name>" --json\`（仅对注册的独立存储追加确认的 \`--store "<id>"\`）并持续到每个请求的制品为 \`done\`、\`skipped\`，或因自身 \`instruction\` 声明的条件不适用而被有意跳过。告知用户关于有意的条件性跳过，记住它且不要重新考虑。依赖项是使能因素而非关卡：若请求的制品仍 \`blocked\` 仅因为你故意跳过了条件性前置制品，尽管被阻塞也运行 \`openspec instructions "<artifact-id>" --change "<name>" --json\`（仅对注册的独立存储追加确认的 \`--store "<id>"\`），然后仅当这些记录的条件性跳过是其唯一缺失的依赖项时使用步骤 3 创建它。若请求的制品被用户未要求捕获的前置制品阻塞且无法条件性跳过，解释该依赖项并在扩展捕获范围前询问。
+4. 创建每个制品后，重新运行 \`openspec-cn status --change "<name>" --json\`（仅对注册的独立存储追加确认的 \`--store "<id>"\`）并持续到每个请求的制品为 \`done\`、\`skipped\`，或因自身 \`instruction\` 声明的条件不适用而被有意跳过。告知用户关于有意的条件性跳过，记住它且不要重新考虑。依赖项是使能因素而非关卡：若请求的制品仍 \`blocked\` 仅因为你故意跳过了条件性前置制品，尽管被阻塞也运行 \`openspec-cn instructions "<artifact-id>" --change "<name>" --json\`（仅对注册的独立存储追加确认的 \`--store "<id>"\`），然后仅当这些记录的条件性跳过是其唯一缺失的依赖项时使用步骤 3 创建它。若请求的制品被用户未要求捕获的前置制品阻塞且无法条件性跳过，解释该依赖项并在扩展捕获范围前询问。
 
 Capture the artifact(s) the user requested without asking them to invoke another workflow command. If they asked only to start a change, stop after scaffolding and show its status.
 
@@ -500,7 +500,7 @@ Capture the artifact(s) the user requested without asking them to invoke another
 - **不要仓促** - 探索是思考时间，不是任务时间
 - **不要强加结构** - 让模式自然浮现
 - **不要自动捕获** - 提议保存洞察，而非擅自保存
-- **不要手动搭建变更脚手架** - 绝不要手动在 \`openspec/changes/\` 下创建新变更目录。始终使用 \`openspec new change "<name>"\`（适用时加上 \`--store <id>\`），以便在写入制品前创建必需的元数据如 \`.openspec.yaml\`。
+- **不要手动搭建变更脚手架** - 绝不要手动在 \`openspec/changes/\` 下创建新变更目录。始终使用 \`openspec-cn new change "<name>"\`（适用时加上 \`--store <id>\`），以便在写入制品前创建必需的元数据如 \`.openspec.yaml\`。
 - **务必可视化** - 一个好图胜过很多段落
 - **务必探索代码库** - 让讨论基于现实
 - **务必质疑假设** - 包括用户的和自己的`

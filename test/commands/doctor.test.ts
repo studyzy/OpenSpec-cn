@@ -265,7 +265,7 @@ describe('openspec doctor (3.6)', () => {
     expect(store.status[0]).toEqual(
       expect.objectContaining({ severity: 'info', code: 'store_checkout_drift' })
     );
-    expect(store.status[0].message).toContain('1 commit behind its upstream tracking branch');
+    expect(store.status[0].message).toContain('1 个提交 behind its upstream tracking branch');
 
     const human = await runCLI(['doctor', '--store', 'team-context'], { cwd: tempDir, env });
     expect(human.stdout).toContain('behind its upstream tracking branch');
@@ -336,7 +336,7 @@ describe('openspec doctor (3.6)', () => {
     const bare = mkdir('bare-dir-human');
     const result = await runCLI(['doctor'], { cwd: bare, env });
     expect(result.exitCode).toBe(1);
-    expect(result.stderr).toContain('Error: 在当前目录或其祖先目录中未找到 OpenSpec 根目录');
+    expect(result.stderr).toContain('错误：在当前目录或其祖先目录中未找到 OpenSpec 根目录');
     expect(result.stderr).not.toContain('at ');
   });
 

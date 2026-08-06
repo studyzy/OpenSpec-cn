@@ -205,7 +205,7 @@ function specLine(spec: ReferenceSpecEntry): string {
 export function renderReferencedStoresBlock(entries: ReferenceIndexEntry[]): string {
   const lines: string[] = [
     '<referenced_stores>',
-    '<!-- Read-only upstream context. Fetch what you need; cite what you use. -->',
+    '<!-- 只读的上游上下文。按需取用；用到的请注明出处。 -->',
   ];
 
   for (const entry of entries) {
@@ -219,9 +219,9 @@ export function renderReferencedStoresBlock(entries: ReferenceIndexEntry[]): str
 /** Pure renderer for the apply-instructions markdown section. */
 export function renderReferencedStoresSection(entries: ReferenceIndexEntry[]): string {
   const lines: string[] = [
-    '### Referenced Stores',
+    '### 被引用的 Stores',
     '',
-    'Read-only upstream context. Fetch what you need; cite what you use.',
+    '只读的上游上下文。按需取用；用到的请注明出处。',
     '',
   ];
 
@@ -340,8 +340,8 @@ export async function assembleReferenceIndex(
         status: [
           warning(
             'reference_invalid_id',
-            `Reference '${id}' is not a valid store id.`,
-            'Use kebab-case store ids in the references list.'
+            `引用 '${id}' 不是有效的 store id。`,
+            '请在 references 列表中使用 kebab-case 形式的 store id。'
           ),
         ],
       });
@@ -396,7 +396,7 @@ export async function assembleReferenceIndex(
           warning(
             'reference_root_unhealthy',
             `被引用的 store '${id}' 已注册但不可用（${inspection.kind.replace(/_/g, ' ')}）。`,
-            `Run: openspec-cn store doctor ${id}`
+            `请运行：openspec-cn store doctor ${id}`
           ),
         ],
       });

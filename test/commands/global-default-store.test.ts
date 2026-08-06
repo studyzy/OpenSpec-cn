@@ -74,6 +74,6 @@ describe('global defaultStore fallback (#1359)', () => {
     const [diagnostic] = parseJson(status).status;
     expect(diagnostic.code).toBe('unknown_store');
     expect(diagnostic.message).toContain("Global defaultStore 'ghost-plans'");
-    expect(diagnostic.fix).toContain('openspec config unset defaultStore');
+    expect(diagnostic.fix).toContain('openspec-cn config unset defaultStore');
   }, 30_000);
 });

@@ -11,7 +11,7 @@ metadata:
 
 引导用户完成他们的第一个完整 OpenSpec 工作流周期。这是一次教学体验——你将在他们的代码库中做真实工作，同时解释每一步。
 
-**存储选择：** 若用户指定了一个存储（存储是注册在本机上的独立 OpenSpec 仓库）或工作位于某个存储中，请运行 `openspec store list --json` 发现已注册的存储 ID，然后在读写 spec 和变更的命令上传递 `--store <id>`（`new change`、`status`、`instructions`、`list`、`show`、`validate`、`archive`、`doctor`、`context`、`view`）。选定后，将 `--store <id>` 视为在当前工作流其余部分中固定不变。以下每个未限定范围的命令示例均为简写形式：运行前请追加该标志。例如，运行 `openspec status --change "<name>" --json --store "<id>"`，而非下面展示的未限定形式。其他命令不接受此标志。命令输出的提示已包含该标志；在后续操作中请保留它。若不指定存储，命令将对最近的本地 `openspec/` 根目录生效。
+**存储选择：** 若用户指定了一个存储（存储是注册在本机上的独立 OpenSpec 仓库）或工作位于某个存储中，请运行 `openspec-cn store list --json` 发现已注册的存储 ID，然后在读写 spec 和变更的命令上传递 `--store <id>`（`new change`、`status`、`instructions`、`list`、`show`、`validate`、`archive`、`doctor`、`context`、`view`）。选定后，将 `--store <id>` 视为在当前工作流其余部分中固定不变。以下每个未限定范围的命令示例均为简写形式：运行前请追加该标志。例如，运行 `openspec-cn status --change "<name>" --json --store "<id>"`，而非下面展示的未限定形式。其他命令不接受此标志。命令输出的提示已包含该标志；在后续操作中请保留它。若不指定存储，命令将对最近的本地 `openspec/` 根目录生效。
 
 ---
 
@@ -506,7 +506,7 @@ openspec-cn archive "<name>" --yes
 没问题！你的变更保存在 `openspec-cn status --change "<name>" --json` 报告的 `changeRoot`。
 
 稍后从我们停下的地方继续：
-- `/openspec-continue-change <name>` - 恢复制品创建（若已安装；否则 `openspec status --change "<name>" --json` 显示下一个制品）
+- `/openspec-continue-change <name>` - 恢复制品创建（若已安装；否则 `openspec-cn status --change "<name>" --json` 显示下一个制品）
 - `/openspec-apply-change <name>` - 跳到实现（若任务存在）
 
 工作不会丢失。随时回来。

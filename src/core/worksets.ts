@@ -84,7 +84,7 @@ export function getWorksetCodeWorkspacePath(
 export function validateWorksetName(name: string): string {
   if (!isKebabId(name)) {
     throw new StoreError(
-      `Workset name '${name}' ${KEBAB_ID_DESCRIPTION}.`,
+      `Workset 名称 '${name}' ${KEBAB_ID_DESCRIPTION}。`,
       'invalid_workset_name',
       {
         target: 'workset.name',
@@ -127,7 +127,7 @@ export function memberListProblem(members: WorksetMember[]): string | null {
 }
 
 export function memberLabelProblem(label: string): string | null {
-  return folderStyleNameProblem(label, 'member name');
+  return folderStyleNameProblem(label, '成员名称');
 }
 
 const WorksetMemberSchema = z
@@ -185,7 +185,7 @@ export function parseWorksetsState(
   for (const [name, entry] of Object.entries(result.data.worksets)) {
     if (!isKebabId(name)) {
       throw invalidWorksetsFileError(
-        `workset name '${name}' ${KEBAB_ID_DESCRIPTION}`,
+        `workset 名称 '${name}' ${KEBAB_ID_DESCRIPTION}`,
         options
       );
     }

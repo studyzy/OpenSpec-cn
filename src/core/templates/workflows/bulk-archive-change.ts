@@ -41,7 +41,7 @@ ${STORE_SELECTION_GUIDANCE}
    **Load current archive inputs once for the selected root before batch validation:**
 
    Choose one selected change from this root and run
-   \`openspec instructions archive --change "<selected-change>" --json\` with the
+   \`openspec-cn instructions archive --change "<selected-change>" --json\` with the
    same selected-root flags. This lookup is advisory and optional: it only supplies
    extra prompt inputs, so it must never block the batch. If it fails or returns
    invalid JSON — for example on an older CLI that does not support this command
@@ -157,7 +157,7 @@ ${STORE_SELECTION_GUIDANCE}
    Before step 8 writes the first main spec or moves any change, fetch every
    required specs-rule snapshot for the confirmed batch. For each change that will
    sync concrete \`artifactPaths.specs.existingOutputPaths\`, run
-   \`openspec instructions specs --change "<name>" --json\` exactly once with the
+   \`openspec-cn instructions specs --change "<name>" --json\` exactly once with the
    same selected-root flags. Obtain all snapshots before the first write or move.
    If any lookup exits non-zero or returns invalid artifact-instruction JSON,
    identify the affected change, report the error, and stop the whole batch before
@@ -196,7 +196,7 @@ ${STORE_SELECTION_GUIDANCE}
 
    c. **Perform the archive**:
 
-      Target name: 若变更名已以 \`YYYY-MM-DD-\` 前缀开头则保持原样；否则将当前日期前置为 \`YYYY-MM-DD-<name>\`（与 \`openspec archive\` 相同的规则）。
+      Target name: 若变更名已以 \`YYYY-MM-DD-\` 前缀开头则保持原样；否则将当前日期前置为 \`YYYY-MM-DD-<name>\`（与 \`openspec-cn archive\` 相同的规则）。
 
       \`\`\`bash
       mkdir -p "<planningHome.changesDir>/archive"
@@ -375,7 +375,7 @@ ${STORE_SELECTION_GUIDANCE}
    **Load current archive inputs once for the selected root before batch validation:**
 
    Choose one selected change from this root and run
-   \`openspec instructions archive --change "<selected-change>" --json\` with the
+   \`openspec-cn instructions archive --change "<selected-change>" --json\` with the
    same selected-root flags. This lookup is advisory and optional: it only supplies
    extra prompt inputs, so it must never block the batch. If it fails or returns
    invalid JSON — for example on an older CLI that does not support this command
@@ -491,7 +491,7 @@ ${STORE_SELECTION_GUIDANCE}
    Before step 8 writes the first main spec or moves any change, fetch every
    required specs-rule snapshot for the confirmed batch. For each change that will
    sync concrete \`artifactPaths.specs.existingOutputPaths\`, run
-   \`openspec instructions specs --change "<name>" --json\` exactly once with the
+   \`openspec-cn instructions specs --change "<name>" --json\` exactly once with the
    same selected-root flags. Obtain all snapshots before the first write or move.
    If any lookup exits non-zero or returns invalid artifact-instruction JSON,
    identify the affected change, report the error, and stop the whole batch before
@@ -530,7 +530,7 @@ ${STORE_SELECTION_GUIDANCE}
 
    c. **Perform the archive**:
 
-      Target name: 若变更名已以 \`YYYY-MM-DD-\` 前缀开头则保持原样；否则将当前日期前置为 \`YYYY-MM-DD-<name>\`（与 \`openspec archive\` 相同的规则）。
+      Target name: 若变更名已以 \`YYYY-MM-DD-\` 前缀开头则保持原样；否则将当前日期前置为 \`YYYY-MM-DD-<name>\`（与 \`openspec-cn archive\` 相同的规则）。
 
       \`\`\`bash
       mkdir -p "<planningHome.changesDir>/archive"

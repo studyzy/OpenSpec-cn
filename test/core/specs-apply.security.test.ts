@@ -60,7 +60,7 @@ describe('spec apply path boundaries', () => {
     await fs.symlink(outsideSpec, linkedSpec);
 
     await expect(findSpecUpdates(changeDir, mainSpecsDir)).rejects.toThrow(
-      'Path is outside the allowed directory'
+      '路径位于允许的目录之外'
     );
     await expect(fs.readFile(outsideSpec, 'utf-8')).resolves.toBe('outside sentinel');
   });
@@ -115,7 +115,7 @@ describe('spec apply path boundaries', () => {
     await fs.symlink(outsideSpec, deltaPath);
 
     await expect(buildUpdatedSpec(update, 'test-change', { silent: true })).rejects.toThrow(
-      'Path is outside the allowed directory'
+      '路径位于允许的目录之外'
     );
   });
 
@@ -131,7 +131,7 @@ describe('spec apply path boundaries', () => {
     await fs.symlink(outsideSpec, targetPath);
 
     await expect(buildUpdatedSpec(update, 'test-change', { silent: true })).rejects.toThrow(
-      'Path is outside the allowed directory'
+      '路径位于允许的目录之外'
     );
     await expect(fs.readFile(outsideSpec, 'utf-8')).resolves.toBe('outside sentinel');
   });
@@ -151,7 +151,7 @@ describe('spec apply path boundaries', () => {
         { added: 1, modified: 0, removed: 0, renamed: 0 },
         { silent: true }
       )
-    ).rejects.toThrow('Path is outside the allowed directory');
+    ).rejects.toThrow('路径位于允许的目录之外');
     await expect(fs.readdir(outsideDir)).resolves.toEqual([]);
   });
 });

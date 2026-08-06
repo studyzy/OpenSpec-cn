@@ -178,7 +178,7 @@ export class Validator {
           level: 'ERROR',
           path: 'spec.md',
           message:
-            'Delta spec found at specs/spec.md. Delta specs must live under a capability path (e.g. specs/<capability-path>/spec.md) — a file at the specs/ root is ignored when the change is applied or archived.',
+            '在 specs/spec.md 处发现了增量规范（delta spec）。增量规范必须位于能力路径之下（例如 specs/<capability-path>/spec.md）——放在 specs/ 根目录下的文件在变更被应用或归档时会被忽略。',
         });
       }
 
@@ -380,8 +380,8 @@ export class Validator {
               level: 'ERROR',
               path: entryPath,
               message:
-                `Requirement present in both RENAMED and REMOVED: "${from}"` +
-                (removedFoldMatch === fromKey ? '' : ` (REMOVED spells it "${removedFoldMatch}")`),
+                `需求同时存在于 RENAMED 和 REMOVED： "${from}"` +
+                (removedFoldMatch === fromKey ? '' : `（REMOVED 中写作 "${removedFoldMatch}"）`),
             });
           }
         }
@@ -490,8 +490,8 @@ export class Validator {
           level: 'ERROR',
           path: entryPath,
           message:
-            `Could not read ${FileSystemUtils.toPosixPath(mainSpecFile)} to check the MODIFIED requirements against it ` +
-            `(${code}). Archive reads the same file, so fix the file before archiving.`,
+            `无法读取 ${FileSystemUtils.toPosixPath(mainSpecFile)}，因此无法据此校验 MODIFIED 需求` +
+            `（${code}）。归档时会读取同一个文件，请在归档前修复该文件。`,
         },
       ];
     }
@@ -542,9 +542,9 @@ export class Validator {
         level: 'ERROR',
         path: entryPath,
         message:
-          `MODIFIED "${block.name}" omits scenario(s) the current spec still has: ` +
-          `${missing.map(name => `"${name}"`).join(', ')}. ` +
-          'Copy them into the MODIFIED block (a MODIFIED requirement replaces the whole block, so archive refuses to drop them).',
+          `MODIFIED "${block.name}" 遗漏了当前 spec 中仍存在的场景： ` +
+          `${missing.map(name => `"${name}"`).join('、')}。` +
+          '请将它们复制到 MODIFIED 块中（MODIFIED 需求会整块替换原需求，因此归档会拒绝丢弃这些场景）。',
       });
     }
     return issues;
@@ -749,10 +749,10 @@ export class Validator {
     blockName: string,
     guidanceOnly = false
   ): string {
-    const base = `${prefix} ${guidanceOnly ? 'should' : 'must'} contain SHALL or MUST`;
-    const suffix = guidanceOnly ? ' (RFC 2119 best practice for English specs)' : '';
+    const base = `${prefix} ${guidanceOnly ? '应当' : '必须'}包含 SHALL 或 MUST`;
+    const suffix = guidanceOnly ? '（RFC 2119 针对英文 spec 的最佳实践）' : '';
     if (this.containsShallOrMust(blockName)) {
-      return `${base} in the requirement body, not only in the header. Move the SHALL/MUST statement to the line immediately after the "### Requirement: ..." header.${suffix}`;
+      return `${base}，且需出现在需求正文中，而不是只出现在标题里。请把 SHALL/MUST 语句移到 "### Requirement: ..." 标题的下一行。${suffix}`;
     }
     return `${base}${suffix}`;
   }
@@ -768,6 +768,6 @@ export class Validator {
     if (sections.length === 1) return sections[0];
     const head = sections.slice(0, -1);
     const last = sections[sections.length - 1];
-    return `${head.join(', ')} and ${last}`;
+    return `${head.join('、')} 和 ${last}`;
   }
 }

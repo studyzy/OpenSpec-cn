@@ -11,7 +11,7 @@ metadata:
 
 在实验性工作流中归档已完成的变更。
 
-**存储选择：** 若用户指定了一个存储（存储是注册在本机上的独立 OpenSpec 仓库）或工作位于某个存储中，请运行 `openspec store list --json` 发现已注册的存储 ID，然后在读写 spec 和变更的命令上传递 `--store <id>`（`new change`、`status`、`instructions`、`list`、`show`、`validate`、`archive`、`doctor`、`context`、`view`）。选定后，将 `--store <id>` 视为在当前工作流其余部分中固定不变。以下每个未限定范围的命令示例均为简写形式：运行前请追加该标志。例如，运行 `openspec status --change "<name>" --json --store "<id>"`，而非下面展示的未限定形式。其他命令不接受此标志。命令输出的提示已包含该标志；在后续操作中请保留它。若不指定存储，命令将对最近的本地 `openspec/` 根目录生效。
+**存储选择：** 若用户指定了一个存储（存储是注册在本机上的独立 OpenSpec 仓库）或工作位于某个存储中，请运行 `openspec-cn store list --json` 发现已注册的存储 ID，然后在读写 spec 和变更的命令上传递 `--store <id>`（`new change`、`status`、`instructions`、`list`、`show`、`validate`、`archive`、`doctor`、`context`、`view`）。选定后，将 `--store <id>` 视为在当前工作流其余部分中固定不变。以下每个未限定范围的命令示例均为简写形式：运行前请追加该标志。例如，运行 `openspec-cn status --change "<name>" --json --store "<id>"`，而非下面展示的未限定形式。其他命令不接受此标志。命令输出的提示已包含该标志；在后续操作中请保留它。若不指定存储，命令将对最近的本地 `openspec/` 根目录生效。
 
 `<capability-path>` 是相对于 `specs/` 的 spec 目录（例如 `user-auth` 或 `identity/user-auth`）。在解析主 spec 时保留每个增量 spec 的完整路径。
 
@@ -24,7 +24,7 @@ metadata:
    若提供了名称，使用它。否则：
    - 从对话上下文推断（若用户提到了某个变更）
    - 若仅有一个活跃变更则自动选择
-   - 若存在歧义，运行 `openspec list --json` 获取可用变更并让用户选择
+   - 若存在歧义，运行 `openspec-cn list --json` 获取可用变更并让用户选择
 
    提示时，仅显示活跃变更（非已归档）。
    若可用，包含每个变更使用的 schema。
@@ -35,7 +35,7 @@ metadata:
 
    After resolving the selected change and planning root, run:
    ```bash
-   openspec instructions archive --change "<name>" --json
+   openspec-cn instructions archive --change "<name>" --json
    ```
    Keep the same selected-root flags on this command. This lookup is advisory and
    optional: it only supplies extra prompt inputs, so it must never block archiving.
@@ -106,7 +106,7 @@ metadata:
    - Anything else — ask again rather than archiving
 
    Before a selected sync writes any main spec, run
-   `openspec instructions specs --change "<name>" --json` once with the same
+   `openspec-cn instructions specs --change "<name>" --json` once with the same
    selected-root flags. Require a zero exit status and valid artifact-instruction
    JSON. If the lookup fails or returns invalid JSON, report the error and stop
    before writing any main spec or moving the change. 省略 `rules` 的有效响应表示未配置制品规则
@@ -129,7 +129,7 @@ metadata:
    mkdir -p "<planningHome.changesDir>/archive"
    ```
 
-   Generate the target name: 若变更名已以 `YYYY-MM-DD-` 前缀开头则保持原样；否则将当前日期前置为 `YYYY-MM-DD-<change-name>`。绝不叠加第二个日期（与 `openspec archive` 相同的规则）。
+   Generate the target name: 若变更名已以 `YYYY-MM-DD-` 前缀开头则保持原样；否则将当前日期前置为 `YYYY-MM-DD-<change-name>`。绝不叠加第二个日期（与 `openspec-cn archive` 相同的规则）。
 
    **检查目标是否已存在：**
    - 是：报错失败，建议重命名现有归档或使用不同日期
@@ -163,7 +163,7 @@ metadata:
 
 **Guardrails**
 - Announce the selected change; prompt for selection when it is ambiguous
-- Use artifact graph (openspec status --json) for completion checking
+- Use artifact graph (openspec-cn status --json) for completion checking
 - Don't block archive on warnings - just inform and confirm
 - Preserve .openspec.yaml when moving to archive (it moves with the directory)
 - Show clear summary of what happened

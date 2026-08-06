@@ -277,7 +277,7 @@ function readBooleanMarker(
       err instanceof Error ? err.message : String(err);
     return {
       declared: false,
-      invalidReason: `the metadata file cannot be read (${message})`,
+      invalidReason: `元数据文件无法读取（${message}）`,
     };
   }
 
@@ -289,7 +289,7 @@ function readBooleanMarker(
     // claim the marker was set.
     const mentioned = new RegExp(`^\\s*(['"]?)${key}\\1\\s*:`, 'm').test(raw);
     return mentioned
-      ? { declared: false, invalidReason: 'the file is not valid YAML' }
+      ? { declared: false, invalidReason: '该文件不是有效的 YAML' }
       : { declared: false };
   }
 
@@ -310,7 +310,7 @@ function readBooleanMarker(
       if (!listSchemas(projectRoot).includes(result.data.schema)) {
         return {
           declared: false,
-          invalidReason: `schema: unknown schema '${result.data.schema}'`,
+          invalidReason: `schema：未知 schema '${result.data.schema}'`,
         };
       }
       resolveSchema(result.data.schema, projectRoot);

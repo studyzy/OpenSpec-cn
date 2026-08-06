@@ -256,7 +256,7 @@ describe('openspec CLI e2e basics', () => {
       expect(result.exitCode).toBe(1);
       expect(output).not.toContain('force closed the prompt');
       expect(output).toContain('无法从标准输入读取回答');
-      expect(output).toContain('openspec archive add-greeting --yes');
+      expect(output).toContain('openspec-cn archive add-greeting --yes');
 
       // The change is untouched: nothing was archived or merged.
       expect(await fileExists(path.join(projectDir, 'openspec', 'changes', 'add-greeting', 'proposal.md'))).toBe(true);
@@ -271,7 +271,7 @@ describe('openspec CLI e2e basics', () => {
       expect(result.exitCode).toBe(1);
       expect(output).not.toContain('force closed the prompt');
       expect(output).toContain('个未完成的任务');
-      expect(output).toContain('openspec archive add-greeting --yes');
+      expect(output).toContain('openspec-cn archive add-greeting --yes');
     });
 
     it('keeps the caller\'s own flags in the suggested rerun', async () => {
@@ -282,7 +282,7 @@ describe('openspec CLI e2e basics', () => {
 
       const output = `${result.stdout}${result.stderr}`;
       expect(result.exitCode).toBe(1);
-      expect(output).toContain('openspec archive add-greeting --skip-specs --yes');
+      expect(output).toContain('openspec-cn archive add-greeting --skip-specs --yes');
     });
 
     it('reports the skip-validation prompt the same way', async () => {
@@ -293,7 +293,7 @@ describe('openspec CLI e2e basics', () => {
       expect(result.exitCode).toBe(1);
       expect(output).not.toContain('force closed the prompt');
       expect(output).toContain('跳过验证需要确认');
-      expect(output).toContain('openspec archive add-greeting --no-validate --yes');
+      expect(output).toContain('openspec-cn archive add-greeting --no-validate --yes');
     });
 
     it('archives normally once that flag is passed', async () => {
@@ -345,7 +345,7 @@ describe('openspec CLI e2e basics', () => {
 
       const output = `${result.stdout}${result.stderr}`;
       expect(result.exitCode).toBe(1);
-      expect(output).toContain('openspec archive add-greeting --yes --store team-store');
+      expect(output).toContain('openspec-cn archive add-greeting --yes --store team-store');
     });
 
     it('keeps --store in front of the `--` for a dash-leading change name', async () => {
@@ -382,7 +382,7 @@ describe('openspec CLI e2e basics', () => {
 
       const output = `${result.stdout}${result.stderr}`;
       expect(result.exitCode).toBe(1);
-      expect(output).toContain('openspec archive --yes --store team-store -- --force');
+      expect(output).toContain('openspec-cn archive --yes --store team-store -- --force');
     });
   });
 });

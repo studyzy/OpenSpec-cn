@@ -315,7 +315,7 @@ artifacts:
       expect(JSON.parse(output as string).error).toContain(
         '无法 Fork schema'
       );
-      expect(JSON.parse(output as string).error).toContain('Path is outside the allowed directory');
+      expect(JSON.parse(output as string).error).toContain('路径位于允许的目录之外');
     });
 
     it('should dereference a confined template link into an independent fork', async () => {

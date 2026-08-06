@@ -237,10 +237,10 @@ describe('searchable-multi-select keybindings', () => {
     it('should include Space toggle and Enter confirm in rendered output', async () => {
       await setup();
       expect(renderOutput).toContain('Space');
-      expect(renderOutput).toContain('toggle');
+      expect(renderOutput).toContain('切换选中');
       expect(renderOutput).toContain('Enter');
-      expect(renderOutput).toContain('confirm');
-      expect(renderOutput).not.toMatch(/Tab.*confirm/);
+      expect(renderOutput).toContain('确认');
+      expect(renderOutput).not.toMatch(/Tab.*确认/);
     });
   });
 });

@@ -342,12 +342,12 @@ function migrateCommandFiles(
 export function describeLegacyMigration(migration: LegacyToolMigration): string {
   const parts: string[] = [];
   if (migration.skillDirs > 0) {
-    parts.push(`${migration.skillDirs} skill${migration.skillDirs === 1 ? '' : 's'}`);
+    parts.push(`${migration.skillDirs} 个 skill`);
   }
   if (migration.commandFiles > 0) {
-    parts.push(`${migration.commandFiles} command${migration.commandFiles === 1 ? '' : 's'}`);
+    parts.push(`${migration.commandFiles} 个命令`);
   }
-  return parts.join(' and ');
+  return parts.join('和');
 }
 
 /**
@@ -383,12 +383,12 @@ export function hasMovableContent(migration: LegacyToolMigration): boolean {
 export function legacyMigrationNotice(migration: LegacyToolMigration): string {
   if (migration.toolId === 'devin') {
     return (
-      `Windsurf is now Devin Desktop, and its config directory moved from ` +
-      `${migration.from}/ to ${migration.to}/. Devin Desktop reads ${migration.from}/ ` +
-      `only as a fallback, and Devin Local does not read it at all.`
+      `Windsurf 现已更名为 Devin Desktop，其配置目录已从 ` +
+      `${migration.from}/ 迁移到 ${migration.to}/。Devin Desktop 仅将 ${migration.from}/ ` +
+      `作为后备读取，而 Devin Local 完全不读取它。`
     );
   }
-  return `${migration.from}/ is the former location for this tool; ${migration.to}/ is current.`;
+  return `${migration.from}/ 是该工具的旧位置；${migration.to}/ 是当前位置。`;
 }
 
 /**

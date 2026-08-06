@@ -98,12 +98,67 @@
 | checklist | 清单 | — |
 | dashboard | 仪表盘 | — |
 | guardrail | 护栏 / 约束 | — |
+| operation guidance | 操作指引 | `operations.*.guidance` 配置项 |
+| advisory | 建议性 | 与"必需/强制"相对 |
+| cloud coding agent | 云端编程 Agent | GitHub Copilot 相关 |
+| opt-in | 主动选择启用 | — |
+| vendor-neutral | 与厂商无关 | 共享 `.agents` 目标 |
+| delivery mode | 交付模式 | skills / commands |
+| skills-only | 仅 skills | 某些工具不生成命令文件 |
+| Not generated | 不生成 | 工具表格中的命令路径单元格 |
+| shadowing (on PATH) | 遮蔽 | PATH 上存在更早的副本 |
+| version manager | 版本管理器 | nvm / fnm / asdf / volta |
+| shim | shim | 保持(版本管理器概念) |
+| envelope | 信封 | 诊断载荷结构 |
+| payload | 载荷 | — |
+| precedence | 优先级 | 根目录解析顺序 |
+| snapshot | 快照 | — |
+| drift | 漂移 / 领先落后计数 | store git 状态 |
+| retire / retirement | 退役 | 能力的 spec 被删除 |
+| ledger | 台账 | 红/绿测试状态记录 |
+| gate | 门禁 | 流程卡点 |
+| runbook | 运行手册 | — |
+| reconcile | 协调处理 | 新旧 skill 文件的对齐 |
+| affected area | 受影响领域 | workspace-planning schema 用语 |
+| allowed edit root | 允许编辑的根目录 | workspace-planning schema 用语 |
+| behavior contract | 行为契约 | spec 的定义性说法 |
+| entry criteria | 准入条件 | — |
+| handoff | 交接 | 领域之间的工作交接 |
+
+## 锚点链接处理约定
+
+翻译标题会让指向该标题的英文锚点(如 `supported-tools.md#how-to-invoke`)失效,
+而引用方往往是**其他**文件。约定做法:在译后标题上方插入一行 HTML 锚点,保留原英文 id:
+
+```markdown
+<a id="how-to-invoke"></a>
+
+## 如何调用
+```
+
+这样既完成汉化,又不破坏任何站内链接,且改动只落在被引用的文件内。
+翻译任一文件后,请用下面的命令自查全仓库指向它的锚点是否仍然有效:
+
+```bash
+grep -rhoP '(docs/)?<文件名>\.md#[a-z0-9-]+' docs/ *.md | sort -u
+```
+
+已按此方式处理的文件:`docs/supported-tools.md`、`docs/installation.md`、`docs/customization.md`。
+
+> 已知遗留问题:`docs/faq.md` 引用的 `troubleshooting.md#commands-dont-show-up` 已失效
+> (该标题已被译为「## 命令不显示」),需由负责 `troubleshooting.md` 的人补上锚点。
 
 ## 特殊文件注意事项
 
 - `docs/multi-language.md`:多语言配置指南,其中各语言示例(葡萄牙语、西班牙语、日语、法语、德语等)的 YAML `context` 块内容**保留原文**,不翻译;只汉化说明性文字。
 - `docs/glossary.md`:术语表,左侧术语列保持英文,右侧定义列汉化。
 - 测试相关:`EXPECTED_FUNCTION_HASHES` 与 `EXPECTED_GENERATED_SKILL_CONTENT_HASHES` 因汉化改变,相关 UT 需在所有汉化完成后重算 Hash 修复(见 CODEBUDDY.md 注意项)。
+- `schemas/**/templates/*.md`:以下标记由硬编码正则匹配,**绝对不可翻译**,否则功能静默失效:
+  - `### Requirement:`(`src/core/parsers/spec-structure.ts`)
+  - `#### Scenario:`(`src/core/parsers/requirement-blocks.ts`)
+  - `## ADDED/MODIFIED/REMOVED/RENAMED Requirements`(虽有中文别名,但项目内到处引用英文名,统一保持英文)
+  - `## Purpose`:`src/core/specs-apply.ts` 中 `/^##\s+Purpose\s*$/i` **没有**中文别名,译成中文会导致归档时 Purpose 无法沿用到主 spec。
+  - `## Why` / `## What Changes`:parser 有中文别名,但 validator 报错文案引用英文名,保持英文更一致。
 
 ## 翻译风格
 

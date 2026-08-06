@@ -40,15 +40,15 @@ describe('artifact-graph workflow integration', () => {
       const proposal = schema.artifacts.find(artifact => artifact.id === 'proposal');
       const specs = schema.artifacts.find(artifact => artifact.id === 'specs');
 
-      expect(proposal?.instruction).toContain('`user-auth` or `identity/user-auth`');
-      expect(proposal?.instruction).toContain('follow the project\'s existing spec organization');
+      expect(proposal?.instruction).toContain('`user-auth` 或 `identity/user-auth`');
+      expect(proposal?.instruction).toContain('并遵循项目现有的 spec 组织方式');
       expect(specs?.instruction).toContain(
-        '`<capability-path>` is the spec directory relative to `specs/`'
+        '`<capability-path>` 是相对于 `specs/` 的 spec 目录'
       );
       expect(specs?.instruction).toContain(
-        'do not add a new domain level when the project uses a flat layout'
+        '当项目采用扁平布局时，不要新增一层领域目录'
       );
-      expect(specs?.instruction).toContain('Do not move or rename the capability');
+      expect(specs?.instruction).toContain('不要移动或重命名该能力');
     });
 
     it('should progress through complete workflow', () => {

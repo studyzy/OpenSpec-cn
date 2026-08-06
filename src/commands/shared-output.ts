@@ -65,9 +65,9 @@ export function emitFailure(
     process.exitCode = 1;
     return;
   }
-  console.error(`Error: ${status.message}`);
+  console.error(`错误：${status.message}`);
   if (status.fix) {
-    console.error(`Fix: ${status.fix}`);
+    console.error(`修复：${status.fix}`);
   }
   process.exitCode = 1;
 }

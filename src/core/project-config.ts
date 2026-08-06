@@ -50,7 +50,7 @@ export const ProjectConfigSchema = z.object({
       z.array(z.string()) // list of rules
     )
     .optional()
-    .describe('Per-artifact rules, keyed by artifact ID'),
+    .describe('按制品 ID 索引的逐制品规则'),
 
   // Optional: per-operation advisory guidance, kept separate from artifact rules.
   operations: z
@@ -59,7 +59,7 @@ export const ProjectConfigSchema = z.object({
       archive: OperationConfigSchema.optional(),
     })
     .optional()
-    .describe('Per-operation advisory guidance'),
+    .describe('逐操作的建议性指引'),
 
   // Note: the `references` field (id strings or {id, remote} maps) is
   // deliberately absent here — readProjectConfig parses and normalizes
@@ -82,7 +82,7 @@ export const ProjectConfigSchema = z.object({
       cloudAgent: z.boolean().optional(),
     })
     .optional()
-    .describe('GitHub Copilot integration preferences'),
+    .describe('GitHub Copilot 集成偏好设置'),
 });
 
 /** Normalized in-memory shape of a referenced store declaration. */
@@ -150,7 +150,7 @@ function parseOperations(raw: unknown): OperationsConfig | undefined {
     const unknownFields = Object.keys(operation).filter((field) => field !== 'guidance');
     if (unknownFields.length > 0) {
       console.warn(
-        `Unknown field(s) in 'operations.${operationId}': ${unknownFields.join(', ')}. Supported fields: guidance`
+        `'operations.${operationId}' 中存在未知字段：${unknownFields.join(', ')}。支持的字段：guidance`
       );
     }
 
@@ -161,7 +161,7 @@ function parseOperations(raw: unknown): OperationsConfig | undefined {
     const guidanceResult = z.array(z.string()).safeParse(operation.guidance);
     if (!guidanceResult.success) {
       console.warn(
-        `Guidance for operation '${operationId}' must be an array of strings, ignoring this operation's guidance`
+        `操作 '${operationId}' 的 guidance 必须是字符串数组，将忽略该操作的 guidance`
       );
       continue;
     }
@@ -169,7 +169,7 @@ function parseOperations(raw: unknown): OperationsConfig | undefined {
     const guidance = guidanceResult.data.filter((entry) => entry.length > 0);
     if (guidance.length < guidanceResult.data.length) {
       console.warn(
-        `Some guidance for operation '${operationId}' are empty strings, ignoring them`
+        `操作 '${operationId}' 的部分 guidance 是空字符串，将忽略这些条目`
       );
     }
     if (guidance.length > 0) {
@@ -428,8 +428,8 @@ export function validateConfigRules(
     if (!validArtifactIds.has(artifactId)) {
       const validIds = Array.from(validArtifactIds).sort().join(', ');
       warnings.push(
-        `Unknown artifact ID in rules: "${artifactId}". ` +
-          `It matches no artifact in any available schema. Known artifact IDs: ${validIds}`
+        `rules 中存在未知的制品 ID："${artifactId}"。` +
+          `它与任何可用 schema 中的制品都不匹配。已知的制品 ID：${validIds}`
       );
     }
   }
@@ -484,28 +484,28 @@ export function suggestSchemas(
   const builtIn = availableSchemas.filter((s) => s.isBuiltIn).map((s) => s.name);
   const projectLocal = availableSchemas.filter((s) => !s.isBuiltIn).map((s) => s.name);
 
-  let message = `Schema '${invalidSchemaName}' not found in openspec/config.yaml\n\n`;
+  let message = `在 openspec/config.yaml 中未找到 schema '${invalidSchemaName}'\n\n`;
 
   if (suggestions.length > 0) {
     message += `您是指以下之一吗？\n`;
     suggestions.forEach((s) => {
-      const type = s.isBuiltIn ? 'built-in' : 'project-local';
+      const type = s.isBuiltIn ? '内置' : '项目本地';
       message += `  - ${s.name} (${type})\n`;
     });
     message += '\n';
   }
 
-  message += `Available schemas:\n`;
+  message += `可用的 schema：\n`;
   if (builtIn.length > 0) {
-    message += `  Built-in: ${builtIn.join(', ')}\n`;
+    message += `  内置：${builtIn.join(', ')}\n`;
   }
   if (projectLocal.length > 0) {
-    message += `  Project-local: ${projectLocal.join(', ')}\n`;
+    message += `  项目本地：${projectLocal.join(', ')}\n`;
   } else {
-    message += `  Project-local: (none found)\n`;
+    message += `  项目本地：（未找到）\n`;
   }
 
-  message += `\nFix: Edit openspec/config.yaml and change 'schema: ${invalidSchemaName}' to a valid schema name`;
+  message += `\n修复方式：编辑 openspec/config.yaml，将 'schema: ${invalidSchemaName}' 改为一个有效的 schema 名称`;
 
   return message;
 }
@@ -572,8 +572,8 @@ export function resolveConfigFilePath(projectRoot: string): string | null {
 /** Human rendering of a malformed pointer reason, shared by every surface. */
 export function storePointerProblem(reason: 'unparseable' | 'non_string'): string {
   return reason === 'unparseable'
-    ? 'the config file could not be read as YAML'
-    : 'the store key must be a single store id string';
+    ? '配置文件无法按 YAML 解析'
+    : 'store 键必须是单个 store id 字符串';
 }
 
 export interface OpenSpecDirClassification {

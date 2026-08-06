@@ -1,64 +1,64 @@
 name: workspace-planning
 version: 1
-description: Workspace planning workflow for cross-area changes
+description: 面向跨领域变更的 workspace 规划工作流
 artifacts:
   - id: proposal
     generates: proposal.md
-    description: Shared workspace proposal with the product goal, scope, affected areas, and impact
+    description: 共享的 workspace proposal，包含产品目标、范围、受影响领域与影响面
     template: proposal.md
     instruction: |
-      Create the workspace-level proposal that captures the shared product goal once.
+      创建 workspace 级别的 proposal，一次性阐明共享的产品目标。
 
-      Sections:
-      - **Why**: Explain the product goal or problem in 1-2 concise paragraphs.
-      - **What Changes**: List the cross-area behavior, workflow, or capability changes.
-      - **Affected Areas**: Name known affected areas using registered workspace link names where applicable. If scope is still being explored, say what remains unresolved.
-      - **Capabilities**: Identify workspace-scoped capabilities that need specs. Area-specific requirements should later live under `specs/<area-or-repo>/<capability>/spec.md`.
-      - **Impact**: Summarize user-facing impact, planning impact, and likely implementation homes without creating repo-local artifacts.
+      章节：
+      - **Why**：用 1-2 段简洁文字说明产品目标或问题。
+      - **What Changes**：列出跨领域的行为、工作流或能力变更。
+      - **Affected Areas**：列出已知的受影响领域，适用时使用已注册的 workspace 链接名称。如果范围仍在探索中，说明哪些部分尚未确定。
+      - **Capabilities**：识别需要 specs 的 workspace 范围能力。领域专属的需求之后应放在 `specs/<area-or-repo>/<capability>/spec.md` 下。
+      - **Impact**：总结面向用户的影响、对规划的影响，以及可能的实现落点，但不要创建仓库本地的制品。
 
-      Keep linked repos and folders as exploration context until an explicit implementation workflow selects an affected area.
+      在明确的实现工作流选定受影响领域之前，将链接的仓库和文件夹仅作为探索用的上下文。
     requires: []
 
   - id: specs
     generates: "specs/**/*.md"
-    description: Workspace-scoped specs organized by affected area and capability
+    description: 按受影响领域与能力组织的 workspace 范围 specs
     template: spec.md
     instruction: |
-      Create workspace-scoped specification files that define WHAT should change.
+      创建 workspace 范围的规范文件，定义应该变更什么（WHAT）。
 
-      Use `specs/<area-or-repo>/<capability>/spec.md` for area-specific requirements. The first path segment should be a registered workspace link name when a registered area owns the requirement. If the area is unresolved, use an exploratory area name and make the unresolved question explicit in the requirement or scenario.
+      领域专属的需求使用 `specs/<area-or-repo>/<capability>/spec.md`。当某个已注册领域拥有该需求时，第一个路径片段应为已注册的 workspace 链接名称。如果领域尚未确定，使用一个探索性的领域名称，并在需求或场景中明确写出待解决的问题。
 
-      These specs are planning artifacts under the workspace change root. Do not create repo-local spec files in linked repos during workspace planning.
+      这些 specs 是 workspace 变更根目录下的规划制品。在 workspace 规划阶段，不要在链接的仓库中创建仓库本地的 spec 文件。
 
-      Delta operations (use ## headers):
-      - **ADDED Requirements**: New workspace-scoped behavior.
-      - **MODIFIED Requirements**: Changed behavior; include the full updated requirement.
-      - **REMOVED Requirements**: Deprecated behavior with Reason and Migration.
-      - **RENAMED Requirements**: Name changes only; use FROM:/TO: format.
+      Delta 操作（使用 ## 标题）：
+      - **ADDED Requirements**：新增的 workspace 范围行为。
+      - **MODIFIED Requirements**：变更的行为；需包含完整的更新后需求。
+      - **REMOVED Requirements**：废弃的行为，需附 Reason 与 Migration。
+      - **RENAMED Requirements**：仅名称变更；使用 FROM:/TO: 格式。
 
-      Each requirement must use SHALL/MUST language and include at least one `#### Scenario:` block.
+      每条需求都必须使用 SHALL/MUST 措辞，并且至少包含一个 `#### Scenario:` 块。
     requires:
       - proposal
 
   - id: design
     generates: design.md
-    description: Cross-area technical design and coordination decisions
+    description: 跨领域的技术设计与协作决策
     template: design.md
     instruction: |
-      Create the cross-area design document for workspace planning.
+      为 workspace 规划创建跨领域的设计文档。
 
-      Focus on decisions that affect multiple areas, handoffs between areas, shared constraints, sequencing risks, and how the workspace plan should stay the source of truth. Avoid line-by-line implementation details and do not instruct agents to edit linked repos until an explicit implementation workflow provides an allowed edit root.
+      聚焦于影响多个领域的决策、领域之间的交接、共享约束、时序风险，以及如何让 workspace 计划持续作为事实来源。避免逐行的实现细节；在明确的实现工作流提供了允许编辑的根目录之前，不要指示 agent 去修改链接的仓库。
     requires:
       - proposal
 
   - id: tasks
     generates: tasks.md
-    description: Coordination checklist for workspace planning and later affected-area implementation
+    description: 用于 workspace 规划及后续受影响领域实现的协作清单
     template: tasks.md
     instruction: |
-      Create the workspace coordination task list.
+      创建 workspace 协作任务列表。
 
-      Group tasks by phase or affected area as useful. Each actionable item must be a checkbox using `- [ ]`. When implementation tasks are area-specific, name the affected area and keep the task at planning granularity until a later implementation workflow selects an allowed edit root.
+      按阶段或受影响领域分组任务（视需要而定）。每个可执行项都必须是使用 `- [ ]` 的复选框。当实现任务是领域专属时，写明受影响领域，并在后续实现工作流选定允许编辑的根目录之前，将任务保持在规划粒度。
     requires:
       - specs
       - design
@@ -67,6 +67,6 @@ apply:
   requires: [tasks]
   tracks: tasks.md
   instruction: |
-    Read the workspace planning context from status and instructions output before applying.
-    Select an affected area and confirm an allowed edit root before making implementation edits.
-    Until an explicit implementation context is available, treat linked repos and folders as read-only exploration context.
+    在应用之前，先从 status 与 instructions 的输出中读取 workspace 规划上下文。
+    在进行实现性编辑之前，先选定受影响领域并确认允许编辑的根目录。
+    在明确的实现上下文可用之前，将链接的仓库和文件夹视为只读的探索上下文。

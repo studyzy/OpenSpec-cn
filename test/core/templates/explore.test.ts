@@ -84,7 +84,7 @@ describe('explore templates', () => {
     for (const [label, body] of bodies) {
       const transition = newChangeTransition(body, label);
 
-      expect(transition, label).toContain('openspec new change "<name>"');
+      expect(transition, label).toContain('openspec-cn new change "<name>"');
       expect(transition, label).toContain(
         '绝不要手动在 `openspec/changes/` 下创建新变更目录'
       );
@@ -98,12 +98,12 @@ describe('explore templates', () => {
   it('retains the selected store throughout the capture transition (#668, #720)', () => {
     for (const [label, body] of bodies) {
       const transition = newChangeTransition(body, label);
-      const scaffold = transition.indexOf('在创建任何制品之前运行 `openspec new change "<name>"`');
+      const scaffold = transition.indexOf('在创建任何制品之前运行 `openspec-cn new change "<name>"`');
       const retainStore = transition.indexOf(
         '在后续每个适用的 `status` 和 `instructions` 命令上保留选定的 `--store <id>`'
       );
       const initialStatus = transition.indexOf(
-        '2. 运行 `openspec status --change "<name>" --json`'
+        '2. 运行 `openspec-cn status --change "<name>" --json`'
       );
 
       expect(retainStore, label).toBeGreaterThan(scaffold);
@@ -122,9 +122,9 @@ describe('explore templates', () => {
     for (const [label, body] of bodies) {
       const transition = newChangeTransition(body, label);
 
-      expect(transition, label).toContain('openspec status --change "<name>" --json');
+      expect(transition, label).toContain('openspec-cn status --change "<name>" --json');
       expect(transition, label).toContain(
-        'openspec instructions "<artifact-id>" --change "<name>" --json'
+        'openspec-cn instructions "<artifact-id>" --change "<name>" --json'
       );
       expect(transition, label).toMatch(/Capture the artifact/i);
       expect(transition, label).toContain(
@@ -146,18 +146,18 @@ describe('explore templates', () => {
   it('keeps the seamless capture steps ordered (#668, #720)', () => {
     for (const [label, body] of bodies) {
       const transition = newChangeTransition(body, label);
-      const scaffold = transition.indexOf('在创建任何制品之前运行 `openspec new change "<name>"`');
+      const scaffold = transition.indexOf('在创建任何制品之前运行 `openspec-cn new change "<name>"`');
       const initialStatus = transition.indexOf(
-        '2. 运行 `openspec status --change "<name>" --json`'
+        '2. 运行 `openspec-cn status --change "<name>" --json`'
       );
       const readyInstructions = transition.indexOf(
-        '对每个处于 `ready` 状态的请求制品，运行 `openspec instructions'
+        '对每个处于 `ready` 状态的请求制品，运行 `openspec-cn instructions'
       );
       const verifyOutput = transition.indexOf(
         '验证选定的具体输出存在'
       );
       const refreshStatus = transition.indexOf(
-        '创建每个制品后，重新运行 `openspec status'
+        '创建每个制品后，重新运行 `openspec-cn status'
       );
 
       expect(scaffold, label).toBeGreaterThanOrEqual(0);
@@ -165,17 +165,17 @@ describe('explore templates', () => {
       expect(readyInstructions, label).toBeGreaterThan(initialStatus);
       expect(verifyOutput, label).toBeGreaterThan(readyInstructions);
       expect(refreshStatus, label).toBeGreaterThan(verifyOutput);
-      expect(occurrenceCount(transition, 'openspec new change "<name>"'), label).toBe(1);
+      expect(occurrenceCount(transition, 'openspec-cn new change "<name>"'), label).toBe(1);
       expect(
-        occurrenceCount(transition, 'openspec status --change "<name>" --json'),
+        occurrenceCount(transition, 'openspec-cn status --change "<name>" --json'),
         label
       ).toBe(2);
       expect(
-        occurrenceCount(transition, 'openspec instructions "<artifact-id>"'),
+        occurrenceCount(transition, 'openspec-cn instructions "<artifact-id>"'),
         label
       ).toBe(2);
       expect(
-        occurrenceCount(transition, 'openspec instructions "<prerequisite-id>"'),
+        occurrenceCount(transition, 'openspec-cn instructions "<prerequisite-id>"'),
         label
       ).toBe(1);
       expect(
@@ -183,7 +183,7 @@ describe('explore templates', () => {
         label
       ).toBe(1);
       expect(
-        occurrenceCount(transition, '创建每个制品后，重新运行 `openspec status'),
+        occurrenceCount(transition, '创建每个制品后，重新运行 `openspec-cn status'),
         label
       ).toBe(1);
     }
@@ -213,13 +213,13 @@ describe('explore templates', () => {
     for (const [label, body] of bodies) {
       const transition = newChangeTransition(body, label);
       const requestedInstructions = transition.indexOf(
-        '对每个处于 `ready` 状态的请求制品，运行 `openspec instructions'
+        '对每个处于 `ready` 状态的请求制品，运行 `openspec-cn instructions'
       );
       const evaluateRequestedCondition = transition.indexOf(
         '在创建请求的制品之前，根据探索出的变更评估其自身 `instruction` 中的任何条件'
       );
       const inspectPrerequisite = transition.indexOf(
-        '对该前置制品运行 `openspec instructions "<prerequisite-id>"'
+        '对该前置制品运行 `openspec-cn instructions "<prerequisite-id>"'
       );
       const evaluateCondition = transition.indexOf(
         '根据探索出的变更评估该条件'
@@ -235,7 +235,7 @@ describe('explore templates', () => {
       );
 
       expect(transition, label).toContain(
-        '对该前置制品运行 `openspec instructions "<prerequisite-id>" --change "<name>" --json`（仅对注册的独立存储追加确认的 `--store "<id>"`），无论它是 `ready` 还是 `blocked`'
+        '对该前置制品运行 `openspec-cn instructions "<prerequisite-id>" --change "<name>" --json`（仅对注册的独立存储追加确认的 `--store "<id>"`），无论它是 `ready` 还是 `blocked`'
       );
       expect(transition, label).toContain(
         '仅当条件不适用时记录为有意跳过'
@@ -253,7 +253,7 @@ describe('explore templates', () => {
       expect(transition, label).toContain('记住它且不要重新考虑');
       expect(transition, label).toContain('依赖项是使能因素而非关卡');
       expect(transition, label).toContain(
-        '尽管被阻塞也运行 `openspec instructions "<artifact-id>" --change "<name>" --json`（仅对注册的独立存储追加确认的 `--store "<id>"`）'
+        '尽管被阻塞也运行 `openspec-cn instructions "<artifact-id>" --change "<name>" --json`（仅对注册的独立存储追加确认的 `--store "<id>"`）'
       );
       expect(transition, label).toContain(
         '仅当这些记录的条件性跳过是其唯一缺失的依赖项时'

@@ -2,7 +2,7 @@
 
 你很少从空白页开始写一个 spec。你用平白语言描述一个变更，`/opsx:propose` 起草需求和场景，然后你把它们改好。本页讲的就是最后这部分——"好"长什么样，以及如何引导 AI 朝那个方向走。
 
-它是 [Reviewing a Change](reviewing-changes.md) 的姊妹篇：审阅是抓住草案里的薄弱环节，编写是知道一个强的草案由什么构成。
+它是 [审查变更](reviewing-changes.md) 的姊妹篇：审阅是抓住草案里的薄弱环节，编写是知道一个强的草案由什么构成。
 
 ## spec 是行为，不是代码
 
@@ -56,9 +56,9 @@ The system SHALL expire a session after 30 minutes of inactivity.
 - **`## MODIFIED Requirements`** —— 已存在并正在改变的行为。包含完整的新版本；一行关于改了什么的小注能帮审阅者。
 - **`## REMOVED Requirements`** —— 正在消失的行为，附一行说明原因。
 
-On archive, ADDED gets appended to the main spec, MODIFIED replaces the old version, and REMOVED is dropped from it. Remove the last requirement a capability has and you retire it: rather than leave a spec with nothing in it, archive deletes `openspec/specs/<capability>/spec.md`. Because that is the one archive step that removes a file, it has to be asked for — add `retire_capabilities: true` to the change's `.openspec.yaml`, alongside the `schema:` that file already needs. Without it the archive aborts and tells you so. For a spec in the caller's checkout, the archive output also names the `git checkout` that restores a committed file; selected stores receive checkout-scoped recovery guidance instead. If you mark a real change as ADDED, you end up with two competing requirements; if you describe new behavior as MODIFIED, there's nothing to replace. When in doubt, open the current spec and see whether the requirement is already there.
+归档时，ADDED 会追加到主 spec 中，MODIFIED 会替换旧版本，REMOVED 则从中删去。如果你移除了某个能力的最后一条需求，就等于让它退役：与其留下一个空空如也的 spec，归档会删除 `openspec/specs/<capability>/spec.md`。因为这是归档过程中唯一会删除文件的步骤，所以必须显式请求——在该变更的 `.openspec.yaml` 中加上 `retire_capabilities: true`，与该文件本就需要的 `schema:` 并列。没有它，归档会中止并告知你原因。对于调用方 checkout 中的 spec，归档输出还会给出用于恢复已提交文件的 `git checkout` 命令；选中的 store 则会收到面向 checkout 范围的恢复指引。如果你把一次真正的修改标成 ADDED，最终会得到两条互相冲突的需求；如果你把新行为描述成 MODIFIED，则没有东西可替换。拿不准时，打开当前 spec 看看这条需求是否已经存在。
 
-One more section is worth knowing about. When your delta creates a capability that doesn't exist yet, open it with `## Purpose` — a sentence or two on what the capability is for. Archive uses it as the Purpose of the main spec it creates; skip it and you get a `TBD` placeholder to fill in by hand. An existing spec already has a Purpose, so a delta's is ignored there — edit `openspec/specs/<capability-path>/spec.md` directly to change one. Here, `<capability-path>` is the directory relative to `specs/`, such as `user-auth` in a flat project or `identity/user-auth` in a project organized by domain.
+还有一个小节值得了解。当你的增量创建了一个尚不存在的能力时，用 `## Purpose` 开头——用一两句话说明这个能力是做什么的。归档会把它用作所创建主 spec 的 Purpose；跳过它，你就会得到一个 `TBD` 占位符，需要手工填写。已存在的 spec 本就有 Purpose，因此那里会忽略增量中的 Purpose——要修改它，请直接编辑 `openspec/specs/<capability-path>/spec.md`。这里的 `<capability-path>` 是相对于 `specs/` 的目录，例如扁平项目中的 `user-auth`，或按领域组织的项目中的 `identity/user-auth`。
 
 ## 合理控制变更规模
 
@@ -73,7 +73,7 @@ One more section is worth knowing about. When your delta creates a capability th
 - 两个人没法不撞车地一起做它。
 - 一半的任务都能自己交付。
 
-更小的变更更易审阅、更易在一段专注会话里构建，也更易在六个月后归档成为唯一遗留时去推理。你随时可以并行跑多个变更——见 [Editing & iterating](editing-changes.md) 和 [Workflows](workflows.md)。
+更小的变更更易审阅、更易在一段专注会话里构建，也更易在六个月后归档成为唯一遗留时去推理。你随时可以并行跑多个变更——见 [编辑与迭代变更](editing-changes.md) 和 [工作流](workflows.md)。
 
 反面也会发生：一行字的错别字修复不需要三个需求加一份 design 文档。让仪式匹配风险大小。
 
@@ -98,6 +98,6 @@ One more section is worth knowing about. When your delta creates a capability th
 
 ## 下一步去哪
 
-- [Reviewing a Change](reviewing-changes.md) — 抓住漏网之鱼的两分钟检查。
-- [Concepts](concepts.md) — specs、changes、deltas 背后的更深模型。
-- [Examples & Recipes](examples.md) — 从开始到结束的真实变更。
+- [审查变更](reviewing-changes.md) — 抓住漏网之鱼的两分钟检查。
+- [概念](concepts.md) — specs、changes、deltas 背后的更深模型。
+- [示例与配方](examples.md) — 从开始到结束的真实变更。

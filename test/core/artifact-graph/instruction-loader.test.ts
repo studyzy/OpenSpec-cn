@@ -20,7 +20,7 @@ describe('instruction-loader', () => {
       expect(template).toContain('## What Changes');
       expect(template).toContain('specs/<capability-path>/spec.md');
       expect(template).toContain('<existing-capability-path>');
-      expect(template).toContain('exact existing path under openspec/specs/');
+      expect(template).toContain('使用 openspec/specs/ 下已存在的精确路径');
     });
 
     it('should throw TemplateLoadError for non-existent template', () => {
@@ -59,7 +59,7 @@ describe('instruction-loader', () => {
 
       try {
         expect(() => loadTemplate('custom', 'proposal.md', tempDir)).toThrow(
-          /outside the allowed directory/u
+          /位于允许的目录之外/u
         );
       } finally {
         fs.rmSync(tempDir, { recursive: true, force: true });
@@ -562,7 +562,7 @@ rules:
         generateInstructions(context, 'proposal', tempDir);
 
         expect(consoleWarnSpy).toHaveBeenCalledWith(
-          expect.stringContaining('Unknown artifact ID in rules: "invalid-artifact"')
+          expect.stringContaining('rules 中存在未知的制品 ID："invalid-artifact"')
         );
       });
 
@@ -594,7 +594,7 @@ rules:
           // Note: We may have gotten warnings from other tests, so check that
           // the count didn't increase by more than 1 from the first call
           const callCount = consoleWarnSpy.mock.calls.filter(call =>
-            call[0]?.includes('Unknown artifact ID in rules:')
+            call[0]?.includes('rules 中存在未知的制品 ID：')
           ).length;
 
           expect(callCount).toBeGreaterThanOrEqual(1);

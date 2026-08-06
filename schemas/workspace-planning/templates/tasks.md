@@ -1,15 +1,15 @@
-## 1. Workspace Planning
+## 1. Workspace 规划
 
-- [ ] 1.1 Confirm the shared product goal and unresolved scope questions.
-- [ ] 1.2 Identify affected areas using registered workspace link names where applicable.
-- [ ] 1.3 Review workspace-scoped specs and design before selecting implementation areas.
+- [ ] 1.1 确认共享的产品目标与尚未解决的范围问题。
+- [ ] 1.2 识别受影响领域，适用时使用已注册的 workspace 链接名称。
+- [ ] 1.3 在选定实现领域之前，评审 workspace 范围的 specs 与 design。
 
-## 2. Affected Area Implementation
+## 2. 受影响领域的实现
 
-- [ ] 2.1 Select an affected area and confirm its allowed edit root before implementation.
-- [ ] 2.2 Create or update repo-local implementation artifacts only after the area is selected.
+- [ ] 2.1 选定一个受影响领域，并在实现前确认其允许编辑的根目录。
+- [ ] 2.2 仅在领域选定之后，才创建或更新仓库本地的实现制品。
 
-## 3. Verification
+## 3. 验证
 
-- [ ] 3.1 Verify workspace planning artifacts remain the source of truth.
-- [ ] 3.2 Record manual acceptance evidence and follow-up fixes.
+- [ ] 3.1 验证 workspace 规划制品仍然是事实来源。
+- [ ] 3.2 记录人工验收证据与后续修复项。

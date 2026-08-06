@@ -457,7 +457,7 @@ export class UpdateCommand {
         }
         console.log();
       }
-      console.log(`了解更多：${chalk.cyan('https://github.com/Fission-AI/OpenSpec')}`);
+      console.log(`了解更多：${chalk.cyan('https://github.com/studyzy/OpenSpec-cn')}`);
     }
 
     await this.syncCopilotCloudFiles(resolvedProjectPath, configuredAndNewTools);
@@ -532,7 +532,7 @@ export class UpdateCommand {
       }
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);
-      console.warn(`Warning: failed to sync Copilot cloud agent files: ${message}`);
+      console.warn(`警告：同步 Copilot 云端 agent 文件失败：${message}`);
     }
   }
 

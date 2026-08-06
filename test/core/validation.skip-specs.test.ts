@@ -71,7 +71,7 @@ describe('Validator skip_specs handling', () => {
 
     expect(report.valid).toBe(false);
     const msg = report.issues.map(i => i.message).join('\n');
-    expect(msg).toContain('skip_specs is set in .openspec.yaml but spec files exist under specs/');
+    expect(msg).toContain('.openspec.yaml 中设置了 skip_specs，但 specs/ 下存在 spec 文件');
   });
 
   it('treats skip_specs plus a delta file with no parseable deltas as a conflict, not acceptance', async () => {
@@ -88,7 +88,7 @@ describe('Validator skip_specs handling', () => {
 
     expect(report.valid).toBe(false);
     const messages = report.issues.map(i => i.message).join('\n');
-    expect(messages).toContain('skip_specs is set in .openspec.yaml but spec files exist under specs/');
+    expect(messages).toContain('.openspec.yaml 中设置了 skip_specs，但 specs/ 下存在 spec 文件');
     expect(report.issues.some(i => i.level === 'INFO')).toBe(false);
   });
 
@@ -105,7 +105,7 @@ describe('Validator skip_specs handling', () => {
 
     expect(report.valid).toBe(false);
     const messages = report.issues.map(i => i.message).join('\n');
-    expect(messages).toContain('skip_specs is set in .openspec.yaml but spec files exist under specs/');
+    expect(messages).toContain('.openspec.yaml 中设置了 skip_specs，但 specs/ 下存在 spec 文件');
   });
 
   it('treats skip_specs plus a stray non-spec file under specs/ as a conflict', async () => {
@@ -124,7 +124,7 @@ describe('Validator skip_specs handling', () => {
 
     expect(report.valid).toBe(false);
     const messages = report.issues.map(i => i.message).join('\n');
-    expect(messages).toContain('skip_specs is set in .openspec.yaml but spec files exist under specs/');
+    expect(messages).toContain('.openspec.yaml 中设置了 skip_specs，但 specs/ 下存在 spec 文件');
     expect(report.issues.some(i => i.level === 'INFO')).toBe(false);
   });
 
@@ -139,8 +139,8 @@ describe('Validator skip_specs handling', () => {
 
     expect(report.valid).toBe(false);
     const messages = report.issues.map(i => i.message).join('\n');
-    expect(messages).toContain('skip_specs is set but .openspec.yaml is not valid change metadata');
-    expect(messages).toContain('not valid YAML');
+    expect(messages).toContain('设置了 skip_specs，但 .openspec.yaml 不是有效的变更元数据');
+    expect(messages).toContain('不是有效的 YAML');
   });
 
   it('does not honor skip_specs when the metadata fails the shared schema', async () => {
@@ -153,7 +153,7 @@ describe('Validator skip_specs handling', () => {
 
     expect(report.valid).toBe(false);
     const msg = report.issues.map(i => i.message).join('\n');
-    expect(msg).toContain('skip_specs is set but .openspec.yaml is not valid change metadata');
+    expect(msg).toContain('设置了 skip_specs，但 .openspec.yaml 不是有效的变更元数据');
     expect(msg).toContain('Change 必须至少有一个 delta');
   });
 
@@ -171,8 +171,8 @@ describe('Validator skip_specs handling', () => {
 
     expect(report.valid).toBe(false);
     const msg = report.issues.map(i => i.message).join('\n');
-    expect(msg).toContain('skip_specs is set but .openspec.yaml is not valid change metadata');
-    expect(msg).toContain("unknown schema 'does-not-exist'");
+    expect(msg).toContain('设置了 skip_specs，但 .openspec.yaml 不是有效的变更元数据');
+    expect(msg).toContain("未知 schema 'does-not-exist'");
     expect(msg).toContain('Change 必须至少有一个 delta');
   });
 
@@ -229,7 +229,7 @@ describe('Validator skip_specs handling', () => {
 
     expect(report.valid).toBe(false);
     const msg = report.issues.map(i => i.message).join('\n');
-    expect(msg).toContain('skip_specs is set but .openspec.yaml is not valid change metadata');
+    expect(msg).toContain('设置了 skip_specs，但 .openspec.yaml 不是有效的变更元数据');
     expect(msg).toContain('schema');
   });
 
@@ -253,7 +253,7 @@ describe('Validator skip_specs handling', () => {
 
     expect(report.valid).toBe(false);
     const msg = report.issues.map(i => i.message).join('\n');
-    expect(msg).toContain('skip_specs is set but .openspec.yaml is not valid change metadata');
+    expect(msg).toContain('设置了 skip_specs，但 .openspec.yaml 不是有效的变更元数据');
   });
 
   it('rejects a schema name that only resolves via extension normalization', async () => {
@@ -270,7 +270,7 @@ describe('Validator skip_specs handling', () => {
 
     expect(report.valid).toBe(false);
     const msg = report.issues.map(i => i.message).join('\n');
-    expect(msg).toContain("unknown schema 'spec-driven.yaml'");
+    expect(msg).toContain("未知 schema 'spec-driven.yaml'");
   });
 
   it('an explicit skip_specs: false never drags metadata problems into validation', async () => {
@@ -287,7 +287,7 @@ describe('Validator skip_specs handling', () => {
 
     expect(report.valid).toBe(false);
     const msg = report.issues.map(i => i.message).join('\n');
-    expect(msg).not.toContain('skip_specs is set');
+    expect(msg).not.toContain('设置了 skip_specs');
     expect(msg).toContain('Change 必须至少有一个 delta');
   });
 
@@ -313,7 +313,7 @@ describe('Validator skip_specs handling', () => {
 
     expect(report.valid).toBe(false);
     const msg = report.issues.map(i => i.message).join('\n');
-    expect(msg).toContain('skip_specs is set in .openspec.yaml but spec files exist under specs/');
+    expect(msg).toContain('.openspec.yaml 中设置了 skip_specs，但 specs/ 下存在 spec 文件');
   });
 
   it('fails closed when the metadata file exists but cannot be read', async () => {
@@ -327,8 +327,8 @@ describe('Validator skip_specs handling', () => {
 
     expect(report.valid).toBe(false);
     const msg = report.issues.map(i => i.message).join('\n');
-    expect(msg).toContain('skip_specs is set but .openspec.yaml is not valid change metadata');
-    expect(msg).toContain('cannot be read');
+    expect(msg).toContain('设置了 skip_specs，但 .openspec.yaml 不是有效的变更元数据');
+    expect(msg).toContain('无法读取');
   });
 
   it('validateChange keeps the no-deltas error when the marker names an unknown schema', async () => {
@@ -344,7 +344,7 @@ describe('Validator skip_specs handling', () => {
     expect(report.valid).toBe(false);
     const msg = report.issues.map(i => i.message).join('\n');
     expect(msg).toContain('Change 必须至少有一个 delta');
-    expect(msg).toContain("unknown schema 'does-not-exist'");
+    expect(msg).toContain("未知 schema 'does-not-exist'");
   });
 
   it('validateChange keeps the no-deltas error when the marker metadata is invalid', async () => {
@@ -358,7 +358,7 @@ describe('Validator skip_specs handling', () => {
     const msg = report.issues.map(i => i.message).join('\n');
     expect(msg).toContain('Change 必须至少有一个 delta');
     // Both validate paths explain why the marker was not honored.
-    expect(msg).toContain('skip_specs is set but .openspec.yaml is not valid change metadata');
+    expect(msg).toContain('设置了 skip_specs，但 .openspec.yaml 不是有效的变更元数据');
   });
 
   it('still rejects zero deltas when metadata is malformed', async () => {
@@ -383,7 +383,7 @@ describe('Validator skip_specs handling', () => {
 
     expect(report.valid).toBe(false);
     const msg = report.issues.map(i => i.message).join('\n');
-    expect(msg).toContain('skip_specs is set but .openspec.yaml is not valid change metadata');
+    expect(msg).toContain('设置了 skip_specs，但 .openspec.yaml 不是有效的变更元数据');
   });
 
   it('does not crash when specs is a regular file instead of a directory', async () => {
@@ -403,7 +403,7 @@ describe('Validator skip_specs handling', () => {
     );
     const marked = await validator.validateChangeDeltaSpecs(testDir);
     expect(marked.valid).toBe(false);
-    expect(marked.issues.map(i => i.message).join('\n')).toContain('skip_specs is set in .openspec.yaml but spec files exist under specs/');
+    expect(marked.issues.map(i => i.message).join('\n')).toContain('.openspec.yaml 中设置了 skip_specs，但 specs/ 下存在 spec 文件');
   });
 
   it('ignores dot-files under specs/ just like every other code path', async () => {
@@ -432,7 +432,7 @@ describe('Validator skip_specs handling', () => {
 
     expect(report.valid).toBe(false);
     const msg = report.issues.map(i => i.message).join('\n');
-    expect(msg).not.toContain('not valid change metadata');
+    expect(msg).not.toContain('不是有效的变更元数据');
     expect(msg).toContain('Change 必须至少有一个 delta');
   });
 

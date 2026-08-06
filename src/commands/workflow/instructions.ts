@@ -232,7 +232,7 @@ export function printInstructionsText(instructions: ArtifactInstructions, isBloc
   // Project context (AI constraint - do not include in output)
   if (context) {
     console.log('<project_context>');
-    console.log('<!-- This is background information for you. Do NOT include this in your output. -->');
+    console.log('<!-- 以下是供你参考的背景信息。请勿将其包含在你的输出中。 -->');
     console.log(context);
     console.log('</project_context>');
     console.log();
@@ -247,7 +247,7 @@ export function printInstructionsText(instructions: ArtifactInstructions, isBloc
   // Rules (AI constraint - do not include in output)
   if (rules && rules.length > 0) {
     console.log('<rules>');
-    console.log('<!-- These are constraints for you to follow. Do NOT include this in your output. -->');
+    console.log('<!-- 以下是你需要遵守的约束条件。请勿将其包含在你的输出中。 -->');
     for (const rule of rules) {
       console.log(`- ${rule}`);
     }
@@ -266,7 +266,7 @@ export function printInstructionsText(instructions: ArtifactInstructions, isBloc
       // for spec files that must not exist.
       if (dep.skipped) {
         console.log(`<dependency id="${dep.id}" status="skipped">`);
-        console.log(`  <description>Skipped: the change declares skip_specs, so this artifact has no files to read.</description>`);
+        console.log(`  <description>已跳过：该变更声明了 skip_specs，因此此制品没有需要阅读的文件。</description>`);
         console.log('</dependency>');
         continue;
       }
@@ -304,7 +304,7 @@ export function printInstructionsText(instructions: ArtifactInstructions, isBloc
 
   // Success criteria placeholder
   console.log('<success_criteria>');
-  console.log('<!-- To be defined in schema validation rules -->');
+  console.log('<!-- 具体内容由 schema 校验规则定义 -->');
   console.log('</success_criteria>');
   console.log();
 
@@ -610,7 +610,7 @@ export async function archiveInstructionsCommand(
       options.change,
       root.path,
       root.changesDir,
-      { newChangeHint: withStoreFlag(root, 'openspec new change <name>') }
+      { newChangeHint: withStoreFlag(root, 'openspec-cn new change <name>') }
     );
     const projectConfig = readProjectConfig(root.path);
     const instructions = generateArchiveInstructions(changeName, projectConfig);
@@ -630,7 +630,7 @@ export async function archiveInstructionsCommand(
 }
 
 export function printArchiveInstructionsText(instructions: ArchiveInstructions): void {
-  console.log(`## Archive Inputs: ${instructions.changeName}`);
+  console.log(`## 归档输入：${instructions.changeName}`);
   console.log();
   printOperationInputsText(instructions);
 }
@@ -640,13 +640,13 @@ function printOperationInputsText(inputs: {
   operationGuidance?: string[];
 }): void {
   if (inputs.context) {
-    console.log('### Project Context (required instruction input)');
+    console.log('### 项目上下文（必填的指令输入）');
     console.log(inputs.context);
     console.log();
   }
 
   if (inputs.operationGuidance && inputs.operationGuidance.length > 0) {
-    console.log('### Operation Guidance (advisory)');
+    console.log('### 操作指引（建议性）');
     for (const guidance of inputs.operationGuidance) {
       console.log(`- ${guidance}`);
     }

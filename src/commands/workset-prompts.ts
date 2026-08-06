@@ -66,7 +66,7 @@ export async function composeInteractively(
 
   console.log('');
   console.log(
-    '[2/3] Add member folders (the first one is the primary - sessions start there)'
+    '[2/3] 添加成员文件夹（第一个为主文件夹，会话将从那里开始）'
   );
   const members: WorksetMember[] = await resolveMemberFlags(input.memberFlags);
   if (members.length > 0) {
@@ -81,7 +81,7 @@ export async function composeInteractively(
       const next = await prompts.select({
         message: '添加另一个文件夹或完成:',
         choices: [
-          { name: 'Finish', value: 'finish' },
+          { name: '完成', value: 'finish' },
           { name: '添加另一个文件夹', value: 'add' },
         ],
         default: 'finish',
@@ -98,7 +98,7 @@ export async function composeInteractively(
       async validate(value: string) {
         const resolved = path.resolve(expandUserPath(value));
         if (!(await pathIsDirectory(resolved))) {
-          return `'${value}' is not an existing folder`;
+          return `'${value}' 不是一个已存在的文件夹`;
         }
         return true;
       },
@@ -117,7 +117,7 @@ export async function composeInteractively(
             return problem;
           }
           if (members.some((member) => member.name === value)) {
-            return `duplicate member name '${value}'`;
+            return `成员名称 '${value}' 重复`;
           }
           return true;
         },
@@ -125,21 +125,21 @@ export async function composeInteractively(
     }
 
     members.push({ name: label, path: resolvedPath });
-    console.log(`  Added '${label}' (${resolvedPath})`);
+    console.log(`  已添加 '${label}' (${resolvedPath})`);
   }
 
   console.log('');
-  console.log('[3/3] Choose your tool');
+  console.log('[3/3] 选择你的工具');
   let tool = input.tool;
   if (tool === undefined) {
     const choices = listOpenerChoices(table);
     const available = choices.filter((choice) => choice.available);
     if (available.length === 0) {
       console.log(
-        '  None of the known tools is on PATH; not saving a preference.'
+        '  PATH 中没有找到任何已知工具；不保存偏好设置。'
       );
       console.log(
-        `  (Known tools: ${choices.map((choice) => `${choice.opener.id} ${choice.note ?? ''}`.trim()).join(', ')})`
+        `  （已知工具：${choices.map((choice) => `${choice.opener.id} ${choice.note ?? ''}`.trim()).join(', ')}）`
       );
     } else {
       tool = await promptToolFromChoices(available);

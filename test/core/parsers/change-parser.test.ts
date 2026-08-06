@@ -44,7 +44,7 @@ describe('ChangeParser', () => {
       expect(change.deltas.length).toBeGreaterThan(0);
       // Since delta spec exists, the description should reflect delta-derived entries
       expect(change.deltas[0].spec).toBe('foo');
-      expect(change.deltas[0].description).toContain('Add requirement:');
+      expect(change.deltas[0].description).toContain('新增需求：');
       expect(change.deltas[0].operation).toBe('ADDED');
       expect(change.deltas[0].requirement).toBeDefined();
     });

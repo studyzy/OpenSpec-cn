@@ -51,7 +51,7 @@ function validateNoDuplicateIds(artifacts: Artifact[]): void {
   const seen = new Set<string>();
   for (const artifact of artifacts) {
     if (seen.has(artifact.id)) {
-      throw new SchemaValidationError(`Duplicate artifact ID: ${artifact.id}`);
+      throw new SchemaValidationError(`重复的制品 ID：${artifact.id}`);
     }
     seen.add(artifact.id);
   }

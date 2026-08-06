@@ -30,7 +30,7 @@ ${STORE_SELECTION_GUIDANCE}
    若提供了名称，使用它。否则：
    - 从对话上下文推断（若用户提到了某个变更）
    - 若仅有一个活跃变更则自动选择
-   - 若存在歧义，运行 \`openspec list --json\` 获取可用变更并让用户选择
+   - 若存在歧义，运行 \`openspec-cn list --json\` 获取可用变更并让用户选择
 
    始终宣告："使用变更：<name>"，以及如何覆盖（例如 \`/opsx:apply <other>\`）。
 
@@ -58,7 +58,7 @@ ${STORE_SELECTION_GUIDANCE}
    - 可选的 \`operationGuidance\`：当前 apply 的咨询性指导
 
    **处理状态：**
-   - 若 \`state: "blocked"\`（缺少制品）：显示消息，建议使用 \`/opsx:continue\`（若未安装，运行 \`openspec status --change "<name>" --json\` 查看下一个制品，\`openspec instructions <artifact-id> --change "<name>" --json\` 了解如何创建）
+   - 若 \`state: "blocked"\`（缺少制品）：显示消息，建议使用 \`/opsx:continue\`（若未安装，运行 \`openspec-cn status --change "<name>" --json\` 查看下一个制品，\`openspec-cn instructions <artifact-id> --change "<name>" --json\` 了解如何创建）
    - 若 \`state: "all_done"\`：祝贺，建议归档
    - 否则：继续实现
 

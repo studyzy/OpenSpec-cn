@@ -52,7 +52,7 @@ AI: Let me trace it... [reads router, middleware stack, config]
  insertion point is middleware right after auth. Want me to scope it?
 ```
 
-注意 AI 现在理解了真实结构，所以它写的 proposal 会贴合代码，而非通用模板。在大型代码库上，这一个习惯能省去最多痛苦。参见 [Explore First](explore.md)。
+注意 AI 现在理解了真实结构，所以它写的 proposal 会贴合代码，而非通用模板。在大型代码库上，这一个习惯能省去最多痛苦。参见 [先探索](explore.md)。
 
 **第 2 步：提案变更。** proposal 及其增量规范只捕获这个变更。
 
@@ -79,7 +79,7 @@ $ openspec-cn update              # 应用到本项目
 /opsx:onboard
 ```
 
-这是在真实项目上最温和的入门方式，它给你留下一个可以保留或丢弃的真实（小）变更。参见 [Commands: `/opsx:onboard`](commands.md#opsxonboard)。
+这是在真实项目上最温和的入门方式，它给你留下一个可以保留或丢弃的真实（小）变更。参见 [命令：`/opsx:onboard`](commands.md#opsxonboard)。
 
 ## "但我已经有需求文档了"
 
@@ -108,25 +108,25 @@ Specs 位于 `openspec/specs/` 下，按**领域（domain）**分组：一个符
 - **按组件：** `api/`、`frontend/`、`workers/`
 - **按限界上下文：** `ordering/`、`fulfillment/`、`inventory/`
 
-选一个让新人点头的方式。你可以稍后细化。参见 [Concepts: Specs](concepts.md#specs)。
+选一个让新人点头的方式。你可以稍后细化。参见 [概念：Specs](concepts.md#specs)。
 
 ## 单体仓库与跨仓库工作
 
 对于单体仓库，最简单的模型是在仓库根目录放一个 `openspec/` 目录，领域映射到你的包或服务。这覆盖了大多数团队。
 
-如果你的工作确实跨越**多个仓库**（或你当作独立对待的多个包），OpenSpec 有一个 beta 版 **stores** 功能：规划位于其自己独立的仓库中，你的任何代码仓库都可以引用，因此 plan 不必生活在某个仓库的 `openspec/` 文件夹里。它还是 beta，所以请将其命令和状态视为仍在演进。从 [Stores User Guide](stores-beta/user-guide.md) 开始，了解心智模型和最小可用路径。
+如果你的工作确实跨越**多个仓库**（或你当作独立对待的多个包），OpenSpec 有一个 beta 版 **stores** 功能：规划位于其自己独立的仓库中，你的任何代码仓库都可以引用，因此 plan 不必生活在某个仓库的 `openspec/` 文件夹里。它还是 beta，所以请将其命令和状态视为仍在演进。从 [Stores 用户指南](stores-beta/user-guide.md) 开始，了解心智模型和最小可用路径。
 
 ## 几点坦诚的提醒
 
 - **抵制回填一切的冲动。** 为没有在改的代码写 specs 感觉有产出，但通常不是。那些 specs 会过时，因为没什么迫使它们跟踪现实。让真实变更驱动你的 specs。
 - **保持早期变更小。** 你的前几个变更更多是关于学习节奏而非交付。紧的范围让循环更快、教训更便宜。
 - **把 `openspec/` 提交到 git。** 你的 specs 和归档属于版本控制，与它们所描述的代码在一起。
-- **给 AI 上下文。** 在具有强约定俗成的大型代码库上，填好 `openspec/config.yaml` 的 `context:`，让每个 proposal 都尊重你的技术栈和模式。参见 [Customization](customization.md#project-configuration)。
+- **给 AI 上下文。** 在具有强约定俗成的大型代码库上，填好 `openspec/config.yaml` 的 `context:`，让每个 proposal 都尊重你的技术栈和模式。参见 [定制化](customization.md#project-configuration)。
 
 ## 下一步去哪
 
-- [Explore First](explore.md) - 改动前理解代码的关键习惯
-- [Getting Started](getting-started.md) - 完整的首个变更演练
-- [Editing & Iterating on a Change](editing-changes.md) - 在学习过程中调整变更
-- [Concepts: Delta Specs](concepts.md#delta-specs) - 为什么增量让棕地工作干净利落
-- [Customization](customization.md) - 教会 OpenSpec 项目的约定
+- [先探索](explore.md) - 改动前理解代码的关键习惯
+- [快速入门](getting-started.md) - 完整的首个变更演练
+- [编辑与迭代变更](editing-changes.md) - 在学习过程中调整变更
+- [概念：增量规范](concepts.md#delta-specs) - 为什么增量让棕地工作干净利落
+- [定制化](customization.md) - 教会 OpenSpec 项目的约定

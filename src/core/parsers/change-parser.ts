@@ -110,7 +110,7 @@ export class ChangeParser extends MarkdownParser {
         deltas.push({
           spec: specName,
           operation: 'ADDED' as DeltaOperation,
-          description: `Add requirement: ${req.text}`,
+          description: `新增需求：${req.text}`,
           // Provide both single and plural forms for compatibility
           requirement: req,
           requirements: [req],
@@ -126,7 +126,7 @@ export class ChangeParser extends MarkdownParser {
         deltas.push({
           spec: specName,
           operation: 'MODIFIED' as DeltaOperation,
-          description: `Modify requirement: ${req.text}`,
+          description: `修改需求：${req.text}`,
           requirement: req,
           requirements: [req],
         });
@@ -141,7 +141,7 @@ export class ChangeParser extends MarkdownParser {
         deltas.push({
           spec: specName,
           operation: 'REMOVED' as DeltaOperation,
-          description: `Remove requirement: ${req.text}`,
+          description: `移除需求：${req.text}`,
           requirement: req,
           requirements: [req],
         });

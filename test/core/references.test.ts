@@ -369,7 +369,7 @@ describe('reference index assembly', () => {
     const section = renderReferencedStoresSection(entries);
 
     expect(block).toContain('<referenced_stores>');
-    expect(block).toContain('Read-only upstream context. Fetch what you need; cite what you use.');
+    expect(block).toContain('只读的上游上下文。按需取用；用到的请注明出处。');
     expect(block).toContain('  - billing: Usage-based invoicing.');
     expect(block).toContain('  - bare');
     expect(block).not.toContain('  - bare:');
@@ -377,7 +377,7 @@ describe('reference index assembly', () => {
     expect(block).toContain("Store missing-context: 被引用的 store 'missing-context' 未在本机注册。");
     expect(block).toContain('Fix: 从队友处获取一个 checkout 并运行：openspec-cn store register <path> --id missing-context');
 
-    expect(section).toContain('### Referenced Stores');
+    expect(section).toContain('### 被引用的 Stores');
     expect(section).toContain('  - billing: Usage-based invoicing.');
   });
 });

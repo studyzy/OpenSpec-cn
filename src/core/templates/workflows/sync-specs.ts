@@ -28,7 +28,7 @@ ${STORE_SELECTION_GUIDANCE}
    若提供了名称，使用它。否则：
    - 从对话上下文推断（若用户提到了某个变更）
    - 若仅有一个活跃变更则自动选择
-   - 若存在歧义，运行 \`openspec list --json\` 获取可用变更并让用户选择
+   - 若存在歧义，运行 \`openspec-cn list --json\` 获取可用变更并让用户选择
 
    提示时，显示有增量 spec（位于 \`specs/\` 目录下）的变更。
 
@@ -38,7 +38,7 @@ ${STORE_SELECTION_GUIDANCE}
 
    运行：
    \`\`\`bash
-   openspec status --change "<name>" --json
+   openspec-cn status --change "<name>" --json
    \`\`\`
 
    JSON 包含 \`planningHome.root\`。主 spec 位于 \`<planningHome.root>/openspec/specs/\` 下 — 对下面的每个主 spec 路径使用该（存储感知的）根路径，而非硬编码的仓库路径。当选中存储时，它指向存储而非当前仓库。
@@ -60,7 +60,7 @@ ${STORE_SELECTION_GUIDANCE}
 4. **对每个增量 spec，应用变更到主 spec**
 
    在第一次主 spec 写入之前，获取一份当前的 specs-rule 快照：
-   - 若 archive 内联调用了此工作流并从 \`openspec instructions specs --change "<name>" --json\` 提供了有效快照，复用它且不再次获取相同指令。
+   - 若 archive 内联调用了此工作流并从 \`openspec-cn instructions specs --change "<name>" --json\` 提供了有效快照，复用它且不再次获取相同指令。
    - 否则现在使用相同的选定根路径标志运行该命令一次。
    - 若直接查找以非零退出或返回无效的制品指令 JSON，报告错误并在写入任何主 spec 之前停止。不要将失败视为缺少规则集。
    - 省略 \`rules\` 的有效响应表示未配置制品规则，现有语义合并继续。
@@ -103,17 +103,17 @@ ${STORE_SELECTION_GUIDANCE}
       - 查找 FROM 需求，重命名为 TO
 
       **增量 spec 中的 \`## Purpose\`：**
-      - 主 spec 已有一个且它是权威的 - 不要管它（这是 \`openspec archive\` 的做法；它会警告然后继续）
+      - 主 spec 已有一个且它是权威的 - 不要管它（这是 \`openspec-cn archive\` 的做法；它会警告然后继续）
 
    d. **若 capability 尚不存在则创建新主 spec**：
       - 创建 \`<planningHome.root>/openspec/specs/<capability-path>/spec.md\`
-      - 添加 Purpose 章节：当增量 spec 有 \`## Purpose\` 时逐字复制其正文（这是 \`openspec archive\` 的做法）；没有时仅写一个简短的 TBD 占位符
+      - 添加 Purpose 章节：当增量 spec 有 \`## Purpose\` 时逐字复制其正文（这是 \`openspec-cn archive\` 的做法）；没有时仅写一个简短的 TBD 占位符
       - 添加 Requirements 章节及 ADDED 需求
       - 遵循下方的 **主 Spec 格式参考**
 
 5. **验证更新后的主 spec**
 
-   使用与之前相同的选定根路径标志运行 \`openspec validate --specs\`。若验证失败，报告问题且不要声称同步成功。
+   使用与之前相同的选定根路径标志运行 \`openspec-cn validate --specs\`。若验证失败，报告问题且不要声称同步成功。
 
 6. **显示摘要**
 
@@ -185,7 +185,7 @@ ${STORE_SELECTION_GUIDANCE}
 **核心原则：智能合并**
 
 与程序化合并不同，你进行的是合并而非覆盖：
-- MODIFIED 块包含完整的需求 — 正文以及所有在变更后保留的场景。\`openspec validate\` 和 \`openspec archive\` 都会拒绝丢弃主 spec 仍具有的场景。
+- MODIFIED 块包含完整的需求 — 正文以及所有在变更后保留的场景。\`openspec-cn validate\` 和 \`openspec-cn archive\` 都会拒绝丢弃主 spec 仍具有的场景。
 - 保留增量 spec 中未提及的任何内容，按主 spec 的现有顺序排列
 - 运用你的判断力合理合并变更
 
@@ -220,7 +220,7 @@ ${STORE_SELECTION_GUIDANCE}
 - 在每次主 spec 写入之前，对非零或无效的 JSON specs-instruction 响应停止
 - 制品规则仅约束正在编写的 specs，绝不要复制到输出文件中`,
     license: 'MIT',
-    compatibility: 'Requires openspec CLI.',
+    compatibility: '需要 openspec-cn CLI。',
     metadata: { author: 'openspec', version: '1.0' },
   };
 }
@@ -248,7 +248,7 @@ ${STORE_SELECTION_GUIDANCE}
    若提供了名称，使用它。否则：
    - 从对话上下文推断（若用户提到了某个变更）
    - 若仅有一个活跃变更则自动选择
-   - 若存在歧义，运行 \`openspec list --json\` 获取可用变更并让用户选择
+   - 若存在歧义，运行 \`openspec-cn list --json\` 获取可用变更并让用户选择
 
    提示时，显示有增量 spec（位于 \`specs/\` 目录下）的变更。
 
@@ -258,7 +258,7 @@ ${STORE_SELECTION_GUIDANCE}
 
    运行：
    \`\`\`bash
-   openspec status --change "<name>" --json
+   openspec-cn status --change "<name>" --json
    \`\`\`
 
    JSON 包含 \`planningHome.root\`。主 spec 位于 \`<planningHome.root>/openspec/specs/\` 下 — 对下面的每个主 spec 路径使用该（存储感知的）根路径，而非硬编码的仓库路径。当选中存储时，它指向存储而非当前仓库。
@@ -280,7 +280,7 @@ ${STORE_SELECTION_GUIDANCE}
 4. **对每个增量 spec，应用变更到主 spec**
 
    在第一次主 spec 写入之前，获取一份当前的 specs-rule 快照：
-   - 若 archive 内联调用了此工作流并从 \`openspec instructions specs --change "<name>" --json\` 提供了有效快照，复用它且不再次获取相同指令。
+   - 若 archive 内联调用了此工作流并从 \`openspec-cn instructions specs --change "<name>" --json\` 提供了有效快照，复用它且不再次获取相同指令。
    - 否则现在使用相同的选定根路径标志运行该命令一次。
    - 若直接查找以非零退出或返回无效的制品指令 JSON，报告错误并在写入任何主 spec 之前停止。不要将失败视为缺少规则集。
    - 省略 \`rules\` 的有效响应表示未配置制品规则，现有语义合并继续。
@@ -323,17 +323,17 @@ ${STORE_SELECTION_GUIDANCE}
       - 查找 FROM 需求，重命名为 TO
 
       **增量 spec 中的 \`## Purpose\`：**
-      - 主 spec 已有一个且它是权威的 - 不要管它（这是 \`openspec archive\` 的做法；它会警告然后继续）
+      - 主 spec 已有一个且它是权威的 - 不要管它（这是 \`openspec-cn archive\` 的做法；它会警告然后继续）
 
    d. **若 capability 尚不存在则创建新主 spec**：
       - 创建 \`<planningHome.root>/openspec/specs/<capability-path>/spec.md\`
-      - 添加 Purpose 章节：当增量 spec 有 \`## Purpose\` 时逐字复制其正文（这是 \`openspec archive\` 的做法）；没有时仅写一个简短的 TBD 占位符
+      - 添加 Purpose 章节：当增量 spec 有 \`## Purpose\` 时逐字复制其正文（这是 \`openspec-cn archive\` 的做法）；没有时仅写一个简短的 TBD 占位符
       - 添加 Requirements 章节及 ADDED 需求
       - 遵循下方的 **主 Spec 格式参考**
 
 5. **验证更新后的主 spec**
 
-   使用与之前相同的选定根路径标志运行 \`openspec validate --specs\`。若验证失败，报告问题且不要声称同步成功。
+   使用与之前相同的选定根路径标志运行 \`openspec-cn validate --specs\`。若验证失败，报告问题且不要声称同步成功。
 
 6. **显示摘要**
 
@@ -405,7 +405,7 @@ ${STORE_SELECTION_GUIDANCE}
 **核心原则：智能合并**
 
 与程序化合并不同，你进行的是合并而非覆盖：
-- MODIFIED 块包含完整的需求 — 正文以及所有在变更后保留的场景。\`openspec validate\` 和 \`openspec archive\` 都会拒绝丢弃主 spec 仍具有的场景。
+- MODIFIED 块包含完整的需求 — 正文以及所有在变更后保留的场景。\`openspec-cn validate\` 和 \`openspec-cn archive\` 都会拒绝丢弃主 spec 仍具有的场景。
 - 保留增量 spec 中未提及的任何内容，按主 spec 的现有顺序排列
 - 运用你的判断力合理合并变更
 

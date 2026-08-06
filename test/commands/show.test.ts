@@ -140,7 +140,7 @@ describe('top-level show command', () => {
       // Resolved as a change, not rejected as an unknown item.
       expect(stderr).not.toContain('Unknown item');
       expect(stderr).toContain('尚无 proposal.md');
-      expect(stderr).toContain('openspec status --change scaffolded');
+      expect(stderr).toContain('openspec-cn status --change scaffolded');
     } finally {
       process.chdir(originalCwd);
     }

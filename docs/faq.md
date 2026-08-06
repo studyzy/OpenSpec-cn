@@ -2,7 +2,7 @@
 
 人们最常问的问题的快速解答。如果你的问题其实是"某东西坏了"，[故障排查](troubleshooting.md)是更合适的页面。如果你想查某个术语的定义，见 [术语表](glossary.md)。
 
-No. OpenSpec works with 30+ assistants, including Claude Code, Cursor, Devin Desktop, GitHub Copilot, Gemini CLI, Codex, and more. The full list and per-tool details are in [Supported Tools](supported-tools.md).
+## 基础
 
 ### 用一句话说，OpenSpec 是什么？
 
@@ -16,27 +16,31 @@ No. OpenSpec works with 30+ assistants, including Claude Code, Cursor, Devin Des
 
 不。把它用在对齐重要的地方，也就是大多数非平凡的工作中。对于一个单字符的拼写修正，这套流程可能不值得，那没关系。
 
-Most likely you typed it in the terminal instead of your AI chat, you used a spelling your tool doesn't register, or the commands aren't installed yet. If the files are missing — or you never set the tool up — run `openspec init`; `openspec update` only refreshes files that already exist. Then restart your assistant and use the form printed under "Getting started" — see [How To Invoke](supported-tools.md#how-to-invoke). [Troubleshooting](troubleshooting.md#commands-dont-show-up) has the full checklist.
+### 我能用在大型既有代码库上吗，还是只能用于新项目？
 
 既有代码库正是主战场。OpenSpec 是 brownfield-first（先适配既有项目）的：你不需要在一开始就把整个应用都文档化。你只为每个变更触及的部分写 spec，spec 会围绕你实际做的工作逐渐补全。有一份专门指南：[在既有项目中使用 OpenSpec](existing-projects.md)。
 
-Each AI tool surfaces custom commands a little differently, and OpenSpec spells them the way your tool loads the file it wrote. A command file named `opsx-propose.md` is typed `/opsx-propose`; one filed under `commands/opsx/` is typed `/opsx:propose`. Tools that take skills instead of commands use the skill name — Codex needs `$openspec-propose`, Kimi Code `/skill:openspec-propose`. The `openspec init` "Getting started" line already prints the right form for the tools you picked; the full table is in [How To Invoke](supported-tools.md#how-to-invoke).
+### 它绑定某一个 AI 工具吗？
 
-不。OpenSpec 可用于 25+ 种助手，包括 Claude Code、Cursor、Windsurf、GitHub Copilot、Gemini CLI、Codex 等。完整列表和每种工具的细节见 [支持的工具](supported-tools.md)。
+不。OpenSpec 可用于 30+ 种助手，包括 Claude Code、Cursor、Devin Desktop、GitHub Copilot、Gemini CLI、Codex 等。完整列表和每种工具的细节见 [支持的工具](supported-tools.md)。
 
 ## 运行命令
 
 ### 我在哪里输入 `/opsx:propose`？
 
-在你的 AI 助手聊天框里，不是终端。把这条命令打进它的聊天窗口。Slash command 就是你"进入" OpenSpec 的方式。（唯一真正需要交互的终端功能是 `openspec-cn view`，用于浏览 specs 和变更的仪表盘。）完整解释见 [命令如何工作](how-commands-work.md)。
+在你的 AI 助手聊天框里，不是终端。这是最常见的困惑点，因此它有专门的一页：[命令如何工作](how-commands-work.md)。简短版本：`openspec-cn ...` 在终端里运行，`/opsx:...` 在聊天里运行。
+
+### 我该怎么"进入交互模式"？
+
+没有单独的模式需要启动。你像平常一样打开 AI 助手，在它的聊天框里输入一条 slash command。Slash command 就是你"进入" OpenSpec 的方式。（唯一真正需要交互的终端功能是 `openspec-cn view`，用于浏览 specs 和变更的仪表盘。）完整解释见 [命令如何工作](how-commands-work.md)。
 
 ### 我输入了 slash command 但什么都没发生。为什么？
 
-最可能是你在终端而不是 AI 聊天里输入的，或者命令还没安装。在项目里运行 `openspec-cn update`，重启助手，然后试着在聊天里输入 `/opsx`，留意自动补全。[故障排查](troubleshooting.md#commands-dont-show-up)有完整清单。
+最可能是你在终端而不是 AI 聊天里输入的，或者你用的写法你的工具并不识别，或者命令还没安装。如果文件缺失——或者你从未配置过该工具——运行 `openspec-cn init`；`openspec-cn update` 只会刷新已经存在的文件。然后重启助手，使用 "Getting started" 下打印出的形式——参见 [如何调用](supported-tools.md#how-to-invoke)。[故障排查](troubleshooting.md#commands-dont-show-up) 有完整清单。
 
 ### 为什么一个工具里语法是 `/opsx:propose`，另一个工具里是 `/opsx-propose`？
 
-每种 AI 工具展示自定义命令的方式略有不同。意图完全一致，只是标点变了。在聊天里输入斜杠，自动补全会显示该工具期望的形式。每种工具的对照表见 [命令如何工作](how-commands-work.md#slash-command-syntax-by-tool)。
+每种 AI 工具展示自定义命令的方式略有不同，OpenSpec 会按照你的工具加载它所写文件的方式来书写命令。一个名为 `opsx-propose.md` 的命令文件输入为 `/opsx-propose`；归档在 `commands/opsx/` 下的则输入为 `/opsx:propose`。使用 skill 而非 command 的工具用 skill 名——Codex 需要 `$openspec-propose`，Kimi Code 则是 `/skill:openspec-propose`。`openspec-cn init` 的 "Getting started" 那一行已经为你选择的工具打印了正确形式；完整对照表见 [如何调用](supported-tools.md#how-to-invoke)。
 
 ### skill 和 command 有什么区别？
 
@@ -44,9 +48,17 @@ Each AI tool surfaces custom commands a little differently, and OpenSpec spells 
 
 ## 工作流
 
-A profile decides which slash commands get installed. **Core** (the default) gives you `propose`, `explore`, `apply`, `update`, `sync`, `archive`. The **expanded** set adds `new`, `continue`, `ff`, `verify`, `bulk-archive`, and `onboard` for finer control. Switch with `openspec config profile`, then apply with `openspec update`.
+### 如果我不确定要构建什么，应该从哪里开始？
 
-从 `/opsx:explore` 开始。它是一个零风险的思考伙伴，会阅读代码库、列出方案、把模糊的问题变成具体的计划，这一切都发生在任何变更或代码存在之前。它在默认 profile 里，随时可用。当计划清晰了，就交给 `/opsx:propose`。
+从 `/opsx:explore` 开始。它是一个零风险的思考伙伴，会阅读代码库、列出方案、把模糊的问题变成具体的计划，这一切都发生在任何变更或代码存在之前。它在默认 profile 里，随时可用。当计划清晰了，就交给 `/opsx:propose`。这是最值得养成的一个习惯，因为它能阻止一个急切的 AI 自信地构建出错误的东西。参见 [先探索](explore.md)。
+
+### 最简单的流程是什么？
+
+```text
+/opsx:explore (可选)   然后   /opsx:propose <你想要什么>   然后   /opsx:apply   然后   /opsx:archive
+```
+
+用 explore 想清楚，用 propose 起草计划，用 apply 构建它，用 archive 归档它。当你已经确切知道想要什么时，跳过 explore。
 
 ### `/opsx:propose` 和 `/opsx:new` 有什么区别？
 
@@ -54,7 +66,7 @@ A profile decides which slash commands get installed. **Core** (the default) giv
 
 ### `core` 和 `expanded` profile 是什么？
 
-一个 profile 决定安装哪些 slash command。**Core**（默认）给你 `propose`、`explore`、`apply`、`sync`、`archive`。**expanded** 集合额外加上 `new`、`continue`、`ff`、`verify`、`bulk-archive` 和 `onboard`，以获得更细的控制。用 `openspec-cn config profile` 切换，然后执行 `openspec-cn update` 应用。
+一个 profile 决定安装哪些 slash command。**Core**（默认）给你 `propose`、`explore`、`apply`、`update`、`sync`、`archive`。**expanded** 集合额外加上 `new`、`continue`、`ff`、`verify`、`bulk-archive` 和 `onboard`，以获得更细的控制。用 `openspec-cn config profile` 切换，然后执行 `openspec-cn update` 应用。
 
 ### 我需要跑 `/opsx:sync` 吗？
 
@@ -66,7 +78,11 @@ A profile decides which slash commands get installed. **Core** (the default) giv
 
 ### 我实现了一部分之后，能回头改计划吗？
 
-可以，任何时候都行。工作流是流畅的，所以审查和编辑都不是会被锁死在某个阶段的。编辑制品，继续。如果你想确保正确，就一直构建直到代码与之一致。`/opsx:verify` 会暴露不一致之处。参见 [编辑与迭代变更](editing-changes.md#i-edited-the-code-by-hand-how-do-i-reconcile-that-with-openspec)。
+可以，任何时候都行。工作流是流畅的，所以审查和编辑都不是会被锁死在某个阶段的。编辑制品，继续。如果你想确保正确，就一直构建直到代码与之一致。`/opsx:verify` 会暴露不一致之处。参见 [编辑与迭代变更](editing-changes.md)。
+
+### 我手动改了代码。如何让它与 spec 重新一致？
+
+判断哪一边现在是对的。如果代码是对的、spec 过时了，就更新增量规范（以及相关的 tasks）来描述实际交付的行为——在归档之前 spec 应当符合现实。如果 spec 是对的、代码跑偏了，就继续构建直到代码符合 spec。`/opsx:verify` 是快速暴露不一致的方式。参见 [编辑与迭代变更](editing-changes.md)。
 
 ### 什么时候更新一个已有变更，什么时候开一个新的？
 
@@ -86,9 +102,19 @@ A profile decides which slash commands get installed. **Core** (the default) giv
 
 Spec 描述可观察的行为：系统做什么、输入、输出、错误条件。Design 描述你将如何构建它：技术方法、架构决策、文件改动。如果实现方式变了但对外可见的行为没变，那它就属于 design，不属于 spec。[概念](concepts.md#what-a-spec-is-and-is-not)有更深入的说明。
 
-To `openspec/changes/archive/YYYY-MM-DD-<name>/`, with all change artifacts preserved. The change moves out of your active list. A change that explicitly declares `retire_capabilities: true` can also delete a main capability spec when it removes that capability's final requirement.
+### 什么是 delta spec？
 
 一种只描述正在变化之处的 spec，使用 `ADDED`、`MODIFIED`、`REMOVED` 小节，而不是重述整个 spec。这是让 OpenSpec 能干净地编辑既有系统的机制。详见 [概念](concepts.md#delta-specs)。
+
+### 归档的变更去哪了？
+
+去到 `openspec/changes/archive/YYYY-MM-DD-<name>/`，所有变更制品都被保留。该变更会从你的活跃列表中移出。一个显式声明了 `retire_capabilities: true` 的变更，在移除某能力的最后一条需求时，还可以删除对应的主能力 spec。
+
+## 配置与自定义
+
+### 我怎么告诉 AI 我的技术栈？
+
+把它写进 `openspec/config.yaml` 的 `context:` 下。那段文字会被注入到每一次规划请求中，因此 AI 始终了解你的技术栈和约定。参见 [自定义](customization.md#project-configuration)。
 
 ### 我能用除英语之外的语言生成 spec 吗？
 
@@ -110,18 +136,18 @@ OpenSpec 在强推理模型上效果最好。README 推荐像 Codex、5.5、Opus
 
 ### 怎么升级？
 
-两步。升级包（`npm install -g @fission-ai/openspec@latest`），然后在项目内运行 `openspec-cn update` 以重新生成 skills 和 commands。
+两步。升级包（`npm install -g @studyzy/openspec-cn@latest`），然后在项目内运行 `openspec-cn update` 以重新生成 skills 和 commands。
 
 ### 怎么卸载 OpenSpec？
 
-没有卸载命令，它只是全局包加上项目里的文件。移除包（`npm uninstall -g @fission-ai/openspec`），可选地删除 `openspec/` 目录及生成的工具文件。逐步说明（包括哪些可以安全保留）见 [安装：卸载](installation.md#uninstalling)。
+没有卸载命令，它只是全局包加上项目里的文件。移除包（`npm uninstall -g @studyzy/openspec-cn`），可选地删除 `openspec/` 目录及生成的工具文件。逐步说明（包括哪些可以安全保留）见 [安装：卸载](installation.md#uninstalling)。
 
 ## 获取帮助
 
 ### 我在哪里提问或报告 bug？
 
 - **Discord：** [discord.gg/YctCnvvshC](https://discord.gg/YctCnvvshC)
-- **GitHub Issues：** [github.com/Fission-AI/OpenSpec/issues](https://github.com/Fission-AI/OpenSpec/issues)
+- **GitHub Issues：** [github.com/studyzy/OpenSpec-cn/issues](https://github.com/studyzy/OpenSpec-cn/issues)
 - **从你的终端：** `openspec-cn feedback "你的消息"` 会为你开一个 GitHub issue。
 
 ### 这些文档有误或让人困惑。我该怎么办？

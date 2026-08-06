@@ -385,7 +385,7 @@ describe('resolveOpenSpecRoot', () => {
         'invalid_store_pointer'
       );
       expect(error.message).toContain(path.join(nonString, 'openspec', 'config.yaml'));
-      expect(error.message).toContain('the store key must be a single store id string');
+      expect(error.message).toContain('store 键必须是单个 store id 字符串');
       expect(fs.existsSync(path.join(nonString, 'openspec', 'changes'))).toBe(false);
 
       const unparseable = createPointerDir('bad-yaml', 'store: [unclosed');
@@ -394,7 +394,7 @@ describe('resolveOpenSpecRoot', () => {
         'invalid_store_pointer'
       );
       // The unparseable case names the real problem, not a phantom key.
-      expect(yamlError.message).toContain('could not be read as YAML');
+      expect(yamlError.message).toContain('配置文件无法按 YAML 解析');
       expect(yamlError.diagnostic.fix).toContain('修复');
 
       // A config that parses to a non-mapping scalar has no pointer at
@@ -594,7 +594,7 @@ describe('resolveOpenSpecRoot', () => {
         'unknown_store'
       );
       expect(error.message).toContain("Global defaultStore 'ghost-plans'");
-      expect(error.diagnostic.fix).toContain('openspec config unset defaultStore');
+      expect(error.diagnostic.fix).toContain('openspec-cn config unset defaultStore');
     });
 
     it('falls through to the registered-store hint when no default is set', async () => {

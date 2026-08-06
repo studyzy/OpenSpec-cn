@@ -94,7 +94,7 @@ describe('ChangeCommand.show/validate', () => {
       await fs.mkdir(path.join(tempRoot, 'openspec', 'changes', 'scaffolded'), { recursive: true });
 
       await expect(cmd.show('scaffolded', { json: false })).rejects.toThrow(
-        /变更 "scaffolded" 尚无 proposal\.md。.*openspec status --change scaffolded/s
+        /变更 "scaffolded" 尚无 proposal\.md。.*openspec-cn status --change scaffolded/s
       );
     });
 
@@ -132,7 +132,7 @@ describe('ChangeCommand.show/validate', () => {
         await fs.symlink(outsideProposal, linkedProposal);
 
         await expect(cmd.show('linked-proposal', { json: false })).rejects.toThrow(
-          /outside the allowed directory/u
+          /路径位于允许的目录之外/u
         );
       }
     );

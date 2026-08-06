@@ -25,15 +25,15 @@
 
 诊断出现在两个位置：**status 数组**（`status: StoreDiagnostic[]`，顶层每个条目）用于健康检查结果，**抛出的错误**在命令失败时被转换为单元素 `status` 数组。
 
-All root-resolving commands (`list`, `show`, `validate`, `status`, `instructions`, `instructions apply`, `instructions archive`, `new change`, `archive`, `doctor`, `context`) resolve one OpenSpec root with one precedence:
+所有需要解析根目录的命令（`list`、`show`、`validate`、`status`、`instructions`、`instructions apply`、`instructions archive`、`new change`、`archive`、`doctor`、`context`）都按同一套优先级解析出唯一一个 OpenSpec 根目录：
 
-1. `--store <id>` → the registered store's root (`source: "store"`).
-2. Otherwise, nearest ancestor with `openspec/`: planning shape → `source: "nearest"` (a `store:` pointer is ignored with a stderr warning); config-only dir with a valid `store:` pointer → that store, `source: "declared"`.
-3. No nearest root + global `defaultStore` set (`openspec config set defaultStore <id>`) → that store, `source: "global_default"`; a stale id fails with the underlying store error and a `fix` naming `openspec config unset defaultStore`.
-4. No nearest root, no default + registered stores exist → error `no_root_with_registered_stores`.
-5. No root, no default, no stores: scaffolding commands treat the cwd as `source: "implicit"`; diagnostic commands (`doctor`, `context`) fail with `no_openspec_root` instead — they inspect, never scaffold.
+1. `--store <id>` → 该已注册 store 的根目录（`source: "store"`）。
+2. 否则，取最近的含有 `openspec/` 的祖先目录：若为规划结构 → `source: "nearest"`（此时 `store:` 指针会被忽略，并在 stderr 输出警告）；若为仅含配置的目录且带有效 `store:` 指针 → 指向该 store，`source: "declared"`。
+3. 没有最近根目录，但设置了全局 `defaultStore`（`openspec-cn config set defaultStore <id>`）→ 指向该 store，`source: "global_default"`；若该 id 已失效，则以底层 store 错误失败，并给出提示 `openspec-cn config unset defaultStore` 的 `fix`。
+4. 没有最近根目录、没有默认值，但存在已注册的 stores → 报错 `no_root_with_registered_stores`。
+5. 没有根目录、没有默认值、也没有 stores：脚手架类命令将 cwd 视为 `source: "implicit"`；而诊断类命令（`doctor`、`context`）则以 `no_openspec_root` 失败 —— 它们只做检查，绝不创建脚手架。
 
-Successful JSON payloads embed the root:
+成功的 JSON 载荷会内嵌 root：
 
 ```json
 "root": { "path": "/abs/path", "source": "store" | "declared" | "global_default" | "nearest" | "implicit", "store_id": "id (only when store-selected)" }
@@ -56,30 +56,30 @@ Successful JSON payloads embed the root:
 `{ "items": [ { "id", "type": "change"|"spec", "valid", "issues": [ { "level", "path", "message", "line"?, "column"? } ], "durationMs" } ], "summary": { "totals": {items,passed,failed}, "byType": {...} }, "version": "1.0", "root" }`。任一 item 失败时退出 1。
 
 ### 4.4 `status --json`
-`{ "changeName", "schemaName", "planningHome"?: { "kind", "root", "changesDir", "defaultSchema" }, "changeRoot", "artifactPaths": { "<id>": {outputPath, resolvedOutputPath, existingOutputPaths} }, "nextSteps": ["..."], "actionContext": { "mode": "repo-local", "sourceOfTruth": "repo", "planningArtifacts", "linkedContext", "allowedEditRoots", "requiresAffectedAreaSelection", "constraints" }, "isPlanningComplete", "isComplete", "applyRequires", "artifacts": [ {id, outputPath, status: "done"|"skipped"|"ready"|"blocked", requires, missingDeps?} ], "root" }`. `isPlanningComplete` means every non-skipped planning artifact exists; skipped artifacts count as satisfied without being created. It does not mean implementation tasks are complete. `isComplete` is retained as a compatibility alias with the same value. Each artifact's `requires` is its direct dependency ids (present for every status, so the transitive required set is computable even when the artifact is `done`); `missingDeps` appears only when `blocked`. The `artifacts` array is in dependency order, with the schema's `artifacts:` declaration order breaking ties between artifacts that become ready at the same time (never alphabetical), so the first `ready` entry is the artifact to write next; `missingDeps` uses that same order. `"skipped"` marks an artifact whose `generates` path is under `specs/` in a change whose `.openspec.yaml` declares `skip_specs: true`; it satisfies dependencies but must not be created. No active changes: `{ "changes": [], "message", "root" }`, exit 0.
+`{ "changeName", "schemaName", "planningHome"?: { "kind", "root", "changesDir", "defaultSchema" }, "changeRoot", "artifactPaths": { "<id>": {outputPath, resolvedOutputPath, existingOutputPaths} }, "nextSteps": ["..."], "actionContext": { "mode": "repo-local", "sourceOfTruth": "repo", "planningArtifacts", "linkedContext", "allowedEditRoots", "requiresAffectedAreaSelection", "constraints" }, "isPlanningComplete", "isComplete", "applyRequires", "artifacts": [ {id, outputPath, status: "done"|"skipped"|"ready"|"blocked", requires, missingDeps?} ], "root" }`。`isPlanningComplete` 表示每个未被跳过的规划制品都已存在；被跳过的制品无需创建即视为已满足。它并不表示实现任务已完成。`isComplete` 作为兼容别名保留，取值相同。每个制品的 `requires` 是其直接依赖的 id（在任何状态下都存在，因此即使制品已 `done` 也能推算出传递依赖集合）；`missingDeps` 仅在 `blocked` 时出现。`artifacts` 数组按依赖顺序排列，当多个制品同时就绪时，以 schema 中 `artifacts:` 的声明顺序打破平局（绝不按字母序），因此第一个 `ready` 条目就是下一个该写的制品；`missingDeps` 也采用同样的顺序。`"skipped"` 标记的是这样一类制品：其 `generates` 路径位于 `specs/` 之下，且所在变更的 `.openspec.yaml` 声明了 `skip_specs: true`；它满足依赖关系，但不得被创建。没有活跃变更时：`{ "changes": [], "message", "root" }`，退出 0。
 
 ### 4.5 `instructions <artifact> --json`
-`{ "changeName", "artifactId", "schemaName", "changeDir", "planningHome"?, "outputPath", "resolvedOutputPath", "existingOutputPaths", "description", "instruction"?, "context"?, "rules"?, "references"?: ReferenceIndexEntry[], "skipped"?, "warning"?, "template", "dependencies": [{id,done,path,description,skipped?}], "unlocks", "root" }`. `unlocks` lists the artifacts this one makes ready, in the schema's declaration order (the same order `status` recommends them). `"skipped": true` (with `"warning"`) appears when the change declares `skip_specs: true` and this artifact is skipped — do not create its files. A dependency entry with `skipped: true` is satisfied without files — do not try to read its paths.
+`{ "changeName", "artifactId", "schemaName", "changeDir", "planningHome"?, "outputPath", "resolvedOutputPath", "existingOutputPaths", "description", "instruction"?, "context"?, "rules"?, "references"?: ReferenceIndexEntry[], "skipped"?, "warning"?, "template", "dependencies": [{id,done,path,description,skipped?}], "unlocks", "root" }`。`unlocks` 列出本制品会使哪些制品变为就绪，按 schema 的声明顺序排列（与 `status` 推荐它们的顺序一致）。当变更声明了 `skip_specs: true` 且本制品被跳过时，会出现 `"skipped": true`（并带 `"warning"`）—— 此时不要创建它的文件。带 `skipped: true` 的依赖条目无需文件即视为已满足 —— 不要尝试读取其路径。
 
 `{ "changeName", "artifactId", "schemaName", "changeDir", "planningHome"?, "outputPath", "resolvedOutputPath", "existingOutputPaths", "description", "instruction"?, "context"?, "rules"?, "references"?: ReferenceIndexEntry[], "template", "dependencies": [{id,done,path,description}], "unlocks", "root" }`。
 
 `ReferenceIndexEntry`：`{ "store_id", "root"?, "specs"?: [{id,summary}], "fetch"?, "status": [] }` —— 已解析的条目携带 root/specs/fetch；未解析的条目携带 store_id + 警告状态。索引上限 50KB（`reference_index_truncated`）。
 
 ### 4.6 `instructions apply --json`
-`{ "changeName", "changeDir", "schemaName", "contextFiles": { "<artifactId>": ["/abs", ...] }, "progress": {total,complete,remaining}, "tasks": [{id,description,done}], "state": "blocked"|"all_done"|"ready", "missingArtifacts"?, "instruction", "references"?, "context"?, "operationGuidance"?, "root" }`. Both optional fields are read from the selected root on every invocation. `context` is a required prompt-level input whose relevant project facts, conventions, and constraints must be applied; `operationGuidance` is advisory input whose entries are followed only when applicable and compatible with the built-in workflow. Both remain separate from state, tasks, progress, context files, and the built-in instruction.
+`{ "changeName", "changeDir", "schemaName", "contextFiles": { "<artifactId>": ["/abs", ...] }, "progress": {total,complete,remaining}, "tasks": [{id,description,done}], "state": "blocked"|"all_done"|"ready", "missingArtifacts"?, "instruction", "references"?, "context"?, "operationGuidance"?, "root" }`。这两个可选字段在每次调用时都会从选中的根目录读取。`context` 是提示词层面的必需输入，其中相关的项目事实、约定与约束必须被应用；`operationGuidance` 是建议性输入，仅当其条目适用且与内置工作流兼容时才遵循。两者都独立于 state、tasks、progress、上下文文件以及内置 instruction。
 
 ### 4.7 `instructions archive --json`
-`{ "changeName", "context"?, "operationGuidance"?, "root" }`. Requires a valid `--change` in the resolved repo/store root and uses the same required-context/advisory-guidance semantics as apply. This is a read-only runtime-input surface: it does not return the static archive workflow, inspect or merge delta specs, write main specs, or move the change.
+`{ "changeName", "context"?, "operationGuidance"?, "root" }`。要求在已解析的仓库/store 根目录中存在有效的 `--change`，并采用与 apply 相同的「必需上下文 / 建议性指引」语义。这是一个只读的运行时输入接口：它不返回静态的归档工作流，不检查或合并增量规范（delta specs），不写入主 specs，也不移动变更。
 
 ### 4.8 `new change <name> --json`
 
 成功：`{ "change": { "id", "path", "metadataPath", "schema" }, "root" }`。失败：`{ "change": null, "status": [d] }`，退出 1。
 
 ### 4.9 `archive <name> --json`
-Success: `{ "archive": { "change", "archivedAs": "YYYY-MM-DD-name", "path", "specsUpdated", "totals"?, "warnings"? }, "root" }`. Failure: `{ "archive": null, "root"?, "status": [d] }`, exit 1. `specsUpdated` is true only when at least one spec file was written or retired (a capability whose last requirement the change removed has its spec deleted, which requires `retire_capabilities: true` in the change's `.openspec.yaml`; every retirement is named in `warnings`, with a pasteable Git recovery command only when the spec lived in the caller's checkout); an already-synced change archives with all-zero totals and the skips listed in `warnings`. JSON mode is strictly non-interactive: every prompt point becomes an `archive_*` code.
+成功：`{ "archive": { "change", "archivedAs": "YYYY-MM-DD-name", "path", "specsUpdated", "totals"?, "warnings"? }, "root" }`。失败：`{ "archive": null, "root"?, "status": [d] }`，退出 1。仅当至少写入或退役了一个 spec 文件时，`specsUpdated` 才为 true（若某项能力的最后一条需求被该变更移除，其 spec 会被删除，这需要变更的 `.openspec.yaml` 中设置 `retire_capabilities: true`；每次退役都会在 `warnings` 中列明，且仅当该 spec 位于调用方的检出目录中时才附带可直接粘贴的 Git 恢复命令）；已经同步过的变更归档时 totals 全为零，跳过项列在 `warnings` 中。JSON 模式严格非交互：每个提示点都会转化为一个 `archive_*` 代码。
 
 ### 4.10 `doctor --json`
-`{ "root": { "path", "source", "store_id"?, "healthy", "status": [] }, "store": { "id", "metadata": {present,valid,remote?}, "origin_url"?, "drift"?: {ahead,behind}, "status": [] } | null, "references": [...], "status": [] }`. `drift` (present only for a git-backed store checkout that has an upstream tracking ref) is ahead/behind counts against the last-fetched upstream, not the live remote. Health findings of any severity exit 0. Failure payload: `{ "root": null, "store": null, "references": [], "status": [d] }`, exit 1.
+`{ "root": { "path", "source", "store_id"?, "healthy", "status": [] }, "store": { "id", "metadata": {present,valid,remote?}, "origin_url"?, "drift"?: {ahead,behind}, "status": [] } | null, "references": [...], "status": [] }`。`drift`（仅当 store 检出目录由 git 支撑且存在上游跟踪引用时才出现）是相对于最后一次 fetch 到的上游的领先/落后计数，而非实时远端。任何严重程度的健康检查结果都退出 0。失败载荷：`{ "root": null, "store": null, "references": [], "status": [d] }`，退出 1。
 
 ### 4.11 `context --json`
 
@@ -121,7 +121,7 @@ setup/register：`{ "store": {id, root, metadata_path?}, "registry": {path, regi
 `store_setup_id_required`, `store_setup_path_required`, `store_setup_path_not_directory`, `store_setup_inside_git_repo`, `store_setup_non_empty_directory`, `store_setup_cancelled`, `store_path_required`, `store_path_missing`, `store_path_not_directory`, `store_root_pointer_declared`, `store_register_root_unhealthy`, `store_register_identity_confirmation_required`, `store_register_cancelled`, `store_remote_empty`, `store_remote_requires_hand_edit`, `store_remove_confirmation_required`, `store_remove_cancelled`, `store_remove_path_not_directory`, `store_remove_metadata_missing`, `store_root_missing`（在 remove 中为 warning，在 doctor 中为 error）, `store_root_not_directory`。
 
 ### Store git
-`store_git_init_failed`, `store_git_identity_missing`, `store_git_commit_failed`, `store_git_no_commits` (warning), `store_clone_fragile_directories` (warning), `store_remote_divergence` (info, doctor), `store_checkout_drift` (info, doctor).
+`store_git_init_failed`, `store_git_identity_missing`, `store_git_commit_failed`, `store_git_no_commits`（warning）, `store_clone_fragile_directories`（warning）, `store_remote_divergence`（info，doctor）, `store_checkout_drift`（info，doctor）。
 
 `relationship_registry_unreadable`, `root_pointer_ignored`, `root_pointer_invalid`, `pointer_declarations_inert`。
 

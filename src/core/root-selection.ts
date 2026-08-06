@@ -374,7 +374,7 @@ async function resolveDefaultStoreRoot(
       const staleFix =
         error.diagnostic.code === 'unknown_store' ||
         error.diagnostic.code === 'no_registered_stores'
-          ? `Register the store (openspec store register <path> --id ${id}) or clear the stale global default (openspec config unset defaultStore).`
+          ? `请注册该存储（openspec-cn store register <path> --id ${id}），或清除过时的全局默认值（openspec-cn config unset defaultStore）。`
           : error.diagnostic.fix;
       throw new RootSelectionError(
         `Global defaultStore '${id}': ${error.message}`,

@@ -771,8 +771,8 @@ describe('displayCliUpdateNote', () => {
 
     expect(output).toContain(`v${OPENSPEC_VERSION} → v9.9.9`);
     expect(output).toContain('npm install -g @studyzy/openspec-cn@latest');
-    expect(output).toContain('Then run "openspec update" again');
-    expect(output).toContain(`Running from: ${getInstallDir()}`);
+    expect(output).toContain('然后再次运行 "openspec-cn update" 以获取新的工作流。');
+    expect(output).toContain(`运行位置：${getInstallDir()}`);
   });
 
   it('picks the upgrade command that matches how the CLI was installed', () => {
@@ -787,7 +787,7 @@ describe('displayCliUpdateNote', () => {
       path.join(PROJECT_ROOT, 'packages', 'app')
     ).join('\n');
     // No npm command: the project's own package manager owns its lockfile.
-    expect(local).toContain('Update the @studyzy/openspec-cn dependency in this project.');
+    expect(local).toContain('请更新本项目中的 @studyzy/openspec-cn 依赖。');
     expect(local).not.toContain('npm install');
 
     const npx = buildCliUpdateLines(
@@ -801,8 +801,8 @@ describe('displayCliUpdateNote', () => {
 
   it('omits the install path only when it cannot be resolved', () => {
     const dir = path.join(GLOBAL_ROOT, 'openspec');
-    expect(buildCliUpdateLines('9.9.9', null, '.').join('\n')).not.toContain('Running from:');
-    expect(buildCliUpdateLines('9.9.9', dir, '.').join('\n')).toContain(`Running from: ${dir}`);
+    expect(buildCliUpdateLines('9.9.9', null, '.').join('\n')).not.toContain('运行位置：');
+    expect(buildCliUpdateLines('9.9.9', dir, '.').join('\n')).toContain(`运行位置：${dir}`);
   });
 
   it('recognizes project-local installs from any directory under the project', () => {
@@ -857,7 +857,7 @@ describe('displayCliUpdateNote', () => {
 
     // Every other flavor does need the second pass.
     expect(buildUpgradeCommandLines(path.join(GLOBAL_ROOT, 'lib', 'node_modules', 'pkg'), PROJECT_ROOT))
-      .toContain('  Then run "openspec update" again to pick up new workflows.');
+      .toContain('  然后再次运行 "openspec-cn update" 以获取新的工作流。');
   });
 
   it('finds the binary npm installs beside its global root', () => {

@@ -77,7 +77,7 @@ function printHumanWorkingSet(workingSet: WorkingSet, declaredReferenceCount: nu
     for (const member of availableStores) {
       console.log(memberLine(member));
       if (member.fetch) {
-        console.log(`  获取: ${member.fetch}`);
+        console.log(`  获取：${member.fetch}`);
       }
     }
   }
@@ -104,14 +104,14 @@ function printHumanWorkingSet(workingSet: WorkingSet, declaredReferenceCount: nu
       for (const diagnostic of member.status) {
         console.log(`  - ${member.id}: ${diagnostic.message}`);
         if (diagnostic.fix) {
-          console.log(`    修复: ${diagnostic.fix}`);
+          console.log(`    修复：${diagnostic.fix}`);
         }
       }
     }
     for (const diagnostic of workingSet.status) {
-      console.log(`  备注: ${diagnostic.message}`);
+      console.log(`  备注：${diagnostic.message}`);
       if (diagnostic.fix) {
-        console.log(`  Fix: ${diagnostic.fix}`);
+        console.log(`  修复：${diagnostic.fix}`);
       }
     }
   }
@@ -129,7 +129,7 @@ function writeCodeWorkspace(
       'context_file_exists',
       {
         target: 'context.output',
-        fix: `Pass --force to overwrite, or choose a different path.`,
+        fix: `传入 --force 覆盖，或选择其他路径。`,
       }
     );
   }
@@ -151,8 +151,8 @@ function writeCodeWorkspace(
     .map((member) => member.id);
   const summary =
     skipped.length > 0
-      ? `Wrote ${resolved} (${available + 1} folders; not available: ${skipped.join(', ')})`
-      : `Wrote ${resolved} (${available + 1} folders)`;
+      ? `已写入 ${resolved}（${available + 1} 个文件夹；不可用：${skipped.join(', ')}）`
+      : `已写入 ${resolved}（${available + 1} 个文件夹）`;
   // stderr keeps JSON stdout pure; for humans it reads inline.
   console.error(summary);
 }

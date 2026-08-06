@@ -1,19 +1,19 @@
-# OpenSpec skills for skills.sh
+# 适用于 skills.sh 的 OpenSpec skills
 
-Install the OpenSpec workflow skills into any [skills.sh](https://skills.sh)-compatible agent:
-
-```bash
-npx skills add Fission-AI/OpenSpec
-```
-
-Each `openspec-*/SKILL.md` here is the same skill `openspec init` writes into a
-project. The skills drive the `openspec` CLI, so for the full setup (CLI +
-`openspec/` project scaffolding + slash commands) run:
+将 OpenSpec 工作流 skills 安装到任何兼容 [skills.sh](https://skills.sh) 的智能体中：
 
 ```bash
-npx openspec@latest init
+npx skills add studyzy/OpenSpec-cn
 ```
 
-> These files are generated from the skill templates — do not edit by hand. Run
-> `pnpm build && pnpm generate:skills` after changing a template;
-> `skillssh-parity.test.ts` fails if they drift.
+此处的每个 `openspec-*/SKILL.md` 与 `openspec-cn init` 写入项目的 skill 完全相同。
+这些 skills 驱动 `openspec-cn` CLI，因此若需完整安装（CLI + `openspec/` 项目脚手架 +
+斜杠命令），请运行：
+
+```bash
+npx @studyzy/openspec-cn@latest init
+```
+
+> 这些文件由 skill 模板生成 —— 请勿手工编辑。修改模板后请运行
+> `pnpm build && pnpm generate:skills`；若两者出现漂移，
+> `skillssh-parity.test.ts` 会失败。

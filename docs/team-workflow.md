@@ -21,13 +21,13 @@ git switch -c add-dark-mode       像往常一样开一条分支
    │
 /opsx:propose add-dark-mode       起草 plan（proposal + specs + tasks）
    │
-REVIEW THE PLAN                   写任何代码之前你先读它 — 见 Reviewing a Change
+REVIEW THE PLAN                   写任何代码之前你先读它 — 见《审查变更》
    │
 /opsx:apply                       构建它；制品与代码一起变化
    │
-git commit && open a PR            PR 包含了 spec 增量 AND 代码
+git commit && open a PR            PR 同时包含 spec 增量和代码
    │
-teammate reviews, merges
+teammate reviews, merges           队友审阅并合并
    │
 /opsx:archive                     把增量并入 specs/，把变更移到 archive/
 ```
@@ -41,7 +41,7 @@ plan 和代码并肩待在同一条分支里，所以你的队友一起审阅两
 审阅者的一个好顺序：
 
 1. **读 `proposal.md`** —— 这是对的问题和范围吗？
-2. **读 `specs/` 下的增量** —— "完成"定义正确吗？（这就是 [Reviewing a Change](reviewing-changes.md) 的两分钟检查，现在发生在 PR 里。）
+2. **读 `specs/` 下的增量** —— "完成"定义正确吗？（这就是 [审查变更](reviewing-changes.md) 的两分钟检查，现在发生在 PR 里。）
 3. **然后读代码 diff** —— 它是否精确地交付了那些需求？
 
 一个对*方法*有不同意见的审阅者，可以针对 proposal 低成本地说出来，而不是在 300 行代码里重新争论。把增量规范放在 PR 描述顶部附近，或指向审阅者看变更文件夹，让他们从这里开始。
@@ -65,10 +65,10 @@ plan 和代码并肩待在同一条分支里，所以你的队友一起审阅两
 
 ## 当规划超出一个仓库
 
-上面一切都假设 plan 活在代码仓库自己的 `openspec/` 文件夹里，这是对的默认。当你的规划确实跨越多个仓库或团队——一个功能触及三个服务，或者一个团队拥有、其他团队消费的需求——那就是 beta 版 **stores** 功能的用武之地：规划有了自己的仓库，任何代码仓库都可以指向它。从 [Stores User Guide](stores-beta/user-guide.md) 开始。
+上面一切都假设 plan 活在代码仓库自己的 `openspec/` 文件夹里，这是对的默认。当你的规划确实跨越多个仓库或团队——一个功能触及三个服务，或者一个团队拥有、其他团队消费的需求——那就是 beta 版 **stores** 功能的用武之地：规划有了自己的仓库，任何代码仓库都可以指向它。从 [Stores 用户指南](stores-beta/user-guide.md) 开始。
 
 ## 下一步去哪
 
-- [Reviewing a Change](reviewing-changes.md) — 审阅过程，现在发生在你的 PR 里。
-- [Writing Good Specs](writing-specs.md) — 包括如何合理控制变更规模以适配一条分支。
-- [Stores User Guide](stores-beta/user-guide.md) — 跨仓库和团队的规划。
+- [审查变更](reviewing-changes.md) — 审阅过程，现在发生在你的 PR 里。
+- [编写优秀的 Specs](writing-specs.md) — 包括如何合理控制变更规模以适配一条分支。
+- [Stores 用户指南](stores-beta/user-guide.md) — 跨仓库和团队的规划。

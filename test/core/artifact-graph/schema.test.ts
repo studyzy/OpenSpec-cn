@@ -95,7 +95,7 @@ artifacts:
     template: templates/other.md
 `;
       expect(() => parseSchema(yaml)).toThrow(SchemaValidationError);
-      expect(() => parseSchema(yaml)).toThrow(/Duplicate artifact ID: proposal/);
+      expect(() => parseSchema(yaml)).toThrow(/重复的制品 ID：proposal/);
     });
 
     it('should throw on invalid requires reference', () => {

@@ -650,7 +650,7 @@ export function registerWorksetCommand(program: Command): void {
         ],
       });
     } else {
-      console.error(`Error: ${message}`);
+      console.error(`错误：${message}`);
     }
     process.exitCode = 1;
   });

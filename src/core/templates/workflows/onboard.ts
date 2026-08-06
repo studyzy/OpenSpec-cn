@@ -516,7 +516,7 @@ openspec-cn archive "<name>" --yes
 没问题！你的变更保存在 \`openspec-cn status --change "<name>" --json\` 报告的 \`changeRoot\`。
 
 稍后从我们停下的地方继续：
-- \`/opsx:continue <name>\` - 恢复制品创建（若已安装；否则 \`openspec status --change "<name>" --json\` 显示下一个制品）
+- \`/opsx:continue <name>\` - 恢复制品创建（若已安装；否则 \`openspec-cn status --change "<name>" --json\` 显示下一个制品）
 - \`/opsx:apply <name>\` - 跳到实现（若任务存在）
 
 工作不会丢失。随时回来。

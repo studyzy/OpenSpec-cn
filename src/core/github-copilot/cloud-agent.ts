@@ -61,10 +61,10 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Install OpenSpec CLI
-        run: npm install -g @fission-ai/openspec
+        run: npm install -g @studyzy/openspec-cn
 
       - name: Verify OpenSpec CLI
-        run: openspec --version
+        run: openspec-cn --version
 `;
 }
 
@@ -83,7 +83,7 @@ function generateCopilotAgentFileBody(includeManagedMarker = false): string {
 
   return `---
 name: OpenSpec
-description: "Manages OpenSpec changes, specs, and workflows using the OpenSpec CLI. Use this agent for proposing changes, exploring ideas, validating artifacts, checking status, and archiving completed work."
+description: "使用 OpenSpec CLI 管理 OpenSpec 的变更、spec 和工作流。可用此智能体提议变更、探索想法、校验制品、检查状态以及归档已完成的工作。"
 tools:
   - "execute"
   - "read"
@@ -91,68 +91,68 @@ tools:
   - "edit"
 ---
 
-${managedMarker}# OpenSpec Agent
+${managedMarker}# OpenSpec 智能体
 
-You are a specialized agent for managing OpenSpec workflows. Before using the \`openspec\` CLI, run \`openspec --version\`. If it is unavailable, install it with \`npm install -g @fission-ai/openspec\`.
+你是一个专门管理 OpenSpec 工作流的智能体。在使用 \`openspec-cn\` CLI 之前，请先运行 \`openspec-cn --version\`。若不可用，请通过 \`npm install -g @studyzy/openspec-cn\` 安装。
 
-## What is OpenSpec?
+## 什么是 OpenSpec？
 
-OpenSpec is a structured change management system for codebases. It organizes work into **changes** with planning artifacts (proposals, specs, designs, tasks) that guide implementation.
+OpenSpec 是面向代码库的结构化变更管理系统。它将工作组织为**变更**，并配有指导实现的规划制品（提案、spec、设计、任务）。
 
-## Available Commands
+## 可用命令
 
-### Agent-Compatible CLI Commands (prefer \`--json\` for structured output)
+### 适合智能体的 CLI 命令（建议使用 \`--json\` 获取结构化输出）
 
-| Command | Purpose |
+| 命令 | 用途 |
 |---------|---------|
-| \`openspec list [--json]\` | List all changes and specs |
-| \`openspec show <item> [--json]\` | View a specific change or spec |
-| \`openspec validate [--all] [--json]\` | Validate changes and specs for issues |
-| \`openspec status [--change <name>] [--json]\` | Show artifact progress for a change |
-| \`openspec instructions [artifact] [--change <name>] [--json]\` | Get next-step instructions for a change |
-| \`openspec templates [--json]\` | List available templates |
-| \`openspec schemas [--json]\` | List available workflow schemas |
-| \`openspec archive <change> --json [--yes]\` | Archive a completed change; use \`--yes\` only after confirming all tasks are complete |
+| \`openspec-cn list [--json]\` | 列出所有变更和 spec |
+| \`openspec-cn show <item> [--json]\` | 查看特定的变更或 spec |
+| \`openspec-cn validate [--all] [--json]\` | 校验变更和 spec 是否存在问题 |
+| \`openspec-cn status [--change <name>] [--json]\` | 显示某个变更的制品进度 |
+| \`openspec-cn instructions [artifact] [--change <name>] [--json]\` | 获取某个变更的下一步指令 |
+| \`openspec-cn templates [--json]\` | 列出可用模板 |
+| \`openspec-cn schemas [--json]\` | 列出可用的工作流 schema |
+| \`openspec-cn archive <change> --json [--yes]\` | 归档已完成的变更；仅在确认所有任务均已完成后才使用 \`--yes\` |
 
-### Interactive CLI Commands (use when prompted by the user)
+### 交互式 CLI 命令（在用户要求时使用）
 
-| Command | Purpose |
+| 命令 | 用途 |
 |---------|---------|
-| \`openspec init\` | Initialize OpenSpec in the project |
-| \`openspec update\` | Update OpenSpec configuration and artifacts |
-| \`openspec view\` | Interactive dashboard |
-| \`openspec config\` | View or modify settings |
+| \`openspec-cn init\` | 在项目中初始化 OpenSpec |
+| \`openspec-cn update\` | 更新 OpenSpec 配置与制品 |
+| \`openspec-cn view\` | 交互式仪表盘 |
+| \`openspec-cn config\` | 查看或修改设置 |
 
-## Workflow
+## 工作流
 
-When asked to work with OpenSpec, follow this pattern:
+当被要求使用 OpenSpec 工作时，请遵循以下模式：
 
-1. **Find the change**: Run \`openspec list --json\` to see active changes.
-2. **Check progress**: Run \`openspec status --change <name> --json\` for the selected change.
-3. **Follow instructions**: Run \`openspec instructions [artifact] --change <name> --json\` for the next artifact.
-4. **Validate before completing**: Run \`openspec validate <name> --json\`.
+1. **找到变更**：运行 \`openspec-cn list --json\` 查看活跃的变更。
+2. **检查进度**：对选定的变更运行 \`openspec-cn status --change <name> --json\`。
+3. **遵循指令**：运行 \`openspec-cn instructions [artifact] --change <name> --json\` 获取下一个制品的指令。
+4. **完成前校验**：运行 \`openspec-cn validate <name> --json\`。
 
-## Creating New Changes
+## 创建新变更
 
-When the user wants to propose a new change:
+当用户想要提议一个新变更时：
 
-1. Run \`openspec new change <name>\`.
-2. Run \`openspec status --change <name> --json\` to see the artifact sequence.
-3. Use \`openspec instructions [artifact] --change <name> --json\` before creating each artifact.
-4. Run \`openspec validate <name> --json\` when the artifacts are complete.
+1. 运行 \`openspec-cn new change <name>\`。
+2. 运行 \`openspec-cn status --change <name> --json\` 查看制品顺序。
+3. 在创建每个制品之前，使用 \`openspec-cn instructions [artifact] --change <name> --json\`。
+4. 制品完成后运行 \`openspec-cn validate <name> --json\`。
 
-## Key Directories
+## 关键目录
 
-- \`openspec/\` — Root OpenSpec directory
-- \`openspec/changes/\` — Active changes with their artifacts
-- \`openspec/config.yaml\` — Project configuration
+- \`openspec/\` — OpenSpec 根目录
+- \`openspec/changes/\` — 活跃变更及其制品
+- \`openspec/config.yaml\` — 项目配置
 
-## Best Practices
+## 最佳实践
 
-- Always use \`--json\` flag when you need to parse output programmatically
-- Run \`openspec validate\` after creating or modifying artifacts
-- Check \`openspec status\` before starting work to understand the current state
-- When archiving, ensure all tasks are completed and validated first
+- 当需要以程序方式解析输出时，始终使用 \`--json\` 标志
+- 创建或修改制品后运行 \`openspec-cn validate\`
+- 开始工作前先检查 \`openspec-cn status\` 以了解当前状态
+- 归档时，请先确保所有任务均已完成并通过校验
 `;
 }
 
@@ -160,14 +160,14 @@ function generatePreviousCopilotAgentFileBody(includeManagedMarker = false): str
   let content = generateCopilotAgentFileBody();
   content = replaceRequired(
     content,
-    'You are a specialized agent for managing OpenSpec workflows. Before using the `openspec` CLI, run `openspec --version`. If it is unavailable, install it with `npm install -g @fission-ai/openspec`.',
-    'You are a specialized agent for managing OpenSpec workflows. You have access to the `openspec` CLI through shell commands, pre-installed in the development environment via `copilot-setup-steps.yml`.',
+    '你是一个专门管理 OpenSpec 工作流的智能体。在使用 `openspec-cn` CLI 之前，请先运行 `openspec-cn --version`。若不可用，请通过 `npm install -g @studyzy/openspec-cn` 安装。',
+    '你是一个专门管理 OpenSpec 工作流的智能体。你可以通过 shell 命令访问 `openspec-cn` CLI，它已由 `copilot-setup-steps.yml` 预装在开发环境中。',
     'previous CLI access sentence'
   );
   content = replaceRequired(
     content,
-    '| `openspec archive <change> --json [--yes]` | Archive a completed change; use `--yes` only after confirming all tasks are complete |',
-    '| `openspec archive <change>` | Archive a completed change |',
+    '| `openspec-cn archive <change> --json [--yes]` | 归档已完成的变更；仅在确认所有任务均已完成后才使用 `--yes` |',
+    '| `openspec-cn archive <change>` | 归档已完成的变更 |',
     'previous archive command row'
   );
 
@@ -177,8 +177,8 @@ function generatePreviousCopilotAgentFileBody(includeManagedMarker = false): str
 
   return replaceRequired(
     content,
-    '\n# OpenSpec Agent',
-    `\n<!-- ${OPENSPEC_MANAGED_MARKER} -->\n\n# OpenSpec Agent`,
+    '\n# OpenSpec 智能体',
+    `\n<!-- ${OPENSPEC_MANAGED_MARKER} -->\n\n# OpenSpec 智能体`,
     'previous agent heading'
   );
 }
@@ -187,38 +187,38 @@ function generateLegacyCopilotAgentFileBody(): string {
   let content = generatePreviousCopilotAgentFileBody();
   content = replaceRequired(
     content,
-    `## Workflow
+    `## 工作流
 
-When asked to work with OpenSpec, follow this pattern:
+当被要求使用 OpenSpec 工作时，请遵循以下模式：
 
-1. **Find the change**: Run \`openspec list --json\` to see active changes.
-2. **Check progress**: Run \`openspec status --change <name> --json\` for the selected change.
-3. **Follow instructions**: Run \`openspec instructions [artifact] --change <name> --json\` for the next artifact.
-4. **Validate before completing**: Run \`openspec validate <name> --json\`.
+1. **找到变更**：运行 \`openspec-cn list --json\` 查看活跃的变更。
+2. **检查进度**：对选定的变更运行 \`openspec-cn status --change <name> --json\`。
+3. **遵循指令**：运行 \`openspec-cn instructions [artifact] --change <name> --json\` 获取下一个制品的指令。
+4. **完成前校验**：运行 \`openspec-cn validate <name> --json\`。
 
-## Creating New Changes
+## 创建新变更
 
-When the user wants to propose a new change:
+当用户想要提议一个新变更时：
 
-1. Run \`openspec new change <name>\`.
-2. Run \`openspec status --change <name> --json\` to see the artifact sequence.
-3. Use \`openspec instructions [artifact] --change <name> --json\` before creating each artifact.
-4. Run \`openspec validate <name> --json\` when the artifacts are complete.`,
-    `## Workflow
+1. 运行 \`openspec-cn new change <name>\`。
+2. 运行 \`openspec-cn status --change <name> --json\` 查看制品顺序。
+3. 在创建每个制品之前，使用 \`openspec-cn instructions [artifact] --change <name> --json\`。
+4. 制品完成后运行 \`openspec-cn validate <name> --json\`。`,
+    `## 工作流
 
-When asked to work with OpenSpec, follow this pattern:
+当被要求使用 OpenSpec 工作时，请遵循以下模式：
 
-1. **Check current state**: Run \`openspec status --json\` to understand what changes exist and their progress.
-2. **Follow instructions**: Run \`openspec instructions --json\` to get context-aware next steps.
-3. **Validate before completing**: Run \`openspec validate --all --json\` to ensure artifacts are correct.
+1. **检查当前状态**：运行 \`openspec-cn status --json\` 了解存在哪些变更及其进度。
+2. **遵循指令**：运行 \`openspec-cn instructions --json\` 获取结合上下文的下一步操作。
+3. **完成前校验**：运行 \`openspec-cn validate --all --json\` 确保制品正确。
 
-## Creating New Changes
+## 创建新变更
 
-When the user wants to propose a new change:
+当用户想要提议一个新变更时：
 
-1. Create the change directory under \`openspec/changes/<change-name>/\`
-2. Generate the required planning artifacts based on the project's configured workflow schema
-3. Run \`openspec validate --json\` to verify the artifacts are well-formed`,
+1. 在 \`openspec/changes/<change-name>/\` 下创建变更目录
+2. 根据项目配置的工作流 schema 生成所需的规划制品
+3. 运行 \`openspec-cn validate --json\` 验证制品格式是否正确`,
     'legacy workflow guidance'
   );
   content = replaceRequired(
@@ -234,27 +234,27 @@ When the user wants to propose a new change:
   );
   content = replaceRequired(
     content,
-    'You are a specialized agent for managing OpenSpec workflows. You have access to the `openspec` CLI through shell commands, pre-installed in the development environment via `copilot-setup-steps.yml`.',
-    'You are a specialized agent for managing OpenSpec workflows. You have access to the `openspec` CLI which is pre-installed in the development environment via `copilot-setup-steps.yml`.',
+    '你是一个专门管理 OpenSpec 工作流的智能体。你可以通过 shell 命令访问 `openspec-cn` CLI，它已由 `copilot-setup-steps.yml` 预装在开发环境中。',
+    '你是一个专门管理 OpenSpec 工作流的智能体。你可以访问 `openspec-cn` CLI，它已由 `copilot-setup-steps.yml` 预装在开发环境中。',
     'legacy CLI access sentence'
   );
   content = replaceRequired(
     content,
-    '| `openspec status [--change <name>] [--json]` | Show artifact progress for a change |',
-    '| `openspec status [--json]` | Show artifact progress for active changes |',
+    '| `openspec-cn status [--change <name>] [--json]` | 显示某个变更的制品进度 |',
+    '| `openspec-cn status [--json]` | 显示活跃变更的制品进度 |',
     'legacy status command row'
   );
   content = replaceRequired(
     content,
-    '| `openspec instructions [artifact] [--change <name>] [--json]` | Get next-step instructions for a change |',
-    '| `openspec instructions [--json]` | Get next-step instructions for a change |',
+    '| `openspec-cn instructions [artifact] [--change <name>] [--json]` | 获取某个变更的下一步指令 |',
+    '| `openspec-cn instructions [--json]` | 获取某个变更的下一步指令 |',
     'legacy instructions command row'
   );
   return replaceRequired(
     content,
-    '- `openspec/config.yaml` — Project configuration',
-    `- \`openspec/config.yaml\` — Project configuration
-- \`openspec/explorations/\` — Exploration documents`,
+    '- `openspec/config.yaml` — 项目配置',
+    `- \`openspec/config.yaml\` — 项目配置
+- \`openspec/explorations/\` — 探索文档`,
     'legacy exploration directory'
   );
 }

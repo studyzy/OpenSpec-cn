@@ -273,7 +273,7 @@ describe('InitCommand', () => {
           '视为在当前工作流其余部分中固定不变'
         );
         expect(content).toContain(
-          'openspec status --change "<name>" --json --store "<id>"'
+          'openspec-cn status --change "<name>" --json --store "<id>"'
         );
       }
 
@@ -312,9 +312,9 @@ describe('InitCommand', () => {
         expect(availabilityGuidance).toBeGreaterThanOrEqual(0);
         expect(content.indexOf(continueReference)).toBe(availabilityGuidance);
         expect(nextReference).toBeGreaterThan(availabilityGuidance);
-        expect(content).toContain('openspec status --change "<name>" --json');
+        expect(content).toContain('openspec-cn status --change "<name>" --json');
         expect(content).toContain(
-          'openspec instructions "<artifact-id>" --change "<name>" --json'
+          'openspec-cn instructions "<artifact-id>" --change "<name>" --json'
         );
       }
 
@@ -328,7 +328,7 @@ describe('InitCommand', () => {
         const mutationsComplete = content.indexOf(
           '遵循下方的 **主 Spec 格式参考**'
         );
-        const validation = content.indexOf('openspec validate --specs');
+        const validation = content.indexOf('openspec-cn validate --specs');
         const summary = content.indexOf('6. **显示摘要**');
 
         expect(mutationsComplete).toBeGreaterThanOrEqual(0);

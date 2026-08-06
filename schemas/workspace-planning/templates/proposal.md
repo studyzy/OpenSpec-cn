@@ -1,6 +1,6 @@
 ## Why
 
-Describe the shared product goal, problem, or opportunity that makes this workspace-level change worth planning.
+描述共享的产品目标、问题或机会，说明这次 workspace 级别的变更为何值得规划。
 
 ## What Changes
 
@@ -8,8 +8,8 @@ Describe the shared product goal, problem, or opportunity that makes this worksp
 
 ## Affected Areas
 
-- Known:
-- Unresolved:
+- 已知：
+- 待确定：
 
 ## Capabilities
 
@@ -23,6 +23,6 @@ Describe the shared product goal, problem, or opportunity that makes this worksp
 
 ## Impact
 
-- Workspace planning:
-- Linked repos or folders:
-- User-facing behavior:
+- Workspace 规划：
+- 链接的仓库或文件夹：
+- 面向用户的行为：

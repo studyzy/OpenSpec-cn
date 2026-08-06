@@ -17,7 +17,7 @@ ${STORE_SELECTION_GUIDANCE}
 
 **输入**：可选地指定变更名称。若省略，检查能否从对话上下文推断。若模糊或歧义，你必须提示用户从可用变更中选择。
 
-\`/opsx:continue\` 是一个扩展 profile 工作流，可能未安装。在下方任何地方建议它之前，请验证它是否可用。若不可用，\`openspec status --change "<name>" --json\` 显示下一个制品，\`openspec instructions "<artifact-id>" --change "<name>" --json\` 解释如何创建它。
+\`/opsx:continue\` 是一个扩展 profile 工作流，可能未安装。在下方任何地方建议它之前，请验证它是否可用。若不可用，\`openspec-cn status --change "<name>" --json\` 显示下一个制品，\`openspec-cn instructions "<artifact-id>" --change "<name>" --json\` 解释如何创建它。
 
 **步骤**
 
@@ -26,7 +26,7 @@ ${STORE_SELECTION_GUIDANCE}
    若提供了名称，使用它。否则：
    - 从对话上下文推断（若用户提到了某个变更）
    - 若仅有一个活跃变更则自动选择
-   - 若存在歧义，运行 \`openspec list --json\` 获取按最近修改排序的可用变更，并让用户选择
+   - 若存在歧义，运行 \`openspec-cn list --json\` 获取按最近修改排序的可用变更，并让用户选择
 
    提示时，展示最近修改的前 3-4 个变更作为选项，显示：
    - 变更名称
@@ -40,7 +40,7 @@ ${STORE_SELECTION_GUIDANCE}
 
 2. **获取变更的制品**
    \`\`\`bash
-   openspec status --change "<name>" --json
+   openspec-cn status --change "<name>" --json
    \`\`\`
    解析 JSON 以理解当前状态。响应包括：
    - \`schemaName\`：使用的工作流 schema（例如 "spec-driven"）
@@ -68,7 +68,7 @@ ${STORE_SELECTION_GUIDANCE}
    - 若用户拒绝修订，不要写入 — 保持该制品不变。
    - 当需要重大重写时，先获取该制品的规则和模板：
      \`\`\`bash
-     openspec instructions "<artifact-id>" --change "<name>" --json
+     openspec-cn instructions "<artifact-id>" --change "<name>" --json
      \`\`\`
 
 6. **指出下一步（仅供参考 - 绝不要执行）**
@@ -85,13 +85,13 @@ ${STORE_SELECTION_GUIDANCE}
 
 **护栏**
 - 仅规划制品 — 绝不要编辑实现代码。若修订后的计划暗示代码更改，停止并指向 \`/opsx:apply\`。
-- 使用 \`openspec status\` 报告的制品 ID 和路径；绝不要基于硬编码的制品名称分支。
+- 使用 \`openspec-cn status\` 报告的制品 ID 和路径；绝不要基于硬编码的制品名称分支。
 - 仅编辑 \`existingOutputPaths\` 中的具体文件；绝不要写入 glob \`resolvedOutputPath\`。
 - 不要推进构建边界：不创建新制品，不在 glob 制品下创建新文件 — 那是 \`/opsx:continue\` 的职责。
 - 在写入前与用户确认每个编辑。
-- 若请求更改的是变更的*意图*而非细化，首先验证扩展 profile \`/opsx:new\` 工作流是否可用。若可用，建议用 \`/opsx:new\` 重新开始（"更新 vs 重新开始" 启发式）。若不可用，请求一个不同的未使用变更名称并建议改用 \`openspec new change "<new-change-name>"\`。`,
+- 若请求更改的是变更的*意图*而非细化，首先验证扩展 profile \`/opsx:new\` 工作流是否可用。若可用，建议用 \`/opsx:new\` 重新开始（"更新 vs 重新开始" 启发式）。若不可用，请求一个不同的未使用变更名称并建议改用 \`openspec-cn new change "<new-change-name>"\`。`,
     license: 'MIT',
-    compatibility: 'Requires openspec CLI.',
+    compatibility: '需要 openspec-cn CLI。',
     metadata: { author: 'openspec', version: '1.0' },
   };
 }
@@ -108,7 +108,7 @@ ${STORE_SELECTION_GUIDANCE}
 
 **输入**：可选地在 \`/opsx:update\` 后指定变更名称（例如 \`/opsx:update add-auth\`）。若省略，检查能否从对话上下文推断。若模糊或歧义，你必须提示用户从可用变更中选择。
 
-\`/opsx:continue\` 是一个扩展 profile 工作流，可能未安装。在下方任何地方建议它之前，请验证它是否可用。若不可用，\`openspec status --change "<name>" --json\` 显示下一个制品，\`openspec instructions "<artifact-id>" --change "<name>" --json\` 解释如何创建它。
+\`/opsx:continue\` 是一个扩展 profile 工作流，可能未安装。在下方任何地方建议它之前，请验证它是否可用。若不可用，\`openspec-cn status --change "<name>" --json\` 显示下一个制品，\`openspec-cn instructions "<artifact-id>" --change "<name>" --json\` 解释如何创建它。
 
 **步骤**
 
@@ -117,7 +117,7 @@ ${STORE_SELECTION_GUIDANCE}
    若提供了名称，使用它。否则：
    - 从对话上下文推断（若用户提到了某个变更）
    - 若仅有一个活跃变更则自动选择
-   - 若存在歧义，运行 \`openspec list --json\` 获取按最近修改排序的可用变更，并让用户选择
+   - 若存在歧义，运行 \`openspec-cn list --json\` 获取按最近修改排序的可用变更，并让用户选择
 
    提示时，展示最近修改的前 3-4 个变更作为选项，显示：
    - 变更名称
@@ -131,7 +131,7 @@ ${STORE_SELECTION_GUIDANCE}
 
 2. **获取变更的制品**
    \`\`\`bash
-   openspec status --change "<name>" --json
+   openspec-cn status --change "<name>" --json
    \`\`\`
    解析 JSON 以理解当前状态。响应包括：
    - \`schemaName\`：使用的工作流 schema（例如 "spec-driven"）
@@ -159,7 +159,7 @@ ${STORE_SELECTION_GUIDANCE}
    - 若用户拒绝修订，不要写入 — 保持该制品不变。
    - 当需要重大重写时，先获取该制品的规则和模板：
      \`\`\`bash
-     openspec instructions "<artifact-id>" --change "<name>" --json
+     openspec-cn instructions "<artifact-id>" --change "<name>" --json
      \`\`\`
 
 6. **指出下一步（仅供参考 - 绝不要执行）**
@@ -176,10 +176,10 @@ ${STORE_SELECTION_GUIDANCE}
 
 **护栏**
 - 仅规划制品 — 绝不要编辑实现代码。若修订后的计划暗示代码更改，停止并指向 \`/opsx:apply\`。
-- 使用 \`openspec status\` 报告的制品 ID 和路径；绝不要基于硬编码的制品名称分支。
+- 使用 \`openspec-cn status\` 报告的制品 ID 和路径；绝不要基于硬编码的制品名称分支。
 - 仅编辑 \`existingOutputPaths\` 中的具体文件；绝不要写入 glob \`resolvedOutputPath\`。
 - 不要推进构建边界：不创建新制品，不在 glob 制品下创建新文件 — 那是 \`/opsx:continue\` 的职责。
 - 在写入前与用户确认每个编辑。
-- 若请求更改的是变更的*意图*而非细化，首先验证扩展 profile \`/opsx:new\` 工作流是否可用。若可用，建议用 \`/opsx:new\` 重新开始（"更新 vs 重新开始" 启发式）。若不可用，请求一个不同的未使用变更名称并建议改用 \`openspec new change "<new-change-name>"\`。`
+- 若请求更改的是变更的*意图*而非细化，首先验证扩展 profile \`/opsx:new\` 工作流是否可用。若可用，建议用 \`/opsx:new\` 重新开始（"更新 vs 重新开始" 启发式）。若不可用，请求一个不同的未使用变更名称并建议改用 \`openspec-cn new change "<new-change-name>"\`。`
   };
 }

@@ -89,9 +89,9 @@ describe('openspec context (4.1)', () => {
     expect(human.exitCode).toBe(0);
     expect(human.stdout).toContain(`team-context 的工作上下文（${storeRoot}）`);
     expect(human.stdout).toContain(`  upstream-context  ${upstream}`);
-    expect(human.stdout).toContain('获取: openspec-cn show <spec-id> --type spec --store upstream-context');
+    expect(human.stdout).toContain('获取：openspec-cn show <spec-id> --type spec --store upstream-context');
     expect(human.stdout).toContain('此机器上不可用');
-    expect(human.stdout).toContain('修复: git clone --');
+    expect(human.stdout).toContain('修复：git clone --');
 
     // Nearest-root session.
     const nearest = await runCLI(['context', '--json'], { cwd: storeRoot, env });
@@ -152,7 +152,7 @@ describe('openspec context (4.1)', () => {
       { cwd: tempDir, env }
     );
     expect(fresh.exitCode).toBe(0);
-    expect(fresh.stderr).toContain('not available: design-system');
+    expect(fresh.stderr).toContain('不可用：design-system');
     const file = JSON.parse(fs.readFileSync(outPath, 'utf-8'));
     expect(file.folders).toEqual([
       { name: 'team-context', path: storeRoot },
@@ -193,7 +193,7 @@ describe('openspec context (4.1)', () => {
     );
     expect(jsonMode.exitCode).toBe(0);
     expect(() => JSON.parse(jsonMode.stdout)).not.toThrow();
-    expect(jsonMode.stderr).toContain(`Wrote ${jsonOut}`);
+    expect(jsonMode.stderr).toContain(`已写入 ${jsonOut}`);
 
     // JSON mode write FAILURE: exactly one JSON document on stdout (the
     // failure payload), never the brief plus a second payload.

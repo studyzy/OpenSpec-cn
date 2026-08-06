@@ -10,15 +10,17 @@ OpenSpec 提供三个层级的自定义能力：
 
 ---
 
+<a id="project-configuration"></a>
+
 ## 项目配置
 
 `openspec/config.yaml` 是定制 OpenSpec、适配团队最简单的方式。它可以让你：
 
-- **Set a default schema** - Skip `--schema` on every command
-- **Inject project context** - AI sees your tech stack, conventions, etc.
-- **Add per-artifact rules** - Custom rules for specific artifacts
-- **Add per-operation guidance** - Advisory preferences for apply and archive work
-- **Remember integration choices** - e.g. the [GitHub Copilot cloud coding agent](supported-tools.md#github-copilot-cloud-coding-agent) opt-in
+- **设置默认 schema** —— 免去在每条命令上写 `--schema`
+- **注入项目上下文** —— 让 AI 了解你的技术栈、约定等
+- **添加按制品的规则** —— 为特定制品定制规则
+- **添加按操作的指引** —— 为 apply 与 archive 工作提供建议性偏好
+- **记住集成选择** —— 例如 [GitHub Copilot 云端编程 Agent](supported-tools.md#github-copilot-cloud-coding-agent) 的启用选项
 
 ### 快速设置
 
@@ -54,8 +56,8 @@ operations:
     guidance:
       - Keep the completion summary concise
 
-# Set by `openspec init` when you choose (or decline) the GitHub Copilot
-# cloud coding agent; controls whether `init`/`update` generate its files.
+# 由 `openspec-cn init` 在你选择（或拒绝）GitHub Copilot 云端编程 Agent 时设置；
+# 控制 `init`/`update` 是否生成其相关文件。
 githubCopilot:
   cloudAgent: false
 ```
@@ -93,59 +95,51 @@ Tech stack: TypeScript, React, Node.js, PostgreSQL
 - **Context**（上下文）会出现在**所有**制品中
 - **Rules**（规则）只出现在匹配的制品里
 
-**Operation guidance:**
+**操作指引（Operation guidance）：**
 
-`operations.apply.guidance` and `operations.archive.guidance` are optional arrays
-of advisory instructions for how an agent should conduct those operations. They
-are separate from `rules`: operation guidance does not constrain artifact content,
-and artifact rules are never relabeled as operation guidance.
+`operations.apply.guidance` 和 `operations.archive.guidance` 是可选数组，用于
+提供建议性指令，说明 Agent 应如何执行这些操作。它们与 `rules` 是分开的：操作
+指引不约束制品内容，制品规则也绝不会被重新标记为操作指引。
 
-Apply and archive fetch these inputs at execution time:
+apply 与 archive 在执行时获取这些输入：
 
 ```bash
-openspec instructions apply --change my-feature --json
-openspec instructions archive --change my-feature --json
+openspec-cn instructions apply --change my-feature --json
+openspec-cn instructions archive --change my-feature --json
 ```
 
-Both surfaces return current project `context` and matching
-`operationGuidance` as separate optional fields. Each invocation reads a fresh
-snapshot from the resolved root. When `--store <id>` is selected, the change,
-context, and guidance all come from that store rather than the current repository.
-The archive instruction command is read-only: it does not inspect or merge delta
-specs, write main specs, move the change, or run the static archive workflow.
+两个接口都会把当前项目的 `context` 以及匹配的 `operationGuidance` 作为两个独立
+的可选字段返回。每次调用都会从已解析的根目录读取一份新的快照。当选择了
+`--store <id>` 时，变更、上下文和指引都来自该 store，而非当前仓库。
+archive instruction 命令是只读的：它不检查或合并增量规范（delta specs），不写入
+主 specs，不移动变更，也不运行静态的归档工作流。
 
-Project context is a required prompt-level input. Generated workflows read it and
-apply relevant project facts, conventions, and constraints. Operation guidance is
-optional additive advice: workflows consider every entry and follow entries that
-are applicable and compatible with the built-in workflow.
+项目上下文是提示词层面的必需输入。生成的工作流会读取它，并应用其中相关的项目
+事实、约定与约束。操作指引则是可选的附加建议：工作流会考虑每一条，并遵循那些
+适用且与内置工作流兼容的条目。
 
-Both fields remain separate from CLI-controlled state, resolved paths, built-in
-steps, explicit user choices, and artifact rules. A workflow reports context
-conflicts while preserving the controlling value. It does not follow inapplicable
-or conflicting guidance and explains why. Neither field is an enforceable check,
-and workflows do not copy their text into implementation files, specs, change
-artifacts, or summaries unless the user separately requests that content.
+这两个字段都独立于 CLI 控制的状态、已解析的路径、内置步骤、用户的显式选择以及
+制品规则。工作流会报告上下文冲突，同时保留起决定作用的值。它不会遵循不适用或
+相互冲突的指引，并会说明原因。这两个字段都不是可强制执行的检查项，除非用户另行
+要求，否则工作流不会把它们的文本拷贝进实现文件、specs、变更制品或总结中。
 
-**Archive and spec-sync input safety:**
+**归档与 spec 同步的输入安全性：**
 
-Archive, bulk archive, and standalone sync use
-`artifactPaths.specs.existingOutputPaths` from `openspec status --json` as the
-only delta-spec source. A schema without a `specs` artifact, or a change whose
-concrete output list is empty, has nothing to sync; other artifacts are not used
-to infer delta specs.
+archive、bulk archive 和独立的 sync 都以 `openspec-cn status --json` 返回的
+`artifactPaths.specs.existingOutputPaths` 作为增量规范（delta spec）的唯一来源。
+若 schema 中没有 `specs` 制品，或某个变更的具体输出列表为空，就没有内容需要同步；
+系统不会用其他制品去推断增量规范。
 
-Before a semantic merge writes a main spec, the workflow consumes current
-`openspec instructions specs --change <name> --json` output. The returned
-`specs` rules constrain only the main specs produced by that merge. Single archive
-passes that snapshot into inline sync, standalone sync fetches it directly, and
-bulk archive obtains every required snapshot before its first spec write. A
-non-zero or invalid JSON archive/specs instruction response is a lookup failure,
-not an empty input: the workflow stops before the affected spec write or change
-move (for bulk archive, before any batch write or move).
+在语义合并写入主 spec 之前，工作流会消费当前
+`openspec-cn instructions specs --change <name> --json` 的输出。返回的 `specs`
+规则仅约束该次合并所产出的主 specs。单个归档会把该快照传入内联 sync，独立 sync
+会直接获取它，而 bulk archive 会在首次写入 spec 之前取得所有必需的快照。若
+archive/specs instruction 响应返回非零退出码或无效 JSON，这属于查询失败，而非空
+输入：工作流会在受影响的 spec 写入或变更移动之前停止（对 bulk archive 而言，是在
+任何批量写入或移动之前停止）。
 
-This configuration does not change archive execution phases, user prompts,
-filesystem operations, semantic merge ownership, the direct `openspec archive`
-command, or the structure and output of artifact `rules`.
+此项配置不会改变归档的执行阶段、用户提示、文件系统操作、语义合并的归属、直接的
+`openspec-cn archive` 命令，也不会改变制品 `rules` 的结构与输出。
 
 ### Schema 解析顺序
 
@@ -157,6 +151,8 @@ command, or the structure and output of artifact `rules`.
 4. 默认值（`spec-driven`）
 
 ---
+
+<a id="custom-schemas"></a>
 
 ## 自定义 Schemas
 
@@ -264,9 +260,8 @@ apply:
 | `instruction` | 创建该制品时给 AI 的指令 |
 | `requires` | 依赖项 —— 哪些制品必须先存在 |
 
-List artifacts in the order you want them written. `requires` decides what is
-possible; the order of the `artifacts:` list decides what comes first when
-several artifacts are ready at once.
+按你希望它们被写出的顺序来列出制品。`requires` 决定什么是可能的；而
+`artifacts:` 列表的顺序决定当多个制品同时就绪时，哪一个排在前面。
 
 ### 模板
 
@@ -276,15 +271,15 @@ several artifacts are ready at once.
 <!-- templates/proposal.md -->
 ## Why
 
-<!-- Explain the motivation for this change. What problem does this solve? -->
+<!-- 说明本次变更的动机。它解决了什么问题？ -->
 
 ## What Changes
 
-<!-- Describe what will change. Be specific about new capabilities or modifications. -->
+<!-- 描述将会发生哪些变化。明确指出新增的能力或所做的修改。 -->
 
 ## Impact
 
-<!-- Affected code, APIs, dependencies, systems -->
+<!-- 受影响的代码、API、依赖、系统 -->
 ```
 
 模板可以包含：
@@ -390,6 +385,8 @@ openspec-cn schema fork spec-driven with-review
 
 ---
 
+<a id="community-schemas"></a>
+
 ## 社区 Schemas
 
 OpenSpec 还支持通过独立仓库分发的社区维护 schema。它们提供了一些固执己见的工作流，将 OpenSpec 与其他工具或系统集成，类似于 [github/spec-kit 的社区扩展目录](https://github.com/github/spec-kit/tree/main/extensions) 对 spec-kit 的作用。
@@ -398,11 +395,11 @@ OpenSpec 还支持通过独立仓库分发的社区维护 schema。它们提供�
 
 | Schema | 维护者 | 仓库 | 描述 |
 |--------|-----------|-----------|-------------|
-| `intent-driven` | @harikrishnan83 | [intent-driven-dev/openspec-schemas](https://github.com/intent-driven-dev/openspec-schemas/tree/main/openspec/schemas/intent-driven) | Captures change intent, observable behaviour, technical design, and durable architectural decisions before implementation. Adds a change-local ADR review manifest and writes qualifying long-lived decisions as immutable, supersedable ADRs. |
+| `intent-driven` | @harikrishnan83 | [intent-driven-dev/openspec-schemas](https://github.com/intent-driven-dev/openspec-schemas/tree/main/openspec/schemas/intent-driven) | 在实现之前先捕获变更意图、可观测行为、技术设计以及持久的架构决策。新增一份变更本地的 ADR 评审清单，并把符合条件的长期决策写成不可变、可被取代的 ADR。 |
 | `superpowers-bridge` | @JiangWay | [JiangWay/openspec-schemas](https://github.com/JiangWay/openspec-schemas/tree/main/superpowers-bridge) | 将 OpenSpec 的制品治理与 [obra/superpowers](https://github.com/obra/superpowers) 的执行技能（头脑风暴、编写计划、通过子 Agent 做 TDD、代码审查、收尾）集成。新增了一个以证据为先的 `retrospective` 制品，弥补了 Superpowers 原生未覆盖的空缺。 |
-| `nanopm` | @nmrtn | [nmrtn/nanopm](https://github.com/nmrtn/nanopm/tree/main/openspec-schema) | PM-first workflow. Runs [nanopm](https://github.com/nmrtn/nanopm)'s planning pipeline (audit → strategy → roadmap → PRD) upstream of implementation. Bridges product planning to OpenSpec's spec-driven engineering workflow. Artifacts read from `.nanopm/` if present — proposal sources the audit, design sources the strategy, and tasks source the PRD breakdown. |
-| `e2e-runbooks` | @Lukk17 | [Lukk17/openspec-schemas](https://github.com/Lukk17/openspec-schemas/tree/master/openspec/schemas/e2e-runbooks) | Capability-level end-to-end test runbooks. Each capability gets an immutable spec, an immutable tasks-template, and one timestamped run record per execution. Assertions are observable behaviour only (HTTP status, response body, persisted state — never log substrings); each run records start/end UTC, duration, and best-estimate LLM token consumption. |
-| `anvil` | @jikkujoyce | [jikkujoyce/openspec-schemas](https://github.com/jikkujoyce/openspec-schemas/tree/main/schemas/anvil) | Spec-driven workflow with TDD discipline and an adversarial review step. Flow: `proposal` → `specs` → `design` → `review` → `test-plan` → `tasks` → `apply` → `verify`. `review` is written by a fresh-context, read-only reviewer (a second model when one is available) and emits a `VERDICT:` line telling the agent to gate `test-plan`, `tasks`, and `apply`; OpenSpec only checks that artifacts exist, so enforce the gate with your own CI or hook. `test-plan` maps every spec scenario to a named test and doubles as a red/green ledger that `verify` audits. |
+| `nanopm` | @nmrtn | [nmrtn/nanopm](https://github.com/nmrtn/nanopm/tree/main/openspec-schema) | PM 优先的工作流。在实现之前先跑一遍 [nanopm](https://github.com/nmrtn/nanopm) 的规划流水线（audit → strategy → roadmap → PRD）。把产品规划衔接到 OpenSpec 的规范驱动工程工作流。若存在 `.nanopm/` 则从中读取制品内容 —— proposal 取自 audit，design 取自 strategy，tasks 取自 PRD 的任务拆解。 |
+| `e2e-runbooks` | @Lukk17 | [Lukk17/openspec-schemas](https://github.com/Lukk17/openspec-schemas/tree/master/openspec/schemas/e2e-runbooks) | 能力级别的端到端测试运行手册。每项能力都有一份不可变的 spec、一份不可变的 tasks 模板，以及每次执行对应一条带时间戳的运行记录。断言只针对可观测行为（HTTP 状态码、响应体、持久化状态 —— 绝不针对日志子串）；每次运行都会记录起止 UTC 时间、耗时，以及对 LLM token 消耗的最佳估算。 |
+| `anvil` | @jikkujoyce | [jikkujoyce/openspec-schemas](https://github.com/jikkujoyce/openspec-schemas/tree/main/schemas/anvil) | 带 TDD 纪律和对抗式评审步骤的规范驱动工作流。流程：`proposal` → `specs` → `design` → `review` → `test-plan` → `tasks` → `apply` → `verify`。`review` 由一个全新上下文、只读的评审者撰写（有条件时使用第二个模型），并输出一行 `VERDICT:`，指示 Agent 对 `test-plan`、`tasks` 和 `apply` 进行门禁控制；OpenSpec 只检查制品是否存在，因此需要你用自己的 CI 或 hook 来强制执行该门禁。`test-plan` 把每个 spec 场景映射到一个具名测试，同时充当由 `verify` 审计的红/绿状态台账。 |
 
 > 想贡献一个社区 schema？开一个 issue 并附上你的仓库链接，或提交一个 PR 往这个表格里加一行。
 

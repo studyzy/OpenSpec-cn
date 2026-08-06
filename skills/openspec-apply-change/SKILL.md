@@ -11,7 +11,7 @@ metadata:
 
 从 OpenSpec 变更中实现任务。
 
-**存储选择：** 若用户指定了一个存储（存储是注册在本机上的独立 OpenSpec 仓库）或工作位于某个存储中，请运行 `openspec store list --json` 发现已注册的存储 ID，然后在读写 spec 和变更的命令上传递 `--store <id>`（`new change`、`status`、`instructions`、`list`、`show`、`validate`、`archive`、`doctor`、`context`、`view`）。选定后，将 `--store <id>` 视为在当前工作流其余部分中固定不变。以下每个未限定范围的命令示例均为简写形式：运行前请追加该标志。例如，运行 `openspec status --change "<name>" --json --store "<id>"`，而非下面展示的未限定形式。其他命令不接受此标志。命令输出的提示已包含该标志；在后续操作中请保留它。若不指定存储，命令将对最近的本地 `openspec/` 根目录生效。
+**存储选择：** 若用户指定了一个存储（存储是注册在本机上的独立 OpenSpec 仓库）或工作位于某个存储中，请运行 `openspec-cn store list --json` 发现已注册的存储 ID，然后在读写 spec 和变更的命令上传递 `--store <id>`（`new change`、`status`、`instructions`、`list`、`show`、`validate`、`archive`、`doctor`、`context`、`view`）。选定后，将 `--store <id>` 视为在当前工作流其余部分中固定不变。以下每个未限定范围的命令示例均为简写形式：运行前请追加该标志。例如，运行 `openspec-cn status --change "<name>" --json --store "<id>"`，而非下面展示的未限定形式。其他命令不接受此标志。命令输出的提示已包含该标志；在后续操作中请保留它。若不指定存储，命令将对最近的本地 `openspec/` 根目录生效。
 
 **输入**：可选地指定变更名称（例如 `/openspec-apply-change add-auth`）。若省略，检查能否从对话上下文推断。若模糊或歧义，你必须提示用户从可用变更中选择。
 
@@ -22,7 +22,7 @@ metadata:
    若提供了名称，使用它。否则：
    - 从对话上下文推断（若用户提到了某个变更）
    - 若仅有一个活跃变更则自动选择
-   - 若存在歧义，运行 `openspec list --json` 获取可用变更并让用户选择
+   - 若存在歧义，运行 `openspec-cn list --json` 获取可用变更并让用户选择
 
    始终宣告："使用变更：<name>"，以及如何覆盖（例如 `/openspec-apply-change <other>`）。
 
@@ -50,7 +50,7 @@ metadata:
    - 可选的 `operationGuidance`：当前 apply 的咨询性指导
 
    **处理状态：**
-   - 若 `state: "blocked"`（缺少制品）：显示消息，建议使用 `/openspec-continue-change`（若未安装，运行 `openspec status --change "<name>" --json` 查看下一个制品，`openspec instructions <artifact-id> --change "<name>" --json` 了解如何创建）
+   - 若 `state: "blocked"`（缺少制品）：显示消息，建议使用 `/openspec-continue-change`（若未安装，运行 `openspec-cn status --change "<name>" --json` 查看下一个制品，`openspec-cn instructions <artifact-id> --change "<name>" --json` 了解如何创建）
    - 若 `state: "all_done"`：祝贺，建议归档
    - 否则：继续实现
 

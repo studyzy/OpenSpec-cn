@@ -44,7 +44,7 @@ openspec/changes/add-dark-mode/
 - 范围膨胀了——你只要一个主题开关，proposal 却顺手也改了 auth "既然都在那儿了"。
 - 它很模糊。"改进设置页"不是范围；"加一个尊重系统偏好的暗色模式开关"才是。
 
-**要回答的问题：** *这和我实际要求的相符吗？有没有什么东西悄悄溜进来了？* 如果答案是不，停下来——别再往下读，改 proposal（见 [Pushing back](#pushing-back-is-cheap)）。
+**要回答的问题：** *这和我实际要求的相符吗？有没有什么东西悄悄溜进来了？* 如果答案是不，停下来——别再往下读，改 proposal（见 [提出异议很便宜](#提出异议很便宜)）。
 
 ## spec 增量：对"完成"的定义正确吗？
 
@@ -88,7 +88,7 @@ The system SHALL let a user switch between light and dark themes.
 
 ## 提出异议很便宜
 
-如果三个问题中任何一个答错了，说出来。没有阶段，也没有锁定的东西——你改掉它然后继续。两种方式，与 [Editing a change](editing-changes.md) 完全一样：
+如果三个问题中任何一个答错了，说出来。没有阶段，也没有锁定的东西——你改掉它然后继续。两种方式，与 [编辑变更](editing-changes.md) 完全一样：
 
 - **自己编辑文件。** 它是纯 Markdown；改范围那行、收紧一个需求、删一个任务。
 - **告诉 AI 哪里错了** 让它改：*"去掉 auth 改动——超出范围，"* *"加一个用户已经选过主题时的场景，"* *"把任务 3 拆成 schema 和 UI。"*
@@ -118,7 +118,7 @@ AI:  Verifying add-dark-mode...
 
 它把问题标记为 CRITICAL、WARNING 或 SUGGESTION，并且**不**阻塞归档——它只是暴露缺口，把决定权留给你。这就是"AI 写了代码"和"它构建了我们所同意的东西"的区别。
 
-`/opsx:verify` 属于扩展 profile。如果你没有它，用 `openspec config profile`（然后 `openspec update`）开启，或者自己重读变更和 diff。
+`/opsx:verify` 属于扩展 profile。如果你没有它，用 `openspec-cn config profile`（然后 `openspec-cn update`）开启，或者自己重读变更和 diff。
 
 ## 把审阅的规模调对
 
@@ -138,6 +138,6 @@ AI:  Verifying add-dark-mode...
 
 ## 下一步去哪
 
-- [Writing Good Specs](writing-specs.md) — 另一面：如何起草值得批准的需求和场景。
-- [Editing & Iterating on a Change](editing-changes.md) — 开始之后改 plan 的具体做法。
-- [Workflows](workflows.md) — 审阅在更大循环中的位置。
+- [编写优秀的 Specs](writing-specs.md) — 另一面：如何起草值得批准的需求和场景。
+- [编辑与迭代变更](editing-changes.md) — 开始之后改 plan 的具体做法。
+- [工作流](workflows.md) — 审阅在更大循环中的位置。

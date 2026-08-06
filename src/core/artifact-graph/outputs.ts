@@ -30,7 +30,7 @@ function assertGlobDirectoryTraversal(
   FileSystemUtils.assertPathWithin(canonicalChangeDir, canonicalDir);
   const visitKey = `${canonicalDir}\0${segmentIndex}`;
   if (ancestors.has(visitKey)) {
-    throw new Error(`Cannot resolve artifact outputs through a linked directory cycle: ${currentDir}`);
+    throw new Error(`无法通过链接目录环解析制品输出：${currentDir}`);
   }
   if (visited.has(visitKey)) return;
   visited.add(visitKey);

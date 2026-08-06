@@ -557,8 +557,8 @@ operations:
       expect(result.exitCode).toBe(0);
       expect(result.stdout).toContain('已阻塞');
       expect(result.stdout).toContain('缺失的产出物：tasks');
-      expect(result.stdout).toContain('### Project Context (required instruction input)');
-      expect(result.stdout).toContain('### Operation Guidance (advisory)');
+      expect(result.stdout).toContain('### 项目上下文（必填的指令输入）');
+      expect(result.stdout).toContain('### 操作指引（建议性）');
     });
 
     it('outputs JSON for apply instructions', async () => {
@@ -641,11 +641,11 @@ operations:
 
       expect(result.exitCode).toBe(0);
       expect(result.stdout).toContain('### 指令');
-      expect(result.stdout).toContain('### Project Context (required instruction input)');
+      expect(result.stdout).toContain('### 项目上下文（必填的指令输入）');
       expect(result.stdout).toContain('Project background');
-      expect(result.stdout).toContain('### Operation Guidance (advisory)');
+      expect(result.stdout).toContain('### 操作指引（建议性）');
       expect(result.stdout).toContain('- Keep summaries concise');
-      expect(result.stdout).not.toContain('### Project Context (advisory)');
+      expect(result.stdout).not.toContain('### 项目上下文（建议性）');
     });
 
     it('omits absent operation inputs without changing apply state behavior', async () => {
@@ -733,7 +733,7 @@ operations:
 
       expect(result.exitCode).toBe(0);
       const matches = result.stderr.match(
-        /Guidance for operation 'apply' must be an array of strings/g
+        /操作 'apply' 的 guidance 必须是字符串数组/g
       );
       expect(matches).toHaveLength(1);
       expect(JSON.parse(result.stdout).operationGuidance).toBeUndefined();
@@ -804,7 +804,7 @@ apply:
       });
       expect(result.exitCode).toBe(0);
       // Should show the instruction from spec-driven schema apply block
-      expect(result.stdout).toContain('work through pending tasks');
+      expect(result.stdout).toContain('逐项完成待办任务');
     });
 
     it('shows all_done state when all tasks are complete', async () => {
@@ -836,8 +836,8 @@ operations:
       expect(result.exitCode).toBe(0);
       expect(result.stdout).toContain('已完成 ✓');
       expect(result.stdout).toContain('可以归档了');
-      expect(result.stdout).toContain('### Project Context (required instruction input)');
-      expect(result.stdout).toContain('### Operation Guidance (advisory)');
+      expect(result.stdout).toContain('### 项目上下文（必填的指令输入）');
+      expect(result.stdout).toContain('### 操作指引（建议性）');
     });
 
     it('uses spec-driven schema apply configuration', async () => {
@@ -1021,12 +1021,12 @@ operations:
       );
 
       expect(result.exitCode).toBe(0);
-      expect(result.stdout).toContain('## Archive Inputs: archive-text-inputs');
-      expect(result.stdout).toContain('### Project Context (required instruction input)');
+      expect(result.stdout).toContain('## 归档输入：archive-text-inputs');
+      expect(result.stdout).toContain('### 项目上下文（必填的指令输入）');
       expect(result.stdout).toContain('Archive background');
-      expect(result.stdout).toContain('### Operation Guidance (advisory)');
+      expect(result.stdout).toContain('### 操作指引（建议性）');
       expect(result.stdout).toContain('- Summarize the outcome');
-      expect(result.stdout).not.toContain('### Project Context (advisory)');
+      expect(result.stdout).not.toContain('### 项目上下文（建议性）');
     });
 
     it('succeeds with valid empty inputs and omits optional JSON fields', async () => {

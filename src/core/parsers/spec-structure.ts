@@ -81,8 +81,8 @@ export function findMainSpecStructureIssues(content: string): MainSpecStructureI
         line: i + 1,
         header: trimmed,
         message:
-          `Requirement header "${trimmed}" duplicates the requirement declared on line ${previousLine}. ` +
-          'Requirement names must be unique so spec updates cannot discard one block while updating another.',
+          `需求标题 "${trimmed}" 与第 ${previousLine} 行声明的需求重复。` +
+          '需求名称必须唯一，否则更新 spec 时可能在更新某个块的同时丢弃另一个块。',
       });
     } else {
       requirementLines.set(requirementName, i + 1);

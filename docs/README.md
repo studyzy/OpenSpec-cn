@@ -21,7 +21,7 @@ OpenSpec 帮你和你的 AI 编程助手**在写任何代码之前先就“要�
 
 **我有一个庞大的存量代码库。** 你不必为它编写全部文档。[在已有项目中使用 OpenSpec](existing-projects.md) 展示了如何在不“煮干整片海洋”的前提下,在真实的、棕地代码上起步。
 
-**I just want to get it working.** [Install](installation.md), run `openspec init`, then read [How Commands Work](how-commands-work.md) so your first slash command lands in the right place. Or hand the setup to your assistant with the [AI-assisted install prompt](installation.md#install-with-your-ai-assistant).
+**我只想让它先跑起来。** [安装](installation.md),运行 `openspec-cn init`,然后阅读 [命令是如何工作的](how-commands-work.md),这样你的第一条斜杠命令才会落在正确的地方。或者用 [AI 辅助安装提示词](installation.md#install-with-your-ai-assistant) 把配置工作直接交给你的助手。
 
 **我通过示例来学习。** [示例与配方](examples.md) 页面从头到尾走完真实的变更:一个小功能、一个 bug 修复、一次重构、一次探索。
 
@@ -41,11 +41,11 @@ OpenSpec 帮你和你的 AI 编程助手**在写任何代码之前先就“要�
 
 | 文档 | 它能给你什么 |
 |-----|-------------------|
-| [Getting Started](getting-started.md) | Install, initialize, and run your first change end to end |
-| [Explore First](explore.md) | Use `/opsx:explore` to think through an idea before you commit |
-| [How Commands Work](how-commands-work.md) | Where slash commands run, what "interactive mode" means, terminal vs chat |
-| [Core Concepts at a Glance](overview.md) | The whole mental model on one page: specs, changes, deltas, archive |
-| [Installation](installation.md) | npm, pnpm, yarn, bun, Nix, a prompt that hands setup to your AI assistant, and how to verify it worked |
+| [快速入门](getting-started.md) | 安装、初始化,并端到端跑完你的第一个变更 |
+| [先探索](explore.md) | 在做出承诺之前,用 `/opsx:explore` 把一个想法想清楚 |
+| [命令是如何工作的](how-commands-work.md) | 斜杠命令在哪里运行、“交互模式”是什么意思、终端与聊天的区别 |
+| [核心概念速览](overview.md) | 一页讲完整套心智模型:specs、变更、增量、归档 |
+| [安装](installation.md) | npm、pnpm、yarn、bun、Nix,一段把配置交给 AI 助手的提示词,以及如何验证是否成功 |
 
 ### 日常使用
 
@@ -59,7 +59,7 @@ OpenSpec 帮你和你的 AI 编程助手**在写任何代码之前先就“要�
 | [在已有项目中使用 OpenSpec](existing-projects.md) | 在大型棕地代码库上采用 OpenSpec |
 | [编辑与迭代一个变更](editing-changes.md) | 更新制品、回退、调和手动修改 |
 | [命令](commands.md) | 每个 `/opsx:*` 斜杠命令的参考 |
-| [CLI](cli.md) | 每个 `openspec` 终端命令的参考 |
+| [CLI](cli.md) | 每个 `openspec-cn` 终端命令的参考 |
 
 ### 深入理解
 
@@ -73,9 +73,9 @@ OpenSpec 帮你和你的 AI 编程助手**在写任何代码之前先就“要�
 
 | 文档 | 它能给你什么 |
 |-----|-------------------|
-| [Customization](customization.md) | Project config, custom schemas, shared context |
-| [Multi-Language](multi-language.md) | Generate artifacts in languages other than English |
-| [Supported Tools](supported-tools.md) | The 30+ AI tools OpenSpec integrates with, and where files land |
+| [定制化](customization.md) | 项目配置、自定义 schema、共享上下文 |
+| [多语言](multi-language.md) | 生成英语之外其他语言的制品 |
+| [支持的工具](supported-tools.md) | OpenSpec 集成的 30+ 种 AI 工具,以及文件会落到哪里 |
 
 ### 当你需要帮助时
 
@@ -95,7 +95,7 @@ OpenSpec 帮你和你的 AI 编程助手**在写任何代码之前先就“要�
 ## 三十秒速览
 
 ```text
-1. 安装          npm install -g @fission-ai/openspec@latest
+1. 安装          npm install -g @studyzy/openspec-cn@latest
 2. 初始化        cd your-project && openspec-cn init
 3. 探索          (在你的 AI 聊天中)  /opsx:explore           ← 可选,但一个很好的习惯
 4. 提案          (在你的 AI 聊天中)  /opsx:propose add-dark-mode
@@ -108,7 +108,7 @@ OpenSpec 帮你和你的 AI 编程助手**在写任何代码之前先就“要�
 ## 还有其他获取帮助的渠道
 
 - **Discord:** [discord.gg/YctCnvvshC](https://discord.gg/YctCnvvshC),用于提问、交流想法和获取帮助。
-- **GitHub Issues:** [github.com/Fission-AI/OpenSpec/issues](https://github.com/Fission-AI/OpenSpec/issues),用于报告 bug 和提出功能请求。
+- **GitHub Issues:** [github.com/studyzy/OpenSpec-cn/issues](https://github.com/studyzy/OpenSpec-cn/issues),用于报告 bug 和提出功能请求。
 - **`openspec-cn feedback "你的消息"`** 直接从你的终端发送反馈(它会打开一个 GitHub issue)。
 
 在这些文档中发现有误、过时或令人困惑的内容?那就是一个 bug。请提交 issue 或 PR。文档改进是你所能做出的最有价值的贡献之一。

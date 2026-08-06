@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { isKebabId } from '../id.js';
+import { isKebabId, KEBAB_ID_DESCRIPTION } from '../id.js';
 
 export { isKebabId } from '../id.js';
 
@@ -8,7 +8,7 @@ const KebabIdentifierSchema = (label: string): z.ZodString =>
     if (!isKebabId(value)) {
       ctx.addIssue({
         code: 'custom',
-        message: `${label} must be kebab-case with lowercase letters, numbers, and single hyphen separators`,
+        message: `${label} ${KEBAB_ID_DESCRIPTION}`,
       });
     }
   });

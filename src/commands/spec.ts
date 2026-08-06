@@ -19,7 +19,7 @@ function assertSpecPath(specsDir: string, specPath: string): void {
     relativePath.startsWith(`..${path.sep}`) ||
     path.isAbsolute(relativePath)
   ) {
-    throw new Error(`Path is outside the allowed directory: ${specPath}`);
+    throw new Error(`路径位于允许的目录之外：${specPath}`);
   }
 
   try {

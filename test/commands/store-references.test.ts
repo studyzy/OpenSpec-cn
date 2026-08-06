@@ -89,7 +89,7 @@ describe('store references in instructions (3.1)', () => {
       cwd: appRepo,
       env,
     });
-    expect(applyHuman.stdout).toContain('### Referenced Stores');
+    expect(applyHuman.stdout).toContain('### 被引用的 Stores');
   });
 
   it('reflects live store edits on every run - nothing is frozen', async () => {

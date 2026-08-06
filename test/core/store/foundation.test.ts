@@ -234,7 +234,7 @@ id: acme-context
         parseStoreMetadataState(`version: 1
 id: Acme
 `)
-      ).toThrow(/Store id must be kebab-case/u);
+      ).toThrow(/Store id 必须是 kebab-case/u);
 
       expect(() =>
         parseStoreMetadataState(`version: 1

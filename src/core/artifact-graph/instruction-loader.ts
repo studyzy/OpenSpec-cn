@@ -118,8 +118,8 @@ export interface ArtifactInstructions {
  * the same do-not-create signal as the text output.
  */
 export const SKIP_SPECS_INSTRUCTIONS_WARNING =
-  'This change declares skip_specs: true in .openspec.yaml (no spec-level behavior changes), so this artifact is skipped.\n' +
-  'Do not create spec files - they will conflict with that marker. If requirements now change, remove skip_specs from .openspec.yaml and rerun this command.';
+  '此变更在 .openspec.yaml 中声明了 skip_specs: true（不存在 spec 级别的行为变化），因此跳过该制品。\n' +
+  '请不要创建 spec 文件——它们会与该标记冲突。如果现在需求发生了变化，请从 .openspec.yaml 中移除 skip_specs 并重新运行此命令。';
 
 /**
  * Dependency information including path and description.

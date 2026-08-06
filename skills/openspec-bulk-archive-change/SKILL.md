@@ -13,7 +13,7 @@ metadata:
 
 此技能允许您批量归档变更，通过检查代码库判断实际已实现的内容，从而智能处理 spec 冲突。
 
-**存储选择：** 若用户指定了一个存储（存储是注册在本机上的独立 OpenSpec 仓库）或工作位于某个存储中，请运行 `openspec store list --json` 发现已注册的存储 ID，然后在读写 spec 和变更的命令上传递 `--store <id>`（`new change`、`status`、`instructions`、`list`、`show`、`validate`、`archive`、`doctor`、`context`、`view`）。选定后，将 `--store <id>` 视为在当前工作流其余部分中固定不变。以下每个未限定范围的命令示例均为简写形式：运行前请追加该标志。例如，运行 `openspec status --change "<name>" --json --store "<id>"`，而非下面展示的未限定形式。其他命令不接受此标志。命令输出的提示已包含该标志；在后续操作中请保留它。若不指定存储，命令将对最近的本地 `openspec/` 根目录生效。
+**存储选择：** 若用户指定了一个存储（存储是注册在本机上的独立 OpenSpec 仓库）或工作位于某个存储中，请运行 `openspec-cn store list --json` 发现已注册的存储 ID，然后在读写 spec 和变更的命令上传递 `--store <id>`（`new change`、`status`、`instructions`、`list`、`show`、`validate`、`archive`、`doctor`、`context`、`view`）。选定后，将 `--store <id>` 视为在当前工作流其余部分中固定不变。以下每个未限定范围的命令示例均为简写形式：运行前请追加该标志。例如，运行 `openspec-cn status --change "<name>" --json --store "<id>"`，而非下面展示的未限定形式。其他命令不接受此标志。命令输出的提示已包含该标志；在后续操作中请保留它。若不指定存储，命令将对最近的本地 `openspec/` 根目录生效。
 
 `<capability-path>` 是相对于 `specs/` 的 spec 目录（例如 `user-auth` 或 `identity/user-auth`）。在解析主 spec 时保留每个增量 spec 的完整路径。
 
@@ -39,7 +39,7 @@ metadata:
    **Load current archive inputs once for the selected root before batch validation:**
 
    Choose one selected change from this root and run
-   `openspec instructions archive --change "<selected-change>" --json` with the
+   `openspec-cn instructions archive --change "<selected-change>" --json` with the
    same selected-root flags. This lookup is advisory and optional: it only supplies
    extra prompt inputs, so it must never block the batch. If it fails or returns
    invalid JSON — for example on an older CLI that does not support this command
@@ -155,7 +155,7 @@ metadata:
    Before step 8 writes the first main spec or moves any change, fetch every
    required specs-rule snapshot for the confirmed batch. For each change that will
    sync concrete `artifactPaths.specs.existingOutputPaths`, run
-   `openspec instructions specs --change "<name>" --json` exactly once with the
+   `openspec-cn instructions specs --change "<name>" --json` exactly once with the
    same selected-root flags. Obtain all snapshots before the first write or move.
    If any lookup exits non-zero or returns invalid artifact-instruction JSON,
    identify the affected change, report the error, and stop the whole batch before
@@ -194,7 +194,7 @@ metadata:
 
    c. **Perform the archive**:
 
-      Target name: 若变更名已以 `YYYY-MM-DD-` 前缀开头则保持原样；否则将当前日期前置为 `YYYY-MM-DD-<name>`（与 `openspec archive` 相同的规则）。
+      Target name: 若变更名已以 `YYYY-MM-DD-` 前缀开头则保持原样；否则将当前日期前置为 `YYYY-MM-DD-<name>`（与 `openspec-cn archive` 相同的规则）。
 
       ```bash
       mkdir -p "<planningHome.changesDir>/archive"

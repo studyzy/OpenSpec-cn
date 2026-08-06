@@ -1271,8 +1271,8 @@ export class InitCommand {
 
     // Links
     console.log();
-    console.log(`了解更多：${chalk.cyan('https://github.com/Fission-AI/OpenSpec')}`);
-    console.log(`反馈：      ${chalk.cyan('https://github.com/Fission-AI/OpenSpec/issues')}`);
+    console.log(`了解更多：${chalk.cyan('https://github.com/studyzy/OpenSpec-cn')}`);
+    console.log(`反馈：      ${chalk.cyan('https://github.com/studyzy/OpenSpec-cn/issues')}`);
 
     // Restart instruction if any tools were configured and got a surface
     // (when nothing was generated there is nothing a restart would pick up);

@@ -473,7 +473,7 @@ export function buildCliUpdateLines(
   projectPath: string,
   options: { withCommand?: boolean } = {}
 ): string[] {
-  const lines = [`A newer OpenSpec CLI is available (v${OPENSPEC_VERSION} → v${latestVersion}).`];
+  const lines = [`有新版本的 OpenSpec CLI 可用（v${OPENSPEC_VERSION} → v${latestVersion}）。`];
 
   // Omitted when we are about to offer to run it — printing a command and then
   // asking to run that same command reads like the user has to do both.
@@ -481,7 +481,7 @@ export function buildCliUpdateLines(
     lines.push(...buildUpgradeCommandLines(installDir, projectPath));
   }
   if (installDir) {
-    lines.push(`  Running from: ${installDir}`);
+    lines.push(`  运行位置：${installDir}`);
   }
 
   return lines;
@@ -505,12 +505,12 @@ export function buildUpgradeCommandLines(
 
   if (isProjectLocalInstall(installDir, projectPath)) {
     // Its package manager owns the lockfile; naming npm could be wrong.
-    lines.push(`  Update the ${PACKAGE_NAME} dependency in this project.`);
+    lines.push(`  请更新本项目中的 ${PACKAGE_NAME} 依赖。`);
   } else {
     lines.push(`  ${GLOBAL_UPGRADE_COMMANDS[detectPackageManager(installDir)]}`);
   }
 
-  lines.push('  Then run "openspec update" again to pick up new workflows.');
+  lines.push('  然后再次运行 "openspec-cn update" 以获取新的工作流。');
   return lines;
 }
 

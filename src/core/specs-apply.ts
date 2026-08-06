@@ -56,7 +56,7 @@ function resolveTrustedSpecPath(specsRoot: string, specPath: string): {
   file: string;
 } {
   if (!isLexicallyWithin(specsRoot, specPath)) {
-    throw new Error(`Path is outside the allowed directory: ${specPath}`);
+    throw new Error(`路径位于允许的目录之外：${specPath}`);
   }
 
   try {
@@ -82,7 +82,7 @@ function resolveTrustedSpecPath(specsRoot: string, specPath: string): {
 
 function assertTrustedSpecPath(root: string, specPath: string): void {
   if (FileSystemUtils.canonicalizeExistingPath(root) !== path.resolve(root)) {
-    throw new Error(`Path is outside the allowed directory: ${specPath}`);
+    throw new Error(`路径位于允许的目录之外：${specPath}`);
   }
   FileSystemUtils.assertPathWithin(root, specPath);
 }
@@ -349,8 +349,8 @@ export async function buildUpdatedSpec(
       // the first way archive can leave a spec that `validate --strict` fails.
       // Measured on the parsed overview, which is what the validator reads.
       warn(
-        `${specName} - carried Purpose is under ${MIN_PURPOSE_LENGTH} characters; ` +
-          `openspec validate --strict reports it as too brief.`
+        `${specName} - 沿用的 Purpose 少于 ${MIN_PURPOSE_LENGTH} 个字符；` +
+          `openspec-cn validate --strict 会将其报告为过于简短。`
       );
     }
   }
@@ -799,8 +799,8 @@ export async function retireSpec(
   } catch (error) {
     if ((error as NodeJS.ErrnoException).code === 'ENOENT') return { retired: false };
     throw new Error(
-      `Could not retire capability '${update.id}': could not verify ${update.target} ` +
-        `before deletion (${error instanceof Error ? error.message : String(error)}).`
+      `无法退役功能 '${update.id}'：无法在删除前验证 ${update.target} ` +
+        `（${error instanceof Error ? error.message : String(error)}）。`
     );
   }
 
@@ -810,14 +810,14 @@ export async function retireSpec(
       inside = await isInsideRealDir(realSource, mainSpecsDir);
     } catch (error) {
       throw new Error(
-        `Could not retire capability '${update.id}': could not verify that ${update.target} ` +
-          `is inside ${mainSpecsDir} (${error instanceof Error ? error.message : String(error)}).`
+        `无法退役功能 '${update.id}'：无法确认 ${update.target} 位于 ${mainSpecsDir} 之内 ` +
+          `（${error instanceof Error ? error.message : String(error)}）。`
       );
     }
     if (!inside) {
       throw new Error(
-        `Could not retire capability '${update.id}': ${update.target} resolves outside ` +
-          `${mainSpecsDir}. Remove the external file by hand, or replace the symlink and rerun.`
+        `无法退役功能 '${update.id}'：${update.target} 解析后位于 ${mainSpecsDir} 之外。` +
+          `请手动删除外部文件，或替换符号链接后重新运行。`
       );
     }
   }
@@ -861,8 +861,8 @@ export async function retireSpec(
     // A bare errno here reads as an internal failure; say what was being
     // attempted so the message is actionable on its own.
     throw new Error(
-      `Could not retire capability '${update.id}': failed to delete ${update.target} ` +
-        `(${(error as Error).message}). Remove it by hand, then rerun the archive.`
+      `无法退役功能 '${update.id}'：无法删除 ${update.target} ` +
+        `（${(error as Error).message}）。请手动删除后重新运行 archive。`
     );
   }
 

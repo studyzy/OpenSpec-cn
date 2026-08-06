@@ -27,11 +27,11 @@ export const VALIDATION_MESSAGES = {
   CHANGE_WHAT_EMPTY: 'What Changes 章节不能为空',
   CHANGE_NO_DELTAS: 'Change 必须至少有一个 delta',
   CHANGE_SKIP_SPECS_CONFLICT:
-    'skip_specs is set in .openspec.yaml but spec files exist under specs/. Remove skip_specs or delete the delta spec files',
+    '.openspec.yaml 中设置了 skip_specs，但 specs/ 下存在 spec 文件。请移除 skip_specs，或删除这些增量 spec 文件',
   CHANGE_SKIP_SPECS_ACCEPTED:
-    'skip_specs is set in .openspec.yaml: change declares no spec-level behavior changes, zero deltas accepted',
+    '.openspec.yaml 中设置了 skip_specs：该变更声明不涉及 spec 层面的行为变化，接受零个 delta',
   CHANGE_SKIP_SPECS_INVALID_METADATA:
-    'skip_specs is set but .openspec.yaml is not valid change metadata, so the marker is not honored. Fix the metadata',
+    '设置了 skip_specs，但 .openspec.yaml 不是有效的变更元数据，因此该标记不生效。请修正元数据',
   CHANGE_TOO_MANY_DELTAS: `超过 ${MAX_DELTAS_PER_CHANGE} 个 delta 时请考虑拆分 change`,
   DELTA_SPEC_EMPTY: 'Spec 名称不能为空',
   DELTA_DESCRIPTION_EMPTY: 'Delta 描述不能为空',
@@ -43,7 +43,7 @@ export const VALIDATION_MESSAGES = {
 
   // Guidance snippets (appended to primary messages for remediation)
   GUIDE_NO_DELTAS:
-    '未找到 deltas。请确保变更在 specs/ 目录中有能力文件夹（例如 specs/http-server/spec.md），其中包含使用 delta 标题（## ADDED/MODIFIED/REMOVED/RENAMED Requirements）的 .md 文件，并且每个需求至少包含一个 "#### Scenario:" 块。如果此变更故意不修改任何 spec（纯重构、工具、文档），请在变更的 .openspec.yaml 中设置 "skip_specs: true"。提示：运行 "openspec change show <change-id> --json --deltas-only" 查看解析出的 deltas。',
+    '未找到 deltas。请确保变更在 specs/ 目录中有能力文件夹（例如 specs/http-server/spec.md），其中包含使用 delta 标题（## ADDED/MODIFIED/REMOVED/RENAMED Requirements）的 .md 文件，并且每个需求至少包含一个 "#### Scenario:" 块。如果此变更故意不修改任何 spec（纯重构、工具、文档），请在变更的 .openspec.yaml 中设置 "skip_specs: true"。提示：运行 "openspec-cn change show <change-id> --json --deltas-only" 查看解析出的 deltas。',
   GUIDE_MISSING_SPEC_SECTIONS:
     '缺少必要章节。期望标题："## Purpose" 和 "## Requirements"。示例：\n## Purpose\n[简短用途]\n\n## Requirements\n### Requirement: 清晰的需求陈述\nUsers SHALL ...\n\n#### Scenario: 描述性名称\n- **WHEN** ...\n- **THEN** ...',
   GUIDE_MISSING_CHANGE_SECTIONS:

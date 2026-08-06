@@ -39,6 +39,34 @@ function isMissingPathError(error: unknown): boolean {
 }
 
 /**
+ * Shared wording for the concurrency guards below. Each of these sentences is
+ * raised from more than one place, so they live here rather than being spelled
+ * out at every throw site where the copies could drift apart.
+ */
+function rollbackWouldOverwriteMessage(target: string): string {
+  return `归档回滚会覆盖 ${target} 处的并发变更。`;
+}
+
+function specInputsChangedMessage(id: string, phase: string): string {
+  return `'${id}' 的 spec 输入在 archive ${phase}期间发生了变化。`;
+}
+
+/** Appended wherever the abort happens before anything on disk was touched. */
+const NO_FILES_CHANGED_HINT = '未更改任何文件；请检查新内容后重新运行。';
+
+function couldNotRestoreStagedSourceMessage(
+  cause: unknown,
+  stagedSource: string,
+  restoreError: unknown
+): string {
+  return (
+    `${cause instanceof Error ? cause.message : String(cause)} ` +
+    `无法恢复位于 ${stagedSource} 的暂存源目录` +
+    `（${restoreError instanceof Error ? restoreError.message : String(restoreError)}）。`
+  );
+}
+
+/**
  * Matches the `YYYY-MM-DD-` prefix that archiving prepends to a change name.
  * A change whose name already starts with one (a common authoring convention)
  * is archived under its existing name so the prefix is never stacked (#1309).
@@ -268,9 +296,9 @@ function rerunCommand(
   // goes last, behind the `--` that ends option parsing. The store flag has
   // to stay in front of that `--` to still be read as an option.
   if (changeName.startsWith('-')) {
-    return `${withStoreFlag(root, `openspec archive ${flags}`)} -- ${quoteChangeName(changeName)}`;
+    return `${withStoreFlag(root, `openspec-cn archive ${flags}`)} -- ${quoteChangeName(changeName)}`;
   }
-  return withStoreFlag(root, `openspec archive ${quoteChangeName(changeName)} ${flags}`);
+  return withStoreFlag(root, `openspec-cn archive ${quoteChangeName(changeName)} ${flags}`);
 }
 
 /**
@@ -340,7 +368,7 @@ async function copyDirContents(src: string, dest: string): Promise<void> {
     } else if (entry.isFile()) {
       await fs.copyFile(srcPath, destPath, constants.COPYFILE_EXCL);
     } else {
-      throw new Error(`Cannot archive unsupported filesystem entry: ${srcPath}`);
+      throw new Error(`无法归档不受支持的文件系统条目：${srcPath}`);
     }
   }
   await fs.chmod(dest, sourceStat.mode & 0o7777);
@@ -369,7 +397,7 @@ async function fingerprintDirectoryContents(root: string): Promise<string> {
   const visit = async (dir: string, relativeDir: string): Promise<void> => {
     const before = await fs.lstat(dir, { bigint: true });
     if (!before.isDirectory()) {
-      throw new Error(`Expected a directory while verifying ${dir}.`);
+      throw new Error(`校验 ${dir} 时期望是一个目录。`);
     }
     updateHashField('directory-mode', (before.mode & 0o7777n).toString());
     const entries = (await fs.readdir(dir, { withFileTypes: true })).sort((a, b) =>
@@ -389,7 +417,7 @@ async function fingerprintDirectoryContents(root: string): Promise<string> {
         const target = await fs.readlink(entryPath);
         const after = await fs.lstat(entryPath, { bigint: true });
         if (statIdentity(stat) !== statIdentity(after)) {
-          throw new Error(`Path changed while archive was reading ${entryPath}.`);
+          throw new Error(`archive 读取 ${entryPath} 期间路径发生了变化。`);
         }
         updateHashField('type', 'symlink');
         updateHashField('target', target);
@@ -397,7 +425,7 @@ async function fingerprintDirectoryContents(root: string): Promise<string> {
         const contentFingerprint = await fingerprintFile(entryPath);
         const after = await fs.lstat(entryPath, { bigint: true });
         if (statIdentity(stat) !== statIdentity(after)) {
-          throw new Error(`Path changed while archive was reading ${entryPath}.`);
+          throw new Error(`archive 读取 ${entryPath} 期间路径发生了变化。`);
         }
         updateHashField('type', 'file');
         updateHashField('mode', (stat.mode & 0o7777n).toString());
@@ -411,7 +439,7 @@ async function fingerprintDirectoryContents(root: string): Promise<string> {
 
     const after = await fs.lstat(dir, { bigint: true });
     if (statIdentity(before) !== statIdentity(after)) {
-      throw new Error(`Directory changed while archive was reading ${dir}.`);
+      throw new Error(`archive 读取 ${dir} 期间目录发生了变化。`);
     }
   };
 
@@ -431,7 +459,7 @@ async function assertCopiedDirectoryUnchanged(
     destinationFingerprint !== expectedFingerprint
   ) {
     throw new Error(
-      `Change directory contents changed during the fallback copy from ${stagedSource} to ${destination}.`
+      `变更目录内容在从 ${stagedSource} 到 ${destination} 的回退拷贝期间发生了变化。`
     );
   }
 }
@@ -471,9 +499,9 @@ async function moveDirectory(
         await fs.rename(src, stagedSource);
       } catch (stageError) {
         throw new Error(
-          `Could not safely stage ${src} before the fallback archive copy ` +
-            `(${stageError instanceof Error ? stageError.message : String(stageError)}). ` +
-            'No fallback copy was attempted.'
+          `在回退归档拷贝之前无法安全暂存 ${src} ` +
+            `（${stageError instanceof Error ? stageError.message : String(stageError)}）。` +
+            '未尝试进行回退拷贝。'
         );
       }
       let destIsOurs = false;
@@ -493,9 +521,7 @@ async function moveDirectory(
           await fs.rename(stagedSource, src);
         } catch (restoreError) {
           throw new Error(
-            `${copyError instanceof Error ? copyError.message : String(copyError)} ` +
-              `Could not restore the staged source at ${stagedSource} ` +
-              `(${restoreError instanceof Error ? restoreError.message : String(restoreError)}).`
+            couldNotRestoreStagedSourceMessage(copyError, stagedSource, restoreError)
           );
         }
         if ((copyError as NodeJS.ErrnoException).code === 'EEXIST') {
@@ -515,9 +541,7 @@ async function moveDirectory(
           await fs.rename(stagedSource, src);
         } catch (restoreError) {
           throw new Error(
-            `${verificationError instanceof Error ? verificationError.message : String(verificationError)} ` +
-              `Could not restore the staged source at ${stagedSource} ` +
-              `(${restoreError instanceof Error ? restoreError.message : String(restoreError)}).`
+            couldNotRestoreStagedSourceMessage(verificationError, stagedSource, restoreError)
           );
         }
         throw verificationError;
@@ -529,10 +553,10 @@ async function moveDirectory(
         // destination is now the only complete copy, so never erase it while
         // trying to make this failed move look atomic.
         throw new MoveDestinationRetainedError(
-          `Copied ${src} to ${dest}, but could not remove the staged source at ` +
-            `${stagedSource} completely ` +
-            `(${cleanupError instanceof Error ? cleanupError.message : String(cleanupError)}). ` +
-            'The complete destination was retained for recovery.'
+          `已将 ${src} 拷贝到 ${dest}，但无法完整删除位于 ` +
+            `${stagedSource} 的暂存源目录` +
+            `（${cleanupError instanceof Error ? cleanupError.message : String(cleanupError)}）。` +
+            '已保留完整的目标目录以便恢复。'
         );
       }
     } else {
@@ -680,7 +704,7 @@ async function fingerprintPath(filePath: string): Promise<string> {
           statIdentity(referentBefore) !== statIdentity(referentAfter) ||
           link !== (await fs.readlink(filePath))
         ) {
-          throw new Error(`Path changed while archive was reading ${filePath}.`);
+          throw new Error(`archive 读取 ${filePath} 期间路径发生了变化。`);
         }
         return `symlink:${statIdentity(stat)}:${link}:${statIdentity(referentAfter)}:${hash}`;
       } catch (error) {
@@ -694,7 +718,7 @@ async function fingerprintPath(filePath: string): Promise<string> {
       const hash = await digest();
       const after = await fs.lstat(filePath, { bigint: true });
       if (statIdentity(stat) !== statIdentity(after)) {
-        throw new Error(`Path changed while archive was reading ${filePath}.`);
+        throw new Error(`archive 读取 ${filePath} 期间路径发生了变化。`);
       }
       return `file:${statIdentity(after)}:${hash}`;
     }
@@ -725,7 +749,7 @@ async function fingerprintMovablePath(filePath: string): Promise<string> {
         statIdentity(referent) !== statIdentity(referentAfter) ||
         link !== linkAfter
       ) {
-        throw new Error(`Path changed while archive was reading ${filePath}.`);
+        throw new Error(`archive 读取 ${filePath} 期间路径发生了变化。`);
       }
       return (
         `symlink:${movableStatIdentity(entry)}:${link}:` +
@@ -734,7 +758,7 @@ async function fingerprintMovablePath(filePath: string): Promise<string> {
     }
     const entryAfter = await fs.lstat(filePath, { bigint: true });
     if (statIdentity(entry) !== statIdentity(entryAfter)) {
-      throw new Error(`Path changed while archive was reading ${filePath}.`);
+      throw new Error(`archive 读取 ${filePath} 期间路径发生了变化。`);
     }
     return `file:${movableStatIdentity(entry)}:${hash}`;
   } catch (error) {
@@ -778,7 +802,7 @@ async function assertRetirementAuthorization(
     !markerStillDeclared
   ) {
     throw new Error(
-      `The ${METADATA_FILENAME} retirement authorization changed before archive could complete.`
+      `${METADATA_FILENAME} 中的退役授权在 archive 完成之前发生了变化。`
     );
   }
 }
@@ -808,8 +832,8 @@ async function assertDistinctMutationTargets(mutations: SpecMutation[]): Promise
     const existing = owners.get(identity);
     if (existing !== undefined) {
       throw new Error(
-        `Spec updates for '${existing}' and '${mutation.update.id}' resolve to the same target ` +
-          `${identity}. Replace the capability alias or combine the deltas before archiving.`
+        `'${existing}' 与 '${mutation.update.id}' 的 spec 更新解析到了同一个目标 ` +
+          `${identity}。请在归档前替换该功能别名，或将这些 delta 合并。`
       );
     }
     owners.set(identity, mutation.update.id);
@@ -880,8 +904,8 @@ async function restoreSpecSnapshots(snapshots: SpecSnapshot[]): Promise<void> {
           try {
             await fs.lstat(snapshot.target);
             throw new Error(
-              `Archive rollback would overwrite a concurrent change at ${snapshot.target}. ` +
-                `The displaced spec was retained at ${snapshot.displacedPath}.`
+              `${rollbackWouldOverwriteMessage(snapshot.target)} ` +
+                `被移走的 spec 已保留在 ${snapshot.displacedPath}。`
             );
           } catch (error) {
             if ((error as NodeJS.ErrnoException).code !== 'ENOENT') throw error;
@@ -1003,7 +1027,7 @@ async function finalizeRetirementBackups(
         snapshot.displacedFingerprint === undefined ||
         (await fingerprintMovablePath(displacedPath)) !== snapshot.displacedFingerprint
       ) {
-        throw new Error('the displaced spec changed after retirement verification');
+        throw new Error('被移走的 spec 在退役校验后发生了变化');
       }
       await finalizeRetiredSpec(snapshot.target, displacedPath, mainSpecsDir);
       snapshot.displacedPath = undefined;
@@ -1118,7 +1142,7 @@ export class ArchiveCommand {
       changeName = selectedChange;
     }
 
-    const changeNameProblem = folderStyleNameProblem(changeName, 'Change name');
+    const changeNameProblem = folderStyleNameProblem(changeName, '变更名称');
     if (changeNameProblem) {
       throw new ArchiveBlockedError('archive_change_name_invalid', changeNameProblem);
     }
@@ -1493,13 +1517,13 @@ export class ArchiveCommand {
                 currentRetirementMarker.invalidReason !== retirementMarker.invalidReason
               ) {
                 throw new Error(
-                  `The ${METADATA_FILENAME} retirement authorization changed while archive was awaiting confirmation.`
+                  `${METADATA_FILENAME} 中的退役授权在 archive 完成之前发生了变更。`
                 );
               }
               const currentUpdates = await findSpecUpdates(changeDir, mainSpecsDir);
               const currentById = new Map(currentUpdates.map((update) => [update.id, update]));
               if (currentUpdates.length !== prepared.length) {
-                throw new Error('The change specs changed while archive was awaiting confirmation.');
+                throw new Error('archive 等待确认期间，变更的 specs 发生了变化。');
               }
               for (const proposed of prepared) {
                 const current = currentById.get(proposed.update.id);
@@ -1900,7 +1924,7 @@ export class ArchiveCommand {
                     proposed.sourceContentFingerprint
                   ) {
                     throw new Error(
-                      `The active delta for '${proposed.update.id}' changed during the fallback copy.`
+                      `功能 '${proposed.update.id}' 对应的活跃 delta 在回退拷贝期间发生了变化。`
                     );
                   }
                 }
@@ -2045,7 +2069,7 @@ export class ArchiveCommand {
         throw new ArchiveBlockedError(
           'archive_change_name_required',
           'A change name is required: no answer could be read from stdin.',
-          withStoreFlag(root, `openspec archive <change-name> ${rerunFlags(options).join(' ')}`)
+          withStoreFlag(root, `openspec-cn archive <change-name> ${rerunFlags(options).join(' ')}`)
         );
       }
       // User cancelled (Ctrl+C)

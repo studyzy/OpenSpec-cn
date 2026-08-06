@@ -82,7 +82,7 @@ describe('top-level validate command', () => {
 
     const result = await runCLI(['validate', 'marked-conflict', '--type', 'change'], { cwd: testDir });
     expect(result.exitCode).toBe(1);
-    expect(result.stderr).toContain('delete the files under specs/');
+    expect(result.stderr).toContain('请移除 skip_specs，或删除这些增量 spec 文件');
     expect(result.stderr).not.toContain('Ensure change has deltas in specs/');
   });
 
@@ -95,8 +95,8 @@ describe('top-level validate command', () => {
 
     const result = await runCLI(['validate', 'marked-invalid', '--type', 'change'], { cwd: testDir });
     expect(result.exitCode).toBe(1);
-    expect(result.stderr).toContain('Fix .openspec.yaml so the skip_specs marker can be honored');
-    expect(result.stderr).not.toContain('delete the files under specs/');
+    expect(result.stderr).toContain('请修正元数据');
+    expect(result.stderr).not.toContain('请移除 skip_specs，或删除这些增量 spec 文件');
   });
 
   it('keeps delta-authoring next steps for a plain zero-delta change', async () => {
@@ -108,7 +108,7 @@ describe('top-level validate command', () => {
     const result = await runCLI(['validate', 'plain-empty', '--type', 'change'], { cwd: testDir });
     expect(result.exitCode).toBe(1);
     expect(result.stderr).toContain('确保变更在 specs/ 中有 deltas');
-    expect(result.stderr).not.toContain('delete the files under specs/');
+    expect(result.stderr).not.toContain('请移除 skip_specs，或删除这些增量 spec 文件');
   });
 
   it('validates all with --all and outputs JSON summary', async () => {

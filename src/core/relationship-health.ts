@@ -95,8 +95,8 @@ export function inspectRelationships(input: InspectRelationshipsInput): Relation
     status.push(
       warning(
         'pointer_declarations_inert',
-        `${input.inertPointerDeclarations.filePath} declares ${input.inertPointerDeclarations.fields.join(' and ')}, but commands read the resolved store's config — these declarations are inert.`,
-        `Move the ${input.inertPointerDeclarations.fields.join('/')} declarations into the store's openspec/config.yaml.`
+        `${input.inertPointerDeclarations.filePath} 声明了 ${input.inertPointerDeclarations.fields.join(' 和 ')}，但各命令读取的是解析出的 store 的配置——这些声明不会生效。`,
+        `请将 ${input.inertPointerDeclarations.fields.join('/')} 声明移到该 store 的 openspec/config.yaml 中。`
       )
     );
   }
@@ -114,7 +114,7 @@ export function inspectRelationships(input: InspectRelationshipsInput): Relation
         makeStoreDiagnostic(
           'info',
           'store_remote_divergence',
-          `The store.yaml remote (${sanitizeInline(input.storeFacts.canonicalRemote, 200)}) differs from the checkout's origin (${sanitizeInline(input.storeFacts.originUrl, 200)}).`,
+          `store.yaml 中的 remote（${sanitizeInline(input.storeFacts.canonicalRemote, 200)}）与检出目录的 origin（${sanitizeInline(input.storeFacts.originUrl, 200)}）不一致。`,
           { target: 'store.metadata' }
         )
       );
@@ -126,7 +126,7 @@ export function inspectRelationships(input: InspectRelationshipsInput): Relation
     // Ahead-only is normal (OpenSpec never pushes stores), so it stays quiet.
     const drift = input.storeFacts.drift;
     if (drift && drift.behind > 0) {
-      const behindCommits = `${drift.behind} commit${drift.behind === 1 ? '' : 's'}`;
+      const behindCommits = `${drift.behind} 个提交`;
       storeStatus.push(
         makeStoreDiagnostic(
           'info',

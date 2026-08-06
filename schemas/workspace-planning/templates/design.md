@@ -1,6 +1,6 @@
 ## Context
 
-Summarize the workspace planning context, relevant linked areas, and constraints.
+概述 workspace 规划的上下文、相关的链接领域与约束。
 
 ## Goals / Non-Goals
 
@@ -8,25 +8,25 @@ Summarize the workspace planning context, relevant linked areas, and constraints
 -
 
 **Non-Goals:**
-- Creating repo-local implementation artifacts before an affected area is selected.
+- 在选定受影响领域之前创建仓库本地的实现制品。
 
 ## Decisions
 
-### Decision: <title>
+### Decision: <标题>
 
-<decision and rationale>
+<决策及其理由>
 
-Alternative considered: <alternative and why it was not chosen>
+考虑过的备选方案：<备选方案及未被选中的原因>
 
 ## Risks / Trade-offs
 
-- <risk> -> <mitigation>
+- <风险> -> <缓解措施>
 
 ## Coordination Notes
 
-- Affected areas:
-- Open handoffs:
-- Implementation entry criteria:
+- 受影响领域：
+- 待交接事项：
+- 进入实现的准入条件：
 
 ## Open Questions
 

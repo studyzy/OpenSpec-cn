@@ -168,9 +168,9 @@ describe('propose schema selection', () => {
       expect(statusStep, `${label} is missing status lookup`).toBeGreaterThan(createStep);
 
       const createSection = body.slice(createStep, statusStep);
-      expect(createSection, label).toMatch(/^\s*openspec new change "<name>"\s*$/m);
+      expect(createSection, label).toMatch(/^\s*openspec-cn new change "<name>"\s*$/m);
       expect(createSection, label).toMatch(
-        /^\s*openspec new change "<name>" --schema "<schema-name>"\s*$/m
+        /^\s*openspec-cn new change "<name>" --schema "<schema-name>"\s*$/m
       );
       expect(createSection, label).toContain(
         '若选中了注册的存储，在该命令及后续每个接受 `--store` 的 OpenSpec 命令中追加'
@@ -187,18 +187,18 @@ describe('propose schema selection', () => {
 
       expect(schemaSection, label).toContain('使用配置的默认 schema');
       expect(schemaSection, label).toContain('明确按名称请求特定 schema');
-      const contextCommand = schemaSection.indexOf('`openspec context --json`');
-      const schemasCommand = schemaSection.indexOf('`openspec schemas --json`');
+      const contextCommand = schemaSection.indexOf('`openspec-cn context --json`');
+      const schemasCommand = schemaSection.indexOf('`openspec-cn schemas --json`');
       expect(contextCommand, `${label} is missing root resolution`).toBeGreaterThanOrEqual(0);
       expect(schemasCommand, `${label} lists schemas before resolving the root`).toBeGreaterThan(
         contextCommand
       );
       expect(schemaSection, label).toContain('从当前工作目录');
       expect(schemaSection, label).toContain(
-        '`openspec context --json --store "<store-id>"`'
+        '`openspec-cn context --json --store "<store-id>"`'
       );
       expect(schemaSection, label).toContain(
-        '在其工作目录设置为返回的 `root.path` 的情况下运行 `openspec schemas --json`'
+        '在其工作目录设置为返回的 `root.path` 的情况下运行 `openspec-cn schemas --json`'
       );
       expect(schemaSection, label).toContain('返回的 `root.path`');
       expect(schemaSection, label).toContain('本地 `store:` 指针');
@@ -206,7 +206,7 @@ describe('propose schema selection', () => {
       expect(schemaSection, label).toContain('`schemas` 不接受 `--store`');
       expect(schemaSection, label).toContain('若 context 仅报告 `no_openspec_root`');
       expect(schemaSection, label).toContain(
-        '改为从当前工作目录运行 `openspec schemas --json`'
+        '改为从当前工作目录运行 `openspec-cn schemas --json`'
       );
       expect(schemaSection, label).toContain(
         '对于无效或不可用的存储，不要使用此回退方式'
@@ -304,7 +304,7 @@ describe('artifact loop guards (propose and ff)', () => {
   it('makes the agent fetch and read the instruction field before skipping', () => {
     for (const [label, body] of loopBodies) {
       expect(body, label).toContain(
-        '运行 `openspec instructions <artifact-id> --change "<name>" --json`，仅当其 `instruction` 字段标记为可选时才跳过'
+        '运行 `openspec-cn instructions <artifact-id> --change "<name>" --json`，仅当其 `instruction` 字段标记为可选时才跳过'
       );
       expect(body, label).toContain('绝不能凭你的判断');
     }

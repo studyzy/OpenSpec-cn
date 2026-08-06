@@ -157,7 +157,7 @@ operations:
           },
         });
         expect(consoleWarnSpy).toHaveBeenCalledWith(
-          expect.stringContaining("Guidance for operation 'archive' must be an array of strings")
+          expect.stringContaining("操作 'archive' 的 guidance 必须是字符串数组")
         );
       });
 
@@ -278,7 +278,7 @@ operations:
           expect.stringContaining("配置中的操作 ID 'deploy' 未知")
         );
         expect(consoleWarnSpy).toHaveBeenCalledWith(
-          expect.stringContaining("Unknown field(s) in 'operations.apply': replacementInstruction")
+          expect.stringContaining("'operations.apply' 中存在未知字段：replacementInstruction")
         );
       });
 
@@ -304,10 +304,10 @@ operations:
           apply: { guidance: ['Run tests'] },
         });
         expect(consoleWarnSpy).toHaveBeenCalledWith(
-          expect.stringContaining("Some guidance for operation 'apply' are empty strings")
+          expect.stringContaining("操作 'apply' 的部分 guidance 是空字符串")
         );
         expect(consoleWarnSpy).toHaveBeenCalledWith(
-          expect.stringContaining("Some guidance for operation 'archive' are empty strings")
+          expect.stringContaining("操作 'archive' 的部分 guidance 是空字符串")
         );
       });
 
@@ -902,9 +902,9 @@ rules:
       const warnings = validateConfigRules(rules, validIds);
 
       expect(warnings).toHaveLength(2);
-      expect(warnings[0]).toContain('Unknown artifact ID in rules: "testplan"');
-      expect(warnings[0]).toContain('Known artifact IDs: design, proposal, specs, tasks');
-      expect(warnings[1]).toContain('Unknown artifact ID in rules: "documentation"');
+      expect(warnings[0]).toContain('rules 中存在未知的制品 ID："testplan"');
+      expect(warnings[0]).toContain('已知的制品 ID：design, proposal, specs, tasks');
+      expect(warnings[1]).toContain('rules 中存在未知的制品 ID："documentation"');
     });
 
     it('should not warn for keys valid in another schema (union across schemas)', () => {
@@ -954,9 +954,9 @@ rules:
     it('should suggest close matches using fuzzy matching', () => {
       const message = suggestSchemas('spec-drven', availableSchemas); // Missing 'i'
 
-      expect(message).toContain("Schema 'spec-drven' not found");
+      expect(message).toContain("在 openspec/config.yaml 中未找到 schema 'spec-drven'");
       expect(message).toContain('您是指以下之一吗？');
-      expect(message).toContain('spec-driven (built-in)');
+      expect(message).toContain('spec-driven (内置)');
     });
 
     it('should suggest custom-workflow for workflow typo', () => {
@@ -969,9 +969,9 @@ rules:
     it('should list all available schemas', () => {
       const message = suggestSchemas('nonexistent', availableSchemas);
 
-      expect(message).toContain('Available schemas:');
-      expect(message).toContain('Built-in: spec-driven');
-      expect(message).toContain('Project-local: custom-workflow, team-process');
+      expect(message).toContain('可用的 schema：');
+      expect(message).toContain('内置：spec-driven');
+      expect(message).toContain('项目本地：custom-workflow, team-process');
     });
 
     it('should handle case when no project-local schemas exist', () => {
@@ -980,15 +980,15 @@ rules:
       ];
       const message = suggestSchemas('invalid', builtInOnly);
 
-      expect(message).toContain('Built-in: spec-driven');
-      expect(message).toContain('Project-local: (none found)');
+      expect(message).toContain('内置：spec-driven');
+      expect(message).toContain('项目本地：（未找到）');
     });
 
     it('should include fix instruction', () => {
       const message = suggestSchemas('wrong-schema', availableSchemas);
 
       expect(message).toContain(
-        "Fix: Edit openspec/config.yaml and change 'schema: wrong-schema' to a valid schema name"
+        "修复方式：编辑 openspec/config.yaml，将 'schema: wrong-schema' 改为一个有效的 schema 名称"
       );
     });
 
@@ -1013,7 +1013,7 @@ rules:
 
       // 'abcdefghijk' has large Levenshtein distance from all schemas
       expect(message).not.toContain('Did you mean');
-      expect(message).toContain('Available schemas:');
+      expect(message).toContain('可用的 schema：');
     });
   });
 });

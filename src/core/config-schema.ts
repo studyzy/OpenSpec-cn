@@ -90,7 +90,7 @@ export function validateConfigKeyPath(path: string): { valid: boolean; reason?: 
 
   const unsafeKey = rawKeys.find((key) => UNSAFE_KEY_SEGMENTS.has(key));
   if (unsafeKey) {
-    return { valid: false, reason: `Key segment "${unsafeKey}" is not allowed` };
+    return { valid: false, reason: `不允许使用键片段 "${unsafeKey}"` };
   }
 
   const rootKey = rawKeys[0];
@@ -100,26 +100,26 @@ export function validateConfigKeyPath(path: string): { valid: boolean; reason?: 
 
   if (rootKey === 'featureFlags') {
     if (rawKeys.length > 2) {
-      return { valid: false, reason: 'featureFlags values are booleans and do not support nested keys' };
+      return { valid: false, reason: 'featureFlags 的值为布尔值，不支持嵌套键' };
     }
     return { valid: true };
   }
 
   if (rootKey === 'telemetry') {
     if (rawKeys.length === 1) {
-      return { valid: false, reason: 'Set nested keys under telemetry (e.g. telemetry.enabled)' };
+      return { valid: false, reason: '请设置 telemetry 下的嵌套键（例如 telemetry.enabled）' };
     }
     if (rawKeys.length !== 2 || !TELEMETRY_SETTABLE_KEYS.has(rawKeys[1])) {
       return {
         valid: false,
-        reason: `Unknown telemetry key "${rawKeys.slice(1).join('.')}" (allowed: enabled)`,
+        reason: `未知的 telemetry 键 "${rawKeys.slice(1).join('.')}"（允许：enabled）`,
       };
     }
     return { valid: true };
   }
 
   if (rawKeys.length > 1) {
-    return { valid: false, reason: `"${rootKey}" does not support nested keys` };
+    return { valid: false, reason: `"${rootKey}" 不支持嵌套键` };
   }
 
   return { valid: true };

@@ -107,7 +107,7 @@ describe('relationship health composition (3.6)', () => {
     expect(behind.store?.status[0]).toEqual(
       expect.objectContaining({ severity: 'info', code: 'store_checkout_drift' })
     );
-    expect(behind.store?.status[0].message).toContain('3 commits behind');
+    expect(behind.store?.status[0].message).toContain('3 个提交 behind');
     expect(behind.store?.drift).toEqual({ ahead: 0, behind: 3 });
 
     // Singular when exactly one commit behind.
@@ -115,7 +115,7 @@ describe('relationship health composition (3.6)', () => {
       ...baseInput(),
       storeFacts: { ...facts, drift: { ahead: 0, behind: 1 } },
     });
-    expect(one.store?.status[0].message).toContain('1 commit behind');
+    expect(one.store?.status[0].message).toContain('1 个提交 behind');
     expect(one.store?.status[0].message).not.toContain('1 commits');
 
     const diverged = inspectRelationships({

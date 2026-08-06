@@ -42,7 +42,7 @@ You: /opsx:apply
 
 - 想重新审视 plan？打开制品阅读它们，或在终端运行 `openspec-cn show <change>` 获取整合视图。
 - 发现要改的东西？编辑制品（或让 AI 改），然后继续。
-- 想要结构化的检查，确认代码符合 plan？运行 `/opsx:verify`（扩展命令）。它报告完整性、正确性、连贯性，而不阻塞任何东西。参见 [Workflows: Verify](workflows.md#verify-check-your-work)。
+- 想要结构化的检查，确认代码符合 plan？运行 `/opsx:verify`（扩展命令）。它报告完整性、正确性、连贯性，而不阻塞任何东西。参见 [工作流：Verify](workflows.md#verify-check-your-work)。
 
 没有"审阅阶段"可以回去，审阅是你可以在任何时刻做的事，包括实现过程中。
 
@@ -60,7 +60,7 @@ You: /opsx:apply
 如果生成的 proposal 没说到点子上，你有三个好办法：
 
 - **就地迭代。** 告诉 AI 哪里不对（"范围太宽，去掉管理功能"）让它改。这最便宜通常也最对。
-- **先探索，再重新提案。** 如果问题出在想法本身不清晰，退一步到 `/opsx:explore`，想清楚，让更锐利的 proposal 从中浮现。参见 [Explore First](explore.md)。
+- **先探索，再重新提案。** 如果问题出在想法本身不清晰，退一步到 `/opsx:explore`，想清楚，让更锐利的 proposal 从中浮现。参见 [先探索](explore.md)。
 - **重新开始。** 如果意图根本变了，开新变更可能比给旧的打补丁更清晰。
 
 最后那招有它自己的决策指南，见下一段。
@@ -73,15 +73,15 @@ You: /opsx:apply
 - 范围收窄（现在先交付 MVP，更多后续再做）？更新，然后归档，再开新变更做第二阶段。
 - 问题本身变了（"加暗色模式"变成了"构建完整主题系统"）？新变更。
 
-完整的流程图和工作示例见 [Workflows: When Update vs Start Fresh](workflows.md#when-to-update-vs-start-fresh)，更深入的论述见 [OPSX: When Update vs. Start Fresh](opsx.md#when-to-update-vs-start-fresh)。
+完整的流程图和工作示例见 [工作流：何时更新 vs 重新开始](workflows.md#when-to-update-vs-start-fresh)，更深入的论述见 [OPSX：何时更新 vs 重新开始](opsx.md#when-to-update-vs-start-fresh)。
 
 ## 关于 tasks 的注意点
 
-`tasks.md` 是活的清单，不是冻结的 plan。你实现时，可以添加你发现的新任务、删掉结果证明不必要的任务，或重新排序它们。AI 在 `/opsx:apply` 期间会勾掉已完成的项，如果你稍后回来，会从第一个未勾选的任务继续。编辑 `/opsx:continue`、`/opsx:apply` 和 `/opsx:verify` 的详情见 [Commands](commands.md)。
+`tasks.md` 是活的清单，不是冻结的 plan。你实现时，可以添加你发现的新任务、删掉结果证明不必要的任务，或重新排序它们。AI 在 `/opsx:apply` 期间会勾掉已完成的项，如果你稍后回来，会从第一个未勾选的任务继续。编辑 `/opsx:continue`、`/opsx:apply` 和 `/opsx:verify` 的详情见 [命令](commands.md)。
 
 ## 下一步去哪
 
-- [Workflows](workflows.md) - 更大循环中的模式与决策
-- [Reviewing a Change](reviewing-changes.md) - 构建前对草案的两分钟检查
-- [Commands](commands.md) - `/opsx:continue`、`/opsx:apply`、`/opsx:verify` 的详细说明
-- [Concepts: Artifacts](concepts.md#artifacts) - 制品详解
+- [工作流](workflows.md) - 更大循环中的模式与决策
+- [审查变更](reviewing-changes.md) - 构建前对草案的两分钟检查
+- [命令](commands.md) - `/opsx:continue`、`/opsx:apply`、`/opsx:verify` 的详细说明
+- [概念：制品](concepts.md#artifacts) - 制品详解

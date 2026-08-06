@@ -50,7 +50,7 @@ ${STORE_SELECTION_GUIDANCE}
 
    **仅在以下情况下使用不同 schema：**
    - 用户明确按名称请求特定 schema → 使用 \`--schema <schema-name>\`
-   - 用户询问 "show workflows" 或 "what workflows" → 通过从当前工作目录运行 \`openspec context --json\` 解析权威根路径。若用户明确选择了注册的存储，请使用 \`openspec context --json --store "<store-id>"\`。然后在其工作目录设置为返回的 \`root.path\` 的情况下运行 \`openspec schemas --json\` 让用户选择。这保留了由本地 \`store:\` 指针或全局 \`defaultStore\` 选择的根路径；\`schemas\` 不接受 \`--store\`。若 context 仅报告 \`no_openspec_root\`，则改为从当前工作目录运行 \`openspec schemas --json\`。对于无效或不可用的存储，不要使用此回退方式。
+   - 用户询问 "show workflows" 或 "what workflows" → 通过从当前工作目录运行 \`openspec-cn context --json\` 解析权威根路径。若用户明确选择了注册的存储，请使用 \`openspec-cn context --json --store "<store-id>"\`。然后在其工作目录设置为返回的 \`root.path\` 的情况下运行 \`openspec-cn schemas --json\` 让用户选择。这保留了由本地 \`store:\` 指针或全局 \`defaultStore\` 选择的根路径；\`schemas\` 不接受 \`--store\`。若 context 仅报告 \`no_openspec_root\`，则改为从当前工作目录运行 \`openspec-cn schemas --json\`。对于无效或不可用的存储，不要使用此回退方式。
 
    否则，省略 \`--schema\` 以保留配置的默认值。
 
@@ -60,18 +60,18 @@ ${STORE_SELECTION_GUIDANCE}
 
    使用配置的默认值：
    \`\`\`bash
-   openspec new change "<name>"
+   openspec-cn new change "<name>"
    \`\`\`
 
    使用显式请求的 schema：
    \`\`\`bash
-   openspec new change "<name>" --schema "<schema-name>"
+   openspec-cn new change "<name>" --schema "<schema-name>"
    \`\`\`
    这将在 CLI 根据 \`.openspec.yaml\` 解析的规划主目录中创建一个脚手架变更。
 
 4. **获取产出物构建顺序**
    \`\`\`bash
-   openspec status --change "<name>" --json
+   openspec-cn status --change "<name>" --json
    \`\`\`
    解析 JSON 以获取：
    - \`applyRequires\`：实现前所需的产出物 ID 数组（例如 \`["tasks"]\`）
@@ -87,7 +87,7 @@ ${STORE_SELECTION_GUIDANCE}
    a. **对于每个 \`ready\`（依赖项已满足）的产出物**：
       - 获取指令：
         \`\`\`bash
-        openspec instructions <artifact-id> --change "<name>" --json
+        openspec-cn instructions <artifact-id> --change "<name>" --json
         \`\`\`
       - 指令 JSON 包含：
         - \`context\`：项目背景（给你的约束 - 不要包含在输出中）
@@ -104,12 +104,12 @@ ${STORE_SELECTION_GUIDANCE}
       - 显示简要进度："已创建 <artifact-id>"
 
    b. **持续创建直到所需集合中的每个产出物都存在（不仅仅是 \`apply.requires\`）**
-      - 创建每个产出物后，重新运行 \`openspec status --change "<name>" --json\`
+      - 创建每个产出物后，重新运行 \`openspec-cn status --change "<name>" --json\`
       - 所需集合是 \`applyRequires\` 加上通过跟踪 \`status --json\` 中的 \`requires\` 边从这些产出物可达的每个产出物 - 传递地遍历它们（spec-driven 涵盖 proposal、specs、design、tasks）。不要触碰此集合之外的产出物
       - \`status\` 仅基于文件存在性，因此一个显示 \`done\` 的 \`applyRequires\` 产出物并不意味着其依赖项存在 - 过早写入 \`tasks.md\` 会标记 \`tasks\` 为 done，但 \`specs\` 从未写入。使用每个产出物的 \`requires\` 边而非其 \`status\` 来构建所需集合：一个 \`done\` 产出物仍然列出其依赖项
       - 已显示 \`status: "skipped"\` 的产出物即已满足：变更在 \`.openspec.yaml\` 中声明了 \`skip_specs\`，因此其文件必须不存在。永远不要尝试创建它
       - 创建所需集合中缺失的每个产出物，然后重新检查 - 创建一个可能会解锁其他产出物
-      - 仅当 \`status\` 已报告为 \`skipped\`，或其自身 \`instruction\` 表明是条件性的时才跳过：运行 \`openspec instructions <artifact-id> --change "<name>" --json\`，仅当其 \`instruction\` 字段标记为可选时才跳过（例如 "create only if..."）。spec-driven 的 \`design.md\` 符合此条件；\`specs\` 仅通过上述 \`skipped\` 状态符合，绝不能凭你的判断。告知用户，且不要重新考虑
+      - 仅当 \`status\` 已报告为 \`skipped\`，或其自身 \`instruction\` 表明是条件性的时才跳过：运行 \`openspec-cn instructions <artifact-id> --change "<name>" --json\`，仅当其 \`instruction\` 字段标记为可选时才跳过（例如 "create only if..."）。spec-driven 的 \`design.md\` 符合此条件；\`specs\` 仅通过上述 \`skipped\` 状态符合，绝不能凭你的判断。告知用户，且不要重新考虑
       - 依赖项是使能因素而非关卡：若一个必需产出物仍 \`blocked\` 仅因为你跳过了条件性依赖项，照样写入
       - 当所需集合中的每个产出物为 \`done\`、\`skipped\` 或已被有意跳过时停止
 
@@ -119,7 +119,7 @@ ${STORE_SELECTION_GUIDANCE}
 
 6. **显示最终状态**
    \`\`\`bash
-   openspec status --change "<name>"
+   openspec-cn status --change "<name>"
    \`\`\`
 
 **输出**
@@ -132,7 +132,7 @@ ${STORE_SELECTION_GUIDANCE}
 
 **产出物创建指南**
 
-- 遵循 \`openspec instructions\` 中每个产出物类型的 \`instruction\` 字段 - 这是权威指导，即使对熟悉的产出物名称也如此
+- 遵循 \`openspec-cn instructions\` 中每个产出物类型的 \`instruction\` 字段 - 这是权威指导，即使对熟悉的产出物名称也如此
 - 若 \`instruction\` 字段指示你使用特定 skill 或命令创建产出物，则调用它而非直接写入产出物
 - schema 定义了每个产出物应包含的内容 - 遵循它
 - 在创建新产出物之前读取依赖产出物以获取上下文
@@ -149,7 +149,7 @@ ${STORE_SELECTION_GUIDANCE}
 - 若同名变更已存在，询问用户是继续还是创建新的
 - 写入后验证每个产出物文件存在，然后再继续下一个`,
     license: 'MIT',
-    compatibility: 'Requires openspec CLI.',
+    compatibility: '需要 openspec-cn CLI。',
     metadata: { author: 'openspec', version: '1.0' },
   };
 }
@@ -199,7 +199,7 @@ ${STORE_SELECTION_GUIDANCE}
 
    **仅在以下情况下使用不同 schema：**
    - 用户明确按名称请求特定 schema → 使用 \`--schema <schema-name>\`
-   - 用户询问 "show workflows" 或 "what workflows" → 通过从当前工作目录运行 \`openspec context --json\` 解析权威根路径。若用户明确选择了注册的存储，请使用 \`openspec context --json --store "<store-id>"\`。然后在其工作目录设置为返回的 \`root.path\` 的情况下运行 \`openspec schemas --json\` 让用户选择。这保留了由本地 \`store:\` 指针或全局 \`defaultStore\` 选择的根路径；\`schemas\` 不接受 \`--store\`。若 context 仅报告 \`no_openspec_root\`，则改为从当前工作目录运行 \`openspec schemas --json\`。对于无效或不可用的存储，不要使用此回退方式。
+   - 用户询问 "show workflows" 或 "what workflows" → 通过从当前工作目录运行 \`openspec-cn context --json\` 解析权威根路径。若用户明确选择了注册的存储，请使用 \`openspec-cn context --json --store "<store-id>"\`。然后在其工作目录设置为返回的 \`root.path\` 的情况下运行 \`openspec-cn schemas --json\` 让用户选择。这保留了由本地 \`store:\` 指针或全局 \`defaultStore\` 选择的根路径；\`schemas\` 不接受 \`--store\`。若 context 仅报告 \`no_openspec_root\`，则改为从当前工作目录运行 \`openspec-cn schemas --json\`。对于无效或不可用的存储，不要使用此回退方式。
 
    否则，省略 \`--schema\` 以保留配置的默认值。
 
@@ -209,18 +209,18 @@ ${STORE_SELECTION_GUIDANCE}
 
    使用配置的默认值：
    \`\`\`bash
-   openspec new change "<name>"
+   openspec-cn new change "<name>"
    \`\`\`
 
    使用显式请求的 schema：
    \`\`\`bash
-   openspec new change "<name>" --schema "<schema-name>"
+   openspec-cn new change "<name>" --schema "<schema-name>"
    \`\`\`
    这将在 CLI 根据 \`.openspec.yaml\` 解析的规划主目录中创建一个脚手架变更。
 
 4. **获取产出物构建顺序**
    \`\`\`bash
-   openspec status --change "<name>" --json
+   openspec-cn status --change "<name>" --json
    \`\`\`
    解析 JSON 以获取：
    - \`applyRequires\`：实现前所需的产出物 ID 数组（例如 \`["tasks"]\`）
@@ -236,7 +236,7 @@ ${STORE_SELECTION_GUIDANCE}
    a. **对于每个 \`ready\`（依赖项已满足）的产出物**：
       - 获取指令：
         \`\`\`bash
-        openspec instructions <artifact-id> --change "<name>" --json
+        openspec-cn instructions <artifact-id> --change "<name>" --json
         \`\`\`
       - 指令 JSON 包含：
         - \`context\`：项目背景（给你的约束 - 不要包含在输出中）
@@ -253,12 +253,12 @@ ${STORE_SELECTION_GUIDANCE}
       - 显示简要进度："已创建 <artifact-id>"
 
    b. **持续创建直到所需集合中的每个产出物都存在（不仅仅是 \`apply.requires\`）**
-      - 创建每个产出物后，重新运行 \`openspec status --change "<name>" --json\`
+      - 创建每个产出物后，重新运行 \`openspec-cn status --change "<name>" --json\`
       - 所需集合是 \`applyRequires\` 加上通过跟踪 \`status --json\` 中的 \`requires\` 边从这些产出物可达的每个产出物 - 传递地遍历它们（spec-driven 涵盖 proposal、specs、design、tasks）。不要触碰此集合之外的产出物
       - \`status\` 仅基于文件存在性，因此一个显示 \`done\` 的 \`applyRequires\` 产出物并不意味着其依赖项存在 - 过早写入 \`tasks.md\` 会标记 \`tasks\` 为 done，但 \`specs\` 从未写入。使用每个产出物的 \`requires\` 边而非其 \`status\` 来构建所需集合：一个 \`done\` 产出物仍然列出其依赖项
       - 已显示 \`status: "skipped"\` 的产出物即已满足：变更在 \`.openspec.yaml\` 中声明了 \`skip_specs\`，因此其文件必须不存在。永远不要尝试创建它
       - 创建所需集合中缺失的每个产出物，然后重新检查 - 创建一个可能会解锁其他产出物
-      - 仅当 \`status\` 已报告为 \`skipped\`，或其自身 \`instruction\` 表明是条件性的时才跳过：运行 \`openspec instructions <artifact-id> --change "<name>" --json\`，仅当其 \`instruction\` 字段标记为可选时才跳过（例如 "create only if..."）。spec-driven 的 \`design.md\` 符合此条件；\`specs\` 仅通过上述 \`skipped\` 状态符合，绝不能凭你的判断。告知用户，且不要重新考虑
+      - 仅当 \`status\` 已报告为 \`skipped\`，或其自身 \`instruction\` 表明是条件性的时才跳过：运行 \`openspec-cn instructions <artifact-id> --change "<name>" --json\`，仅当其 \`instruction\` 字段标记为可选时才跳过（例如 "create only if..."）。spec-driven 的 \`design.md\` 符合此条件；\`specs\` 仅通过上述 \`skipped\` 状态符合，绝不能凭你的判断。告知用户，且不要重新考虑
       - 依赖项是使能因素而非关卡：若一个必需产出物仍 \`blocked\` 仅因为你跳过了条件性依赖项，照样写入
       - 当所需集合中的每个产出物为 \`done\`、\`skipped\` 或已被有意跳过时停止
 
@@ -268,7 +268,7 @@ ${STORE_SELECTION_GUIDANCE}
 
 6. **显示最终状态**
    \`\`\`bash
-   openspec status --change "<name>"
+   openspec-cn status --change "<name>"
    \`\`\`
 
 **输出**
@@ -281,7 +281,7 @@ ${STORE_SELECTION_GUIDANCE}
 
 **产出物创建指南**
 
-- 遵循 \`openspec instructions\` 中每个产出物类型的 \`instruction\` 字段 - 这是权威指导，即使对熟悉的产出物名称也如此
+- 遵循 \`openspec-cn instructions\` 中每个产出物类型的 \`instruction\` 字段 - 这是权威指导，即使对熟悉的产出物名称也如此
 - 若 \`instruction\` 字段指示你使用特定 skill 或命令创建产出物，则调用它而非直接写入产出物
 - schema 定义了每个产出物应包含的内容 - 遵循它
 - 在创建新产出物之前读取依赖产出物以获取上下文

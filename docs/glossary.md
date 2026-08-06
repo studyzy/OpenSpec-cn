@@ -50,9 +50,9 @@
 
 **Explore（`/opsx:explore`）.** 思考伙伴式命令。它阅读代码库、比较方案、把模糊的想法澄清成具体计划，不产生任何制品也不写代码。当你有问题但还没有计划时，这是推荐的起点。参见 [先探索](explore.md)。
 
-**CLI.** 你在终端运行的 `openspec` 程序。它用于搭建项目、列出并校验变更、打开仪表盘。
+**CLI.** 你在终端运行的 `openspec-cn` 程序。它用于搭建项目、列出并校验变更、打开仪表盘。
 
-**Profile.** The set of slash commands installed in your project. **Core** (the default) is `propose`, `explore`, `apply`, `update`, `sync`, `archive`. The **expanded** set adds `new`, `continue`, `ff`, `verify`, `bulk-archive`, `onboard`. Change it with `openspec config profile`.
+**Profile.** 安装到你项目中的 slash command 集合。**Core**（默认）包含 `propose`、`explore`、`apply`、`update`、`sync`、`archive`。**扩展（expanded）** 集合再加上 `new`、`continue`、`ff`、`verify`、`bulk-archive`、`onboard`。用 `openspec-cn config profile` 修改它。
 
 **Delivery（交付）.** OpenSpec 安装的是 skills、命令文件还是两者皆有。全局配置，由 `openspec-cn update` 应用。
 

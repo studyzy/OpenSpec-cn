@@ -49,7 +49,7 @@ describe('printInstructionsText for skip_specs changes', () => {
     const output = capture('specs');
 
     expect(output).toContain('skip_specs: true');
-    expect(output).toContain('Do not create spec files');
+    expect(output).toContain('请不要创建 spec 文件');
     expect(output).toContain('</artifact>');
     expect(output).not.toContain('<task>');
     expect(output).not.toContain('<template>');
@@ -69,7 +69,7 @@ describe('printInstructionsText for skip_specs changes', () => {
     const instructions = generateInstructions(context, 'specs');
 
     expect(instructions.skipped).toBe(true);
-    expect(instructions.warning).toContain('Do not create spec files');
+    expect(instructions.warning).toContain('请不要创建 spec 文件');
   });
 
   it('marks the specs dependency as skipped instead of done with files to read', () => {
@@ -80,7 +80,7 @@ describe('printInstructionsText for skip_specs changes', () => {
 
     const output = capture('tasks');
     expect(output).toContain('<dependency id="specs" status="skipped">');
-    expect(output).toContain('no files to read');
+    expect(output).toContain('没有需要阅读的文件');
     // The skipped dependency must not point the agent at spec file paths.
     expect(output).not.toContain('specs/**/*.md</path>');
   });

@@ -39,7 +39,7 @@ describe('validate: MODIFIED blocks that would drop a main-spec scenario (#1477)
 
   /** The scenario-loss issue, so assertions cannot pass on an unrelated error. */
   const lossIssue = (report: { issues: Array<{ level: string; path: string; message: string }> }) =>
-    report.issues.find((i) => i.message.includes('omits scenario(s)'));
+    report.issues.find((i) => i.message.includes('遗漏了'));
 
   const validate = (changeDir: string) =>
     new Validator(true).validateChangeDeltaSpecs(changeDir, { mainSpecsDir });
@@ -88,7 +88,7 @@ describe('validate: MODIFIED blocks that would drop a main-spec scenario (#1477)
     const report = await validate(changeDir);
 
     expect(report.valid).toBe(false);
-    const issue = report.issues.find((i) => i.message.includes('omits scenario(s)'));
+    const issue = report.issues.find((i) => i.message.includes('遗漏了'));
     expect(issue?.level).toBe('ERROR');
     expect(issue?.path).toBe('widgets/spec.md');
     expect(issue?.message).toContain('MODIFIED "Widget state"');
@@ -201,7 +201,7 @@ describe('validate: MODIFIED blocks that would drop a main-spec scenario (#1477)
     const report = await validate(changeDir);
 
     expect(report.valid).toBe(false);
-    const issue = report.issues.find((i) => i.message.includes('omits scenario(s)'));
+    const issue = report.issues.find((i) => i.message.includes('遗漏了'));
     expect(issue?.path).toBe('platform/session/spec.md');
     expect(issue?.message).toContain('"Resumed"');
   });
@@ -344,7 +344,7 @@ describe('validate: MODIFIED blocks that would drop a main-spec scenario (#1477)
     const report = await validate(changeDir);
 
     expect(report.valid).toBe(false);
-    const issue = report.issues.find((i) => i.message.includes('Could not read'));
+    const issue = report.issues.find((i) => i.message.includes('无法读取'));
     expect(issue?.level).toBe('ERROR');
     expect(issue?.message).toContain('widgets/spec.md');
     expect(issue?.message).toContain('EISDIR');
