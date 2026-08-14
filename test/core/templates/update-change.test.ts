@@ -80,7 +80,7 @@ describe('update-change templates', () => {
   it('explains the optional continue workflow before suggesting it', () => {
     for (const [label, body] of bodies) {
       const availabilityGuidance = body.indexOf(
-        '`/opsx:continue` 是一个扩展 profile 工作流，可能未安装'
+        '`/opsx:continue` 是一个可选工作流，可能未安装'
       );
       const firstSuggestion = body.indexOf(
         '`/opsx:continue`',
@@ -110,7 +110,7 @@ describe('update-change templates', () => {
       expect(body, label).not.toContain('openspec-cn new change "<name>"');
 
       const newAvailabilityCheck = body.indexOf(
-        '首先验证扩展 profile `/opsx:new` 工作流是否可用'
+        '首先验证可选 `/opsx:new` 工作流是否可用'
       );
       const newRecommendation = body.indexOf('建议用 `/opsx:new` 重新开始');
       expect(newAvailabilityCheck, label).toBeGreaterThanOrEqual(0);

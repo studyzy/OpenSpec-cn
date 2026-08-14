@@ -60,6 +60,7 @@ OpenSpec 生成的文件，以及设置完成后打印的 "Getting started" 提�
 | IBM Bob Shell (`bob`) | `.bob/skills/openspec-*/SKILL.md` | `.bob/commands/opsx-<id>.md` |
 | Claude Code (`claude`) | `.claude/skills/openspec-*/SKILL.md` | `.claude/commands/opsx/<id>.md` |
 | Cline (`cline`) | `.cline/skills/openspec-*/SKILL.md` | `.clinerules/workflows/opsx-<id>.md` |
+| Command Code (`command-code`) | `.commandcode/skills/openspec-*/SKILL.md` | `.commandcode/commands/opsx-<id>.md` |
 | CodeArts (`codeartsagent`) | `.codeartsdoer/skills/openspec-*/SKILL.md` | 不生成（无命令适配器；使用基于 skill 的 `/openspec-*` 调用） |
 | CodeBuddy (`codebuddy`) | `.codebuddy/skills/openspec-*/SKILL.md` | `.codebuddy/commands/opsx/<id>.md` |
 | Codex (`codex`) | `.agents/skills/openspec-*/SKILL.md` | 不生成（仅 skills；使用 `$openspec-*`） |
@@ -147,6 +148,8 @@ GitHub 的 [Copilot coding agent](https://docs.github.com/en/copilot/using-githu
 
 对于早于该标记机制的项目，OpenSpec 会从受管 skill 的引用形式推断归属：`$openspec-*` 表示 Codex，`/openspec-*` 表示厂商无关目标。若一棵通用的规范树与旧版 `.codex/skills` 并存，则会被视为更早的双目标安装，并被合并到兼容的共享树中。
 
+`openspec-cn update` 同样遵循这一归属。如果项目把 `.agents` 作为厂商无关目标，且仅从零散的 prompt 文件中检测到遗留的 Codex 安装，update 会保留既有的 `agents` 树而非用 Codex 语法重写它，并保留那些遗留 prompt 文件而不是删除。若想把这棵共享树交给 Codex，请显式运行 `openspec-cn init --tools codex`。
+
 ## 非交互式安装
 
 对于 CI/CD 或脚本化安装,使用 `--tools`(以及可选的 `--profile`):
@@ -165,7 +168,7 @@ openspec-cn init --tools none
 openspec-cn init --profile core
 ```
 
-**可用工具 ID(`--tools`)** —— `windsurf` 也可接受，作为 `devin` 的别名：`amazon-q`, `antigravity`, `auggie`, `bob`, `claude`, `cline`, `codeartsagent`, `codex`, `devin`, `forgecode`, `codebuddy`, `continue`, `costrict`, `crush`, `cursor`, `factory`, `gemini`, `github-copilot`, `hermes`, `iflow`, `junie`, `kilocode`, `kimi`, `kiro`, `lingma`, `minimax-code`, `vibe`, `oh-my-pi`, `opencode`, `pi`, `qoder`, `qwen`, `roocode`, `trae`, `zcode`, `agents`
+**可用工具 ID(`--tools`)** —— `windsurf` 也可接受，作为 `devin` 的别名：`amazon-q`, `antigravity`, `auggie`, `bob`, `claude`, `cline`, `command-code`, `codeartsagent`, `codex`, `devin`, `forgecode`, `codebuddy`, `continue`, `costrict`, `crush`, `cursor`, `factory`, `gemini`, `github-copilot`, `hermes`, `iflow`, `junie`, `kilocode`, `kimi`, `kiro`, `lingma`, `minimax-code`, `vibe`, `oh-my-pi`, `opencode`, `pi`, `qoder`, `qwen`, `roocode`, `trae`, `zcode`, `agents`
 
 ## 依赖工作流的安装
 

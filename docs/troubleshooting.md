@@ -92,6 +92,7 @@ Validation 检查你的 specs 和变更是否有结构性问题。读信息：�
 openspec-cn validate <name>           # 校验单个项
 openspec-cn validate --all            # 校验全部
 openspec-cn validate --all --strict   # 更严格的检查，适合 CI
+openspec-cn validate --archived       # 若已归档变更带有未勾选任务则失败
 ```
 
 常见原因是缺失必需小节（如没有场景的 spec）或畸形的增量头部。修复文件后重跑。输出格式见 [CLI 参考](cli.md#openspec-cn-validate)。
@@ -128,6 +129,8 @@ openspec-cn archive <change-name> --yes
 ```
 
 保留你原本传入的所有标志——`--skip-specs` 和 `--no-validate` 会改变归档的行为，所以只加一个 `--yes` 重跑并不是同一条命令。当前版本会为你点名该标志，并打印一行可直接粘贴的 `Fix:`。如果你本意是从列表中挑选，请显式传入变更名：选择器同样需要一个答案。
+
+如果你改为将 archive 的输出重定向到文件或由工具捕获，且*确实*通过管道提供了答案（`printf 'y\n' | openspec-cn archive …`），旧版本在绘制提示时会把这些终端转义码写进捕获内容——在某些环境中足以把文件撑爆。当前版本在 stdout 不是终端时会将确认提示读取为纯文本，而无参数的 `openspec-cn archive`（否则会绘制交互式变更选择器）会要求你先传入变更名，而不是把菜单渲染进捕获内容。无论哪种方式，重定向和 agent 运行都能保持干净；传入 `--yes`（带变更名）则会完全跳过提示。
 
 ## 配置
 

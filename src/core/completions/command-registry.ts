@@ -98,6 +98,10 @@ export const COMMAND_REGISTRY: CommandDefinition[] = [
         name: 'specs',
         description: '验证所有规范',
       },
+      {
+        name: 'archived',
+        description: 'Validate that archived changes have all tasks completed (for pre-commit linting)',
+      },
       COMMON_FLAGS.type,
       COMMON_FLAGS.strict,
       COMMON_FLAGS.jsonValidation,
@@ -227,6 +231,7 @@ export const COMMAND_REGISTRY: CommandDefinition[] = [
     description: '列出可用的工作流 Schema 及其描述',
     flags: [
       COMMON_FLAGS.json,
+      COMMON_FLAGS.store,
     ],
   },
   {

@@ -50,7 +50,7 @@ OpenSpec CLI (`openspec`) 提供用于项目初始化、验证、状态检查与
 | `openspec-cn status` | 查看制品进度 | `--json` 获取结构化状态 |
 | `openspec-cn instructions` | 获取下一步 | `--json` 用于 agent 指令 |
 | `openspec-cn templates` | 查找模板路径 | `--json` 用于路径解析 |
-| `openspec-cn schemas` | 列出可用的 schemas | `--json` 用于 schema 发现 |
+| `openspec-cn schemas` | 列出可用的 schemas | `--json` 用于 schema 发现；`--store <id>` 用于选择已注册的根目录 |
 | `openspec-cn store setup <id>` | 创建并注册本地 store | `--json` 配合显式输入以获取结构化 setup 输出 |
 | `openspec-cn store register <path>` | 注册已有的 store | `--json` 用于结构化注册输出 |
 | `openspec-cn store unregister <id>` | 取消本地 store 注册 | `--json` 用于结构化清理输出 |
@@ -109,7 +109,7 @@ openspec-cn init [path] [options]
 
 当设置了 `OPENSPEC_NO_ANIMATION` 环境变量(任意值,包括空值)、`NO_COLOR` 被设为非空值,或操作系统启用了减弱动态效果偏好(macOS 的"减弱动态效果"、GNOME 关闭动画)时,欢迎动画同样会被跳过。
 
-**支持的工具 ID(`--tools`)** — `windsurf` 同样被接受,作为 `devin` 的别名:`amazon-q`, `antigravity`, `auggie`, `bob`, `claude`, `cline`, `codeartsagent`, `codex`, `devin`, `forgecode`, `codebuddy`, `continue`, `costrict`, `crush`, `cursor`, `factory`, `gemini`, `github-copilot`, `hermes`, `iflow`, `junie`, `kilocode`, `kimi`, `kiro`, `lingma`, `minimax-code`, `vibe`, `oh-my-pi`, `opencode`, `pi`, `qoder`, `qwen`, `roocode`, `trae`, `zcode`, `agents`
+**支持的工具 ID(`--tools`)** — `windsurf` 同样被接受,作为 `devin` 的别名:`amazon-q`, `antigravity`, `auggie`, `bob`, `claude`, `cline`, `command-code`, `codeartsagent`, `codex`, `devin`, `forgecode`, `codebuddy`, `continue`, `costrict`, `crush`, `cursor`, `factory`, `gemini`, `github-copilot`, `hermes`, `iflow`, `junie`, `kilocode`, `kimi`, `kiro`, `lingma`, `minimax-code`, `vibe`, `oh-my-pi`, `opencode`, `pi`, `qoder`, `qwen`, `roocode`, `trae`, `zcode`, `agents`
 
 > 该列表与 `src/core/config.ts` 中的 `AI_TOOLS` 对应。各工具的 skill 与命令路径见 [支持的工具](supported-tools.md)。
 
@@ -543,11 +543,14 @@ openspec-cn validate [item-name] [options]
 | `--all` | 验证所有变更和 specs |
 | `--changes` | 验证所有变更 |
 | `--specs` | 验证所有 specs |
+| `--archived` | 验证已归档变更的所有任务是否已完成(用于 pre-commit lint) |
 | `--type <type>` | 名称有歧义时指定类型:`change` 或 `spec` |
 | `--strict` | 启用严格验证模式 |
 | `--json` | 以 JSON 输出 |
 | `--concurrency <n>` | 最大并行验证数(默认:6,或环境变量 `OPENSPEC_CONCURRENCY`) |
 | `--no-interactive` | 关闭提示 |
+
+`--archived` 是独立的作用域:它不校验 spec 增量(归档时已应用),而是检查 `changes/archive/` 下每个变更的 `tasks.md` 复选框是否全部勾选,若有未勾选则以非零退出。这能捕获带着未完成工作被归档的变更——非常适合在 pre-commit 钩子中使用。
 
 **示例:**
 
@@ -566,6 +569,9 @@ openspec-cn validate --all --json
 
 # 提高并行度的严格验证
 openspec-cn validate --all --strict --concurrency 12
+
+# 若有任何已归档变更仍带有未勾选的任务则失败
+openspec-cn validate --archived
 ```
 
 **输出(文本):**
@@ -889,6 +895,7 @@ openspec-cn schemas [options]
 | 选项 | 描述 |
 |--------|-------------|
 | `--json` | 以 JSON 输出 |
+| `--store <id>` | 使用已注册的 store 作为 OpenSpec 根目录 |
 
 **示例:**
 

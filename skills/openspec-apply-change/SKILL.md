@@ -11,7 +11,7 @@ metadata:
 
 从 OpenSpec 变更中实现任务。
 
-**存储选择：** 若用户指定了一个存储（存储是注册在本机上的独立 OpenSpec 仓库）或工作位于某个存储中，请运行 `openspec-cn store list --json` 发现已注册的存储 ID，然后在读写 spec 和变更的命令上传递 `--store <id>`（`new change`、`status`、`instructions`、`list`、`show`、`validate`、`archive`、`doctor`、`context`、`view`）。选定后，将 `--store <id>` 视为在当前工作流其余部分中固定不变。以下每个未限定范围的命令示例均为简写形式：运行前请追加该标志。例如，运行 `openspec-cn status --change "<name>" --json --store "<id>"`，而非下面展示的未限定形式。其他命令不接受此标志。命令输出的提示已包含该标志；在后续操作中请保留它。若不指定存储，命令将对最近的本地 `openspec/` 根目录生效。
+**存储选择：** 若用户指定了一个存储（存储是注册在本机上的独立 OpenSpec 仓库）或工作位于某个存储中，请运行 `openspec-cn store list --json` 发现已注册的存储 ID，然后在读写 spec 和变更的命令上传递 `--store <id>`（`new change`、`status`、`instructions`、`list`、`show`、`validate`、`archive`、`doctor`、`context`、`schemas`、`view`）。选定后，将 `--store <id>` 视为在当前工作流其余部分中固定不变。以下每个未限定范围的命令示例均为简写形式：运行前请追加该标志。例如，运行 `openspec-cn status --change "<name>" --json --store "<id>"`，而非下面展示的未限定形式。其他命令不接受此标志。命令输出的提示已包含该标志；在后续操作中请保留它。若不指定存储，命令将对最近的本地 `openspec/` 根目录生效。
 
 **输入**：可选地指定变更名称（例如 `/openspec-apply-change add-auth`）。若省略，检查能否从对话上下文推断。若模糊或歧义，你必须提示用户从可用变更中选择。
 
@@ -87,6 +87,7 @@ metadata:
    **暂停条件：**
    - 任务不清晰 → 请求澄清
    - 实现揭示设计问题 → 建议更新产出物
+   - 任务需要超出 spec 和 tasks 描述的工作，或者你想删减、收窄、推迟或接受指定行为的例外来勉强适配 → 把新增的范围摆出来并询问；不要默默吸收
    - 遇到错误或阻塞 → 报告并等待指导
    - 用户中断
 
@@ -157,6 +158,8 @@ All tasks complete! 你可以用 `/openspec-archive-change` 归档此变更。
 - 保持代码更改最小且聚焦于每个任务
 - 完成每个任务后立即更新任务复选框
 - 在错误、阻塞或不明确的需求时暂停 - 不要猜测
+- 当任务需要超出 spec 描述的工作时，摆出新增的范围并暂停 - 绝不默默收窄、推迟或简化掉指定行为
+- 只有当任务的指定行为被完整实现时才将任务标记为 `- [x]`，而不是部分完成或推迟时
 - 使用 CLI 输出中的 contextFiles，不要假设特定文件名
 - 不要将 context 或 operation guidance 作为任务完成的证据
 - 应用相关的项目上下文；报告与控制工作流输入的冲突

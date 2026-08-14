@@ -17,7 +17,7 @@ ${STORE_SELECTION_GUIDANCE}
 
 **输入**：可选地指定变更名称。若省略，检查能否从对话上下文推断。若模糊或歧义，你必须提示用户从可用变更中选择。
 
-\`/opsx:continue\` 是一个扩展 profile 工作流，可能未安装。在下方任何地方建议它之前，请验证它是否可用。若不可用，\`openspec-cn status --change "<name>" --json\` 显示下一个制品，\`openspec-cn instructions "<artifact-id>" --change "<name>" --json\` 解释如何创建它。
+\`/opsx:continue\` 是一个可选工作流，可能未安装。在下方任何地方建议它之前，请验证它是否可用。若不可用，\`openspec-cn status --change "<name>" --json\` 显示下一个制品，\`openspec-cn instructions "<artifact-id>" --change "<name>" --json\` 解释如何创建它。
 
 **步骤**
 
@@ -89,7 +89,7 @@ ${STORE_SELECTION_GUIDANCE}
 - 仅编辑 \`existingOutputPaths\` 中的具体文件；绝不要写入 glob \`resolvedOutputPath\`。
 - 不要推进构建边界：不创建新制品，不在 glob 制品下创建新文件 — 那是 \`/opsx:continue\` 的职责。
 - 在写入前与用户确认每个编辑。
-- 若请求更改的是变更的*意图*而非细化，首先验证扩展 profile \`/opsx:new\` 工作流是否可用。若可用，建议用 \`/opsx:new\` 重新开始（"更新 vs 重新开始" 启发式）。若不可用，请求一个不同的未使用变更名称并建议改用 \`openspec-cn new change "<new-change-name>"\`。`,
+- 若请求更改的是变更的*意图*而非细化，首先验证可选 \`/opsx:new\` 工作流是否可用。若可用，建议用 \`/opsx:new\` 重新开始（"更新 vs 重新开始" 启发式）。若不可用，请求一个不同的未使用变更名称并建议改用 \`openspec-cn new change "<new-change-name>"\`。`,
     license: 'MIT',
     compatibility: '需要 openspec-cn CLI。',
     metadata: { author: 'openspec', version: '1.0' },
@@ -108,7 +108,7 @@ ${STORE_SELECTION_GUIDANCE}
 
 **输入**：可选地在 \`/opsx:update\` 后指定变更名称（例如 \`/opsx:update add-auth\`）。若省略，检查能否从对话上下文推断。若模糊或歧义，你必须提示用户从可用变更中选择。
 
-\`/opsx:continue\` 是一个扩展 profile 工作流，可能未安装。在下方任何地方建议它之前，请验证它是否可用。若不可用，\`openspec-cn status --change "<name>" --json\` 显示下一个制品，\`openspec-cn instructions "<artifact-id>" --change "<name>" --json\` 解释如何创建它。
+\`/opsx:continue\` 是一个可选工作流，可能未安装。在下方任何地方建议它之前，请验证它是否可用。若不可用，\`openspec-cn status --change "<name>" --json\` 显示下一个制品，\`openspec-cn instructions "<artifact-id>" --change "<name>" --json\` 解释如何创建它。
 
 **步骤**
 
@@ -180,6 +180,6 @@ ${STORE_SELECTION_GUIDANCE}
 - 仅编辑 \`existingOutputPaths\` 中的具体文件；绝不要写入 glob \`resolvedOutputPath\`。
 - 不要推进构建边界：不创建新制品，不在 glob 制品下创建新文件 — 那是 \`/opsx:continue\` 的职责。
 - 在写入前与用户确认每个编辑。
-- 若请求更改的是变更的*意图*而非细化，首先验证扩展 profile \`/opsx:new\` 工作流是否可用。若可用，建议用 \`/opsx:new\` 重新开始（"更新 vs 重新开始" 启发式）。若不可用，请求一个不同的未使用变更名称并建议改用 \`openspec-cn new change "<new-change-name>"\`。`
+- 若请求更改的是变更的*意图*而非细化，首先验证可选 \`/opsx:new\` 工作流是否可用。若可用，建议用 \`/opsx:new\` 重新开始（"更新 vs 重新开始" 启发式）。若不可用，请求一个不同的未使用变更名称并建议改用 \`openspec-cn new change "<new-change-name>"\`。`
   };
 }

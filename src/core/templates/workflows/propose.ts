@@ -50,7 +50,7 @@ ${STORE_SELECTION_GUIDANCE}
 
    **仅在以下情况下使用不同 schema：**
    - 用户明确按名称请求特定 schema → 使用 \`--schema <schema-name>\`
-   - 用户询问 "show workflows" 或 "what workflows" → 通过从当前工作目录运行 \`openspec-cn context --json\` 解析权威根路径。若用户明确选择了注册的存储，请使用 \`openspec-cn context --json --store "<store-id>"\`。然后在其工作目录设置为返回的 \`root.path\` 的情况下运行 \`openspec-cn schemas --json\` 让用户选择。这保留了由本地 \`store:\` 指针或全局 \`defaultStore\` 选择的根路径；\`schemas\` 不接受 \`--store\`。若 context 仅报告 \`no_openspec_root\`，则改为从当前工作目录运行 \`openspec-cn schemas --json\`。对于无效或不可用的存储，不要使用此回退方式。
+   - 用户询问 "show workflows" 或 "what workflows" → 通过从当前工作目录运行 \`openspec-cn context --json\` 解析权威根路径。若用户明确选择了注册的存储，请使用 \`openspec-cn context --json --store "<store-id>"\`。然后在其工作目录设置为返回的 \`root.path\` 的情况下运行 \`openspec-cn schemas --json\` 让用户选择。这保留了由本地 \`store:\` 指针或全局 \`defaultStore\` 选择的根路径；当显式选择了注册的存储时，请同样向 \`openspec-cn schemas --json\` 追加 \`--store "<store-id>"\`。若 context 仅报告 \`no_openspec_root\`，则改为从当前工作目录运行 \`openspec-cn schemas --json\`。对于无效或不可用的存储，不要使用此回退方式。
 
    否则，省略 \`--schema\` 以保留配置的默认值。
 
@@ -199,7 +199,7 @@ ${STORE_SELECTION_GUIDANCE}
 
    **仅在以下情况下使用不同 schema：**
    - 用户明确按名称请求特定 schema → 使用 \`--schema <schema-name>\`
-   - 用户询问 "show workflows" 或 "what workflows" → 通过从当前工作目录运行 \`openspec-cn context --json\` 解析权威根路径。若用户明确选择了注册的存储，请使用 \`openspec-cn context --json --store "<store-id>"\`。然后在其工作目录设置为返回的 \`root.path\` 的情况下运行 \`openspec-cn schemas --json\` 让用户选择。这保留了由本地 \`store:\` 指针或全局 \`defaultStore\` 选择的根路径；\`schemas\` 不接受 \`--store\`。若 context 仅报告 \`no_openspec_root\`，则改为从当前工作目录运行 \`openspec-cn schemas --json\`。对于无效或不可用的存储，不要使用此回退方式。
+   - 用户询问 "show workflows" 或 "what workflows" → 通过从当前工作目录运行 \`openspec-cn context --json\` 解析权威根路径。若用户明确选择了注册的存储，请使用 \`openspec-cn context --json --store "<store-id>"\`。然后在其工作目录设置为返回的 \`root.path\` 的情况下运行 \`openspec-cn schemas --json\` 让用户选择。这保留了由本地 \`store:\` 指针或全局 \`defaultStore\` 选择的根路径；当显式选择了注册的存储时，请同样向 \`openspec-cn schemas --json\` 追加 \`--store "<store-id>"\`。若 context 仅报告 \`no_openspec_root\`，则改为从当前工作目录运行 \`openspec-cn schemas --json\`。对于无效或不可用的存储，不要使用此回退方式。
 
    否则，省略 \`--schema\` 以保留配置的默认值。
 

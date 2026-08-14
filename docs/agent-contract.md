@@ -25,15 +25,15 @@
 
 诊断出现在两个位置：**status 数组**（`status: StoreDiagnostic[]`，顶层每个条目）用于健康检查结果，**抛出的错误**在命令失败时被转换为单元素 `status` 数组。
 
-所有需要解析根目录的命令（`list`、`show`、`validate`、`status`、`instructions`、`instructions apply`、`instructions archive`、`new change`、`archive`、`doctor`、`context`）都按同一套优先级解析出唯一一个 OpenSpec 根目录：
+所有需要解析根目录的命令（`list`、`show`、`validate`、`status`、`instructions`、`instructions apply`、`instructions archive`、`new change`、`archive`、`doctor`、`context`、`schemas`）都按同一套优先级解析出唯一一个 OpenSpec 根目录：
 
 1. `--store <id>` → 该已注册 store 的根目录（`source: "store"`）。
 2. 否则，取最近的含有 `openspec/` 的祖先目录：若为规划结构 → `source: "nearest"`（此时 `store:` 指针会被忽略，并在 stderr 输出警告）；若为仅含配置的目录且带有效 `store:` 指针 → 指向该 store，`source: "declared"`。
 3. 没有最近根目录，但设置了全局 `defaultStore`（`openspec-cn config set defaultStore <id>`）→ 指向该 store，`source: "global_default"`；若该 id 已失效，则以底层 store 错误失败，并给出提示 `openspec-cn config unset defaultStore` 的 `fix`。
 4. 没有最近根目录、没有默认值，但存在已注册的 stores → 报错 `no_root_with_registered_stores`。
-5. 没有根目录、没有默认值、也没有 stores：脚手架类命令将 cwd 视为 `source: "implicit"`；而诊断类命令（`doctor`、`context`）则以 `no_openspec_root` 失败 —— 它们只做检查，绝不创建脚手架。
+5. 没有根目录、没有默认值、也没有 stores：命令可将 cwd 视为 `source: "implicit"`；而 `doctor`、`context`、`list` 以及批量 `validate` 则以 `no_openspec_root` 失败。`list` 为带有 `openspec/project.md` 的遗留项目保留隐式回退。
 
-成功的 JSON 载荷会内嵌 root：
+成功的 JSON 载荷通常会内嵌 root；而成功的 `schemas --json` 刻意保持为第 4.13 节记录的兼容性裸数组：
 
 ```json
 "root": { "path": "/abs/path", "source": "store" | "declared" | "global_default" | "nearest" | "implicit", "store_id": "id (only when store-selected)" }
@@ -91,7 +91,7 @@ setup/register：`{ "store": {id, root, metadata_path?}, "registry": {path, regi
 
 ### 4.13 `schemas --json` / `templates --json`
 
-`schemas`：裸数组 `[ {name, description, artifacts, source} ]`。`templates`：键控对象 `{ "<artifactId>": {path, source} }`。两者都基于 cwd，没有 root/status 键。
+`schemas`：成功时保持为裸数组 `[ {name, description, artifacts, source} ]`；它解析规范化的根目录选择优先级，并接受 `--store <id>`。根目录选择失败：`{ "schemas": [], "root": null, "status": [d] }`，退出 1。`templates`：键控对象 `{ "<artifactId>": {path, source} }`，仍基于 cwd，没有 root/status 键。
 
 ## 5. 退出码契约
 
@@ -147,5 +147,5 @@ setup/register：`{ "store": {id, root, metadata_path?}, "registry": {path, regi
 4. src 中存在四份并行的信封类型声明；归档诊断从不携带 `target`。
 5. `list --json` 复用 `status` 键作为每个变更的字符串枚举。
 6. 只有 `validate` 输出携带 `version` 字段。
-7. `schemas`/`templates` 忽略根目录选择（基于 cwd，无 `--store`）。
+7. `templates` 忽略根目录选择（基于 cwd，无 `--store`）。
 8. 已废弃的名词形式（`change`/`spec` 子命令）发出不带 `root`/`status` 的非信封载荷。

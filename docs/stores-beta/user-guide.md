@@ -360,7 +360,7 @@ Worksets 刻意*不是*共享状态。它们活在你的机器上，从不被提
 - **绝不 sync，这是设计使然。** OpenSpec 永不 clone、pull 或 push。一个过时的 checkout 会一直显示陈旧 specs，直到*你* pull；references 是从磁盘上任何现存内容实时索引的。
 - **空的规划文件夹可以缺失。** 一个新的 store 可能还没有 `openspec/changes/`、`openspec/specs/` 或 `openspec/changes/archive/`。这在 beta 期间是被接受的；这些文件夹会在普通命令为其创建文件时自行出现。
 - **指针仓库保持指针身份。** 一个 `openspec/config.yaml` 声明了 `store: <id>` 的仅配置仓库，被视为外部化规划，而非可注册的 store checkout。如果你有意想把这个仓库转成本地 store 根，先移除 `store:` 这一行。
-- **有些命令留在原地。** `view`、`templates`、`schemas`，以及已废弃的名词形式（`openspec-cn change show`，...）只作用于当前目录 —— 没有 `--store`。
+- **有些命令留在原地。** `templates` 和已废弃的名词形式（`openspec-cn change show`，...）只作用于当前目录 —— 没有 `--store`。`schemas` 遵循规范化的根目录选择优先级并接受 `--store <id>`，同时保持其成功的 JSON 数组形态不变。
 - **每机器状态就是每机器的。** store 注册表和 worksets 都是本地设置。你机器上的任何布局信息都不会被提交到共享规划中。
 - **Worksets 有两种启动方式。** 一个无法用 workspace 文件或按文件夹 attach 标志启动的工具，不能被加为 opener。
 - **Agent JSON 有一个已知的命名大小写分裂**（store 系列键是 snake_case，工作流系列是 camelCase）。记录在 [agent 契约](../agent-contract.md)；统一它延后到带版本号的发布。

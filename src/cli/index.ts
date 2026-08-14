@@ -4,7 +4,7 @@ import { createRequire } from 'module';
 import ora from 'ora';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { promises as fs } from 'fs';
+import { existsSync, promises as fs } from 'fs';
 import { AI_TOOLS, TOOL_ID_ALIASES } from '../core/config.js';
 import { UpdateCommand } from '../core/update.js';
 import {
@@ -116,6 +116,27 @@ export function getCommandPath(command: Command): string {
   return names.join(':') || 'openspec';
 }
 
+/**
+ * True when the executing command asked for JSON output — used to suppress the
+ * first-run telemetry notice so stdout stays a single valid JSON document.
+ *
+ * `--json` reaches commands three ways, so a single parsed option is not enough:
+ * - declared on the leaf (`openspec status --json`) → `opts().json`
+ * - declared on a parent group and read via globals (`openspec workset --json list`)
+ *   → `optsWithGlobals().json`
+ * - a residual arg on a permissive group that never declares the option
+ *   (`openspec store --json`, which detects it from `command.args`) → `args`
+ *
+ * Suppressing is always safe: the disclosure is only deferred to the next
+ * non-JSON run, never lost, whereas printing it on a JSON run corrupts stdout.
+ */
+export function isJsonRun(command: Command): boolean {
+  return (
+    command.optsWithGlobals().json === true ||
+    command.args.includes('--json')
+  );
+}
+
 program
   .name('openspec-cn')
   .description('基于规范驱动开发的AI原生系统')
@@ -136,8 +157,9 @@ program.hook('preAction', async (thisCommand, actionCommand) => {
     process.env.NO_COLOR = '1';
   }
 
-  // Show first-run telemetry notice (if not seen)
-  await maybeShowTelemetryNotice();
+  // Show first-run telemetry notice (if not seen). Suppress it whenever the run
+  // asked for JSON so stdout stays a single valid JSON document (see isJsonRun).
+  await maybeShowTelemetryNotice({ silent: isJsonRun(actionCommand) });
 
   // Track command execution (use actionCommand to get the actual subcommand)
   const commandPath = getCommandPath(actionCommand);
@@ -302,6 +324,9 @@ program
       const root = await resolveRootForCommand(options ?? {}, {
         json: options?.json,
         failurePayload: options?.specs ? { specs: [], root: null } : { changes: [], root: null },
+        // Preserve the cwd fallback for pre-config.yaml projects. The resolver
+        // still lets a registered/default store take precedence over it.
+        allowImplicitRoot: existsSync(path.join(process.cwd(), 'openspec', 'project.md')),
       });
       if (!root) {
         return;
@@ -442,6 +467,7 @@ program
   .option('--all', '验证所有更改和规范')
   .option('--changes', '验证所有更改')
   .option('--specs', '验证所有规范')
+  .option('--archived', '验证已归档的更改是否所有任务已完成（用于 pre-commit lint）')
   .option('--type <type>', '当项目类型不明确时指定类型：change|spec')
   .option('--strict', '启用严格验证模式')
   .option('--json', '以JSON格式输出验证报告')
@@ -449,7 +475,7 @@ program
   .option('--no-interactive', '禁用交互式提示')
   .option('--store <id>', STORE_OPTION_DESCRIPTION)
   .addOption(hiddenStorePathOption())
-  .action(async (itemName?: string, options?: { all?: boolean; changes?: boolean; specs?: boolean; type?: string; strict?: boolean; json?: boolean; noInteractive?: boolean; concurrency?: string; store?: string; storePath?: string }) => {
+  .action(async (itemName?: string, options?: { all?: boolean; changes?: boolean; specs?: boolean; archived?: boolean; type?: string; strict?: boolean; json?: boolean; noInteractive?: boolean; concurrency?: string; store?: string; storePath?: string }) => {
     try {
       const validateCommand = new ValidateCommand();
       await validateCommand.execute(itemName, options);
@@ -631,11 +657,17 @@ program
   .command('schemas')
   .description('列出可用的工作流 Schema 及其描述')
   .option('--json', '以 JSON 格式输出（供 Agent 使用）')
+  .option('--store <id>', STORE_OPTION_DESCRIPTION)
+  .addOption(hiddenStorePathOption())
   .action(async (options: SchemasOptions) => {
     try {
       await schemasCommand(options);
     } catch (error) {
-      failWithError(error);
+      failWithError(error, {
+        enabled: options.json,
+        payload: { schemas: [], root: null },
+        fallbackCode: 'schemas_error',
+      });
       process.exit(1);
     }
   });

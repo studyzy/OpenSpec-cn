@@ -25,7 +25,7 @@ import {
 } from './specs-apply.js';
 import { discoverSpecFiles, hasAnyFileUnder } from '../utils/spec-discovery.js';
 import { METADATA_FILENAME, readRetireCapabilitiesMarker, readSkipSpecsMarker } from '../utils/change-metadata.js';
-import { isNonInteractivePromptError } from '../utils/interactive.js';
+import { confirmPrompt, isNonInteractivePromptError } from '../utils/interactive.js';
 import { FileSystemUtils } from '../utils/file-system.js';
 import { folderStyleNameProblem } from './id.js';
 
@@ -312,9 +312,8 @@ async function confirmOrBlock(
   prompt: { message: string; default: boolean },
   blocked: () => ArchiveBlockedError
 ): Promise<boolean> {
-  const { confirm } = await import('@inquirer/prompts');
   try {
-    return await confirm(prompt);
+    return await confirmPrompt(prompt);
   } catch (error) {
     if (isNonInteractivePromptError(error)) {
       throw blocked();
@@ -2031,6 +2030,19 @@ export class ArchiveCommand {
     if (changeDirs.length === 0) {
       console.log('未找到活跃的变更。');
       return null;
+    }
+
+    // A picker needs a real terminal, and @inquirer's `select` writes ANSI
+    // cursor escapes to stdout even when it is redirected — the same #1526
+    // mechanism the confirm prompts were fixed for. When either stream is not a
+    // TTY, refuse up front with the guidance the caught ExitPromptError would
+    // give, rather than render an escape-spewing menu into a pipe or file.
+    if (!process.stdin.isTTY || !process.stdout.isTTY) {
+      throw new ArchiveBlockedError(
+        'archive_change_name_required',
+        '需要指定变更名：没有可用终端来从列表中选择。',
+        withStoreFlag(root, `openspec-cn archive <change-name> ${rerunFlags(options).join(' ')}`)
+      );
     }
 
     // Build choices with progress inline to avoid duplicate lists

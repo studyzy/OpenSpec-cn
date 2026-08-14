@@ -203,7 +203,10 @@ describe('propose schema selection', () => {
       expect(schemaSection, label).toContain('返回的 `root.path`');
       expect(schemaSection, label).toContain('本地 `store:` 指针');
       expect(schemaSection, label).toContain('全局 `defaultStore`');
-      expect(schemaSection, label).toContain('`schemas` 不接受 `--store`');
+      expect(schemaSection, label).toContain(
+        '请同样向 `openspec-cn schemas --json` 追加 `--store "<store-id>"`'
+      );
+      expect(schemaSection, label).not.toContain('`schemas` 不接受 `--store`');
       expect(schemaSection, label).toContain('若 context 仅报告 `no_openspec_root`');
       expect(schemaSection, label).toContain(
         '改为从当前工作目录运行 `openspec-cn schemas --json`'

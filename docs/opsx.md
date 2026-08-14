@@ -165,7 +165,7 @@ rules:
 | `/opsx:apply` | 实现任务，按需更新制品 |
 | `/opsx:update` | 修订一个变更的规划制品并保持一致 |
 | `/opsx:verify` | 对照制品验证实现（扩展工作流） |
-| `/opsx:sync` | 将增量规范同步到主 specs（默认工作流，可选） |
+| `/opsx:sync` | 将增量规范合并到主 specs（可选） |
 | `/opsx:archive` | 完成时归档 |
 | `/opsx:bulk-archive` | 归档多个已完成的变更（扩展工作流） |
 | `/opsx:onboard` | 端到端变更的引导式走查（扩展工作流） |
@@ -214,6 +214,12 @@ rules:
 /opsx:update add-dark-mode - we're storing the theme in a cookie now
 ```
 修订变更既有的规划制品并保持一致——可朝任意方向（一处 design 编辑可能回荡到 proposal）。仅限规划制品：它从不编辑代码，也从不创建缺失的制品（那是 `/opsx:continue`）。每次编辑都先与你确认。如果变更已实现，它会建议 `/opsx:apply` 以便代码追上修订后的计划。若你的修订改变了变更的*意图*，则重新开始——见[何时更新 vs. 重新开始](#何时更新-vs-重新开始)。
+
+### 同步增量规范（sync delta specs）
+```text
+/opsx:sync
+```
+将当前变更的增量规范合并进你的主 `openspec/specs/` 而不归档——变更保持活跃。它会应用整个增量：`## REMOVED` 下的需求会从主 spec 中删除，被重命名的需求会被就地改标题，而增量未提及的内容则保持不变。同步是可选的——如果你还没同步，归档时会提示你先同步。当你希望在归档前更新主 specs、当并行变更需要建立在本次新增的 specs 之上、或当你希望在归档前审查合并后的主 spec 时，使用它。
 
 ### 收尾
 ```

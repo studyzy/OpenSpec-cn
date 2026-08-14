@@ -25,7 +25,7 @@ metadata:
 
 ---
 
-**存储选择：** 若用户指定了一个存储（存储是注册在本机上的独立 OpenSpec 仓库）或工作位于某个存储中，请运行 `openspec-cn store list --json` 发现已注册的存储 ID，然后在读写 spec 和变更的命令上传递 `--store <id>`（`new change`、`status`、`instructions`、`list`、`show`、`validate`、`archive`、`doctor`、`context`、`view`）。选定后，将 `--store <id>` 视为在当前工作流其余部分中固定不变。以下每个未限定范围的命令示例均为简写形式：运行前请追加该标志。例如，运行 `openspec-cn status --change "<name>" --json --store "<id>"`，而非下面展示的未限定形式。其他命令不接受此标志。命令输出的提示已包含该标志；在后续操作中请保留它。若不指定存储，命令将对最近的本地 `openspec/` 根目录生效。
+**存储选择：** 若用户指定了一个存储（存储是注册在本机上的独立 OpenSpec 仓库）或工作位于某个存储中，请运行 `openspec-cn store list --json` 发现已注册的存储 ID，然后在读写 spec 和变更的命令上传递 `--store <id>`（`new change`、`status`、`instructions`、`list`、`show`、`validate`、`archive`、`doctor`、`context`、`schemas`、`view`）。选定后，将 `--store <id>` 视为在当前工作流其余部分中固定不变。以下每个未限定范围的命令示例均为简写形式：运行前请追加该标志。例如，运行 `openspec-cn status --change "<name>" --json --store "<id>"`，而非下面展示的未限定形式。其他命令不接受此标志。命令输出的提示已包含该标志；在后续操作中请保留它。若不指定存储，命令将对最近的本地 `openspec/` 根目录生效。
 
 **输入**：用户的请求应包含变更名称（kebab-case）或对要构建内容的描述。
 
@@ -48,7 +48,7 @@ metadata:
 
    **仅在以下情况下使用不同 schema：**
    - 用户明确按名称请求特定 schema → 使用 `--schema <schema-name>`
-   - 用户询问 "show workflows" 或 "what workflows" → 通过从当前工作目录运行 `openspec-cn context --json` 解析权威根路径。若用户明确选择了注册的存储，请使用 `openspec-cn context --json --store "<store-id>"`。然后在其工作目录设置为返回的 `root.path` 的情况下运行 `openspec-cn schemas --json` 让用户选择。这保留了由本地 `store:` 指针或全局 `defaultStore` 选择的根路径；`schemas` 不接受 `--store`。若 context 仅报告 `no_openspec_root`，则改为从当前工作目录运行 `openspec-cn schemas --json`。对于无效或不可用的存储，不要使用此回退方式。
+   - 用户询问 "show workflows" 或 "what workflows" → 通过从当前工作目录运行 `openspec-cn context --json` 解析权威根路径。若用户明确选择了注册的存储，请使用 `openspec-cn context --json --store "<store-id>"`。然后在其工作目录设置为返回的 `root.path` 的情况下运行 `openspec-cn schemas --json` 让用户选择。这保留了由本地 `store:` 指针或全局 `defaultStore` 选择的根路径；当显式选择了注册的存储时，请同样向 `openspec-cn schemas --json` 追加 `--store "<store-id>"`。若 context 仅报告 `no_openspec_root`，则改为从当前工作目录运行 `openspec-cn schemas --json`。对于无效或不可用的存储，不要使用此回退方式。
 
    否则，省略 `--schema` 以保留配置的默认值。
 

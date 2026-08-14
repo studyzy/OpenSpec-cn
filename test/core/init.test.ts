@@ -302,7 +302,7 @@ describe('InitCommand', () => {
 
       for (const [content, continueReference] of updateVariants) {
         const availabilityGuidance = content.indexOf(
-          `${continueReference} 是一个扩展 profile 工作流，可能未安装`
+          `${continueReference} 是一个可选工作流，可能未安装`
         );
         const nextReference = content.indexOf(
           continueReference,
@@ -499,6 +499,49 @@ describe('InitCommand', () => {
           (entry) => entry.includes('已跳过命令：kimi') && entry.includes('（无适配器）'),
         ),
       ).toBe(true);
+    });
+
+    it('should support Command Code with both skills and generated commands', async () => {
+      saveGlobalConfig({
+        featureFlags: {},
+        profile: 'core',
+        delivery: 'both',
+      });
+
+      const initCommand = new InitCommand({ tools: 'command-code', force: true });
+      await initCommand.execute(testDir);
+
+      // Skills install under .commandcode/skills (Command Code's native skill surface)
+      const skillFile = path.join(testDir, '.commandcode', 'skills', 'openspec-explore', 'SKILL.md');
+      expect(await fileExists(skillFile)).toBe(true);
+
+      // Adapter-backed: Command Code reads custom slash commands from
+      // .commandcode/commands/opsx-<id>.md, invoked as /opsx-<id>.
+      const commandFile = path.join(testDir, '.commandcode', 'commands', 'opsx-explore.md');
+      expect(await fileExists(commandFile)).toBe(true);
+      const commandContent = await fs.readFile(commandFile, 'utf-8');
+      expect(commandContent).toContain('**Provided arguments**: $ARGUMENTS');
+      expect(commandContent).not.toMatch(/^---\n/);
+    });
+
+    it('should generate Command Code commands and skip skills under delivery=commands', async () => {
+      saveGlobalConfig({
+        featureFlags: {},
+        profile: 'core',
+        delivery: 'commands',
+      });
+
+      const initCommand = new InitCommand({ tools: 'command-code', force: true });
+      await initCommand.execute(testDir);
+
+      // commands-only delivery: the adapter still writes commands...
+      const commandFile = path.join(testDir, '.commandcode', 'commands', 'opsx-explore.md');
+      expect(await fileExists(commandFile)).toBe(true);
+      const commandContent = await fs.readFile(commandFile, 'utf-8');
+      expect(commandContent).toContain('**Provided arguments**: $ARGUMENTS');
+
+      // ...but no skills are installed
+      expect(await directoryExists(path.join(testDir, '.commandcode', 'skills'))).toBe(false);
     });
 
     it('should support CodeArts as an adapterless skills-only tool', async () => {
@@ -712,6 +755,54 @@ describe('InitCommand', () => {
         await fileExists(path.join(testDir, '.codex', 'skills', 'openspec-propose', 'SKILL.md'))
       ).toBe(false);
       expect(await fs.readFile(customSkill, 'utf-8')).toBe('user skill');
+    });
+
+    it('should not suggest an IDE restart for CLI-only tools', async () => {
+      const initCommand = new InitCommand({ tools: 'claude', force: true });
+
+      await initCommand.execute(testDir);
+
+      expect(getConsoleOutput()).not.toContain('请重启你的 IDE');
+    });
+
+    it('should suggest an IDE restart for IDE-resident tools', async () => {
+      const initCommand = new InitCommand({ tools: 'cursor', force: true });
+
+      await initCommand.execute(testDir);
+
+      expect(getConsoleOutput()).toContain('请重启你的 IDE');
+    });
+
+    it('should suggest an IDE restart when a mix of CLI and IDE tools is configured', async () => {
+      // One IDE-resident tool (cursor) among CLI tools (claude) is enough: the
+      // hint targets the tool that needs it, so the gate must not require every
+      // configured tool to be IDE-resident.
+      const initCommand = new InitCommand({ tools: 'claude,cursor', force: true });
+
+      await initCommand.execute(testDir);
+
+      expect(getConsoleOutput()).toContain('请重启你的 IDE');
+    });
+
+    it('should word the restart hint for commands when an IDE tool gets a command surface', async () => {
+      // Default delivery generates commands for an adapter-backed IDE tool, so the
+      // hint must name commands, driven by the IDE tool's own generated surface.
+      const initCommand = new InitCommand({ tools: 'cursor', force: true });
+
+      await initCommand.execute(testDir);
+
+      expect(getConsoleOutput()).toContain('请重启你的 IDE 以使新命令生效。');
+    });
+
+    it('should word the restart hint for skills when an IDE tool gets only a skill surface', async () => {
+      // Skills-only delivery generates no commands, so the same IDE tool must be
+      // told about skills, not commands.
+      saveGlobalConfig({ featureFlags: {}, profile: 'core', delivery: 'skills' });
+      const initCommand = new InitCommand({ tools: 'cursor', force: true });
+
+      await initCommand.execute(testDir);
+
+      expect(getConsoleOutput()).toContain('请重启你的 IDE 以使新 skills 生效。');
     });
 
     it('should create skills for multiple tools at once', async () => {
@@ -1676,10 +1767,10 @@ describe('InitCommand - profile and detection features', () => {
     expect(startHint).not.toContain('/openspec-propose');
     expect(startHint).not.toContain('/opsx:propose');
 
-    // No slash commands were generated, so the restart line must not claim any
+    // Codex 是 CLI 工具：其 skills 在文件存在时立即加载，无需重启 IDE 进程，
+    // 因此重启提示不应出现（#1067）。
     const restartHint = logCalls.find((entry) => entry.includes('请重启你的 IDE'));
-    expect(restartHint).toContain('请重启你的 IDE 以使新 skills 生效。');
-    expect(restartHint).not.toContain('slash commands');
+    expect(restartHint).toBeUndefined();
   });
 
   it('should print the @-prefixed prompt hint for amazon-q (prompt library, no slash surface)', async () => {
@@ -1953,4 +2044,11 @@ async function directoryExists(dirPath: string): Promise<boolean> {
   } catch {
     return false;
   }
+}
+
+function getConsoleOutput(): string {
+  return (console.log as unknown as { mock: { calls: unknown[][] } }).mock.calls
+    .flat()
+    .map(String)
+    .join('\n');
 }

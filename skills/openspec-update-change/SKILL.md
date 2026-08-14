@@ -11,11 +11,11 @@ metadata:
 
 修订变更的现有规划制品并保持它们之间一致。绝不要编辑代码。
 
-**存储选择：** 若用户指定了一个存储（存储是注册在本机上的独立 OpenSpec 仓库）或工作位于某个存储中，请运行 `openspec-cn store list --json` 发现已注册的存储 ID，然后在读写 spec 和变更的命令上传递 `--store <id>`（`new change`、`status`、`instructions`、`list`、`show`、`validate`、`archive`、`doctor`、`context`、`view`）。选定后，将 `--store <id>` 视为在当前工作流其余部分中固定不变。以下每个未限定范围的命令示例均为简写形式：运行前请追加该标志。例如，运行 `openspec-cn status --change "<name>" --json --store "<id>"`，而非下面展示的未限定形式。其他命令不接受此标志。命令输出的提示已包含该标志；在后续操作中请保留它。若不指定存储，命令将对最近的本地 `openspec/` 根目录生效。
+**存储选择：** 若用户指定了一个存储（存储是注册在本机上的独立 OpenSpec 仓库）或工作位于某个存储中，请运行 `openspec-cn store list --json` 发现已注册的存储 ID，然后在读写 spec 和变更的命令上传递 `--store <id>`（`new change`、`status`、`instructions`、`list`、`show`、`validate`、`archive`、`doctor`、`context`、`schemas`、`view`）。选定后，将 `--store <id>` 视为在当前工作流其余部分中固定不变。以下每个未限定范围的命令示例均为简写形式：运行前请追加该标志。例如，运行 `openspec-cn status --change "<name>" --json --store "<id>"`，而非下面展示的未限定形式。其他命令不接受此标志。命令输出的提示已包含该标志；在后续操作中请保留它。若不指定存储，命令将对最近的本地 `openspec/` 根目录生效。
 
 **输入**：可选地指定变更名称。若省略，检查能否从对话上下文推断。若模糊或歧义，你必须提示用户从可用变更中选择。
 
-`/openspec-continue-change` 是一个扩展 profile 工作流，可能未安装。在下方任何地方建议它之前，请验证它是否可用。若不可用，`openspec-cn status --change "<name>" --json` 显示下一个制品，`openspec-cn instructions "<artifact-id>" --change "<name>" --json` 解释如何创建它。
+`/openspec-continue-change` 是一个可选工作流，可能未安装。在下方任何地方建议它之前，请验证它是否可用。若不可用，`openspec-cn status --change "<name>" --json` 显示下一个制品，`openspec-cn instructions "<artifact-id>" --change "<name>" --json` 解释如何创建它。
 
 **步骤**
 
@@ -87,4 +87,4 @@ metadata:
 - 仅编辑 `existingOutputPaths` 中的具体文件；绝不要写入 glob `resolvedOutputPath`。
 - 不要推进构建边界：不创建新制品，不在 glob 制品下创建新文件 — 那是 `/openspec-continue-change` 的职责。
 - 在写入前与用户确认每个编辑。
-- 若请求更改的是变更的*意图*而非细化，首先验证扩展 profile `/openspec-new-change` 工作流是否可用。若可用，建议用 `/openspec-new-change` 重新开始（"更新 vs 重新开始" 启发式）。若不可用，请求一个不同的未使用变更名称并建议改用 `openspec-cn new change "<new-change-name>"`。
+- 若请求更改的是变更的*意图*而非细化，首先验证可选 `/openspec-new-change` 工作流是否可用。若可用，建议用 `/openspec-new-change` 重新开始（"更新 vs 重新开始" 启发式）。若不可用，请求一个不同的未使用变更名称并建议改用 `openspec-cn new change "<new-change-name>"`。
