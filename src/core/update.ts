@@ -247,7 +247,7 @@ export class UpdateCommand {
       // Still check for new tool directories and extra workflows
       this.detectNewTools(resolvedProjectPath, configuredTools);
       this.displayExtraWorkflowsNote(resolvedProjectPath, configuredTools, desiredWorkflows);
-      this.displayMissingCoreWorkflowsNote(profile, globalConfig.workflows);
+      this.displayMissingCoreWorkflowsNote(profile, desiredWorkflows);
       this.displaySetupNotes(configuredTools);
       return;
     }
@@ -267,6 +267,7 @@ export class UpdateCommand {
     // 10. Update tools (all if force, otherwise only those needing update)
     const toolsToUpdate = this.force ? configuredTools : [...toolsToUpdateSet];
     const updatedTools: string[] = [];
+    const updatedToolIds: string[] = [];
     const failedTools: Array<{ name: string; error: string }> = [];
     const skillsInvocableCommandSkips: string[] = [];
     const zeroArtifactTools: string[] = [];
@@ -361,6 +362,7 @@ export class UpdateCommand {
 
         spinner.succeed(`${tool.name} 已更新`);
         updatedTools.push(tool.name);
+        updatedToolIds.push(tool.value);
         for (const migration of migrateLegacyToolDirs(
           resolvedProjectPath,
           [tool.value],
@@ -474,7 +476,7 @@ export class UpdateCommand {
 
     // 14. Display note about extra workflows not in profile
     this.displayExtraWorkflowsNote(resolvedProjectPath, configuredAndNewTools, desiredWorkflows);
-    this.displayMissingCoreWorkflowsNote(profile, globalConfig.workflows);
+    this.displayMissingCoreWorkflowsNote(profile, desiredWorkflows);
     this.displaySetupNotes(configuredAndNewTools);
 
     // 15. List affected tools
@@ -484,7 +486,20 @@ export class UpdateCommand {
     }
 
     console.log();
-    console.log(chalk.dim('重启 IDE 以使更改生效。'));
+    const affectedToolIds = [...new Set([...newlyConfiguredTools, ...updatedToolIds])];
+    const shouldRestartIde = affectedToolIds.some((toolId) => {
+      const tool = AI_TOOLS.find((candidate) => candidate.value === toolId);
+      return Boolean(
+        tool?.requiresIdeRestart &&
+        (
+          shouldGenerateCommandsForTool(toolId, delivery) ||
+          shouldGenerateSkillsForTool(toolId, delivery)
+        )
+      );
+    });
+    if (shouldRestartIde) {
+      console.log(chalk.dim('重启 IDE 以使更改生效。'));
+    }
     if (failedTools.length > 0) {
       throw new Error(`OpenSpec 更新失败：${failedTools.map((tool) => tool.name).join(', ')}`);
     }
@@ -649,9 +664,8 @@ export class UpdateCommand {
       return;
     }
 
-    const label = missing.length === 1 ? '个工作流' : '个工作流';
     const pronoun = missing.length === 1 ? '它' : '它们';
-    console.log(chalk.dim(`注意：你的自定义 profile 缺少 ${missing.length} 个核心${label}：${missing.join(', ')}`));
+    console.log(chalk.dim(`注意：你的自定义 profile 缺少 ${missing.length} 个核心工作流：${missing.join(', ')}`));
     console.log(chalk.dim(`运行 \`openspec-cn config profile\` 添加${pronoun}，或运行 \`openspec-cn config profile core\` 使用核心集。`));
   }
 
@@ -1100,7 +1114,12 @@ export class UpdateCommand {
       }
     }
 
-    const inferredCodexWorkflows = getLegacyWorkflowIdsForTool(detection, 'codex');
+    const inferredCodexWorkflows = getProfileWorkflows(
+      'custom',
+      getLegacyWorkflowIdsForTool(detection, 'codex')
+    ).filter((workflow): workflow is (typeof ALL_WORKFLOWS)[number] =>
+      (ALL_WORKFLOWS as readonly string[]).includes(workflow)
+    );
 
     // Create skills/commands for selected tools using effective profile+delivery.
     const newlyConfigured: string[] = [];

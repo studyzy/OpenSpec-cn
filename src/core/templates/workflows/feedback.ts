@@ -47,6 +47,7 @@ export function getFeedbackSkillTemplate(): SkillTemplate {
 5. **确认后提交**
    - 使用 \`openspec-cn feedback\` 命令提交
    - 格式：\`openspec-cn feedback "title" --body "body content"\`
+   - 命令会在 Issue 正文中保留标题文本，并缩短过长的 GitHub Issue 标题
    - 命令会自动添加元数据（版本、平台、时间戳）
 
 **草稿示例**

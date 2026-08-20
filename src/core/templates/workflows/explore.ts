@@ -327,7 +327,7 @@ export function getOpsxExploreCommandTemplate(): CommandTemplate {
 
 ${STORE_SELECTION_GUIDANCE}
 
-**输入**：\`/opsx:explore\` 之后的参数是用户想思考的内容。可能是：
+**Input**: \`/opsx:explore\` 之后的参数是用户想思考的内容。可能是：
 - 模糊想法："实时协作"
 - 具体问题："auth 系统越来越乱"
 - 变更名："add-dark-mode"（在该变更上下文中探索）

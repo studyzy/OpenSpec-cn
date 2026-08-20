@@ -15,7 +15,7 @@ export function getUpdateChangeSkillTemplate(): SkillTemplate {
 
 ${STORE_SELECTION_GUIDANCE}
 
-**输入**：可选地指定变更名称。若省略，检查能否从对话上下文推断。若模糊或歧义，你必须提示用户从可用变更中选择。
+**Input**: 可选地指定变更名称。若省略，检查能否从对话上下文推断。若模糊或歧义，你必须提示用户从可用变更中选择。
 
 \`/opsx:continue\` 是一个可选工作流，可能未安装。在下方任何地方建议它之前，请验证它是否可用。若不可用，\`openspec-cn status --change "<name>" --json\` 显示下一个制品，\`openspec-cn instructions "<artifact-id>" --change "<name>" --json\` 解释如何创建它。
 
@@ -106,7 +106,7 @@ export function getOpsxUpdateCommandTemplate(): CommandTemplate {
 
 ${STORE_SELECTION_GUIDANCE}
 
-**输入**：可选地在 \`/opsx:update\` 后指定变更名称（例如 \`/opsx:update add-auth\`）。若省略，检查能否从对话上下文推断。若模糊或歧义，你必须提示用户从可用变更中选择。
+**Input**: 可选地在 \`/opsx:update\` 后指定变更名称（例如 \`/opsx:update add-auth\`）。若省略，检查能否从对话上下文推断。若模糊或歧义，你必须提示用户从可用变更中选择。
 
 \`/opsx:continue\` 是一个可选工作流，可能未安装。在下方任何地方建议它之前，请验证它是否可用。若不可用，\`openspec-cn status --change "<name>" --json\` 显示下一个制品，\`openspec-cn instructions "<artifact-id>" --change "<name>" --json\` 解释如何创建它。
 

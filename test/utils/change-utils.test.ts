@@ -17,7 +17,7 @@ describe('validateChangeName', () => {
       expect(validateChangeName('a'.repeat(200))).toEqual({ valid: true });
       const result = validateChangeName('a'.repeat(201));
       expect(result.valid).toBe(false);
-      expect(result.error).toContain('too long');
+      expect(result.error).toContain('过长');
     });
 
     it('should accept name with multiple segments', () => {

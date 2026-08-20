@@ -61,6 +61,34 @@ describe('propose preamble', () => {
   });
 });
 
+describe('default task guidance', () => {
+  it('requires a concrete verification method in each task (#345)', () => {
+    const tasks = defaultSchema.artifacts.find(artifact => artifact.id === 'tasks');
+    expect(tasks).toBeDefined();
+    expect(tasks!.instruction).toContain('每个任务必须（MUST）说明如何验证其已完成');
+    expect(tasks!.instruction).toMatch(
+      /测试、命令、\s+可观察行为或交付的产物/
+    );
+    expect(tasks!.instruction).toMatch(
+      /把验证方式写进该任务的复选框描述/
+    );
+    expect(tasks!.instruction).toMatch(
+      /只有当需要检查跨越多个实现任务的整体集成或系统行为时，\s+才单独使用一个验证任务/
+    );
+
+    const example = tasks!.instruction.match(/```\s*([\s\S]*?)```/)?.[1];
+    expect(example).toBeDefined();
+    const numberedTasks = example!.split('\n').filter(line => /^- \[ \] \d+\.\d+ /.test(line));
+    expect(numberedTasks).toHaveLength(4);
+    expect(numberedTasks.every(line => /验证/.test(line))).toBe(true);
+    expect(numberedTasks[0]).toContain('预期文件已存在');
+    expect(numberedTasks[1]).toContain('包安装成功');
+    expect(numberedTasks[2]).toContain('导出测试通过');
+    expect(numberedTasks[3]).toContain('单元测试覆盖引号和分隔符');
+    expect(example).not.toMatch(/^- \[ \] \d+\.\d+ (?:验证)\b/im);
+  });
+});
+
 describe('propose implementation boundary', () => {
   it('makes the planning-only boundary prominent (#232, #258, #262)', () => {
     for (const [label, body] of proposeBodies) {

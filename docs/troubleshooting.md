@@ -59,7 +59,7 @@ openspec-cn init --tools claude,cursor
 
 5. **确认你初始化了这个项目。** Skill 是按项目写入的。如果你克隆了仓库或切换了文件夹，在那里运行 `openspec-cn init`（或 `openspec-cn update`）。
 
-6. **确认你的工具支持命令文件。** Codex、CodeArts、ForgeCode、Hermes、Kimi Code、Mistral Vibe 以及共享的 `.agents` 目标不会生成 `opsx-*` 命令文件；它们改用基于 skill 的调用方式，因此 `/opsx` 对它们永远不会自动补全。在 Codex 中输入 `$openspec-propose`，在 Kimi Code 中输入 `/skill:openspec-propose`，在其余工具中输入 `/openspec-propose`。共享的 `.agents` 目标是厂商中立的，所以 `/openspec-propose` 只是通用形式而非保证形式——如果你的助手不响应它，请查阅它自己的文档了解如何调用 skill。Amazon Q 确实会得到命令文件，但会把它们加载进提示词库而非斜杠菜单——在那里输入 `@opsx-propose`，而不是 `/opsx`。每种工具的形式都列在 [如何调用](supported-tools.md#how-to-invoke) 中。
+6. **确认你的工具支持命令文件。** Codex、CodeArts、ForgeCode、Hermes、Kimi Code、Mistral Vibe、Zed Agent 以及共享的 `.agents` 目标不会生成 `opsx-*` 命令文件；它们改用基于 skill 的调用方式，因此 `/opsx` 对它们永远不会自动补全。在 Codex 中输入 `$openspec-propose`，在 Kimi Code 中输入 `/skill:openspec-propose`，在其余工具中输入 `/openspec-propose`。共享的 `.agents` 目标是厂商中立的，所以 `/openspec-propose` 只是通用形式而非保证形式——如果你的助手不响应它，请查阅它自己的文档了解如何调用 skill。Amazon Q 确实会得到命令文件，但会把它们加载进提示词库而非斜杠菜单——在那里输入 `@opsx-propose`，而不是 `/opsx`。每种工具的形式都列在 [如何调用](supported-tools.md#how-to-invoke) 中。
 
 ## 使用变更时
 

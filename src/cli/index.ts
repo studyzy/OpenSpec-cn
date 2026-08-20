@@ -49,6 +49,7 @@ import {
   type NewChangeOptions,
 } from '../commands/workflow/index.js';
 import { maybeShowTelemetryNotice, trackCommand, shutdown } from '../telemetry/index.js';
+import { maybeShowCompletionTip } from '../core/completion-tip.js';
 import { COMMON_FLAGS } from '../core/completions/shared-flags.js';
 import { isInteractive } from '../utils/interactive.js';
 
@@ -137,6 +138,29 @@ export function isJsonRun(command: Command): boolean {
   );
 }
 
+/**
+ * True for the commands that exist to serve shell completions: the user-facing
+ * `openspec completion ...` group and the hidden `__complete` resolver that
+ * generated completion scripts call on every Tab press. Tipping either about
+ * completions is noise, and `__complete` would burn the one-shot tip invisibly.
+ */
+export function isCompletionRun(commandPath: string): boolean {
+  return commandPath.split(':')[0] === 'completion' || commandPath === '__complete';
+}
+
+/**
+ * True when the first-run completions tip must be deferred rather than shown.
+ *
+ * Deferring keeps the tip unconsumed, so it still reaches the user on a later
+ * run that can actually carry it. All three cases are runs nobody would read a
+ * hint from: JSON output, the completion machinery itself, and a stderr that is
+ * not a terminal — pipes and the agent-driven runs that dominate this CLI's
+ * usage would otherwise burn the user's one-shot tip into a log nobody opens.
+ */
+export function shouldDeferCompletionTip(command: Command, stderrIsTty: boolean): boolean {
+  return isJsonRun(command) || isCompletionRun(getCommandPath(command)) || !stderrIsTty;
+}
+
 program
   .name('openspec-cn')
   .description('基于规范驱动开发的AI原生系统')
@@ -157,18 +181,34 @@ program.hook('preAction', async (thisCommand, actionCommand) => {
     process.env.NO_COLOR = '1';
   }
 
-  // Show first-run telemetry notice (if not seen). Suppress it whenever the run
-  // asked for JSON so stdout stays a single valid JSON document (see isJsonRun).
+  // Show first-run telemetry notice (if not seen). It's written to stderr, so it
+  // never pollutes stdout — but --json runs still defer it (see isJsonRun) so the
+  // very first invocation stays free of any incidental output on either stream.
   await maybeShowTelemetryNotice({ silent: isJsonRun(actionCommand) });
 
   // Track command execution (use actionCommand to get the actual subcommand)
   const commandPath = getCommandPath(actionCommand);
+
   await trackCommand(commandPath, version);
 });
 
 // Shutdown telemetry after command completes
-program.hook('postAction', async () => {
-  await shutdown();
+program.hook('postAction', async (_thisCommand, actionCommand) => {
+  // Show the first-run shell-completions tip (on stderr, so piped stdout stays
+  // clean). postAction, not preAction: the tip trails the command's own output
+  // instead of pushing an error message or `init`'s setup summary down the
+  // screen. Deferred — not consumed — whenever nobody would read it: JSON runs,
+  // `openspec completion ...`, and a stderr that is not a terminal (agents and
+  // pipes would otherwise silently burn the user's one-shot tip).
+  try {
+    await maybeShowCompletionTip({
+      silent: shouldDeferCompletionTip(actionCommand, Boolean(process.stderr.isTTY)),
+    });
+  } finally {
+    // The flush runs even if the hint throws: parse() is synchronous, so a
+    // rejection here has no catch anywhere above it.
+    await shutdown();
+  }
 });
 
 const availableToolIds = AI_TOOLS
@@ -183,12 +223,13 @@ program
   .command('init [path]')
   .description('在您的项目中初始化OpenSpec')
   .option('--tools <tools>', toolsOptionDescription)
+  .option('--language <language>', '用此语言编写新的 OpenSpec 制品')
   .option('--force', '自动清理旧文件而不提示')
   .option('--profile <profile>', '覆盖全局配置档案（core 或 custom）')
   .option('--no-animation', '显示静态欢迎屏而非动画版')
   .option('--copilot-cloud', '无需提示直接配置 GitHub Copilot 云端 coding-agent 文件')
   .option('--no-copilot-cloud', '无需提示跳过 GitHub Copilot 云端 coding-agent 文件')
-  .action(async (targetPath = '.', options?: { tools?: string; force?: boolean; profile?: string; animation?: boolean; copilotCloud?: boolean }) => {
+  .action(async (targetPath = '.', options?: { tools?: string; language?: string; force?: boolean; profile?: string; animation?: boolean; copilotCloud?: boolean }) => {
     try {
       // Validate that the path is a valid directory
       const resolvedPath = path.resolve(targetPath);
@@ -212,6 +253,7 @@ program
       const { InitCommand } = await import('../core/init.js');
       const initCommand = new InitCommand({
         tools: options?.tools,
+        language: options?.language,
         force: options?.force,
         profile: options?.profile,
         animation: options?.animation,
@@ -423,10 +465,12 @@ changeCmd
   .action(async (changeName?: string, options?: { strict?: boolean; json?: boolean; noInteractive?: boolean }) => {
     try {
       const changeCommand = new ChangeCommand();
+      // validate() already sets process.exitCode, and Node honours it at
+      // natural exit. Calling process.exit() here would skip commander's
+      // postAction hook — the same trap called out for `update` below — which
+      // kills the telemetry flush and the first-run completions tip on what is
+      // a routine outcome, not an error: a change that fails validation.
       await changeCommand.validate(changeName, options);
-      if (typeof process.exitCode === 'number' && process.exitCode !== 0) {
-        process.exit(process.exitCode);
-      }
     } catch (error) {
       console.error(`错误：${(error as Error).message}`);
       process.exitCode = 1;

@@ -202,11 +202,11 @@ describe('FeedbackCommand', () => {
       // Only one attempt, and no note about a dropped label
       expect(mockExecFileSync).toHaveBeenCalledTimes(1);
       expect(consoleLogSpy).not.toHaveBeenCalledWith(
-        expect.stringContaining("without the 'feedback' label")
+        expect.stringContaining("未定义 'feedback' 标签")
       );
     });
 
-    it('should include --body flag when body is provided', async () => {
+    it('should preserve message and body whitespace in the issue body', async () => {
       const issueUrl = 'https://github.com/studyzy/OpenSpec-cn/issues/124';
 
       mockExecSync.mockImplementation((cmd: string, options?: any) => {
@@ -221,17 +221,97 @@ describe('FeedbackCommand', () => {
 
       mockExecFileSync.mockReturnValue(`${issueUrl}\n`);
 
-      await feedbackCommand.execute('Title here', { body: 'Detailed description' });
+      const message = '  Title here  ';
+      const details = '    const x = 1;  ';
+      await feedbackCommand.execute(message, { body: details });
 
-      // Verify body is included in the arguments
-      expect(mockExecFileSync).toHaveBeenCalledWith(
-        'gh',
-        expect.arrayContaining([
-          '--body',
-          expect.stringContaining('Detailed description'),
-        ]),
-        expect.any(Object)
+      const args = mockExecFileSync.mock.calls[0][1] as string[];
+      const body = args[args.indexOf('--body') + 1];
+      expect(body).toContain(
+        `## Summary\n\n${message}\n\n## Details\n\n${details}\n\n---`
       );
+    });
+
+    it('should preserve the full message in the body and shorten a long title', async () => {
+      mockExecSync.mockImplementation((cmd: string) => {
+        if (cmd === 'which gh' || cmd === 'where gh') {
+          return Buffer.from('/usr/local/bin/gh');
+        }
+        if (cmd === 'gh auth status') {
+          return Buffer.from('Logged in');
+        }
+        return '';
+      });
+
+      mockExecFileSync.mockReturnValue('https://github.com/studyzy/OpenSpec-cn/issues/125\n');
+
+      const message =
+        'Generated workflows declare too few allowed tools,\nso headless runs cannot write files and silently fail.';
+      await feedbackCommand.execute(message);
+
+      const args = mockExecFileSync.mock.calls[0][1] as string[];
+      const title = args[args.indexOf('--title') + 1];
+      const body = args[args.indexOf('--body') + 1];
+
+      expect(title).toBe(
+        '反馈: Generated workflows declare too few allowed tools, so headless…'
+      );
+      expect(title.length).toBeLessThanOrEqual(72);
+      expect(title).not.toMatch(/[\r\n]/);
+      expect(body).toContain(`## Summary\n\n${message}`);
+    });
+
+    it('should not split Unicode grapheme clusters when shortening a title', async () => {
+      mockExecSync.mockImplementation((cmd: string) => {
+        if (cmd === 'which gh' || cmd === 'where gh') {
+          return Buffer.from('/usr/local/bin/gh');
+        }
+        if (cmd === 'gh auth status') {
+          return Buffer.from('Logged in');
+        }
+        return '';
+      });
+
+      mockExecFileSync.mockReturnValue('https://github.com/studyzy/OpenSpec-cn/issues/125\n');
+
+      const family = '👨‍👩‍👧‍👦';
+      const message = family.repeat(20);
+      await feedbackCommand.execute(message);
+
+      const args = mockExecFileSync.mock.calls[0][1] as string[];
+      const title = args[args.indexOf('--title') + 1];
+      const summary = title.slice('反馈: '.length, -1);
+
+      expect(Array.from(title).length).toBeLessThanOrEqual(72);
+      expect(title.endsWith('…')).toBe(true);
+      expect(summary).toMatch(/^(?:👨‍👩‍👧‍👦)+$/u);
+    });
+
+    it('should enforce the title limit at the exact boundary', async () => {
+      mockExecSync.mockImplementation((cmd: string) => {
+        if (cmd === 'which gh' || cmd === 'where gh') {
+          return Buffer.from('/usr/local/bin/gh');
+        }
+        if (cmd === 'gh auth status') {
+          return Buffer.from('Logged in');
+        }
+        return '';
+      });
+
+      mockExecFileSync.mockReturnValue('https://github.com/studyzy/OpenSpec-cn/issues/125\n');
+
+      await feedbackCommand.execute('x'.repeat(68));
+      await feedbackCommand.execute('x'.repeat(69));
+
+      const exactArgs = mockExecFileSync.mock.calls[0][1] as string[];
+      const shortenedArgs = mockExecFileSync.mock.calls[1][1] as string[];
+      const exactTitle = exactArgs[exactArgs.indexOf('--title') + 1];
+      const shortenedTitle = shortenedArgs[shortenedArgs.indexOf('--title') + 1];
+
+      expect(exactTitle).toBe(`反馈: ${'x'.repeat(68)}`);
+      expect(Array.from(exactTitle)).toHaveLength(72);
+      expect(shortenedTitle).toBe(`反馈: ${'x'.repeat(67)}…`);
+      expect(Array.from(shortenedTitle)).toHaveLength(72);
     });
 
     it('should format title with "反馈:" prefix', async () => {
@@ -385,12 +465,12 @@ describe('FeedbackCommand', () => {
 
       expect(mockExecFileSync).toHaveBeenCalledTimes(1);
       expect(consoleLogSpy).not.toHaveBeenCalledWith(
-        expect.stringContaining("without the 'feedback' label")
+        expect.stringContaining("未定义 'feedback' 标签")
       );
     });
 
     it('should retry without the label when the repo does not define it', async () => {
-      const issueUrl = 'https://github.com/Fission-AI/OpenSpec/issues/129';
+      const issueUrl = 'https://github.com/studyzy/OpenSpec-cn/issues/129';
 
       mockExecSync.mockImplementation((cmd: string, options?: any) => {
         if (cmd === 'which gh' || cmd === 'where gh') {
@@ -445,7 +525,7 @@ describe('FeedbackCommand', () => {
         expect.stringContaining(issueUrl)
       );
       expect(consoleLogSpy).toHaveBeenCalledWith(
-        expect.stringContaining("without the 'feedback' label")
+        expect.stringContaining("未定义 'feedback' 标签")
       );
     });
 
@@ -525,8 +605,11 @@ describe('FeedbackCommand', () => {
         }
       });
 
+      const message =
+        'Generated workflows declare too few allowed tools,\nso headless runs cannot write files and silently fail.';
+
       try {
-        await feedbackCommand.execute('Test message', { body: 'Test body' });
+        await feedbackCommand.execute(message, { body: 'Test body' });
       } catch (error: any) {
         // Expected to exit
       }
@@ -536,13 +619,19 @@ describe('FeedbackCommand', () => {
         expect.stringContaining('--- 格式化后的反馈内容 ---')
       );
       expect(consoleLogSpy).toHaveBeenCalledWith(
-        expect.stringContaining('标题: 反馈: Test message')
+        expect.stringContaining('标题: 反馈: Generated workflows declare too few allowed tools, so headless…')
       );
       expect(consoleLogSpy).toHaveBeenCalledWith(
         expect.stringContaining('标签: feedback')
       );
       expect(consoleLogSpy).toHaveBeenCalledWith(
         expect.stringContaining('--- 反馈结束 ---')
+      );
+      expect(consoleLogSpy).toHaveBeenCalledWith(
+        expect.stringContaining(`## Summary\n\n${message}`)
+      );
+      expect(consoleLogSpy).toHaveBeenCalledWith(
+        expect.stringContaining('## Details\n\nTest body')
       );
     });
 

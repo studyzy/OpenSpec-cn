@@ -165,6 +165,15 @@ describe('declared store fallback (3.2)', () => {
       expect(snapshot(path.join(tempDir, 'data'))).toEqual(dataBefore);
     }
 
+    const refusedWithLanguage = await runCLI(
+      ['init', '.', '--tools', 'none', '--language', 'French'],
+      { cwd: pointerRepo, env }
+    );
+    expect(refusedWithLanguage.exitCode).toBe(1);
+    expect(refusedWithLanguage.stderr).toContain("此仓库的规划已外部化到 store 'team-context'");
+    expect(refusedWithLanguage.stderr).toContain('移除 store: 行');
+    expect(snapshot(pointerRepo)).toEqual(before);
+
     // Conversion: remove the line, rerun, get a normal local root.
     fs.writeFileSync(path.join(pointerRepo, 'openspec', 'config.yaml'), 'schema: spec-driven\n');
     const converted = await runCLI(['init', '.', '--tools', 'none'], {

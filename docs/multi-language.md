@@ -4,6 +4,16 @@
 
 ## 快速设置
 
+对于新项目，可在初始化时设置语言：
+
+```bash
+openspec-cn init --language "Portuguese (pt-BR)"
+```
+
+这会把语言指令写入 `openspec/config.yaml`。如果项目已有配置，请直接编辑其 `context` 字段，以便保留既有的项目指引。
+
+你也可以手动配置同样的行为：
+
 在你的 `openspec/config.yaml` 里加上语言指令：
 
 ```yaml
@@ -12,12 +22,15 @@ schema: spec-driven
 context: |
   Language: Portuguese (pt-BR)
   All artifacts must be written in Brazilian Portuguese.
+  Keep OpenSpec structural headings and SHALL/MUST keywords in English.
 
   # 项目上下文如下...
   Tech stack: TypeScript, React, Node.js
 ```
 
 就这么简单。所有生成的制品现在都是葡萄牙语。
+
+OpenSpec 的文档结构和规范性 `SHALL`/`MUST` 关键字保持英文，因为校验依赖它们。周围的需求与场景正文可以使用你选择的语言。
 
 ## 语言示例
 

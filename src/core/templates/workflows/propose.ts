@@ -29,7 +29,7 @@ export function getOpsxProposeSkillTemplate(): SkillTemplate {
 
 ${STORE_SELECTION_GUIDANCE}
 
-**输入**：用户的请求应包含变更名称（kebab-case）或对要构建内容的描述。
+**Input**: 用户的请求应包含变更名称（kebab-case）或对要构建内容的描述。
 
 **步骤**
 
@@ -178,7 +178,7 @@ export function getOpsxProposeCommandTemplate(): CommandTemplate {
 
 ${STORE_SELECTION_GUIDANCE}
 
-**输入**：\`/opsx:propose\` 之后的参数是变更名称（kebab-case），或用户想要构建内容的描述。
+**Input**: \`/opsx:propose\` 之后的参数是变更名称（kebab-case），或用户想要构建内容的描述。
 
 **步骤**
 

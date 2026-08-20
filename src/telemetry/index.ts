@@ -197,8 +197,9 @@ export async function maybeShowTelemetryNotice(
       return;
     }
 
-    // Display notice
-    console.log(
+    // Display notice on stderr, not stdout: stdout is reserved for command
+    // output (raw passthrough text, JSON, etc.) and must stay parser/pipe-safe.
+    console.error(
       '注意：OpenSpec 会收集匿名使用统计。退出方式：设置 OPENSPEC_TELEMETRY=0，或运行 openspec-cn config set telemetry.enabled false'
     );
 

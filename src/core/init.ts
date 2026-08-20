@@ -11,7 +11,12 @@ import ora from 'ora';
 import * as fs from 'fs';
 import { createRequire } from 'module';
 import { FileSystemUtils } from '../utils/file-system.js';
-import { classifyOpenSpecDir, storePointerProblem } from './project-config.js';
+import {
+  classifyOpenSpecDir,
+  MAX_CONTEXT_SIZE,
+  readProjectConfig,
+  storePointerProblem,
+} from './project-config.js';
 import { findRepoPlanningRootSync } from './planning-home.js';
 import { getSkillReferenceTransformer, getTransformerForTool, usesNaturalLanguageSkillReferences } from '../utils/command-references.js';
 import {
@@ -83,6 +88,14 @@ const { version: OPENSPEC_VERSION } = require('../../package.json');
 
 const DEFAULT_SCHEMA = 'spec-driven';
 
+function formatLanguageContext(language: string): string {
+  return [
+    `语言：${language}`,
+    `所有制品必须用 ${language} 编写。`,
+    'OpenSpec 结构标题与 SHALL/MUST 关键字保持英文。',
+  ].join('\n');
+}
+
 const PROGRESS_SPINNER = {
   interval: 80,
   frames: ['░░░', '▒░░', '▒▒░', '▒▒▒', '▓▒▒', '▓▓▒', '▓▓▓', '▒▓▓', '░▒▓'],
@@ -109,6 +122,7 @@ const WORKFLOW_TO_SKILL_DIR: Record<string, string> = {
 
 type InitCommandOptions = {
   tools?: string;
+  language?: string;
   force?: boolean;
   interactive?: boolean;
   profile?: string;
@@ -147,6 +161,7 @@ type DeferredLegacyCleanup = {
 
 export class InitCommand {
   private readonly toolsArg?: string;
+  private readonly language?: string;
   private readonly force: boolean;
   private readonly interactiveOption?: boolean;
   private readonly profileOverride?: string;
@@ -155,6 +170,7 @@ export class InitCommand {
 
   constructor(options: InitCommandOptions = {}) {
     this.toolsArg = options.tools;
+    this.language = this.normalizeLanguage(options.language);
     this.force = options.force ?? false;
     this.interactiveOption = options.interactive;
     this.profileOverride = options.profile;
@@ -196,6 +212,8 @@ export class InitCommand {
         }
       }
     }
+
+    await this.assertLanguageCanBeApplied(projectPath, openspecPath);
 
     // Check for legacy artifacts and handle cleanup
     const deferredLegacyCleanup = await this.handleLegacyCleanup(projectPath, extendMode);
@@ -751,13 +769,34 @@ export class InitCommand {
   ): ValidatedInitTool[] {
     const validatedTools: ValidatedInitTool[] = [];
 
-    const reconciledToolIds = toolIds.includes('codex') && toolIds.includes('agents')
-      ? toolIds.filter((toolId) => toolId !== 'agents')
+    const sharedAgentsTargets = ['codex', 'zed', 'agents'];
+    const selectedSharedTargets = sharedAgentsTargets.filter((toolId) => toolIds.includes(toolId));
+    // A Codex-rendered tree already serves Zed. Keep it when Zed is added later
+    // so Codex users do not lose the `$openspec-*` references they require.
+    const preserveConfiguredCodex = selectedSharedTargets.includes('zed') &&
+      toolStates.get('codex')?.configured;
+    const sharedTargetCandidates = preserveConfiguredCodex
+      ? [...new Set([...selectedSharedTargets, 'codex'])]
+      : selectedSharedTargets;
+    const sharedTargetOwner = sharedTargetCandidates.includes('codex')
+      ? 'codex'
+      : selectedSharedTargets.includes('zed')
+        ? 'zed'
+        : selectedSharedTargets[0];
+    const firstSharedIndex = toolIds.findIndex((id) => sharedAgentsTargets.includes(id));
+    const reconciledToolIds = sharedTargetCandidates.length > 1
+      ? toolIds.flatMap((toolId, index) => {
+          if (!sharedAgentsTargets.includes(toolId)) return [toolId];
+          return index === firstSharedIndex && sharedTargetOwner ? [sharedTargetOwner] : [];
+        })
       : toolIds;
-    if (reconciledToolIds.length !== toolIds.length) {
+    if (
+      reconciledToolIds.length !== toolIds.length ||
+      reconciledToolIds.some((toolId, index) => toolId !== toolIds[index])
+    ) {
       console.log(
         chalk.dim(
-          'Codex 和 agents 共享 .agents/skills 目录；将写入一个以 Codex 和通用 skill 引用为主的技能树。'
+          `Codex、Zed 和 agents 共享 .agents/skills 目录；将写入一个以 ${sharedTargetOwner} 为主的技能树。`
         )
       );
     }
@@ -985,6 +1024,66 @@ export class InitCommand {
   // CONFIG FILE
   // ═══════════════════════════════════════════════════════════
 
+  private normalizeLanguage(language: string | undefined): string | undefined {
+    if (language === undefined) return undefined;
+
+    const normalized = language.trim();
+    if (!normalized) {
+      throw new Error('--language 选项需要一个非空值。');
+    }
+    if (/\p{Cc}|\p{Bidi_Control}|[\u200B\u2028\u2029\uFEFF]/u.test(normalized)) {
+      throw new Error(
+        '--language 选项必须是单行，且不含控制字符或不可见的格式字符。'
+      );
+    }
+    const serializedContext = `${formatLanguageContext(normalized)}\n`;
+    if (Buffer.byteLength(serializedContext, 'utf8') > MAX_CONTEXT_SIZE) {
+      throw new Error(
+        `--language 选项超出 OpenSpec 的 ${MAX_CONTEXT_SIZE / 1024}KB 项目上下文上限。`
+      );
+    }
+    return normalized;
+  }
+
+  private languageContext(): string | undefined {
+    if (!this.language) return undefined;
+    return formatLanguageContext(this.language);
+  }
+
+  private async assertLanguageCanBeApplied(
+    projectPath: string,
+    openspecPath: string
+  ): Promise<void> {
+    const languageContext = this.languageContext();
+    if (!languageContext) return;
+
+    const configPath = path.join(openspecPath, 'config.yaml');
+    const hasConfig = fs.existsSync(configPath) ||
+      fs.existsSync(path.join(openspecPath, 'config.yml'));
+    if (!hasConfig) {
+      try {
+        FileSystemUtils.assertProjectArtifactPath(projectPath, configPath);
+      } catch (error) {
+        const reason = error instanceof Error ? `: ${error.message}` : '';
+        throw new Error(`无法为 --language 创建 openspec/config.yaml${reason}`);
+      }
+      if (!(await FileSystemUtils.canWriteFile(configPath))) {
+        throw new Error(
+          '无法为 --language 创建 openspec/config.yaml：目标位置不可写。'
+        );
+      }
+      return;
+    }
+
+    const existingContext = readProjectConfig(projectPath)?.context;
+    if (existingContext?.includes(languageContext)) return;
+
+    throw new Error(
+      '--language 不会覆盖已存在的 OpenSpec config。' +
+      '请改为将语言指令添加到其 context 字段中。'
+    );
+  }
+
   private async createConfig(openspecPath: string, extendMode: boolean): Promise<'created' | 'exists' | 'skipped'> {
     const configPath = path.join(openspecPath, 'config.yaml');
     const configYmlPath = path.join(openspecPath, 'config.yml');
@@ -997,11 +1096,18 @@ export class InitCommand {
 
 
     try {
-      const yamlContent = serializeConfig({ schema: DEFAULT_SCHEMA });
+      const yamlContent = serializeConfig({
+        schema: DEFAULT_SCHEMA,
+        context: this.languageContext(),
+      });
       FileSystemUtils.assertProjectArtifactPath(path.dirname(openspecPath), configPath);
       await FileSystemUtils.writeFile(configPath, yamlContent);
       return 'created';
-    } catch {
+    } catch (error) {
+      if (this.language) {
+        const reason = error instanceof Error ? `: ${error.message}` : '';
+        throw new Error(`无法为 --language 创建 openspec/config.yaml${reason}`);
+      }
       return 'skipped';
     }
   }

@@ -33,7 +33,7 @@ Codex 仅支持 skills：即使交付方式设为 `commands`，OpenSpec 也会�
 | `.../opsx-<id>.*` —— 文件名即命令名 | `/opsx-<id>` | 其余所有会生成命令文件的工具，Amazon Q 和 Devin 除外 |
 | `.devin/workflows/opsx-<id>.md` —— Devin 的两个 Agent 中只有一个会读取它 | 在 Devin Desktop 上是 `/opsx-<id>`，在 Devin Local 上是 `/openspec-<skill>` | Devin Desktop\*\*\*\* |
 | `.amazonq/prompts/opsx-<id>.md` —— 这是提示词，不是命令 | `@opsx-<id>` | Amazon Q Developer |
-| 无 —— 仅 skills | `/openspec-<skill>` | CodeArts、ForgeCode、Hermes、MiniMax Code、Mistral Vibe、共享 `.agents` |
+| 无 —— 仅 skills | `/openspec-<skill>` | CodeArts、ForgeCode、Hermes、MiniMax Code、Mistral Vibe、Zed Agent、共享 `.agents` |
 | 无 —— Kimi Code | `/skill:openspec-<skill>` | Kimi Code |
 | 无 —— Codex CLI | `$openspec-<skill>` | Codex（[`/openspec-<skill>` 不被识别](https://github.com/openai/codex/issues/11817)） |
 
@@ -90,6 +90,7 @@ OpenSpec 生成的文件，以及设置完成后打印的 "Getting started" 提�
 | [Rovo Dev CLI](https://support.atlassian.com/rovo/docs/use-rovo-dev-cli/) (`rovodev`) | `.rovodev/skills/openspec-*/SKILL.md` | 不生成。Rovo 没有斜杠命令入口 —— 它会自动匹配 skills，或通过提示词匹配（例如"使用 openspec-propose skill"）；`/skills` 只用于管理它们。生成的内容按名称引用 skills，绝不会写成 `/openspec-*` 命令。 |
 | [Zoo Code](https://github.com/Zoo-Code-Org/Zoo-Code) (`roocode`) | `.roo/skills/openspec-*/SKILL.md` | `.roo/commands/opsx-<id>.md` |
 | Trae (`trae`) | `.trae/skills/openspec-*/SKILL.md` | `.trae/commands/opsx-<id>.md` |
+| [Zed Agent](https://zed.dev/docs/ai/skills) (`zed`) | `.agents/skills/openspec-*/SKILL.md` | 不生成（仅 skills；使用 `/openspec-*` 或 `@openspec-*`） |
 | ZCode (`zcode`) | `.zcode/skills/openspec-*/SKILL.md` | `.zcode/commands/opsx/<id>.md` |
 | 共享 `.agents` skills (`agents`) | `.agents/skills/openspec-*/SKILL.md` | 不生成（无命令适配器；使用基于 skill 的 `/openspec-*` 调用） |
 
@@ -134,7 +135,7 @@ GitHub 的 [Copilot coding agent](https://docs.github.com/en/copilot/using-githu
 | 同一个仓库上有多个 Agent，且都读取 `.agents/skills` | `agents` —— 只需一棵 skill 树，而不是每个工具一棵 |
 | 你的工具尚未被列出，但它会读取 `.agents/skills` | `agents` |
 
-把它和某个工具专属 ID 一起选中是没问题的；通常各自会写入自己的根目录。Codex 是个例外，因为它使用的正是同一个规范的 `.agents` 根目录。如果 `codex` 和 `agents` 同时被选中，OpenSpec 会只保留一棵以 Codex 为主导的树。它的交接说明中会同时给出面向 Codex 的 `$openspec-*` 和面向其他 Agent 的 `/openspec-*`，因此 `--tools all` 以及既有的多 Agent 配置都能继续工作，而不会出现两个写入方覆盖同一批文件的情况。
+把它和某个工具专属 ID 一起选中是没问题的；通常各自会写入自己的根目录。Codex 和 Zed Agent 是个例外，因为它们使用的正是同一个规范的 `.agents` 根目录。如果 `codex` 与 `zed` 或 `agents` 一起被选中，OpenSpec 会只保留一棵以 Codex 为主导的树。它的交接说明中会同时给出面向 Codex 的 `$openspec-*` 和面向其他 Agent 的 `/openspec-*`，因此 `--tools all` 以及既有的多 Agent 配置都能继续工作，而不会出现两个写入方覆盖同一批文件的情况。
 一旦项目中存在 `.agents/skills/` 目录，OpenSpec 也会自动提供该选项 —— 仅有一个空的 `.agents/` 是不够的，因为工具也会把那个根目录用于规则和子 Agent 定义。请注意 `.agents` 不是 `.agent`：单数形式的目录属于 Antigravity。
 
 有两点需要了解：
@@ -144,7 +145,9 @@ GitHub 的 [Copilot coding agent](https://docs.github.com/en/copilot/using-githu
 - **不会创建或修改任何 `AGENTS.md`。** 目标是 `.agents/` 目录。
   如果你根目录的 `AGENTS.md` 中仍带有旧版本留下的 OpenSpec 标记块，`openspec-cn update` 会将其清除 —— 参见[迁移指南](migration-guide.md)。
 
-由于 `.agents/skills/` 是共享的，有必要了解 OpenSpec 在其中主张归属的内容：它只会为你所选的工作流写入、刷新和移除 `openspec-*` skill 目录，外加一个 `.openspec-target` 标记文件，用于记录那棵共享树是由 Codex 还是由厂商无关目标渲染的。该目录中的其他任何内容都不会被动。请把 `openspec-*` 这些名称和该标记视为 OpenSpec 所有 —— 对它们内部的修改会在下一次 `openspec-cn update` 时被替换掉，这一点与其他所有工具一致。
+这里的 Zed 支持针对的是内置的 Zed Agent。Zed External Agents 和 Terminal Threads 使用各自的集成。Agent Skills 需要 [Zed v1.4.2](https://github.com/zed-industries/zed/releases/tag/v1.4.2) 或更高版本。在你[授予信任](https://zed.dev/docs/worktree-trust)之前，项目级 skills 在不受信任的 worktree 中不可用。
+
+由于 `.agents/skills/` 由 Codex、Zed Agent 和厂商无关目标共享，有必要了解 OpenSpec 在其中主张归属的内容：它只会为你所选的工作流写入、刷新和移除 `openspec-*` skill 目录，外加一个 `.openspec-target` 标记文件，用于记录那棵共享树是由 Codex、Zed Agent 还是厂商无关目标渲染的。该目录中的其他任何内容都不会被动。请把 `openspec-*` 这些名称和该标记视为 OpenSpec 所有 —— 对它们内部的修改会在下一次 `openspec-cn update` 时被替换掉，这一点与其他所有工具一致。
 
 对于早于该标记机制的项目，OpenSpec 会从受管 skill 的引用形式推断归属：`$openspec-*` 表示 Codex，`/openspec-*` 表示厂商无关目标。若一棵通用的规范树与旧版 `.codex/skills` 并存，则会被视为更早的双目标安装，并被合并到兼容的共享树中。
 
@@ -168,7 +171,7 @@ openspec-cn init --tools none
 openspec-cn init --profile core
 ```
 
-**可用工具 ID(`--tools`)** —— `windsurf` 也可接受，作为 `devin` 的别名：`amazon-q`, `antigravity`, `auggie`, `bob`, `claude`, `cline`, `command-code`, `codeartsagent`, `codex`, `devin`, `forgecode`, `codebuddy`, `continue`, `costrict`, `crush`, `cursor`, `factory`, `gemini`, `github-copilot`, `hermes`, `iflow`, `junie`, `kilocode`, `kimi`, `kiro`, `lingma`, `minimax-code`, `vibe`, `oh-my-pi`, `opencode`, `pi`, `qoder`, `qwen`, `roocode`, `trae`, `zcode`, `agents`
+**可用工具 ID(`--tools`)** —— `windsurf` 也可接受，作为 `devin` 的别名：`amazon-q`, `antigravity`, `auggie`, `bob`, `claude`, `cline`, `command-code`, `codeartsagent`, `codex`, `devin`, `forgecode`, `codebuddy`, `continue`, `costrict`, `crush`, `cursor`, `factory`, `gemini`, `github-copilot`, `hermes`, `iflow`, `junie`, `kilocode`, `kimi`, `kiro`, `lingma`, `minimax-code`, `vibe`, `oh-my-pi`, `opencode`, `pi`, `qoder`, `qwen`, `roocode`, `trae`, `zed`, `zcode`, `agents`
 
 ## 依赖工作流的安装
 

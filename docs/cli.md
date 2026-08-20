@@ -88,6 +88,8 @@ OpenSpec CLI (`openspec`) 提供用于项目初始化、验证、状态检查与
 openspec-cn init [path] [options]
 ```
 
+使用 `--language <language>` 可向新项目的 `openspec/config.yaml` 添加语言指令。对于已有项目，请编辑该配置的 `context` 字段，这样 OpenSpec 就永远不会覆盖项目特定的指引。
+
 **参数:**
 
 | 参数 | 是否必填 | 描述 |
@@ -99,6 +101,7 @@ openspec-cn init [path] [options]
 | 选项 | 描述 |
 |--------|-------------|
 | `--tools <list>` | 非交互式配置 AI 工具。使用 `all`、`none` 或逗号分隔的列表 |
+| `--language <language>` | 创建新配置时使用此语言编写制品 |
 | `--force` | 自动清理旧版文件,不提示 |
 | `--profile <profile>` | 本次 init 运行覆盖全局 profile(`core` 或 `custom`) |
 | `--no-animation` | 显示静态欢迎屏而非动画版本 |
@@ -109,7 +112,7 @@ openspec-cn init [path] [options]
 
 当设置了 `OPENSPEC_NO_ANIMATION` 环境变量(任意值,包括空值)、`NO_COLOR` 被设为非空值,或操作系统启用了减弱动态效果偏好(macOS 的"减弱动态效果"、GNOME 关闭动画)时,欢迎动画同样会被跳过。
 
-**支持的工具 ID(`--tools`)** — `windsurf` 同样被接受,作为 `devin` 的别名:`amazon-q`, `antigravity`, `auggie`, `bob`, `claude`, `cline`, `command-code`, `codeartsagent`, `codex`, `devin`, `forgecode`, `codebuddy`, `continue`, `costrict`, `crush`, `cursor`, `factory`, `gemini`, `github-copilot`, `hermes`, `iflow`, `junie`, `kilocode`, `kimi`, `kiro`, `lingma`, `minimax-code`, `vibe`, `oh-my-pi`, `opencode`, `pi`, `qoder`, `qwen`, `roocode`, `trae`, `zcode`, `agents`
+**支持的工具 ID(`--tools`)** — `windsurf` 同样被接受,作为 `devin` 的别名:`amazon-q`, `antigravity`, `auggie`, `bob`, `claude`, `cline`, `command-code`, `codeartsagent`, `codex`, `devin`, `forgecode`, `codebuddy`, `continue`, `costrict`, `crush`, `cursor`, `factory`, `gemini`, `github-copilot`, `hermes`, `iflow`, `junie`, `kilocode`, `kimi`, `kiro`, `lingma`, `minimax-code`, `vibe`, `oh-my-pi`, `opencode`, `pi`, `qoder`, `qwen`, `roocode`, `trae`, `zed`, `zcode`, `agents`
 
 > 该列表与 `src/core/config.ts` 中的 `AI_TOOLS` 对应。各工具的 skill 与命令路径见 [支持的工具](supported-tools.md)。
 
@@ -1188,13 +1191,13 @@ openspec-cn feedback <message> [options]
 
 | 参数 | 是否必填 | 描述 |
 |----------|----------|-------------|
-| `message` | 是 | 反馈消息 |
+| `message` | 是 | 反馈摘要；长文本会在 Issue 标题中缩短，并在正文中保留 |
 
 **选项:**
 
 | 选项 | 描述 |
 |--------|-------------|
-| `--body <text>` | 详细描述 |
+| `--body <text>` | 附加在摘要之后的详细内容 |
 
 **要求:** 必须安装并已认证 GitHub CLI(`gh`)。
 
@@ -1241,6 +1244,11 @@ openspec-cn completion generate bash > ~/.bash_completion.d/openspec
 openspec-cn completion uninstall
 ```
 
+Completions are opt-in. The CLI mentions them once, on stderr, the first time you
+run a command in an interactive terminal, and never again — it also stays quiet
+if you already have completions installed. Set `OPENSPEC_NO_COMPLETIONS=1` to
+suppress that tip entirely.
+
 ---
 
 ## 退出码
@@ -1262,6 +1270,7 @@ openspec-cn completion uninstall
 | `EDITOR` or `VISUAL` | Editor for `openspec config edit` |
 | `NO_COLOR` | Disable color output when set |
 | `OPENSPEC_NO_ANIMATION` | Disable the `openspec init` welcome animation when set |
+| `OPENSPEC_NO_COMPLETIONS` | Set to `1` to suppress the one-time tip about shell completions |
 | `OPENSPEC_NO_UPDATE_CHECK` | Disable the `openspec update` check for a newer published CLI when set (any value, including empty). Also skipped when `CI` is set (unless `false`/`0`/`no`/`off`) or `NODE_ENV=test` |
 | `npm_config_registry` | Registry the `openspec update` version check asks. Must be an `http(s)` URL or it falls back to `https://registry.npmjs.org`. No `.npmrc` file is read |
 

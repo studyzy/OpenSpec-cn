@@ -88,10 +88,15 @@ artifacts:
       不要为既有能力的 delta 添加 `## Purpose` ——
       该 spec 已经有一个，delta 中的会被忽略。要修改
       既有能力的 Purpose（包括残留的 `TBD` 占位符），
-      请直接编辑 `openspec/specs/<capability-path>/spec.md`。
+      请直接编辑 `<planningHome.root>/openspec/specs/<capability-path>/spec.md`。
+      `planningHome.root` 来自 `openspec instructions ... --json` 响应。
+      始终使用它而不是仓库相对路径：只要变更位于某个 store 中
+      —— 无论该 store 来自 `--store`、项目中的 `store:` 指针，
+      还是全局默认 store —— 它都会解析到该 store；否则解析到当前仓库。
+      无需自行判断属于哪种情况，该字段已经处理好。
 
       MODIFIED 需求的工作流程：
-      1. 在 openspec/specs/<capability-path>/spec.md 中定位既有需求
+      1. 在 `<planningHome.root>/openspec/specs/<capability-path>/spec.md` 中定位既有需求（与上面相同的 store-aware 根目录）
       2. 复制整个需求块（从 `### Requirement:` 到其所有场景）
       3. 粘贴到 `## MODIFIED Requirements` 下，并编辑以反映新行为
       4. 确保标题文本完全一致（忽略空白差异）
@@ -179,22 +184,25 @@ artifacts:
       - 每个任务必须（MUST）是复选框：`- [ ] X.Y 任务描述`
       - 任务应足够小，可在一次会话内完成
       - 按依赖关系排序（什么必须先做？）
+      - 每个任务必须（MUST）说明如何验证其已完成（测试、命令、
+        可观察行为或交付的产物）。把验证方式写进该任务的复选框描述。
+        只有当需要检查跨越多个实现任务的整体集成或系统行为时，
+        才单独使用一个验证任务。
 
       示例：
       ```
       ## 1. 准备工作
 
-      - [ ] 1.1 创建新的模块结构
-      - [ ] 1.2 在 package.json 中添加依赖
+      - [ ] 1.1 创建新的模块结构，并验证预期文件已存在
+      - [ ] 1.2 在 package.json 中添加依赖，并验证包安装成功
 
       ## 2. 核心实现
 
-      - [ ] 2.1 实现数据导出函数
-      - [ ] 2.2 添加 CSV 格式化工具
+      - [ ] 2.1 实现数据导出函数，并验证导出测试通过
+      - [ ] 2.2 添加 CSV 格式化工具，并验证单元测试覆盖引号和分隔符
       ```
 
       需要构建什么参考 specs，怎么构建参考 design。
-      每个任务都应当是可验证的 —— 你能判断它何时完成。
     requires:
       - specs
       - design

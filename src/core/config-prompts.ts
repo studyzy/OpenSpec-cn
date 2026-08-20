@@ -13,16 +13,24 @@ export function serializeConfig(config: Partial<ProjectConfig>): string {
   lines.push(`schema: ${config.schema}`);
   lines.push('');
 
-  // 上下文段落（带注释）
-  lines.push('# 项目上下文（可选）');
-  lines.push('# 创建产出物时会展示给 AI 使用。');
-  lines.push('# 可添加你的技术栈、编码规范、风格指南、领域知识等。');
-  lines.push('# 示例：');
-  lines.push('#   context: |');
-  lines.push('#     技术栈：TypeScript、React、Node.js');
-  lines.push('#     我们使用 conventional commits');
-  lines.push('#     领域：电子商务平台');
-  lines.push('');
+  if (config.context !== undefined) {
+    lines.push('context: |');
+    for (const line of config.context.split('\n')) {
+      lines.push(`  ${line}`);
+    }
+    lines.push('');
+  } else {
+    // Context section with comments
+    lines.push('# 项目上下文（可选）');
+    lines.push('# 创建产出物时会展示给 AI 使用。');
+    lines.push('# 可添加你的技术栈、编码规范、风格指南、领域知识等。');
+    lines.push('# 示例：');
+    lines.push('#   context: |');
+    lines.push('#     技术栈：TypeScript、React、Node.js');
+    lines.push('#     我们使用 conventional commits');
+    lines.push('#     领域：电子商务平台');
+    lines.push('');
+  }
 
   // 规则段落（带注释）
   lines.push('# 按产出物的规则（可选）');

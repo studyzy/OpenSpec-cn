@@ -15,7 +15,7 @@ export function getFfChangeSkillTemplate(): SkillTemplate {
 
 ${STORE_SELECTION_GUIDANCE}
 
-**输入**：用户的请求应当包含变更名（kebab-case）或对想要构建内容的描述。
+**Input**: 用户的请求应当包含变更名（kebab-case）或对想要构建内容的描述。
 
 **步骤**
 
@@ -128,7 +128,7 @@ export function getOpsxFfCommandTemplate(): CommandTemplate {
 
 ${STORE_SELECTION_GUIDANCE}
 
-**输入**：\`/opsx:ff\` 之后的参数是变更名（kebab-case），或用户想要构建内容的描述。
+**Input**: \`/opsx:ff\` 之后的参数是变更名（kebab-case），或用户想要构建内容的描述。
 
 **步骤**
 

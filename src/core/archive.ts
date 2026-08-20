@@ -97,6 +97,35 @@ export async function isRetirableSpec(specName: string, rebuilt: string): Promis
 }
 
 /**
+ * How much of one blocking line the abort is willing to show. A line long
+ * enough to fill the screen would push the way out of the abort off it.
+ */
+const UNACCOUNTED_LINE_MAX = 200;
+
+/**
+ * The first few lines a retirement would delete without being able to name
+ * them, quoted, with a count for the rest. Capped so a long tail cannot bury
+ * the rest of the abort.
+ *
+ * The lines are authored spec content printed verbatim to a terminal, so they
+ * get the same treatment as a change directory name (`describeChangeName`): a
+ * raw CR could forge a line of its own, and an ESC could redraw the screen.
+ * Truncation counts code points so a cut never leaves half a surrogate pair.
+ */
+function describeUnaccountedContent(lines: string[]): string {
+  const shown = lines
+    .slice(0, 3)
+    .map((line) => {
+      const safe = [...line.replace(/[\u0000-\u001f\u007f]/g, '?')];
+      const clipped = safe.slice(0, UNACCOUNTED_LINE_MAX).join('');
+      return `"${safe.length > UNACCOUNTED_LINE_MAX ? `${clipped}\u2026` : clipped}"`;
+    })
+    .join(', ');
+  const rest = lines.length > 3 ? `，以及另外 ${lines.length - 3} 行` : '';
+  return `${shown}${rest}`;
+}
+
+/**
  * What this run should do with a rebuilt spec: write it as usual, retire the
  * capability because the delta removed its last requirement (#1302), or do
  * nothing because there is no spec to write and none to retire.
@@ -1591,25 +1620,54 @@ export class ArchiveCommand {
               const specName = p.update.id;
               const report = await new Validator().validateSpecContent(specName, p.rebuilt);
               if (!report.valid) {
+                // This run is what emptied the capability, and "no
+                // requirements" is the only thing wrong with the spec that
+                // would be written - so retiring it is what archive would do,
+                // and what stands in the way of that is worth saying. Not
+                // always the *only* fix: a live requirement can be hiding in a
+                // second `## Requirements` section the validator never reaches,
+                // and merging the sections fixes that spec without a deletion.
+                const emptiedByThisRun =
+                  p.update.exists &&
+                  p.counts.removed > 0 &&
+                  p.noRequirementBlocks &&
+                  (await isRetirableSpec(specName, p.rebuilt));
                 // The dead end #1302 describes: the rebuilt spec is unwritable
                 // for exactly one reason, and retiring the capability is the
                 // fix - but only the author can authorise deleting the spec, so
                 // the abort names the marker instead of just rejecting. Says so
                 // only when the marker is the ONLY thing missing, so it never
                 // sends someone after a marker that would not have helped.
-                const retirementWouldFix =
-                  !retirementDeclared &&
-                  p.update.exists &&
-                  p.counts.removed > 0 &&
-                  (await isRetirementCandidate(p.update, p, false));
-                const retirementHint = retirementWouldFix
-                  ? `此变更移除了 '${specName}' 的最后一条需求。要废弃该功能并删除其 spec，` +
-                    `请在变更的 ${METADATA_FILENAME} 中添加 \`retire_capabilities: true\` ` +
-                    `（该文件需要与 \`schema:\` 并列），然后重新运行。` +
-                    (retirementMarker.invalidReason
-                      ? ` 当前存在的标记无法生效（${retirementMarker.invalidReason}）。`
-                      : '')
-                  : undefined;
+                const retirementHint =
+                  !retirementDeclared && emptiedByThisRun && p.unaccountedContent.length === 0
+                    ? `此变更移除了 '${specName}' 的最后一条需求。要废弃该功能并删除其 spec，` +
+                      `请在变更的 ${METADATA_FILENAME} 中添加 \`retire_capabilities: true\` ` +
+                      `（该文件需要与 \`schema:\` 并列），然后重新运行。` +
+                      (retirementMarker.invalidReason
+                        ? ` 当前存在的标记无法生效（${retirementMarker.invalidReason}）。`
+                        : '')
+                    : undefined;
+                // #1696: the marker is missing AND the file holds content a
+                // retirement cannot account for, so this abort said nothing at
+                // all - just "must have at least one requirement", with no way
+                // forward. It names the content instead of the marker, on
+                // purpose: the marker is only ever named when adding it would
+                // really let the archive through, and here it would not. Once
+                // the content is resolved the rerun names the marker.
+                const blockedRetirementHint =
+                  !retirementDeclared && emptiedByThisRun && p.unaccountedContent.length > 0
+                    ? `此变更移除了 '${specName}' 的最后一条需求，因此重建后的 spec 没有任何需求、` +
+                      `无法写入。归档本来会改为废弃该功能，但 spec 中仍含有合并无法安全处理、` +
+                      `删除文件时会一并带走的内容，所以会被拒绝：` +
+                      `${describeUnaccountedContent(p.unaccountedContent)}。` +
+                      '请将其移入 `## Purpose` 或规范需求中，或者手动删除该 spec，然后重新运行。' +
+                      // Said here too, because an author looking at a marker they
+                      // believe authorises the deletion should not have to clear
+                      // the content first to find out it was never read.
+                      (retirementMarker.invalidReason
+                        ? ` 当前存在的标记无法生效（${retirementMarker.invalidReason}）。`
+                        : '')
+                    : undefined;
                 // The marker was set and retirement was still refused. Saying
                 // nothing left the author who did exactly what the docs asked
                 // back in the original dead end with no signal that their
@@ -1622,8 +1680,7 @@ export class ArchiveCommand {
                   (await isRetirableSpec(specName, p.rebuilt))
                     ? `'${specName}' 声明了 retire_capabilities，但该 spec 包含合并无法安全处理的内容，` +
                       `删除该文件会一并带走：` +
-                      `${p.unaccountedContent.slice(0, 3).map((line) => `"${line}"`).join(', ')}` +
-                      `${p.unaccountedContent.length > 3 ? `，以及另外 ${p.unaccountedContent.length - 3} 行` : ''}。` +
+                      `${describeUnaccountedContent(p.unaccountedContent)}。` +
                       '请将其移入 `## Purpose` 或规范需求中，或者手动删除该 spec。'
                     : undefined;
                 if (json) {
@@ -1632,6 +1689,7 @@ export class ArchiveCommand {
                     `为 '${specName}' 重建的 spec 验证失败。未更改任何文件。`,
                     refusalReason ??
                       retirementHint ??
+                      blockedRetirementHint ??
                       `修复 change deltas 后运行 ${withStoreFlag(root, `openspec-cn validate ${specName}`)}。`
                   );
                 }
@@ -1641,6 +1699,7 @@ export class ArchiveCommand {
                   else if (issue.level === 'WARNING') console.log(chalk.yellow(`  ⚠ ${issue.message}`));
                 }
                 if (retirementHint) console.log(chalk.yellow(`  → ${retirementHint}`));
+                if (blockedRetirementHint) console.log(chalk.yellow(`  → ${blockedRetirementHint}`));
                 if (refusalReason) console.log(chalk.yellow(`  → ${refusalReason}`));
                 console.log('已中止。未更改任何文件。');
                 process.exitCode = 1;

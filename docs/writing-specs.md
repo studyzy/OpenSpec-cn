@@ -56,7 +56,7 @@ The system SHALL expire a session after 30 minutes of inactivity.
 - **`## MODIFIED Requirements`** —— 已存在并正在改变的行为。包含完整的新版本；一行关于改了什么的小注能帮审阅者。
 - **`## REMOVED Requirements`** —— 正在消失的行为，附一行说明原因。
 
-归档时，ADDED 会追加到主 spec 中，MODIFIED 会替换旧版本，REMOVED 则从中删去。如果你移除了某个能力的最后一条需求，就等于让它退役：与其留下一个空空如也的 spec，归档会删除 `openspec/specs/<capability>/spec.md`。因为这是归档过程中唯一会删除文件的步骤，所以必须显式请求——在该变更的 `.openspec.yaml` 中加上 `retire_capabilities: true`，与该文件本就需要的 `schema:` 并列。没有它，归档会中止并告知你原因。对于调用方 checkout 中的 spec，归档输出还会给出用于恢复已提交文件的 `git checkout` 命令；选中的 store 则会收到面向 checkout 范围的恢复指引。如果你把一次真正的修改标成 ADDED，最终会得到两条互相冲突的需求；如果你把新行为描述成 MODIFIED，则没有东西可替换。拿不准时，打开当前 spec 看看这条需求是否已经存在。
+归档时，ADDED 会追加到主 spec 中，MODIFIED 会替换旧版本，REMOVED 则从中删去。如果你移除了某个能力的最后一条需求，就等于让它退役：与其留下一个空空如也的 spec，归档会删除 `openspec/specs/<capability>/spec.md`。因为这是归档过程中唯一会删除文件的步骤，所以必须显式请求——在该变更的 `.openspec.yaml` 中加上 `retire_capabilities: true`，与该文件本就需要的 `schema:` 并列。没有它，归档会中止并告知你原因。退役会删除整个文件，因此只要 spec 中除标题、`## Purpose` 和需求块之外还含有任何内容（例如 `## Notes` 小节、需求下方的注释），归档也会拒绝——中止信息会点名这些行；请把它们移入 `## Purpose` 或某条需求中，或者手动删除该 spec。对于调用方 checkout 中的 spec，归档输出还会给出用于恢复已提交文件的 `git checkout` 命令；选中的 store 则会收到面向 checkout 范围的恢复指引。如果你把一次真正的修改标成 ADDED，最终会得到两条互相冲突的需求；如果你把新行为描述成 MODIFIED，则没有东西可替换。拿不准时，打开当前 spec 看看这条需求是否已经存在。
 
 还有一个小节值得了解。当你的增量创建了一个尚不存在的能力时，用 `## Purpose` 开头——用一两句话说明这个能力是做什么的。归档会把它用作所创建主 spec 的 Purpose；跳过它，你就会得到一个 `TBD` 占位符，需要手工填写。已存在的 spec 本就有 Purpose，因此那里会忽略增量中的 Purpose——要修改它，请直接编辑 `openspec/specs/<capability-path>/spec.md`。这里的 `<capability-path>` 是相对于 `specs/` 的目录，例如扁平项目中的 `user-auth`，或按领域组织的项目中的 `identity/user-auth`。
 

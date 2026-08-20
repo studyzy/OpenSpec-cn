@@ -78,7 +78,7 @@ CLI 是**引擎**。它了解规则：一个变更文件夹长什么样、哪些
 | `.../commands/opsx/<id>.*` | `/opsx:propose` | Claude Code、Gemini CLI、Crush |
 | `.../opsx-<id>.*` | `/opsx-propose` | Cursor、GitHub Copilot (IDE)、Devin Desktop、Trae、Oh My Pi |
 | `.amazonq/prompts/opsx-<id>.md` | `@opsx-propose` | Amazon Q Developer |
-| 无 — 仅 skills | `/openspec-propose` | CodeArts、ForgeCode、Hermes、Mistral Vibe、共享的 `.agents` |
+| 无 — 仅 skills | `/openspec-propose` | CodeArts、ForgeCode、Hermes、Mistral Vibe、Zed Agent、共享的 `.agents` |
 | 无 — Kimi Code | `/skill:openspec-propose` | Kimi Code |
 | 无 — Codex CLI | `$openspec-propose` | Codex |
 
@@ -112,7 +112,7 @@ Devin 是唯一横跨两行的工具。Devin Desktop 读取
 
 快速检查，按从快到慢：
 
-1. **在你的 AI 聊天中输入一个斜杠。** 开始输入 `/opsx` 并留意自动补全建议。如果它们出现了，就说明装好了。在仅支持 skills 的工具上（Codex、Kimi Code、CodeArts、ForgeCode、Hermes、Mistral Vibe，或共享的 `.agents` 目标），即使安装完好 `/opsx` 也永远不会补全——请改用上表中的 skill 名。
+1. **在你的 AI 聊天中输入一个斜杠。** 开始输入 `/opsx` 并留意自动补全建议。如果它们出现了，就说明装好了。在仅支持 skills 的工具上（Codex、Kimi Code、CodeArts、ForgeCode、Hermes、Mistral Vibe、Zed Agent，或共享的 `.agents` 目标），即使安装完好 `/opsx` 也永远不会补全——请改用上表中的 skill 名。
 2. **查找那些文件。** 对于 Claude Code，检查 `.claude/skills/` 是否包含 `openspec-*` 文件夹。其他工具使用它们自己的目录（[支持的工具](supported-tools.md) 中有列出）。
 3. **重新运行安装。** 在你的项目根目录运行 `openspec-cn update`。这会为你配置的所有工具重新生成 skill 和 command 文件。
 4. **重启你的助手。** 许多工具在启动时扫描 skills 和 commands，因此开一个新窗口可能正是缺失的那一步。

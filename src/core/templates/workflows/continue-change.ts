@@ -15,7 +15,7 @@ export function getContinueChangeSkillTemplate(): SkillTemplate {
 
 ${STORE_SELECTION_GUIDANCE}
 
-**输入**：可选地指定变更名。若省略，检查能否从对话上下文推断。若模糊或歧义，你必须提示用户从可用变更中选择。
+**Input**: 可选地指定变更名。若省略，检查能否从对话上下文推断。若模糊或歧义，你必须提示用户从可用变更中选择。
 
 **步骤**
 
@@ -133,7 +133,7 @@ export function getOpsxContinueCommandTemplate(): CommandTemplate {
 
 ${STORE_SELECTION_GUIDANCE}
 
-**输入**：可选地在 \`/opsx:continue\` 后指定变更名（例如 \`/opsx:continue add-auth\`）。若省略，检查能否从对话上下文推断。若模糊或歧义，你必须提示用户从可用变更中选择。
+**Input**: 可选地在 \`/opsx:continue\` 后指定变更名（例如 \`/opsx:continue add-auth\`）。若省略，检查能否从对话上下文推断。若模糊或歧义，你必须提示用户从可用变更中选择。
 
 **步骤**
 

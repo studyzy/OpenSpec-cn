@@ -19,7 +19,7 @@ ${STORE_SELECTION_GUIDANCE}
 
 \`<capability-path>\` 是相对于 \`specs/\` 的 spec 目录（例如 \`user-auth\` 或 \`identity/user-auth\`）。在解析主 spec 时保留每个增量 spec 的完整路径。
 
-**输入**：无需输入（通过提示选择）
+**Input**: None required（通过提示选择）
 
 **步骤**
 
@@ -353,7 +353,7 @@ ${STORE_SELECTION_GUIDANCE}
 
 \`<capability-path>\` 是相对于 \`specs/\` 的 spec 目录（例如 \`user-auth\` 或 \`identity/user-auth\`）。在解析主 spec 时保留每个增量 spec 的完整路径。
 
-**输入**：无需输入（通过提示选择）
+**Input**: None required（通过提示选择）
 
 **步骤**
 
