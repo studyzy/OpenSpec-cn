@@ -35,6 +35,7 @@ import { registerContextCommand } from '../commands/context.js';
 import { registerWorksetCommand } from '../commands/workset.js';
 import {
   statusCommand,
+  BATCH_STATUS_FAILURE_PAYLOAD,
   instructionsCommand,
   applyInstructionsCommand,
   archiveInstructionsCommand,
@@ -429,8 +430,9 @@ changeCmd
   .option('--json', '以 JSON 格式输出')
   .option('--deltas-only', '仅显示 deltas（仅 JSON）')
   .option('--requirements-only', '--deltas-only 的别名（已弃用）')
+  .option('--diff', '显示 delta spec 的逐需求 diff')
   .option('--no-interactive', '禁用交互式提示')
-  .action(async (changeName?: string, options?: { json?: boolean; requirementsOnly?: boolean; deltasOnly?: boolean; noInteractive?: boolean }) => {
+  .action(async (changeName?: string, options?: { json?: boolean; requirementsOnly?: boolean; deltasOnly?: boolean; diff?: boolean; noInteractive?: boolean }) => {
     try {
       const changeCommand = new ChangeCommand();
       await changeCommand.show(changeName, options);
@@ -539,6 +541,7 @@ program
   // change-only flags
   .option('--deltas-only', '仅显示 deltas（仅 JSON，change）')
   .option('--requirements-only', '--deltas-only 的别名（已弃用，change）')
+  .option('--diff', '显示 delta spec 的逐需求 diff（change）')
   // spec-only flags
   .option('--requirements', '仅 JSON：仅显示需求（排除场景）')
   .option('--no-scenarios', '仅 JSON：排除场景内容')
@@ -643,6 +646,7 @@ program
   .command('status')
   .description('显示变更的产出物完成状态')
   .option('--change <id>', '要显示状态的变更名称')
+  .option('--all', '显示所有活跃变更的状态')
   .option('--schema <name>', 'Schema 覆盖（从 config.yaml 自动检测）')
   .option('--json', '以 JSON 格式输出')
   .option('--store <id>', STORE_OPTION_DESCRIPTION)
@@ -651,7 +655,13 @@ program
     try {
       await statusCommand(options);
     } catch (error) {
-      failWithError(error, { enabled: options.json, fallbackCode: 'change_error' });
+      failWithError(error, {
+        enabled: options.json,
+        // The batch null-shape; the single-change failure shape is
+        // pre-existing contract and stays payload-free.
+        payload: options.all ? BATCH_STATUS_FAILURE_PAYLOAD : undefined,
+        fallbackCode: 'change_error',
+      });
       process.exit(1);
     }
   });

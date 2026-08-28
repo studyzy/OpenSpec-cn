@@ -547,7 +547,7 @@ describe('schema fork fidelity (PR #1130)', () => {
     const output = consoleLogSpy.mock.calls.map((c) => String(c[0])).join('\n');
     expect(process.exitCode).toBeTruthy();
     expect(output).toContain('"forked": false');
-    expect(output).toMatch(/changed on disk|concurrent|aborted/i);
+    expect(output).toMatch(/磁盘上发生变化|并发|中止/i);
 
     // The concurrent edit is preserved — NOT overwritten by the fork. The
     // destination still has the concurrent content, and is not the fork's copy

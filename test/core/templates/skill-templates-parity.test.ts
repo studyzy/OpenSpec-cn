@@ -42,7 +42,7 @@ const EXPECTED_FUNCTION_HASHES: Record<string, string> = {
   getArchiveChangeSkillTemplate: '27ae04d50ec772c48214f0dbea78e5d669bd6685528acd9d9e31506eaa5ef1bd',
   getBulkArchiveChangeSkillTemplate: '2a8ab89664e3d93bdc0af08a9d0c00d951804d14cdd9b48216b015f1fa495e9e',
   getContinueChangeSkillTemplate: 'c0fa4c9eec7fd2f378b868a25ec293ce47d268108d39b66971c06508edc11428',
-  getExploreSkillTemplate: 'ebb3c6741efeca075e717b93bdcb2cf598152090bf5aaa52261d071f1dfa57c7',
+  getExploreSkillTemplate: '80b66d1cff21f9687a3643d9ab0e675d543166a87a3336b98c282497de39049f',
   getFeedbackSkillTemplate: '4d3252e3a359d4769bf36166ac6f486e92d7797e922bf9707808f6437ab022ef',
   getFfChangeSkillTemplate: '37908d37ef23676a304277e9183dc5fc5cd4a2c1608b6f069274c422b24c41e7',
   getNewChangeSkillTemplate: 'a645c6a2e6bacc62fb0662e2b0be8e632c52f3a6da01a090a05d2e94f4686d01',
@@ -51,7 +51,7 @@ const EXPECTED_FUNCTION_HASHES: Record<string, string> = {
   getOpsxArchiveCommandTemplate: 'bded434a697b86ff3d0acd7efccbc7dc350e5554648c705748666adc96298e60',
   getOpsxBulkArchiveCommandTemplate: '8e9241d90a48b15d39f7768b8501581fbfeec84d995b336346c22937340662ad',
   getOpsxContinueCommandTemplate: '241390ddab99a67d3cb5a08bc7ad48671d7c82e2f74975e7555f40e6a6cf031f',
-  getOpsxExploreCommandTemplate: 'afcf940c587e7a0794c70e91d08f819675aaeb9c65690eded2bc6a3c30ac8060',
+  getOpsxExploreCommandTemplate: '9fb6544a1954f30759fa0783da4c814591c8d2f24de3ed89505229994af0e24c',
   getOpsxFfCommandTemplate: 'e81a7959b780dd7eb00651ce9d04f7a5088c89b9cb6f257720dfb929c2bbc476',
   getOpsxNewCommandTemplate: '3edb14a25e8cd62b8790eb19205e687203d86573a7314f7c144fac0403807f58',
   getOpsxOnboardCommandTemplate: '036fcce079c61a50170b2a360542f32f6bd33e110c7f3e4692d2c24389000c1d',
@@ -66,7 +66,7 @@ const EXPECTED_FUNCTION_HASHES: Record<string, string> = {
 };
 
 const EXPECTED_GENERATED_SKILL_CONTENT_HASHES: Record<string, string> = {
-  'openspec-explore': '45a0743765c18a479c3e8c8cc2788e68d14ca1d9d2203822651d86610779532c',
+  'openspec-explore': '85d75af2eee7007e93add37a3de5a5d551ca49ca11a29e30c9881cb6de8b2359',
   'openspec-new-change': 'ab178f982cd0f11864e09f61f0b400a79a0e0c5d67555ee76d5c864cd7f6d49c',
   'openspec-continue-change': '80eef9d88132d28943f164380dd4f8a8c501039a82adaa1fe96f4ee8952935ae',
   'openspec-apply-change': 'dc7618f96b47566538eab1175ffaa4201aa1b91c460da5ba7097f39a668082e8',

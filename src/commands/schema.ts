@@ -3,7 +3,7 @@ import * as fs from 'node:fs';
 import * as path from 'node:path';
 import { createHash } from 'node:crypto';
 import ora from 'ora';
-import { stringify as stringifyYaml, parseDocument } from 'yaml';
+import { stringify as stringifyYaml, parseDocument, isMap } from 'yaml';
 import {
   getSchemaDir,
   getProjectSchemasDir,
@@ -14,6 +14,7 @@ import {
 } from '../core/artifact-graph/resolver.js';
 import { parseSchema, SchemaValidationError } from '../core/artifact-graph/schema.js';
 import type { SchemaYaml, Artifact } from '../core/artifact-graph/types.js';
+import { resolveConfigFilePath } from '../core/project-config.js';
 import { FileSystemUtils } from '../utils/file-system.js';
 
 /**
@@ -369,6 +370,100 @@ function fingerprintDir(dir: string): string {
   };
   walk(dir, '');
   return hash.digest('hex');
+}
+
+interface PreparedConfigUpdate {
+  path: string;
+  content: Buffer;
+  originalContent: Buffer | null;
+  originalMode: number | null;
+}
+
+/** @internal File-operation seam for transactional failure tests. */
+export const schemaInitFileOperations = {
+  renameSync: fs.renameSync,
+};
+
+async function prepareDefaultConfigUpdate(
+  projectRoot: string,
+  schemaName: string
+): Promise<PreparedConfigUpdate> {
+  const configPath =
+    resolveConfigFilePath(projectRoot) ??
+    path.join(projectRoot, 'openspec', 'config.yaml');
+  FileSystemUtils.assertProjectArtifactPath(projectRoot, configPath);
+
+  if (fs.existsSync(configPath)) {
+    const stats = fs.lstatSync(configPath);
+    if (stats.isSymbolicLink()) {
+      throw new Error(
+        `无法设置默认 schema：${path.basename(configPath)} 必须是常规文件，而非符号链接`
+      );
+    }
+    if (!stats.isFile()) {
+      throw new Error(
+        `无法设置默认 schema：${path.basename(configPath)} 必须是常规文件`
+      );
+    }
+    if (
+      !(await FileSystemUtils.canWriteFile(configPath)) ||
+      !(await FileSystemUtils.canWriteFile(path.dirname(configPath)))
+    ) {
+      throw new Error(
+        `无法设置默认 schema：${path.basename(configPath)} 不可写`
+      );
+    }
+
+    const originalContent = fs.readFileSync(configPath);
+    const config = parseDocument(originalContent.toString('utf-8'));
+    if (config.errors.length > 0) {
+      throw new Error(
+        `无法设置默认 schema：${path.basename(configPath)} 是无效的 YAML`
+      );
+    }
+    if (config.contents !== null && !isMap(config.contents)) {
+      throw new Error(
+        `无法设置默认 schema：${path.basename(configPath)} 必须包含一个 YAML 对象`
+      );
+    }
+    config.set('schema', schemaName);
+    config.delete('defaultSchema');
+
+    return {
+      path: configPath,
+      content: Buffer.from(config.toString()),
+      originalContent,
+      originalMode: stats.mode,
+    };
+  }
+
+  if (!(await FileSystemUtils.canWriteFile(configPath))) {
+    throw new Error(
+      `无法设置默认 schema：${path.dirname(configPath)} 不可写`
+    );
+  }
+
+  return {
+    path: configPath,
+    content: Buffer.from(stringifyYaml({ schema: schemaName })),
+    originalContent: null,
+    originalMode: null,
+  };
+}
+
+function configMatchesPreparedState(prepared: PreparedConfigUpdate): boolean {
+  if (prepared.originalContent === null) {
+    return !fs.existsSync(prepared.path);
+  }
+  if (!fs.existsSync(prepared.path)) return false;
+
+  const stats = fs.lstatSync(prepared.path);
+  return (
+    stats.isFile() &&
+    !stats.isSymbolicLink() &&
+    stats.mode === prepared.originalMode &&
+    fs.readFileSync(prepared.path).equals(prepared.originalContent)
+  );
 }
 
 /**
@@ -829,8 +924,8 @@ export function registerSchemaCommand(program: Command): void {
               : null;
             if (currentFingerprint !== authorizedDestinationFingerprint) {
               throw new Error(
-                `Schema '${destinationName}' at ${destinationDir} changed on disk while the fork was being prepared. ` +
-                  `Aborted to preserve those concurrent changes; nothing was overwritten. Re-run the fork to overwrite the current contents.`
+                `在准备 fork 期间，${destinationDir} 处的 Schema '${destinationName}' 在磁盘上发生了变化。` +
+                  `已中止以保留这些并发变更；未覆盖任何内容。请重新运行 fork 以覆盖当前内容。`
               );
             }
 
@@ -1103,53 +1198,175 @@ export function registerSchemaCommand(program: Command): void {
           };
         }
 
-        // Replace only after all inputs have been collected and validated
-        if (schemaExists) {
-          if (spinner) spinner.start(`Removing existing schema '${name}'...`);
-          fs.rmSync(schemaDir, { recursive: true });
-        }
+        // Parse and serialize the config before staging any schema files. This
+        // makes malformed, non-object, linked, and read-only configs fail before
+        // an existing schema can be moved or a new one can appear.
+        const preparedConfig = options?.default
+          ? await prepareDefaultConfigUpdate(projectRoot, name)
+          : null;
+        const schemasDir = getProjectSchemasDir(projectRoot);
+        FileSystemUtils.assertProjectArtifactPath(projectRoot, schemaDir);
+        const authorizedSchemaFingerprint = schemaExists
+          ? fingerprintDir(schemaDir)
+          : null;
 
-        // Create schema directory
         if (spinner) spinner.start(`Creating schema '${name}'...`);
-        fs.mkdirSync(schemaDir, { recursive: true });
-
-        fs.writeFileSync(
-          path.join(schemaDir, 'schema.yaml'),
-          stringifyYaml(schema)
+        fs.mkdirSync(schemasDir, { recursive: true });
+        const schemaStagingDir = fs.mkdtempSync(
+          path.join(schemasDir, '.init-staging-')
         );
+        let configStagingDir: string | null = null;
+        let stagedConfigPath: string | null = null;
 
-        // Create template files in templates/ subdirectory (standard location)
-        const templatesDir = path.join(schemaDir, 'templates');
-        for (const artifact of selectedArtifacts) {
-          const templatePath = path.join(templatesDir, artifact.template);
-          const templateDir = path.dirname(templatePath);
+        try {
+          fs.writeFileSync(
+            path.join(schemaStagingDir, 'schema.yaml'),
+            stringifyYaml(schema)
+          );
 
-          if (!fs.existsSync(templateDir)) {
-            fs.mkdirSync(templateDir, { recursive: true });
+          const templatesDir = path.join(schemaStagingDir, 'templates');
+          for (const artifact of selectedArtifacts) {
+            const templatePath = path.join(templatesDir, artifact.template);
+            fs.mkdirSync(path.dirname(templatePath), { recursive: true });
+            fs.writeFileSync(templatePath, createDefaultTemplate(artifact.id));
           }
 
-          // Create default template content
-          const templateContent = createDefaultTemplate(artifact.id);
-          fs.writeFileSync(templatePath, templateContent);
-        }
+          const validation = validateSchema(schemaStagingDir);
+          if (!validation.valid) {
+            throw new Error(
+              `Generated schema failed validation: ${validation.issues
+                .map((issue) => issue.message)
+                .join('; ')}`
+            );
+          }
 
-        // Update config if --default
-        if (options?.default) {
-          const configPath = path.join(projectRoot, 'openspec', 'config.yaml');
-
-          if (fs.existsSync(configPath)) {
-            const { parse: parseYaml, stringify: stringifyYaml2 } = await import('yaml');
-            const configContent = fs.readFileSync(configPath, 'utf-8');
-            const config = parseYaml(configContent) || {};
-            config.defaultSchema = name;
-            fs.writeFileSync(configPath, stringifyYaml2(config));
-          } else {
-            // Create config file
-            const configDir = path.dirname(configPath);
-            if (!fs.existsSync(configDir)) {
-              fs.mkdirSync(configDir, { recursive: true });
+          if (preparedConfig) {
+            const configDir = path.dirname(preparedConfig.path);
+            configStagingDir = fs.mkdtempSync(
+              path.join(configDir, '.schema-init-config-')
+            );
+            stagedConfigPath = path.join(
+              configStagingDir,
+              path.basename(preparedConfig.path)
+            );
+            fs.writeFileSync(stagedConfigPath, preparedConfig.content);
+            if (preparedConfig.originalMode !== null) {
+              fs.chmodSync(stagedConfigPath, preparedConfig.originalMode);
             }
-            fs.writeFileSync(configPath, stringifyYaml({ defaultSchema: name }));
+          }
+
+          // Re-resolve both destinations immediately before the first move so
+          // a parent symlink swap during staging cannot redirect the commit.
+          FileSystemUtils.assertProjectArtifactPath(projectRoot, schemaDir);
+          if (preparedConfig) {
+            FileSystemUtils.assertProjectArtifactPath(projectRoot, preparedConfig.path);
+          }
+
+          const currentSchemaFingerprint = fs.existsSync(schemaDir)
+            ? fingerprintDir(schemaDir)
+            : null;
+          if (currentSchemaFingerprint !== authorizedSchemaFingerprint) {
+            throw new Error(
+              `在准备初始化期间，Schema '${name}' 在磁盘上发生了变化。` +
+                '已中止以保留这些并发变更。'
+            );
+          }
+          if (preparedConfig && !configMatchesPreparedState(preparedConfig)) {
+            throw new Error(
+              `在准备初始化期间，${path.basename(preparedConfig.path)} 在磁盘上发生了变化。` +
+                '已中止以保留这些并发变更。'
+            );
+          }
+
+          const token = `${process.pid}-${Date.now()}`;
+          const schemaBackup = `${schemaDir}.init-backup-${token}`;
+          const configBackup = preparedConfig
+            ? `${preparedConfig.path}.init-backup-${token}`
+            : null;
+          let schemaBackedUp = false;
+          let configBackedUp = false;
+          let schemaInstalled = false;
+          let configInstalled = false;
+
+          try {
+            if (schemaExists) {
+              schemaInitFileOperations.renameSync(schemaDir, schemaBackup);
+              schemaBackedUp = true;
+            }
+            if (preparedConfig && preparedConfig.originalContent !== null) {
+              schemaInitFileOperations.renameSync(preparedConfig.path, configBackup!);
+              configBackedUp = true;
+            }
+
+            schemaInitFileOperations.renameSync(schemaStagingDir, schemaDir);
+            schemaInstalled = true;
+            if (preparedConfig && stagedConfigPath) {
+              schemaInitFileOperations.renameSync(stagedConfigPath, preparedConfig.path);
+              configInstalled = true;
+            }
+          } catch (installError) {
+            const rollbackErrors: string[] = [];
+            try {
+              if (configInstalled && preparedConfig) {
+                fs.rmSync(preparedConfig.path, { force: true });
+              }
+              if (configBackedUp && preparedConfig && configBackup) {
+                schemaInitFileOperations.renameSync(configBackup, preparedConfig.path);
+              }
+            } catch (rollbackError) {
+              rollbackErrors.push(`配置文件：${(rollbackError as Error).message}`);
+            }
+            try {
+              if (schemaInstalled) {
+                fs.rmSync(schemaDir, { recursive: true, force: true });
+              }
+              if (schemaBackedUp) {
+                schemaInitFileOperations.renameSync(schemaBackup, schemaDir);
+              }
+            } catch (rollbackError) {
+              rollbackErrors.push(`Schema：${(rollbackError as Error).message}`);
+            }
+
+            if (rollbackErrors.length > 0) {
+              throw new Error(
+                `Schema 初始化失败且回滚不完整（${rollbackErrors.join(', ')}）。` +
+                  `恢复备份可能残留在 ${schemaDir} 和 ${preparedConfig?.path ?? '配置文件'} 附近。`,
+                { cause: installError }
+              );
+            }
+            throw installError;
+          }
+
+          // The transaction is committed. Cleanup cannot turn success into a
+          // false failure, so leave a recoverable backup and warn if removal is
+          // blocked instead of reporting that initialization failed.
+          for (const backup of [
+            schemaBackedUp ? schemaBackup : null,
+            configBackedUp ? configBackup : null,
+          ]) {
+            if (!backup) continue;
+            try {
+              fs.rmSync(backup, { recursive: true, force: true });
+            } catch (cleanupError) {
+              console.error(
+                `警告：初始化成功，但 ${backup} 处的备份无法移除：${(cleanupError as Error).message}`
+              );
+            }
+          }
+        } catch (error) {
+          try {
+            fs.rmSync(schemaStagingDir, { recursive: true, force: true });
+          } catch {
+            // Best-effort cleanup must not hide the operation's real error.
+          }
+          throw error;
+        } finally {
+          if (configStagingDir) {
+            try {
+              fs.rmSync(configStagingDir, { recursive: true, force: true });
+            } catch {
+              // Best-effort cleanup. A committed config has already moved out.
+            }
           }
         }
 

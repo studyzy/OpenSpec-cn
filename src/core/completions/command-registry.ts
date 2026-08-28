@@ -138,6 +138,10 @@ export const COMMAND_REGISTRY: CommandDefinition[] = [
         description: '--deltas-only 的别名（已弃用，change 专用）',
       },
       {
+        name: 'diff',
+        description: '显示 delta spec 的逐需求 diff（change 专用）',
+      },
+      {
         name: 'requirements',
         description: '仅显示需求，排除场景（仅 JSON，spec 专用）',
       },
@@ -189,6 +193,10 @@ export const COMMAND_REGISTRY: CommandDefinition[] = [
         name: 'change',
         description: '要显示状态的变更名称',
         takesValue: true,
+      },
+      {
+        name: 'all',
+        description: '显示所有活跃变更的状态',
       },
       {
         name: 'schema',
@@ -287,6 +295,7 @@ export const COMMAND_REGISTRY: CommandDefinition[] = [
             name: 'path',
             description: 'Store 使用的目录',
             takesValue: true,
+            completionType: 'path',
           },
           {
             name: 'init-git',
@@ -379,6 +388,7 @@ export const COMMAND_REGISTRY: CommandDefinition[] = [
         name: 'code-workspace',
         description: '同时为该集合写入 VS Code 工作区文件',
         takesValue: true,
+        completionType: 'path',
       },
       {
         name: 'force',
@@ -410,6 +420,7 @@ export const COMMAND_REGISTRY: CommandDefinition[] = [
             description:
               '成员文件夹，格式为 <path> 或 <name>=<path>；可重复，第一个为主成员',
             takesValue: true,
+            completionType: 'path',
           },
           {
             name: 'tool',
@@ -491,6 +502,10 @@ export const COMMAND_REGISTRY: CommandDefinition[] = [
           {
             name: 'requirements-only',
             description: '--deltas-only 的别名（已弃用）',
+          },
+          {
+            name: 'diff',
+            description: '显示 delta spec 的逐需求 diff',
           },
           COMMON_FLAGS.noInteractive,
         ],

@@ -29,6 +29,30 @@ function occurrenceCount(body: string, value: string): number {
   return body.split(value).length - 1;
 }
 
+const NON_ASCII = /[^\x00-\x7F]/;
+
+// Diagram lines are the ones drawn with box/arrow glyphs. Prose lines in the
+// worked examples (user dialog, the optional summary) are not diagrams, and the
+// CN build localizes them, so only the graphic lines must stay ASCII.
+const DIAGRAM_LINE = /[\|+v^=<>]/;
+
+function fencedBlockLines(body: string): Array<[number, string]> {
+  const lines: Array<[number, string]> = [];
+  let inFence = false;
+
+  body.split('\n').forEach((line, index) => {
+    if (line.trimStart().startsWith('```')) {
+      inFence = !inFence;
+      return;
+    }
+    if (inFence && DIAGRAM_LINE.test(line)) {
+      lines.push([index + 1, line]);
+    }
+  });
+
+  return lines;
+}
+
 describe('explore templates', () => {
   // Regression for #696: explore never loaded the project's declared
   // context, so it reasoned without the tech stack, conventions, and
@@ -80,6 +104,38 @@ describe('explore templates', () => {
     }
   });
 
+  it('requires separate confirmation before any file-writing action (#1715)', () => {
+    for (const [label, body] of bodies) {
+      expect(body, label).toContain(
+        '在进行第一次可写入操作之前'
+      );
+      expect(body, label).toContain('说明你要更改的制品或文件');
+      expect(body, label).toContain('提出一个直接的"是/否"问题');
+      expect(body, label).toContain('在单独的消息中等候用户的明确确认');
+      expect(body, label).toContain(
+        '回答设计或澄清问题绝不等于同意写入'
+      );
+      expect(body, label).toContain('无需确认即可运行只读命令或工具');
+      expect(body, label).toContain(
+        '确认仅覆盖你描述的范围；再次扩展前需重新询问'
+      );
+    }
+  });
+
+  it('treats workflow configuration and write-capable commands as changes (#1715)', () => {
+    for (const [label, body] of bodies) {
+      expect(body, label).toContain(
+        '创建或编辑 schemas、templates 或 `openspec/config.yaml` 是变更'
+      );
+      expect(body, label).toContain(
+        '包括 `openspec new change` 或其他会写入文件的命令'
+      );
+      expect(body, label).toContain(
+        '在已确认的范围内创建或更新 OpenSpec 变更制品没问题，写入其他任何内容则不行'
+      );
+    }
+  });
+
   it('scaffolds a new change before capturing exploration artifacts (#668, #720)', () => {
     for (const [label, body] of bodies) {
       const transition = newChangeTransition(body, label);
@@ -126,9 +182,9 @@ describe('explore templates', () => {
       expect(transition, label).toContain(
         'openspec-cn instructions "<artifact-id>" --change "<name>" --json'
       );
-      expect(transition, label).toMatch(/Capture the artifact/i);
+      expect(transition, label).toMatch(/捕获用户请求的制品/);
       expect(transition, label).toContain(
-        'without asking them to invoke another workflow command'
+        '无需让他们调用另一个工作流命令'
       );
       expect(transition, label).toMatch(/按依赖顺序处理/i);
       expect(transition, label).toMatch(
@@ -189,11 +245,33 @@ describe('explore templates', () => {
     }
   });
 
+  // Regression for #983: the worked examples drew boxes and tables with
+  // Unicode box-drawing, arrow, and marker glyphs. Agents copy those
+  // examples verbatim, and on terminals that render the glyphs
+  // double-width the right border of every padded box drifted loose.
+  it('draws every fenced example with plain ASCII only (#983)', () => {
+    for (const [label, body] of bodies) {
+      const offenders = fencedBlockLines(body)
+        .filter(([, line]) => NON_ASCII.test(line))
+        .map(([lineNumber, line]) => `${lineNumber}: ${line}`);
+
+      expect(offenders, `${label} fenced examples must be pure ASCII`).toEqual([]);
+    }
+  });
+
+  it('tells the agent to draw with ASCII and says why (#983)', () => {
+    for (const [label, body] of bodies) {
+      expect(body, label).toContain('**仅使用纯 ASCII 绘制**');
+      expect(body, label).toContain('渲染宽度可能不同');
+      expect(body, label).toContain('让每个图形字符保持 ASCII');
+    }
+  });
+
   it('stops after scaffolding when the user requests only a new change (#668)', () => {
     for (const [label, body] of bodies) {
       const transition = newChangeTransition(body, label);
       expect(transition, label).toContain(
-        'If they asked only to start a change, stop after scaffolding and show its status'
+        '若他们只要求开始一个变更，则在搭建脚手架后停止并显示其状态'
       );
     }
   });
