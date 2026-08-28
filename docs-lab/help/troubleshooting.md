@@ -1,6 +1,6 @@
-# Troubleshooting
+# 故障排查
 
-> When OpenSpec doesn't do what you expected: symptoms and their fixes.
+> 当 OpenSpec 没有按预期工作时：症状与对应的修复。
 
 <!-- WIP, on the todo list: this page is not written yet and is held back from the
 site (its section is commented out in website/docs.sync.config.mjs, 2026-08-21). The
@@ -9,12 +9,12 @@ once the prose lands. -->
 
 <!-- Skeleton: headings only. Canonical home for symptom-to-fix, including the skills-missing checklist. -->
 
-## Skills don't appear in chat
+## 聊天中不显示 skills
 
-## The agent ignores the workflow
+## Agent 无视工作流
 
-## Validation failures
+## 校验失败
 
-## Sync and archive issues
+## Sync 和归档问题
 
-## Getting help
+## 获取帮助

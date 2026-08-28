@@ -1,17 +1,17 @@
-# Explore an idea
+# 探索一个想法
 
-> Think it through with the agent before you commit to a proposal.
+> 在提交 proposal 之前，先和 Agent 一起把想法想清楚。
 
 <!-- Skeleton: headings only. -->
 
-## When to explore first
+## 何时先探索
 
-## A real explore session
+## 一次真实的探索会话
 
-## From exploration to proposal
+## 从探索到提案
 
-## Advanced
+## 进阶
 
-### Exploring mid-change
+### 变更中途探索
 
-### Challenging a draft plan
+### 质疑草拟的计划

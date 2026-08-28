@@ -124,6 +124,14 @@
 | behavior contract | 行为契约 | spec 的定义性说法 |
 | entry criteria | 准入条件 | — |
 | handoff | 交接 | 领域之间的工作交接 |
+| diff | diff / 差异 | `show --diff` 的逐需求对比功能；命令名保留英文 |
+| rollback | 回滚 | schema fork/init 的事务回滚 |
+| fork | fork | 保持（schema 复制功能，如 `schema fork`） |
+| placeholder | 占位符 | archive 为新建能力写入的 `## Purpose` 占位文本 |
+| diagram | 图 / 图示 | ASCII 图；`ASCII diagram` 译"ASCII 图" |
+| write-capable action | 可写入操作 | explore 模板中需确认才能执行的操作 |
+| confirmation | 确认 | 写文件前的用户确认 |
+| batch | 批处理 | `status --all` / `validate --all` 的批量模式 |
 
 ## 锚点链接处理约定
 

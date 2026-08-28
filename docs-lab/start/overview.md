@@ -1,6 +1,6 @@
-# Overview
+# 概述
 
-TODO: this page is being rewritten from scratch.
+TODO: 此页面正在从头重写。
 
 <!-- Emptied 2026-08-21. The previous skeleton (section headings, narrative beats, and
 the diagram-options gallery) was cleared so the page starts clean. The old goal line

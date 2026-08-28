@@ -1,10 +1,10 @@
 # Stores (beta)
 
-> Plan changes that span repositories: one store, many repos.
+> 规划跨越多个仓库的变更：一个 store，多个仓库。
 
-OpenSpec normally lives inside one repo: an `openspec/` folder next to the code it plans. A store moves that folder into a repository of its own, and several code repos can share it.
+OpenSpec 通常住在单个仓库里：一个 `openspec/` 文件夹，紧挨着它所规划的代码。store 把这个文件夹搬进一个独立的仓库，多个代码仓库可以共享它。
 
-After a one-time setup on each machine, commands like `status`, `new change`, and `archive` can work in the store from any directory.
+在每台机器上完成一次性设置后，`status`、`new change`、`archive` 等命令就能从任何目录作用于 store。
 
 ```
          team-plans  (a store: OpenSpec in its own repo)
@@ -21,13 +21,15 @@ After a one-time setup on each machine, commands like `status`, `new change`, an
 (code repo)   (code repo)    (code repo)
 ```
 
-You share a store with git, the same way you share code: commit, push, pull, and review it yourself. Specs and changes get branches and pull requests the same way code does.
+你和分享代码一样用 git 分享 store：自己提交、推送、拉取并评审。Specs 和 changes 和代码一样获得分支和 pull request。
 
-## When you need one
+<a id="when-you-need-one"></a>
 
-Two common reasons to use a store:
+## 何时需要 store
 
-- **Frontend and backend in separate repos**: one feature touches both, and the plan needs a single home instead of two halves.
+用 store 的两个常见理由：
+
+- **前后端分属不同仓库**：一个功能同时触及两者，计划需要单一归属，而不是两半。
 
   ```
         shop-plans  (store)
@@ -39,7 +41,7 @@ Two common reasons to use a store:
   (frontend repo)     (backend repo)
   ```
 
-- **One product, several client repos**: Android, iOS, and web ship from their own repos but share one expected behavior. A spec describes behavior, not implementation, so one spec serves all three.
+- **一个产品，多个客户端仓库**：Android、iOS 和 Web 从各自的仓库发布，但共享同一份预期行为。Spec 描述的是行为而不是实现，所以一份 spec 服务三者。
 
   ```
           product-specs  (store)
@@ -51,26 +53,28 @@ Two common reasons to use a store:
   (code repo)   (code repo)   (code repo)
   ```
 
-You can have more than one store, though we recommend keeping the count low.
+你可以有不止一个 store，不过我们建议数量尽量少。
 
-## Set up a store
+<a id="set-up-a-store"></a>
 
-One person creates the store, then everyone else joins it.
+## 设置一个 store
 
-1. **Create the store** (one person, once per team). Run `openspec store setup` and answer the prompts:
+一个人创建 store，其他人加入它。
+
+1. **创建 store**（一个人，每个团队一次）。运行 `openspec-cn store setup` 并回答提示：
 
    ```bash
-   # run from anywhere; it asks what to create and where
-   openspec store setup
+   # 从任何位置运行；它会询问创建什么以及在哪里
+   openspec-cn store setup
    ```
    
-   It asks three questions:
+   它会问三个问题：
    
-   - **Store name**: `team-plans`
-   - **Where should this store live?**: pre-filled with `~/openspec/<name>`, press Enter to accept it or type another path
-   - **Create this store?**: shows what it's about to make, answer `Yes`
+   - **Store name**：`team-plans`
+   - **Where should this store live?**：预填为 `~/openspec/<name>`，按 Enter 接受，或输入其他路径
+   - **Create this store?**：展示它将要创建的内容，回答 `Yes`
    
-   Then it reports what it created:
+   然后它报告创建了什么：
    
    ```yaml
    Store ready: team-plans
@@ -79,29 +83,29 @@ One person creates the store, then everyone else joins it.
    Registry: registered
    
    Next: run normal OpenSpec commands against this store, for example:
-     openspec new change <change-id> --store team-plans
+     openspec-cn new change <change-id> --store team-plans
    Share this store by committing and pushing it like any Git repo.
    ```
 
-2. **Push it to your git host.** Create an empty `team-plans` repo on your host first. Setup doesn't add a git remote, so connect the store to that repo, then push:
+2. **把它推送到你的 git 托管平台。** 先在托管平台创建一个空的 `team-plans` 仓库。Setup 不会添加 git remote，所以把 store 连到那个仓库，然后推送：
 
    ```bash
-   # connect the store to the empty repo on your git host
+   # 把 store 连到你 git 托管平台上的空仓库
    cd ~/openspec/team-plans
    git remote add origin git@github.com:acme/team-plans.git
 
-   # publish it
+   # 发布它
    git push -u origin main
    ```
    
-3. **Join the store** (every teammate, once per machine):
+3. **加入 store**（每个团队成员，每台机器一次）：
    
    ```bash
-   # get the store onto your machine
+   # 把 store 弄到你机器上
    git clone git@github.com:acme/team-plans.git ~/openspec/team-plans
    
-   # tell OpenSpec where it lives
-   openspec store register ~/openspec/team-plans
+   # 告诉 OpenSpec 它在哪里
+   openspec-cn store register ~/openspec/team-plans
    ```
 
    ```yaml
@@ -111,31 +115,31 @@ One person creates the store, then everyone else joins it.
    Registry: registered
    ```
    
-   Registering tells your machine where this store lives. The store's name is already committed inside it, in `.openspec-store/store.yaml`. Setup registered the creator's copy, so only cloned copies need this step.
+   注册告诉你的机器这个 store 在哪里。store 的名字已经提交在它内部，位于 `.openspec-store/store.yaml`。Setup 注册了创建者的副本，所以只有克隆的副本需要这一步。
    
-4. **Confirm it worked**, from any directory:
+4. **确认生效**，从任何目录：
    
    ```bash
-   # any OpenSpec command reaches the store by name
-   openspec status --store team-plans
+   # 任何 OpenSpec 命令都可以按名字到达 store
+   openspec-cn status --store team-plans
    ```
 
    ```yaml
    Using OpenSpec root: team-plans (/Users/you/openspec/team-plans)
-   No active changes. Create one with: openspec new change <name> --store team-plans
+   No active changes. Create one with: openspec-cn new change <name> --store team-plans
    ```
    
-## Types of setups
+## 设置类型
 
-OpenSpec has three setups. The rest of this page uses these names:
+OpenSpec 有三种设置。本页其余部分使用这些名字：
 
-- **repo-local**: OpenSpec inside your repo, no store. The default.
-- **store-only**: your repo keeps no specs or changes of its own. Everything lives in the store.
-- **store-optional**: your project has its own `openspec/` folder and also reaches a store when you ask.
+- **repo-local**：OpenSpec 在你的仓库里，没有 store。默认。
+- **store-only**：你的仓库不保留自己的 specs 或 changes。一切都住在 store 里。
+- **store-optional**：你的项目有自己的 `openspec/` 文件夹，并且在你要求时也能到达 store。
 
-### The default: OpenSpec inside your repo (`repo-local`)
+### 默认：OpenSpec 在仓库内（`repo-local`）
 
-`openspec init` puts an `openspec/` folder next to your code, and that repo's specs and changes live there. No store is involved. This is the setup [Set up your project](../start/setup.md) teaches, and most projects never need another.
+`openspec-cn init` 在你的代码旁放一个 `openspec/` 文件夹，那个仓库的 specs 和 changes 住在那里。不涉及任何 store。这是 [设置你的项目](../start/setup.md) 教的设置，大多数项目永远不需要别的。
 
 ```
 web-app  (code repo)
@@ -144,11 +148,11 @@ web-app  (code repo)
     └── changes/
 ```
 
-### OpenSpec outside your repo, in a store (`store-only`)
+### OpenSpec 在仓库外，在 store 中（`store-only`）
 
-The repo keeps no specs or changes of its own. Everything it plans lives in the store, and one line in the repo's config connects the two.
+仓库不保留自己的 specs 或 changes。它规划的一切都住在 store 里，仓库配置中的一行把它们连起来。
 
-Common when one team builds all the repos and plans in one place. The [examples above](#when-you-need-one) all have this shape.
+常见于一个团队构建所有仓库并集中规划的场景。上面的[示例](#when-you-need-one)都是这种形态。
 
 ```
 team-plans  (store)
@@ -162,11 +166,11 @@ web-app  (code repo)
     └── config.yaml    nothing else
 ```
 
-### OpenSpec in your repo and in a store (`store-optional`)
+### OpenSpec 同时在仓库和 store 中（`store-optional`）
 
-The repo stays repo-local for its own work, while the store holds the shared specs and changes. Inside the repo, OpenSpec uses your project's `openspec/` folder, and reaches the store only when you pass `--store`.
+仓库为自己的工作保持 repo-local，同时 store 承载共享的 specs 和 changes。在仓库内，OpenSpec 使用你项目的 `openspec/` 文件夹，只有当你传 `--store` 时才到达 store。
 
-Common when a repo used OpenSpec before the store existed, or when a mostly independent repo only occasionally touches shared work.
+常见于一个仓库在 store 出现之前就用 OpenSpec，或一个基本独立的仓库只是偶尔触碰共享工作。
 
 ```
 team-plans  (store)
@@ -180,100 +184,104 @@ web-app  (code repo)
     └── changes/
 ```
 
-A repo can start repo-local and move its specs and changes into the store later. [Move a repo's specs and changes into the store](#move-a-repos-specs-and-changes-into-the-store) shows how.
+一个仓库可以先 repo-local，之后再把它 specs 和 changes 移入 store。[把仓库的 specs 和 changes 移入 store](#move-a-repos-specs-and-changes-into-the-store) 说明了怎么做。
 
-## Where artifacts get created when using stores
+<a id="where-artifacts-get-created-when-using-stores"></a>
 
-When you use a store, OpenSpec also has to decide where the artifacts get created. It depends on your setup:
+## 使用 store 时制品在哪里创建
 
-- **store-only** (your project only writes to the store): every artifact is created in the store. The `store:` line below records that.
-- **store-optional** (your project has its own `openspec/` folder and also uses a store): artifacts are created in your project, unless you name the store in your request or pass `--store` for that change. Your agent then carries the flag through the rest of the workflow.
+当你使用 store 时，OpenSpec 还必须决定制品在哪里创建。这取决于你的设置：
 
-OpenSpec writes artifacts to one of two places: your project's `openspec/` folder, or the store's. It picks in this order, and the first option that applies wins:
+- **store-only**（你的项目只写入 store）：每个制品都在 store 中创建。下面的 `store:` 行记录这一点。
+- **store-optional**（你的项目有自己的 `openspec/` 文件夹，同时也用 store）：制品在你的项目中创建，除非你在请求中指名 store，或为那个变更传 `--store`。然后你的 Agent 会在工作流的其余部分带着这个标志。
 
-1. **`--store <id>` on a command.** Always wins, from any directory.
-2. **Your project's `openspec/` folder.** If your project has its own `specs/` or `changes/` folders, OpenSpec uses them.
-3. **The `store:` line in your project.** How a store-only project records its store.
-4. **`defaultStore` on your machine.** The fallback when none of the above applies.
+OpenSpec 把制品写入两个地方之一：你项目的 `openspec/` 文件夹，或 store 的。它按这个顺序选择，第一个适用的选项胜出：
 
-Whichever applied, OpenSpec's first output line names the folder it acted on (`Using OpenSpec root: ...`). The exact rules, including the error cases, are in [Configuration › Stores](../reference/configuration/stores.md).
+1. **命令上的 `--store <id>`。** 永远胜出，从任何目录。
+2. **你项目的 `openspec/` 文件夹。** 如果你的项目有自己的 `specs/` 或 `changes/` 文件夹，OpenSpec 使用它们。
+3. **你项目里的 `store:` 行。** store-only 项目记录其 store 的方式。
+4. **你机器上的 `defaultStore`。** 以上都不适用时的回退。
 
-### The `store:` line (store-only projects)
+无论哪项生效，OpenSpec 的第一行输出都会说出它操作的文件夹（`Using OpenSpec root: ...`）。确切的规则，包括各种错误情况，见 [配置 › Stores](../reference/configuration/stores.md)。
 
-Add one line to your project's `openspec/config.yaml`:
+### `store:` 那一行（store-only 项目）
+
+在你的项目 `openspec/config.yaml` 中添加一行：
 
 ```yaml
 # web-app/openspec/config.yaml
 store: team-plans
 ```
 
-Everything you or your agent run inside your project now uses the store, with no flag to type:
+现在你在项目里运行的一切都使用这个 store，不用敲任何标志：
 
 ```bash
-# inside web-app, connected
-openspec status
+# 在 web-app 内部，已连接
+openspec-cn status
 ```
 
 ```yaml
 Using OpenSpec root: team-plans (/Users/you/openspec/team-plans)
-No active changes. Create one with: openspec new change <name> --store team-plans
+No active changes. Create one with: openspec-cn new change <name> --store team-plans
 ```
 
-- **Without the line**: run a plain command in a store-only project and OpenSpec stops with an error listing your registered stores.
-- **Commit it**: teammates who clone your project get the line too. They still need the store registered on their machine ([step 3 of Set up a store](#set-up-a-store)), or OpenSpec errors and tells them to register it.
-- **Next to real folders**: if your project also has `specs/` or `changes/` folders, OpenSpec uses those and ignores the line, with a warning.
+- **没有这一行**：在 store-only 项目里运行一条普通命令，OpenSpec 会带着列出你已注册 stores 的错误停下来。
+- **提交它**：克隆你项目的队友也会拿到这一行。他们仍需要在各自机器上注册 store（[设置一个 store 的第 3 步](#set-up-a-store)），否则 OpenSpec 会报错并让他们注册。
+- **和真实文件夹并列**：如果你的项目也有 `specs/` 或 `changes/` 文件夹，OpenSpec 使用那些并忽略这一行，同时给出警告。
 
-### `defaultStore` on your machine
+### 你机器上的 `defaultStore`
 
-Set it once if every project you work in uses the same store. OpenSpec falls back to it when it finds no flag, no local `openspec/` folder, and no `store:` line:
+如果你工作的每个项目都用同一个 store，设置一次即可。当 OpenSpec 找不到标志、找不到本地 `openspec/` 文件夹、也找不到 `store:` 行时，就会回退到它：
 
 ```bash
-# use team-plans whenever nothing else names a store
-openspec config set defaultStore team-plans
+# 每当没有其他东西指名 store 时，使用 team-plans
+openspec-cn config set defaultStore team-plans
 
-# undo it
-openspec config unset defaultStore
+# 撤销它
+openspec-cn config unset defaultStore
 ```
 
-**Commands that stay local.** `init`, `update`, `templates`, `schemas`, and the `openspec schema` subcommands act on the current directory only and take no `--store`.
+**保持本地的命令。** `init`、`update`、`templates`、`schemas` 以及 `openspec-cn schema` 子命令只作用于当前目录，不接受 `--store`。
 
-## Move a repo's specs and changes into the store
+<a id="move-a-repos-specs-and-changes-into-the-store"></a>
 
-To take a repo from repo-local to store-only:
+## 把仓库的 specs 和 changes 移入 store
 
-1. Move everything in the repo's `openspec/specs/` and `openspec/changes/` into the same folders in the store.
-2. Delete the now-empty folders, so the repo's `openspec/` folder holds only `config.yaml`.
-3. Add the `store:` line to that `config.yaml`.
+要把一个仓库从 repo-local 变为 store-only：
 
-`openspec status` inside the repo now starts with `Using OpenSpec root: team-plans`.
+1. 把仓库 `openspec/specs/` 和 `openspec/changes/` 中的一切，移入 store 里相同的文件夹。
+2. 删除现在为空的文件夹，让仓库的 `openspec/` 文件夹只保留 `config.yaml`。
+3. 把 `store:` 行加进那个 `config.yaml`。
 
-## Work in the store
+仓库内的 `openspec-cn status` 现在会以 `Using OpenSpec root: team-plans` 开头。
 
-The workflows don't change, for you or for your agent. Propose, apply, and archive run the way they always do. The only difference is where the artifacts get created, and [the section above](#where-artifacts-get-created-when-using-stores) covers that.
+## 在 store 中工作
 
-Create a change from inside a store-only repo and it lands in the store:
+工作流不会变，无论对你还是对你的 Agent。Propose、apply 和 archive 按它们一直以来的方式运行。唯一的不同是制品在哪里创建，[上面的章节](#where-artifacts-get-created-when-using-stores) 覆盖了这一点。
+
+在 store-only 仓库内部创建一个变更，它会落进 store：
 
 ```bash
-# inside web-app; the store: line routes this to team-plans
-openspec new change add-login
+# 在 web-app 内部；store: 行把它路由到 team-plans
+openspec-cn new change add-login
 ```
 
 ```yaml
 Using OpenSpec root: team-plans (/Users/you/openspec/team-plans)
 Created change 'add-login' at /Users/you/openspec/team-plans/openspec/changes/add-login/
 Schema: spec-driven
-Next: openspec status --change add-login --store team-plans
+Next: openspec-cn status --change add-login --store team-plans
 ```
 
-- **Where it went**: into the store repo, not next to your code.
-- **Sharing it**: the change exists only in your checkout until you commit and push the store repo. Teammates see it when they pull. The same goes for every artifact the workflows write.
-- **Paths in the docs**: wherever the docs show an `openspec/` path, in a store setup that folder is the store's.
+- **它去了哪里**：进了 store 仓库，而不是你的代码旁边。
+- **分享它**：在你提交并推送 store 仓库之前，这个变更只存在于你的 checkout 里。队友拉取时才能看到。工作流写出的每个制品都一样。
+- **文档中的路径**：无论文档在哪里展示 `openspec/` 路径，在 store 设置中那个文件夹就是 store 的。
 
-When artifacts get created somewhere you didn't expect, `openspec doctor` checks your setup without changing anything and prints a fix for each finding:
+当制品创建到了你意料之外的地方，`openspec-cn doctor` 会在不改动任何东西的情况下检查你的设置，并为每个发现打印一条修复：
 
 ```bash
-# check the current root and its stores
-openspec doctor
+# 检查当前根目录及其 stores
+openspec-cn doctor
 ```
 
 ```yaml
@@ -288,13 +296,13 @@ References
   (none declared)
 ```
 
-`openspec context` lists the root and stores your current directory works with, when you want the same picture without the checks.
+`openspec-cn context` 列出你当前目录所配合的根目录和 stores，当你想看到同样的画面但不需要这些检查时。
 
-To open the store and a repo in one editor window, so your agent can read both, see [Worksets (beta)](worksets.md).
+要在同一个编辑器窗口打开 store 和一个仓库，让你的 Agent 能同时读到两者，见 [Worksets (beta)](worksets.md)。
 
-## Read specs from another store
+## 从另一个 store 读取 specs
 
-Your repo can keep its own `openspec/` folder and still let your agent read another store's specs. Declare that store under `references:` in the repo's `openspec/config.yaml`:
+你的仓库可以保留自己的 `openspec/` 文件夹，同时仍让你的 Agent 读取另一个 store 的 specs。在那个仓库的 `openspec/config.yaml` 的 `references:` 下声明那个 store：
 
 ```yaml
 # api-server/openspec/config.yaml
@@ -302,20 +310,20 @@ references:
   - team-plans
 ```
 
-References are read-only. Your work stays in your repo, and the reference only changes what your agent is told.
+References 是只读的。你的工作留在你的仓库里，reference 只改变你的 Agent 被告知的内容。
 
-When a workflow creates an artifact, its instructions gain an index of the referenced store's specs, each with a one-line summary and the exact command to fetch it:
+当工作流创建一个制品时，它的指令会获得被引用 store 的 specs 索引，每个 spec 带一行摘要和获取它的确切命令：
 
 ```xml
 <referenced_stores>
 <!-- Read-only upstream context. Fetch what you need; cite what you use. -->
 Store team-plans (/Users/you/openspec/team-plans):
   - payments: Rules for charging and refunding customers.
-  Fetch: openspec show <spec-id> --type spec --store team-plans
+  Fetch: openspec-cn show <spec-id> --type spec --store team-plans
 </referenced_stores>
 ```
 
-A reference can also carry the store's clone URL, for machines that don't have that store yet:
+reference 也可以携带 store 的克隆 URL，供还没有那个 store 的机器使用：
 
 ```yaml
 references:
@@ -323,7 +331,7 @@ references:
   - { id: design-system, remote: "git@github.com:acme/design-system.git" }
 ```
 
-With the URL declared, `openspec doctor` turns a missing store into a pasteable fix:
+声明 URL 后，`openspec-cn doctor` 会把缺失的 store 变成一条可粘贴的修复：
 
 ```yaml
 # output wrapped to fit
@@ -331,11 +339,11 @@ References
   - team-plans: ok (/Users/you/openspec/team-plans)
   - design-system: Referenced store 'design-system' is not registered on this machine.
     Fix: git clone -- git@github.com:acme/design-system.git '/Users/you/openspec/design-system' &&
-         openspec store register '/Users/you/openspec/design-system' --id design-system
+         openspec-cn store register '/Users/you/openspec/design-system' --id design-system
 ```
 
-## Beta limits
+## Beta 限制
 
-- **The shape may change**: command names, flags, and file formats can change between releases. Re-read this page after upgrading.
-- **No sync, by design**: OpenSpec never clones, pulls, or pushes. A stale checkout shows stale specs until you pull, and references are read from whatever is on disk.
-- **One checkout per store name**: registering a second folder under a name that's already registered fails, with a hint to run `openspec store unregister` first.
+- **形态可能改变**：命令名、标志和文件格式会在版本之间变化。升级后重新阅读本页。
+- **按设计不同步**：OpenSpec 从不克隆、拉取或推送。过期的 checkout 会显示过期的 specs，直到你拉取；references 从磁盘上现有的内容读取。
+- **每个 store 名字只有一个 checkout**：在已注册的名字下注册第二个文件夹会失败，并提示先运行 `openspec-cn store unregister`。

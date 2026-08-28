@@ -1,27 +1,29 @@
 # Schemas
 
-> Change what OpenSpec produces: the artifacts, their order, and their templates.
+> 改变 OpenSpec 产出什么：制品、它们的顺序和模板。
 
-A schema defines what a change proposal produces: which artifacts, in what order, from which templates. For example, [spec-driven](../reference/schemas/spec-driven/index.md), the default bundled schema, produces these four in roughly this order, each building on what came before:
+schema 定义变更提案产出什么：哪些制品、什么顺序、来自哪些模板。例如默认随附的 [spec-driven](../reference/schemas/spec-driven/index.md) 大致按这个顺序产出下面四个，每个都建立在前一个之上：
 
 ```
 proposal → specs → design → tasks
 ```
 
-Fork a schema when you want these to be different documents, whether that means fewer of them, different names, or a different structure.
+当你希望这些是不同的文档时 fork 一个 schema，无论是指更少的文档、不同的名字，还是不同的结构。
 
-## Where schemas live
+<a id="where-schemas-live"></a>
 
-OpenSpec looks for a schema in three places, in order, and uses the first one it finds:
+## schemas 放在哪里
 
-1. **Your project**: `openspec/schemas/`, committed with the repo so your whole team gets it.
-2. **Your machine**: `~/.local/share/openspec/schemas` on macOS and Linux (or under `$XDG_DATA_HOME` if you set it), or `%LOCALAPPDATA%\openspec\schemas` on Windows. Schemas here are available in every project you work in.
-3. **The package**: the built-ins, like `spec-driven`, ship inside openspec itself.
+OpenSpec 会按顺序在三个地方查找 schema，使用它找到的第一个：
 
-The same name can exist in more than one place, and the more specific location wins. `openspec schema which` shows which copy is in use:
+1. **你的项目**：`openspec/schemas/`，随仓库一起提交，这样整个团队都能拿到。
+2. **你的机器**：macOS 和 Linux 上是 `~/.local/share/openspec/schemas`（如果你设置了 `$XDG_DATA_HOME` 则在其下），Windows 上是 `%LOCALAPPDATA%\openspec\schemas`。这里的 schemas 在你工作的每个项目中都可用。
+3. **包内**：像 `spec-driven` 这样的内置 schema 随 openspec 本身发布。
+
+同一个名字可以存在于多个地方，更具体的位置胜出。`openspec-cn schema which` 显示正在使用哪个副本：
 
 ```
-$ openspec schema which spec-driven
+$ openspec-cn schema which spec-driven
 Schema: spec-driven
 Source: project
 Path: /your-project/openspec/schemas/spec-driven
@@ -30,9 +32,9 @@ Shadows:
   package: .../openspec/schemas/spec-driven
 ```
 
-## What's in a schema
+## schema 里有什么
 
-A schema is defined by a folder of plain files: one schema.yaml that declares the artifacts, and a template for each of them. Here's the built-in `spec-driven`:
+schema 由一个纯文件文件夹定义：一个声明制品的 schema.yaml，以及每个制品各一个模板。这是内置的 `spec-driven`：
 
 ```
 spec-driven/
@@ -44,10 +46,10 @@ spec-driven/
     └── tasks.md
 ```
 
-- **schema.yaml**: declares each artifact, the file it generates, the template it starts from, what it requires first, and the instruction the agent receives when creating it. Every field's contract is in [schema.yaml](../reference/schemas/schema-yaml.md).
-- **templates/**: one markdown skeleton per artifact, which the agent fills in.
+- **schema.yaml**：声明每个制品、它生成的文件、它起始所用的模板、它首先需要什么，以及 Agent 在创建它时收到的指令。每个字段的契约在 [schema.yaml](../reference/schemas/schema-yaml.md) 中。
+- **templates/**：每个制品一个 markdown 骨架，由 Agent 填充。
 
-Here's the tasks artifact's entry in schema.yaml, trimmed:
+下面是 schema.yaml 中 tasks 制品的条目，已精简：
 
 ```yaml
 artifacts:
@@ -62,21 +64,21 @@ artifacts:
       - design
 ```
 
-The built-in schemas ship inside the openspec package, so you never edit them in place. You get your own copy by forking.
+内置 schemas 随 openspec 包一起发布，所以你永远不要就地编辑它们。通过 fork 获得你自己的副本。
 
-## Creating your own custom schema
+## 创建你自己的自定义 schema
 
-There are two ways to get your own schema:
+有两种方式获得你自己的 schema：
 
-1. **Fork an existing schema** and edit your copy. Start here when an existing schema is close to what you want, because everything in it already works.
-2. **Start from scratch** when none of them fit, scaffolding an empty schema with `openspec schema init`.
+1. **fork 一个已有 schema** 并编辑你的副本。当某个已有 schema 接近你想要的样子时从这里开始，因为里面的一切都已经能工作。
+2. **从零开始**，当没有一个合适的，用 `openspec-cn schema init` 搭建一个空 schema。
 
-### Fork an existing schema
+### fork 一个已有 schema
 
-1. Fork the schema you want to start from, running from your project root:
+1. fork 你想作为起点的 schema，从你的项目根目录运行：
 
    ```console
-   $ openspec schema fork spec-driven
+   $ openspec-cn schema fork spec-driven
 
    Note: Schema commands are experimental and may change.
    ✔ Forked 'spec-driven' to 'spec-driven-custom'
@@ -85,80 +87,82 @@ There are two ways to get your own schema:
    Destination: /your-project/openspec/schemas/spec-driven-custom
    ```
 
-   Pass a second argument to pick the name (`openspec schema fork spec-driven team-flow`). Names are kebab-case.
+   传入第二个参数来选择名字（`openspec-cn schema fork spec-driven team-flow`）。名字是 kebab-case。
 
-2. Edit the copy: schema.yaml and the templates. [Editing your fork](#editing-your-fork) covers what to change.
+2. 编辑副本：schema.yaml 和模板。[编辑你的 fork](#editing-your-fork) 覆盖了要改什么。
 
-3. Validate it:
+3. 校验它：
 
    ```bash
-   openspec schema validate spec-driven-custom
+   openspec-cn schema validate spec-driven-custom
    ```
 
-   This is the one command that catches a broken schema (missing templates, bad YAML, dependency cycles) before you're in the middle of a change.
+   这是唯一能在一个坏 schema（缺失模板、YAML 错误、依赖循环）让你身陷变更中途之前抓住它的命令。
 
-4. Point your project at it in openspec/config.yaml. This step is yours to do because fork leaves config.yaml untouched:
+4. 在 openspec/config.yaml 中把你的项目指向它。这一步要你自己做，因为 fork 不会动 config.yaml：
 
    ```yaml
    schema: spec-driven-custom
    ```
 
-5. New change proposals now follow your schema. Changes created earlier keep the schema they started with.
+5. 新的变更提案现在遵循你的 schema。更早创建的变更保留它们开始时用的 schema。
 
-To replace the default everywhere without touching config.yaml, fork to the same name: `openspec schema fork spec-driven spec-driven`. Your project's copy then shadows the built-in, as [Where schemas live](#where-schemas-live) explains.
+要在不触碰 config.yaml 的情况下随处替换默认 schema，fork 成同名即可：`openspec-cn schema fork spec-driven spec-driven`。于是你项目里的副本会遮蔽内置的，正如 [schemas 放在哪里](#where-schemas-live) 所解释的。
 
-### Start from scratch
+### 从零开始
 
-`openspec schema init` scaffolds a new schema instead of copying one:
+`openspec-cn schema init` 搭建一个新的 schema，而不是复制一个：
 
 ```console
-$ openspec schema init lite --description "Lite flow" --artifacts proposal,tasks
+$ openspec-cn schema init lite --description "Lite flow" --artifacts proposal,tasks
 
 ✔ Created schema 'lite'
 Schema created at: /your-project/openspec/schemas/lite
 Artifacts: proposal, tasks
 ```
 
-The scaffold is bare. Artifacts come from the built-in four ids only, and the generated templates carry no instructions, so the agent gets less guidance until you write your own. From there the fork steps apply unchanged: validate it, then point config.yaml at it.
+脚手架是空的。制品只来自内置的四个 id，生成的模板不带任何指令，所以在你写出自己的之前，Agent 得到的指引较少。之后 fork 的步骤原样适用：校验它，然后把 config.yaml 指向它。
 
-## Editing your fork
+<a id="editing-your-fork"></a>
 
-A fork has two kinds of files to edit:
+## 编辑你的 fork
 
-- **templates/** change the skeleton of each document. Add a section to the tasks template and every new tasks.md starts with it.
-- **schema.yaml** changes the workflow itself: which artifacts exist, what each one requires first, and the instruction the agent gets when creating it.
+一个 fork 有两类文件可编辑：
 
-For example, to drop the design document for a leaner flow:
+- **templates/** 改变每份文档的骨架。给 tasks 模板加一个章节，每个新的 tasks.md 都会以它开头。
+- **schema.yaml** 改变工作流本身：存在哪些制品、每个制品首先需要什么，以及 Agent 在创建它时得到的指令。
 
-1. Delete the `design` entry from schema.yaml.
-2. Remove `design` from the `requires` list of `tasks`.
-3. Validate:
+例如，为更精简的流程去掉 design 文档：
+
+1. 从 schema.yaml 中删除 `design` 条目。
+2. 从 `tasks` 的 `requires` 列表中移除 `design`。
+3. 校验：
 
    ```console
-   $ openspec schema validate spec-driven-custom
+   $ openspec-cn schema validate spec-driven-custom
 
    ✓ Schema 'spec-driven-custom' is valid
    ```
 
-Skip step 2 and validate catches it:
+跳过第 2 步，校验会抓住它：
 
 ```console
 ✗ Schema 'spec-driven-custom' has errors:
   error: Invalid dependency reference in artifact 'tasks': 'design' does not exist
 ```
 
-Validate after every hand-edit. A broken schema otherwise surfaces in the middle of a change, when a workflow asks for a file that isn't there. Like config.yaml, schema edits reach the agent on the next run.
+每次手工编辑后都要校验。一个坏 schema 否则会在变更中途浮出水面，当某个工作流索要一个不存在的文件时。和 config.yaml 一样，schema 的编辑会在下次运行时传给 Agent。
 
-## A fork is a snapshot
+## fork 是一份快照
 
-`openspec update` refreshes the installed skills and commands, and it never touches `openspec/schemas/`. Your fork keeps working exactly as you left it, which also means it stops receiving improvements when the built-in schema evolves. To pick those up later, fork the built-in again under a new name and port the differences across.
+`openspec-cn update` 会刷新已安装的 skills 和 commands，但它从不触碰 `openspec/schemas/`。你的 fork 会精确地按你留下的样子继续工作，这也意味着当内置 schema 演进时，它不再接收改进。要在之后接收这些改进，就再以新名字 fork 一次内置 schema，并把差异迁移过去。
 
-## Sharing schemas
+## 分享 schemas
 
-Sharing a schema means copying its folder.
+分享一个 schema 就是复制它的文件夹。
 
-- **With your team**: commit `openspec/schemas/` and everyone on the repo uses it.
-- **Across your projects**: put the folder in the user-level directory from [Where schemas live](#where-schemas-live).
-- **From the community**: the [community catalog](https://github.com/Fission-AI/OpenSpec/blob/main/docs/customization.md#community-schemas) lists shared schemas. Copy one into `openspec/schemas/<name>` and it works like your own.
+- **和你的团队**：提交 `openspec/schemas/`，仓库里的每个人都用它。
+- **跨你的项目**：把文件夹放进 [schemas 放在哪里](#where-schemas-live) 提到的用户级目录。
+- **来自社区**：[社区目录](https://github.com/Fission-AI/OpenSpec/blob/main/docs/customization.md#community-schemas) 列出了共享的 schemas。复制一个到 `openspec/schemas/<name>`，它就和自己的 schema 一样工作。
 
-We're working on a schema registry, public and private, so schemas can be installed by name instead of copied by hand.
+我们正在做一个 schema registry，公有的和私有的，这样 schemas 可以按名字安装，而不是手工复制。

@@ -1,34 +1,34 @@
 ---
 name: write-openspec-docs
-description: Switches into OpenSpec docs-writing mode; loads the house style guide and drafts or revises pages in its voice (action-first, no preamble, scannable). Use when writing or editing pages in the OpenSpec docs tree.
+description: 切换到 OpenSpec 文档写作模式；加载 house style 指南，并以其语气（动作优先、无开场白、可扫读）起草或修订页面。在编写或编辑 OpenSpec 文档树中的页面时使用。
 argument-hint: page or section
 ---
 
-# Write OpenSpec docs
+# 编写 OpenSpec 文档
 
-You are now writing OpenSpec's user docs. Read [writing.md](writing.md); it is the style authority for everything drafted here. The short version, in effect immediately:
+你现在要编写 OpenSpec 的用户文档。先读 [writing.md](writing.md)；它是这里起草一切内容的风格权威。即刻生效的精简版：
 
-- A page is a retrieval surface, not an essay. Structure decides whether the reader finds the answer; prose only decides how it reads. Open every section with the answer, never a running story.
-- Choose the page type before the outline. Guides follow the reader's task; reference mirrors the product's structure and uses exact field, command, and file names as scan anchors. Reference needs complete coverage without compressing several facts into one sentence, cell, or paragraph.
-- Draft the shortest version that answers; expanding a spare page is cheap, cutting a bloated one is a rewrite. Plain words, the fewest of them: an idea that fits in one line takes one line. Depth most readers skip goes behind a link, and the payload (commands, real output, failures and fixes) stays whole.
-- Dumb sentences, smart structure. Write the obvious sentence (actor, verb, object, stating the literal event); never compress extra facts in or take an angle. No hype adjectives, no preamble, no em dashes.
-- One job per slot: one fact per sentence, list intros only announce the list, one reader question or lookup target per section. A related fact gets its own slot, never a ride in someone else's.
-- Ground items in what the reader can verify: path or folder first, concept as the gloss, real output shown honestly.
-- No house template. Inventories open with a list naming every item, then expand each in its own unit after the list, never inline. Sequences take numbered steps (numbers mean order; inventories take bullets). Single ideas and reasoning stay in short prose.
-- Every load-bearing fact sits on a scan anchor: code fence, numbered bold lead-in, `**Term**: fact` bullet, table, file tree. Never only mid-paragraph.
-- Before finishing, run two backstop tests. Retrievability: can each question or exact product name be found by scanning alone? The glance: inspect the rendered page as shapes; does it look finishable, or like work? Check table-heavy changes at desktop and narrow widths. A failure means a slot got written without being earned; fix it now, don't leave it for review.
+- 页面是检索表面，不是文章。结构决定读者能否找到答案；行文只决定读起来如何。每个章节以答案开头，绝不以流水账叙事开头。
+- 先选定页面类型，再定大纲。指南跟随读者的任务；参考镜像产品的结构，并使用精确的字段、命令和文件名作为扫描锚点。参考需要完整覆盖，而不把几个事实压缩进一个句子、单元格或段落。
+- 起草最短的可回答版本；扩充一个精简的页面很便宜，砍一个臃肿的页面就是重写。用平实的词，用最少量的词：一个能放进一行的想法就占一行。大多数读者跳过的深度放到链接后面，而载荷（命令、真实输出、失败与修复）保持完整。
+- 笨句子，巧结构。写下显而易见的句子（动作主体、动词、宾语，陈述字面事件）；绝不在句中塞入额外事实或夹带立场。没有炒作形容词，没有开场白，没有破折号。
+- 一个槽位一个职责：一个句子一个事实，列表引言只宣告列表，一个章节只回答一个读者问题或承担一个查表目标。相关事实有自己的槽位，绝不搭别人的便车。
+- 以读者可验证之物落地：路径或文件夹在前，概念作为释义，真实输出如实展示。
+- 没有 house 模板。清单以一份列出所有条目的列表开头，然后在列表之后逐条以各自单元展开，绝不内联。序列用编号步骤（编号表示顺序；清单用项目符号）。单一想法和推理留在简短行文中。
+- 每个承重事实都落在扫描锚点上：代码围栏、编号加粗引导语、`**Term**: fact` 项目符号、表格、文件树。绝不只在段落中间。
+- 完成前跑两个兜底测试。可检索性：仅靠扫读能否找到每个问题或精确产品名？一瞥测试：把渲染后的页面看成形状来审视；它看起来可完成，还是像没做完的活？在桌面和窄宽度下检查表格较多的改动。失败意味着某个槽位未经挣得就写了出来；现在就修，不要留到评审。
 
-## Ground rules
+## 基本规则
 
-- Load the `no-ai-slop` skill before drafting; it owns the generic slop patterns, while [writing.md](writing.md) owns what OpenSpec's docs specifically look and sound like.
-- Read the target page in full before editing it.
-- Real facts only: flags, paths, and output as they exist in source. If a claim can't be checked cheaply, still write it, but name it as unchecked when you show the work; never bridge a gap with a plausible-sounding sentence.
-- A fact lives on one page; everywhere else links to it. The docs tree's README owns the page map and structural invariants; check it before restructuring or adding pages.
-- For reference pages, inventory the contract from source before drafting prose. Follow the reference process in [writing.md](writing.md#reference-pages).
-- When unsure how something should scan or sound, match the exemplars: `docs-lab/start/setup.md` for section shape and inventories, `docs-lab/start/installation.md` (Uninstalling) for multi-step tasks.
+- 起草前加载 `no-ai-slop` skill；它负责通用的 slop 模式，而 [writing.md](writing.md) 负责 OpenSpec 文档具体的样子和声音。
+- 编辑前通读目标页面。
+- 只写真实事实：标志、路径和输出都按源码中真实存在的样子写。如果一个断言无法廉价核实，仍可写出，但在展示工作时把它标注为未核实；绝不用一句听起来合理的句子来填补缺口。
+- 一个事实只存在于一个页面上；其他任何地方都链接过去。文档树的 README 负责页面地图和结构不变式；在重组或新增页面之前先查它。
+- 对参考页面，起草行文前先从源码盘点契约。遵循 [writing.md](writing.md#reference-pages) 中的参考流程。
+- 不确定某个东西该如何扫读或听起来怎样时，对照范例：`docs-lab/start/setup.md` 用于章节形状和清单，`docs-lab/start/installation.md`（Uninstalling）用于多步任务。
 
-## When done
+## 完成后
 
-Show the user what changed and name any unchecked claims.
+向用户展示改了什么，并指出任何未核实的断言。
 
-If the user asks for the deep, evidence-first drafting session (run every command, one section per sitting, formal checkpoints), follow [full-process.md](full-process.md).
+如果用户要求深入、以证据优先的起草会话（运行每条命令、每次只写一个章节、正式检查点），遵循 [full-process.md](full-process.md)。

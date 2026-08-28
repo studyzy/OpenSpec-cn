@@ -1,49 +1,49 @@
-# Full drafting process (opt-in)
+# 完整起草流程（可选启用）
 
-The evidence-first, checkpointed way to draft a page. Use this only when the user asks for the deep process; the default mode is SKILL.md alone.
+以证据优先、带检查点的方式起草一个页面。只在用户要求深度流程时使用；默认模式仅使用 SKILL.md。
 
-## Orient (every session, before any writing)
+## 定向（每次会话，在任何写作之前）
 
-1. Read the README at the root of the docs tree you're writing in. Where it states invariants or a page map, it wins over this skill.
-2. Read the target page top to bottom, plus anything its comments cite.
-3. Read the sibling pages this page links to or overlaps with, enough to know what must stay a link rather than become an explanation.
-4. Write down the page's job in one line: who arrives, trying to do what, and what they leave able to do. If the page carries a job statement (docs-lab pages use a `>` blockquote under the title), test against it. If the unit you're about to write doesn't serve that job, stop and raise it instead of drafting around it.
+1. 阅读你正在写作的文档树根部的 README。凡它声明不变式或页面地图之处，它优先于本 skill。
+2. 从头到尾阅读目标页面，以及其注释引用的任何内容。
+3. 阅读此页面链接到或与之重叠的同级页面，足以知道什么必须保持为链接而不是变成解释。
+4. 用一行写下页面的职责：谁带着想做什么的问题到来，他们离开时能做什么。如果页面带职责声明（docs-lab 页面在标题下用 `>` blockquote），用它来检验。如果你即将写的单元不为该职责服务，停下来并提出来，而不是绕开它起草。
 
-## Work in small units
+## 以小单元工作
 
-- The default unit is one `##` section. A page is several sittings, not one.
-- For revisions to existing prose, the unit is the requested change, however many headings it touches.
-- Draft the next unit only after the user has reviewed the current one. When the user asks for fixes, fix only that; don't smuggle in the next unit.
+- 默认单元是一个 `##` 章节。一个页面是多次落座，不是一次。
+- 对既有行文的修订，单元是所请求的改动，无论它触及多少标题。
+- 只有在用户评审完当前单元后才起草下一个单元。当用户要求修复时，只修那个；不要夹带下一个单元。
 
-## Evidence before prose
+## 行文之前先有证据
 
-Before drafting a unit, know where its claims come from.
+在起草一个单元之前，知道它的断言来自哪里。
 
-- Run the terminal commands the unit will show when they're cheap: read-only commands anywhere, anything that mutates state in a scratch directory or not at all. Paste real output; trim it, never retouch it.
-- Check names against source: flags, paths, config keys, and defaults come from `src/` and the CLI's own help, not from older docs. When docs and source disagree, source wins; note the conflict for the user.
-- Never bridge a gap with a plausible-sounding sentence. A claim you couldn't check gets flagged at the checkpoint, not silently shipped. Don't let one expensive check stall the draft.
+- 当便宜时，运行该单元将展示的终端命令：任何地方的只读命令、任何在临时目录中或完全不改动状态的东西。粘贴真实输出；修剪它，绝不润饰它。
+- 对照源码检查名称：标志、路径、配置键和默认值来自 `src/` 和 CLI 自身的帮助，而不是旧文档。当文档和源码冲突时，源码胜出；向用户标注冲突。
+- 绝不用一句听起来合理的句子填补缺口。一个你无法核实的断言在检查点被标记，而不是静默上线。不要让一次昂贵的检查卡住草稿。
 
-## Strip the slop
+## 剥离 slop
 
-Invoke the `no-ai-slop` skill on the drafted unit and apply its edit pass. Docs prose gets no exemption: the patterns it names read as machine-written to exactly the audience these docs must win over.
+在起草的单元上调用 `no-ai-slop` skill 并应用它的编辑。文档行文没有豁免：它点名的那些模式，对恰恰是这些文档必须赢得的读者来说，读起来就像机器写的。
 
-## Does it do the job?
+## 它履行职责吗？
 
-Reread the unit cold, as the reader the job line names, arriving with their actual problem. Answer three questions:
+以职责行点名的读者的身份，带着他们的实际问题，冷读一遍该单元。回答三个问题：
 
-1. Can they act? Every step is runnable as written, and nothing depends on knowledge the page hasn't given or linked.
-2. Do they know it worked? Where success could be in doubt, the unit shows something visible: output, a file, what the agent does next. Where the outcome is obvious, no success line is owed.
-3. What can they do now that they couldn't before? If the honest answer is "they read some context", the unit is explaining instead of solving; cut it back to what serves the job or raise it with the user.
+1. 他们能行动吗？每一步都照字面可运行，且没有任何东西依赖页面未给出或未链接的知识。
+2. 他们知道它成功了吗？在成功可能有疑问的地方，单元展示可见的东西：输出、一个文件、agent 下一步做什么。在结果显而易见的地方，不欠任何成功行。
+3. 他们现在能做什么以前不能做的？如果诚实的答案是"他们读到了一些上下文"，该单元是在解释而不是解决；把它砍回服务职责的部分，或向用户提出。
 
-A unit that fails here gets fixed before the checkpoint, not annotated.
+在这里失败的单元在检查点前修复，而不是加注。
 
-## Checkpoint
+## 检查点
 
-End the unit by showing the user:
+以向用户展示以下内容来结束单元：
 
-- the file path and the unit written;
-- the page's job in one line, and what this unit lets the reader do toward it;
-- which claims you checked and how (commands run, files read);
-- any claim still unchecked.
+- 文件路径和写出的单元；
+- 一行页面的职责，以及这个单元让读者能朝它做什么；
+- 你核实的断言及其方式（运行的命令、读过的文件）；
+- 任何仍未核实的断言。
 
-Then stop. The next unit starts when the user says so.
+然后停下。下一个单元在用户说开始时才开始。

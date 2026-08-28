@@ -1,30 +1,30 @@
-# Change metadata (.openspec.yaml)
+# 变更元数据（.openspec.yaml）
 
-> The supported fields and validation rules for the metadata stored with each change.
+> 每个变更存储的元数据所支持的字段与校验规则。
 
-## Location
+## 位置
 
-Each change keeps its metadata at `openspec/changes/<change-name>/.openspec.yaml`, next to its artifacts. Creating a change writes the file with `schema` and `created` filled in.
+每个变更将其元数据存放在 `openspec/changes/<change-name>/.openspec.yaml`，与其制品放在一起。创建变更时会写入该文件，并自动填入 `schema` 和 `created`。
 
-## Fields
+## 字段
 
-| Key | Type | Required | Effect |
+| 键 | 类型 | 必填 | 作用 |
 | --- | --- | --- | --- |
-| `schema` | string | Yes | The workflow schema this change follows |
-| `created` | string, YYYY-MM-DD | No | Records the date the change was created |
-| `goal` | string | No | Records what the change sets out to do |
-| `affected_areas` | list of strings | No | Records the areas the change expects to touch |
-| `initiative` | map: `store` and `id` | No | Records the initiative this change belongs to |
-| `skip_specs` | boolean | No | Declares the change makes no spec deltas, so zero deltas validate |
-| `retire_capabilities` | boolean | No | Authorizes archive to delete a capability this change empties |
+| `schema` | string | Yes | 该变更遵循的工作流 schema |
+| `created` | string, YYYY-MM-DD | No | 记录变更创建的日期 |
+| `goal` | string | No | 记录变更打算达成的目标 |
+| `affected_areas` | list of strings | No | 记录变更预期触及的领域 |
+| `initiative` | map: `store` and `id` | No | 记录该变更所属的 initiative |
+| `skip_specs` | boolean | No | 声明该变更不产生任何 spec 增量，因此零增量可通过校验 |
+| `retire_capabilities` | boolean | No | 授权归档删除该变更清空的某项能力 |
 
 ### schema
 
-The workflow schema this change follows. It is set when the change is created and wins over the project config, so a change keeps its schema even if `openspec/config.yaml` changes afterwards. Valid names are listed in [Schemas](../schemas/index.md).
+该变更遵循的工作流 schema。它在变更创建时被设置，并且优先于项目配置，因此即使之后 `openspec/config.yaml` 发生变化，变更也会保留自己的 schema。有效的名称列在 [Schemas](../schemas/index.md) 中。
 
 ### initiative
 
-The initiative this change belongs to, as a store id and an initiative id, both kebab-case:
+该变更所属的 initiative，以 store id 和 initiative id 表示，两者均为 kebab-case：
 
 ```yaml
 initiative:
@@ -32,19 +32,19 @@ initiative:
   id: unify-billing
 ```
 
-Keys other than `store` and `id` are rejected. No command reads the link today.
+`store` 和 `id` 之外的键会被拒绝。目前没有任何命令读取该链接。
 
 ### skip_specs
 
-Declares the change intentionally makes no spec deltas: a pure refactor, tooling, or docs change. With it set, validation accepts zero deltas, and artifacts that would generate spec files count as complete. Setting it while spec files exist under specs/ is a validation error. Its effect on deltas and archive is on [spec-driven](../schemas/spec-driven/index.md).
+声明该变更有意不产生 spec 增量：例如纯重构、工具或文档变更。设置后，校验接受零增量，且本会生成 spec 文件的制品也视为完成。若在 specs/ 下已存在 spec 文件时设置该字段，则是校验错误。它对增量和归档的影响参见 [spec-driven](../schemas/spec-driven/index.md)。
 
 ### retire_capabilities
 
-Authorizes archive to retire a capability. When this change's REMOVED deltas take away the last requirement a capability has, archive deletes that capability's main spec instead of stopping. The flag exists because the deletion is only recoverable from git, so it stays the author's call. The archive behavior is on [spec-driven](../schemas/spec-driven/index.md).
+授权归档时退役某项能力。当本变更的 REMOVED 增量移除了某能力所拥有的最后一条需求时，归档会删除该能力的主 spec，而不是中止。此标志之所以存在，是因为删除只能通过 git 恢复，所以由作者决定。归档行为参见 [spec-driven](../schemas/spec-driven/index.md)。
 
-## Example
+## 示例
 
-A filled-in .openspec.yaml:
+一个填写完整的 .openspec.yaml：
 
 ```yaml
 schema: spec-driven
@@ -55,8 +55,8 @@ affected_areas:
   - api
 ```
 
-## Validation
+## 校验
 
-The file is validated whenever a command writes or reads it. A write that fails validation throws and writes nothing. Reading an existing file fails on invalid YAML, a field that breaks its contract, or a schema name that is not available. A missing file is not an error, and the change is treated as having no metadata.
+每当命令写入或读取该文件时都会进行校验。写入校验失败会抛出异常且不写入任何内容。读取已有文件时，若 YAML 无效、字段违反其约定，或 schema 名称不可用，则失败。文件缺失不算错误，该变更视为没有元数据。
 
-Unlike [config.yaml](config-yaml.md), bad values are never dropped with a warning. A metadata error stops the command. The one exception is unknown top-level keys, which are ignored rather than rejected.
+与 [config.yaml](config-yaml.md) 不同，坏值不会仅以警告方式丢弃。元数据错误会中止命令。唯一的例外是未知的顶级键，它们会被忽略而不是被拒绝。

@@ -1,6 +1,6 @@
-# Workflow runs
+# 工作流运行
 
-> How a workflow run executes, from invocation to written artifacts.
+> 工作流运行如何执行，从调用到写入制品。
 
 <!-- WIP, on the todo list: this page is not written yet and is held back from the
 site (its entry is commented out in website/docs.sync.config.mjs, 2026-08-21). The file

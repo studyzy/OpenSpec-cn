@@ -1,15 +1,15 @@
-# Review the plan
+# 评审计划
 
-> The two-minute pass that catches wrong turns before they're code.
+> 用两分钟过一遍，在错误变成代码之前抓住它们。
 
 <!-- Skeleton: headings only. -->
 
-## The two-minute pass
+## 两分钟过一遍
 
-## What good requirements look like
+## 好的需求长什么样
 
-## What good scenarios look like
+## 好的场景长什么样
 
-## Pushing back
+## 提出异议
 
-## Advanced: verify after apply
+## 进阶：实施后验证

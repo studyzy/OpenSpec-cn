@@ -1,10 +1,10 @@
-# Project configuration
+# 项目配置
 
-> Make the workflows plan changes the way you want with a few lines in config.yaml.
+> 用 config.yaml 中的几行配置，让工作流按你想要的方式规划变更。
 
-`openspec/config.yaml` tells the workflows how you want changes planned.
+`openspec/config.yaml` 告诉工作流你希望变更如何被规划。
 
-For example, the following configuration updates the creation rules for the [tasks.md](../reference/schemas/spec-driven/index.md) artifact:
+例如，下面的配置更新了 [tasks.md](../reference/schemas/spec-driven/index.md) 制品的创建规则：
 
 ```yaml
 rules:
@@ -12,23 +12,23 @@ rules:
     - End every task with a commit
 ```
 
-When the agent runs, it pulls from these rules and ensures every task ends with a commit step.
+当 Agent 运行时，它会采用这些规则，确保每个任务都以一次提交收尾。
 
-Keep rules short. Everything here lands in the agent's context, and verbose rules can make the output worse.
+保持 rules 简短。这里的一切都会进入 Agent 的上下文，冗长的规则可能让输出变差。
 
-## How it works
+## 工作原理
 
-config.yaml holds instructions the agent receives when it creates artifacts or works through the workflow.
+config.yaml 保存的是 Agent 在创建制品或推进工作流时收到的指令。
 
-Here's what happens on every run:
+每次运行时会发生这些：
 
-1. You run a workflow (e.g. `/openspec-propose`).
-2. The agent calls the [`openspec instructions`](../reference/cli.md) command.
-3. The command reads your context and rules from config.yaml.
-4. OpenSpec's built-in instructions and your customizations are combined into a single prompt for the agent.
-5. The agent follows that prompt to write the artifact.
+1. 你运行一个工作流（例如 `/openspec-propose`）。
+2. Agent 调用 [`openspec-cn instructions`](../reference/cli.md) 命令。
+3. 该命令从 config.yaml 读取你的 context 和 rules。
+4. OpenSpec 的内置指令和你的定制会合并成给 Agent 的单一提示词。
+5. Agent 依据该提示词撰写制品。
 
-For example, with a `context` field and the rule from the top of this page, here's what [`openspec instructions`](../reference/cli.md) returns for tasks.md (trimmed and annotated):
+例如，有了一个 `context` 字段和本页开头的规则，下面是 [`openspec-cn instructions`](../reference/cli.md) 为 tasks.md 返回的内容（已精简并加注）：
 
 ```xml
 <artifact id="tasks" change="add-dark-mode" schema="spec-driven">
@@ -56,27 +56,27 @@ For example, with a `context` field and the rule from the top of this page, here
 </artifact>
 ```
 
-Your config arrives first, then OpenSpec's built-in instruction and template. Rules add to the built-ins and never replace them. Edits to config.yaml reach the agent on the next run.
+你的配置先出现，然后是 OpenSpec 的内置指令和模板。Rules 是对内置内容的追加，从不替换。对 config.yaml 的编辑会在下次运行时传给 Agent。
 
-[Workflow runs](../reference/architecture/workflow-runs.md) covers the full run, from invocation to written artifacts.
+[工作流运行](../reference/architecture/workflow-runs.md) 覆盖了从调用到产出制品的完整过程。
 
-## The fields
+## 字段
 
-Three fields shape what the agent receives. Each field's exact contract (types, limits, validation) is in [Project configuration (config.yaml)](../reference/configuration/config-yaml.md).
+三个字段决定 Agent 收到什么。每个字段的精确契约（类型、限制、校验）在 [项目配置 (config.yaml)](../reference/configuration/config-yaml.md) 中。
 
-| Field | What it does | Injected into |
+| 字段 | 作用 | 注入到 |
 |---|---|---|
-| `context` | Instructions the agent always receives | Everything: every artifact, `apply`, `archive` |
-| `rules` | Extra instructions for one artifact | Only that artifact's creation |
-| `operations` | Guidance for how a workflow step is carried out | Only `apply` and `archive` |
+| `context` | Agent 始终收到的指令 | 一切：每个制品、`apply`、`archive` |
+| `rules` | 针对某个制品的额外指令 | 仅该制品的创建 |
+| `operations` | 工作流步骤如何执行的指引 | 仅 `apply` 和 `archive` |
 
-config.yaml's other fields (`schema`, `store`, `references`) select which schema and which OpenSpec root a project uses. The contract page covers them.
+config.yaml 的其他字段（`schema`、`store`、`references`）选择项目使用哪个 schema、哪个 OpenSpec 根目录。契约页覆盖了它们。
 
-The last column is exact, so a field reaches only the steps listed there. In particular, `verify` never receives `rules`. It checks the implementation against the artifacts as written.
+最后一列是精确的，所以一个字段只到达列出的步骤。特别是 `verify` 从不接收 `rules`。它对照制品本身检查实现。
 
 ### context
 
-`context` is what the agent should know up front when planning a change, whether it's creating an artifact, applying tasks, or archiving:
+`context` 是 Agent 在规划变更时应该预先知道的，无论是创建制品、实施任务还是归档：
 
 ```yaml
 context: |
@@ -85,13 +85,13 @@ context: |
   We use conventional commits
 ```
 
-This is planning context, not project documentation. Add a fact when it should shape every plan, like the cross-platform line above. Leave out anything the agent can learn by reading the code.
+这是规划上下文，不是项目文档。当某个事实应该影响每份计划时就加进去，比如上面的跨平台那一行。Agent 通过读代码就能知道的内容就省略。
 
-**Another language**: because context reaches every artifact, it's also how you change the output language. One line, like `Write all artifacts in Spanish.`, switches every proposal, spec, and tasks file the workflows write.
+**另一种语言**：因为 context 会到达每个制品，它也是你改变输出语言的方式。一行，比如 `Write all artifacts in Spanish.`，就能切换工作流写出的每个 proposal、spec 和 tasks 文件的语言。
 
 ### rules
 
-`rules` attach to one artifact, keyed by artifact id. Each line is added to that artifact's built-in guidance:
+`rules` 挂到某个制品上，以制品 id 为键。每一行都会加到该制品的内置指引中：
 
 ```yaml
 rules:
@@ -101,11 +101,11 @@ rules:
     - Every UI task includes a Playwright test
 ```
 
-Proposals now stay short and tasks.md always plans browser tests. Every other artifact is untouched.
+现在 proposal 保持简短，tasks.md 总是规划浏览器测试。其他制品不受影响。
 
 ### operations
 
-`operations` guides how the agent carries out `apply` and `archive`, rather than what artifacts say:
+`operations` 指引 Agent 如何执行 `apply` 和 `archive`，而不是制品的内容：
 
 ```yaml
 operations:
@@ -117,8 +117,8 @@ operations:
       - Summarize what shipped before archiving
 ```
 
-During apply, the agent lints as it completes tasks. During archive, it closes with a summary.
+在 apply 过程中，Agent 在完成任务时运行 lint。在 archive 过程中，它最后给出一个总结。
 
-## When config.yaml isn't enough
+## 当 config.yaml 不够用时
 
-Config adds instructions on top of the standard workflow, but it can't change which artifacts exist or how they're structured. When you want that level of control, or rules aren't steering behavior consistently, [fork a schema](schemas.md).
+Config 在标准工作流之上追加指令，但它不能改变存在哪些制品或它们如何组织。当你想要那个级别的控制，或者 rules 不能稳定地引导行为时，[fork 一个 schema](schemas.md)。

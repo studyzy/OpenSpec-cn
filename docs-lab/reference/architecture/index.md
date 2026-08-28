@@ -1,6 +1,6 @@
-# Overview
+# 概述
 
-> How OPSX is built: internals for the curious.
+> OPSX 是如何构建的：为好奇者准备的内部结构。
 
 <!-- WIP, on the todo list: this page is not written yet and is held back from the
 site (its entry is commented out in website/docs.sync.config.mjs, 2026-08-21). The file
@@ -11,9 +11,9 @@ prose lands. -->
 the current system); split from a single architecture.md page into this folder
 on 2026-08-10. -->
 
-The pages in this section:
+本部分的页面：
 
-- [Workflow runs](workflow-runs.md): how a workflow run executes, from invocation to written artifacts.
-- [Design decisions](design-decisions.md): why OPSX works the way it does.
+- [工作流运行](workflow-runs.md)：工作流运行如何执行，从调用到写入制品。
+- [设计决策](design-decisions.md)：为什么 OPSX 要这样工作。
 
-## How the pieces fit
+## 各部分的配合方式

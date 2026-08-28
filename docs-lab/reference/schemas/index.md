@@ -1,20 +1,20 @@
-# Overview
+# 概述
 
-> Every available workflow schema and the artifacts it defines.
+> 每个可用的工作流 schema，以及它定义的制品。
 
 <!-- This group states the formats. How schemas shape artifacts and how to
 change or write one is customize/schemas.md's job. -->
 
-A schema defines which artifacts a change proposal produces, and in what order. On disk it's a folder with a schema.yaml in it. Every field of that file is on the [schema.yaml](schema-yaml.md) page.
+一个 schema 定义变更提案产生哪些制品，以及按什么顺序产生。在磁盘上它是一个包含 schema.yaml 的目录。该文件的每个字段都在 [schema.yaml](schema-yaml.md) 页面上。
 
-## Available schemas
+## 可用的 schemas
 
-One schema ships with the CLI:
+CLI 附带一个 schema：
 
-| Schema | Artifacts |
+| Schema | 制品 |
 |---|---|
-| [spec-driven](spec-driven/index.md) (default) | `proposal`, `specs`, `design`, `tasks` |
+| [spec-driven](spec-driven/index.md)（默认） | `proposal`, `specs`, `design`, `tasks` |
 
-A project can add its own schemas, and a machine can override globally. Where those folders live and which copy wins is in schema.yaml's [Location](schema-yaml.md#location) section.
+项目可以添加自己的 schemas，机器也可以全局覆盖。这些目录放在哪里、哪份副本生效，见 schema.yaml 的[位置](schema-yaml.md#location)一节。
 
-In your terminal, [`openspec schemas`](../cli.md#openspec-schemas) prints every schema your project can see.
+在终端中，[`openspec-cn schemas`](../cli.md#openspec-schemas) 会打印你的项目能看到的每个 schema。

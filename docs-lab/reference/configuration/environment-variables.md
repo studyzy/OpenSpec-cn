@@ -1,6 +1,6 @@
-# Environment variables
+# 环境变量
 
-> Every environment variable OpenSpec reads.
+> OpenSpec 读取的每一个环境变量。
 
 <!-- Skeleton: headings only. This page is the telemetry opt-out's home
 (README TODO): OPENSPEC_TELEMETRY=0, DO_NOT_TRACK=1, auto-disabled in CI, plus

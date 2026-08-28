@@ -1,24 +1,24 @@
 ---
 name: verify-openspec-docs
-description: Fact-checks OpenSpec user documentation with a fresh-context subagent that re-runs commands and checks claims against source. Manually triggered; not part of the drafting loop. Use when the user asks to verify, fact-check, or accuracy-check a docs page, section, or set of changed claims.
+description: 用全新上下文的子代理对 OpenSpec 用户文档做事实核查，子代理重新运行命令并对照源码检查断言。手动触发；不是起草循环的一部分。在用户要求验证、事实核查或准确性检查一个文档页面、章节或一组改动的断言时使用。
 argument-hint: page or section
 ---
 
-# Verify OpenSpec docs
+# 验证 OpenSpec 文档
 
-Check finished docs prose against reality. The point of a fresh context is that the reviewer hasn't watched the prose get written, so it can't be talked into the author's assumptions.
+对照现实检查完成的文档行文。全新上下文的意义在于评审者没有看着行文写出来，所以它不会被说服接受作者的前提假设。
 
-This skill runs only when the user asks for it. Drafting is owned by `write-openspec-docs`; don't invoke this from inside a drafting session unless the user requests a verification pass.
+本 skill 只在用户要求时运行。起草由 `write-openspec-docs` 负责；除非用户请求一次验证，否则不要在起草会话中调用本 skill。
 
-## Scope the run
+## 界定运行范围
 
-1. Confirm the target: a page, one `##` section, or a list of changed claims. If invoked without a target, ask.
-2. Read the README at the root of the docs tree the target lives in; its invariants and page map are part of what gets checked.
-3. One subagent per unit (one `##` section, or the stated claim list). A full page is several subagents, run in parallel.
+1. 确认目标：一个页面、一个 `##` 章节，或一份改动的断言列表。如果未带目标调用，就询问。
+2. 阅读目标所在文档树根部的 README；它的不变式和页面地图是会被检查的一部分。
+3. 每个单元一个子代理（一个 `##` 章节，或声明的断言列表）。一个完整页面是几个子代理，并行运行。
 
-## Spawn the reviewer
+## 启动评审者
 
-General-purpose subagent. Subagents don't inherit skills, so the prompt hands the reviewer everything by path. Fill every placeholder, make every path absolute, and send:
+通用子代理。子代理不继承 skills，所以提示词按路径把一切都交给评审者。填好每个占位符，让每个路径都绝对化，然后发送：
 
 ```
 You are reviewing one unit of OpenSpec's user documentation before it reaches the docs owner. Be the two hardest readers it will meet: a skeptical developer reading it cold, and a fact-checker with the repo open.
@@ -41,9 +41,9 @@ Then check, in this order:
 Report findings only, most severe first. For each: quote the line, say what is wrong, and give the fix in one line. For every fact you verified, say how (the command you ran, or the file and line you checked). List any claim you could not verify and why. Do not rewrite the unit. If the unit is clean, say so and list exactly what you verified.
 ```
 
-## Handle the report
+## 处理报告
 
-- Default is report, not rewrite: show the user the findings ranked most severe first, each with the quoted line and one-line fix, plus what was verified and how, and any claim the reviewer couldn't verify.
-- Apply fixes only when the user asked for a verify-and-fix run or approves the findings. A verifier can also be wrong: rejections go in the report with your reason, so the user can overrule you.
-- If an applied fix changed a factual claim, verify again, scoped to the changed claims. Typo and wording fixes don't need a second pass.
-- Two passes without converging means stop and take it to the user. Don't polish in a loop.
+- 默认是报告，不是重写：向用户展示按严重度从高到低排列的发现，每条带引用行和一行修复，加上核验了什么及如何核验，以及评审者无法核实的任何断言。
+- 只在用户要求验证并修复或批准发现时才应用修复。验证者也可能出错：被拒绝的内容连同你的理由放进报告，让用户能推翻你。
+- 如果应用的修复改变了一个事实断言，再次验证，范围限定在改动的断言。拼写和措辞修复不需要第二遍。
+- 两遍仍未收敛意味着停下并把问题交给用户。不要在循环里打磨。

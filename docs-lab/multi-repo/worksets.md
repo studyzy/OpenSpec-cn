@@ -1,25 +1,25 @@
 # Worksets (beta)
 
-> Open the store and the repos that use it in one editor window, so your agent sees both.
+> 在同一个编辑器窗口打开 store 和使用它的仓库，让你的 Agent 同时看到两者。
 
-With a store, the context your agent needs is split across folders. The specs and changes live in the store, and the code lives in each repo. An agent started in one repo can read and grep that repo and nothing else, so it works from half the picture.
+有 store 时，你的 Agent 需要的上下文分散在多个文件夹里。Specs 和 changes 住在 store 中，代码住在各个仓库里。在一个仓库中启动的 Agent 只能读取和 grep 那个仓库，别无其他，所以它只能基于一半的图景工作。
 
-Worksets are the utility OpenSpec provides for this. A workset is a saved, named list of folders you open together. This page assumes the store is already set up and registered on your machine. [Stores (beta)](stores.md) covers that.
+Worksets 就是 OpenSpec 为此提供的工具。一个 workset 是你在同一时间一起打开的一组已保存、有名字的文件夹。本页假设 store 已经设置好并注册在你机器上。[Stores (beta)](stores.md) 覆盖了那部分。
 
-## How it works
+## 工作原理
 
-- **What it is**: a named list of folders, saved on your machine only. Nothing is written into the member folders, and nothing is committed.
-- **What opening does**: OpenSpec generates a `.code-workspace` file from the list and launches your editor on it. Every member folder sits in one window.
-- **What you get**: your editor's search, and any agent you run inside that window, can read every member folder. The agent can grep the store's specs and the repo's code in one session.
-- **What it doesn't change**: which `openspec/` folder a command uses. That still follows [Where artifacts get created](stores.md#where-artifacts-get-created-when-using-stores).
+- **它是什么**：一个命名的文件夹列表，只保存在你的机器上。不会向成员文件夹写入任何内容，也不提交任何东西。
+- **打开做什么**：OpenSpec 根据列表生成一个 `.code-workspace` 文件，并在其上启动你的编辑器。每个成员文件夹都落在同一个窗口里。
+- **你得到什么**：你编辑器的搜索，以及你在那个窗口内运行的任何 Agent，都能读取每个成员文件夹。Agent 可以在一个会话里 grep store 的 specs 和仓库的代码。
+- **它不改变什么**：命令使用哪个 `openspec/` 文件夹。那仍然遵循[使用 store 时制品在哪里创建](stores.md#where-artifacts-get-created-when-using-stores)。
 
-## Set it up
+## 设置它
 
-1. **Save the workset** (once per machine). List the repo and the store as members, and the tool to open them with:
+1. **保存 workset**（每台机器一次）。把仓库和 store 列为成员，以及用什么工具打开它们：
 
    ```bash
-   # save a named list of folders you open together
-   openspec workset create platform \
+   # 保存一组你一起打开的命名文件夹
+   openspec-cn workset create platform \
      --member ~/src/web-app \
      --member ~/openspec/team-plans \
      --tool code
@@ -27,17 +27,17 @@ Worksets are the utility OpenSpec provides for this. A workset is a saved, named
 
    ```yaml
    Saved workset 'platform' (2 members) to your machine.
-   Open it any time with: openspec workset open platform
+   Open it any time with: openspec-cn workset open platform
    ```
 
-2. **Open it** whenever you start work:
+2. **每次开始工作时打开它**：
 
    ```bash
-   # open every member in one VS Code window
-   openspec workset open platform
+   # 在同一个 VS Code 窗口中打开每个成员
+   openspec-cn workset open platform
    ```
 
-`openspec workset list` shows what you saved, and `openspec workset remove <name>` deletes a workset without touching the member folders:
+`openspec-cn workset list` 显示你保存了什么，`openspec-cn workset remove <name>` 删除一个 workset 而不触碰成员文件夹：
 
 ```yaml
 platform  (opens in VS Code)
@@ -45,18 +45,18 @@ platform  (opens in VS Code)
   team-plans  /Users/you/openspec/team-plans
 ```
 
-## Use it: one change, two folders
+## 使用它：一个变更，两个文件夹
 
-Say the `add-login` change lives in the `team-plans` store, and the code for it lives in `web-app`. Open the `platform` workset and ask your agent to implement the change. In that one session it can:
+假设 `add-login` 变更住在 `team-plans` store 里，它的代码住在 `web-app` 中。打开 `platform` workset，让你的 Agent 实施这个变更。在那个会话里它能：
 
-- read `team-plans/openspec/changes/add-login/` and the specs next to it
-- edit the code in `web-app/`
-- run `openspec` commands from inside `web-app`
+- 读取 `team-plans/openspec/changes/add-login/` 以及旁边的 specs
+- 编辑 `web-app/` 里的代码
+- 在 `web-app` 内部运行 `openspec-cn` 命令
 
-Without the workset, the agent only sees whichever folder it was started in.
+没有 workset，Agent 只能看到它被启动的那个文件夹。
 
-## Tools out of the box
+## 开箱即用的工具
 
-- **VS Code** (`--tool code`) and **Cursor** (`--tool cursor`): built in. Each opens one window with every member folder.
-- **Claude Code and Codex in the terminal**: temporarily disabled as workset openers while that flow is reworked. `--tool claude` or `--tool codex` stops with an error that says so and points you to VS Code or Cursor.
-- **Other editors**: add them under the `openers` key in [CLI settings (config.json)](../reference/configuration/config-json.md).
+- **VS Code**（`--tool code`）和 **Cursor**（`--tool cursor`）：内置。各自打开一个包含所有成员文件夹的窗口。
+- **终端里的 Claude Code 和 Codex**：在流程重做期间，暂时禁用作为 workset 打开器。`--tool claude` 或 `--tool codex` 会带着说明错误的报错停下来，并把你指向 VS Code 或 Cursor。
+- **其他编辑器**：在 [CLI settings (config.json)](../reference/configuration/config-json.md) 的 `openers` 键下添加它们。

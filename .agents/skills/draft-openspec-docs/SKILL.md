@@ -1,16 +1,16 @@
 ---
 name: draft-openspec-docs
-description: Collaborative page-drafting mode for the OpenSpec docs. Builds a scratch plan inside the target page (purpose, structure, numbered draft steps), iterates on it with the user, then drafts one section per approved step and cleans up after itself. Use when a page needs a from-scratch rewrite or a new page is being shaped with the user in the loop.
+description: OpenSpec 文档的协作式页面起草模式。在目标页面内部构建一份草稿计划（目的、结构、编号起草步骤），与用户一起迭代，然后按已批准的步骤逐章节起草，并在完成后清理自身。在页面需要从头重写，或一个新区块需要用户参与塑形时使用。
 argument-hint: target page
 ---
 
-# Draft OpenSpec docs (scratch-plan workflow)
+# 起草 OpenSpec 文档（草稿计划工作流）
 
-You are shaping a docs page with the user in the loop. The page is planned and reviewed inside the page itself, then drafted one section at a time. Load `write-openspec-docs` (the style authority) and `no-ai-slop` before drafting anything.
+你在与用户一起塑形一个文档页面。页面在自身内部被规划和评审，然后逐章节起草。起草任何内容前加载 `write-openspec-docs`（风格权威）和 `no-ai-slop`。
 
-## 1. Set up the scratch section
+## 1. 设置草稿章节
 
-Strip the page to its title and `>` goal line, then add a working section below them:
+把页面剥到只剩标题和 `>` 目标行，然后在它们下方加一个工作章节：
 
 ```md
 ## Scratch: page plan (delete before publish)
@@ -20,27 +20,27 @@ Strip the page to its title and `>` goal line, then add a working section below 
 ### Structure
 ```
 
-- **Purpose**: 3-5 dot points. Who the reader is and what they come to look up, what the page covers, what it links out to. Check `docs-lab/README.md` (the page's goal line) and `docs-lab/message-map.md` (the questions routed here) before writing it.
-- **Structure**: a numbered list of the page's sections, one line each naming the section and the shape of its content (table, fence, tree, bullets).
-- Say what the page will do, never what it won't. Plain words and short bullets; the user reads this in their editor.
+- **Purpose**：3-5 个要点。读者是谁、他们来查什么、页面覆盖什么、它链接出去到什么。写它之前检查 `docs-lab/README.md`（页面的目标行）和 `docs-lab/message-map.md`（路由到这里的那些问题）。
+- **Structure**：页面章节的编号列表，每行一个，点名章节及其内容的形状（table、fence、tree、bullets）。
+- 说页面将做什么，绝不说它不做什么。用平实的词和短要点；用户在他们的编辑器里读这个。
 
-## 2. Iterate until the plan is approved
+## 2. 迭代到计划被批准
 
-- Plan edits are cheap; page edits aren't. Reshape the plan as many times as the user asks before drafting.
-- Record every decision in the plan itself, not only in chat. Add a `### Notes` list for follow-ups that belong to other pages and product observations found along the way.
-- The user may edit the file directly between turns; their edits are decisions, not drift to revert.
-- Surface one open call at a time, with a recommendation.
+- 计划编辑很便宜；页面编辑不便宜。在起草前按用户要求重塑计划多少次都行。
+- 把每个决策记在计划本身里，而不只是在聊天中。加一个 `### Notes` 列表，收录属于其他页面的后续事项和沿途发现的产品观察。
+- 用户可能在两轮之间直接编辑文件；他们的编辑是决策，不是要回退的漂移。
+- 一次抛出一个悬而未决的抉择，并附一个建议。
 
-## 3. Add the draft plan, then draft step by step
+## 3. 添加草稿计划，然后逐步骤起草
 
-Once the structure holds, add a `### Draft plan` below the notes: one step per page section, each with an ID and a readable title (`**D1. Goal line and intro**`), ending with a consolidation step (cross-page updates) and a cleanup step. Then:
+一旦结构站得住，在 notes 下方加一个 `### Draft plan`：每个页面章节一个步骤，各带 ID 和可读标题（`**D1. Goal line and intro**`），以一个整合步骤（跨页面更新）和一个清理步骤结束。然后：
 
-- Wait for the user to call a step ID. Draft exactly that step, into the page above the scratch block.
-- Verify each fact against source before writing it; a cheap grep beats trust. Reference content shows the raw contract (templates, instructions, config) verbatim in fences, linked to the file on GitHub, rather than paraphrasing it.
-- Keep sibling sections on a repeatable sub-structure so the page scans as one system.
-- Mark the step `(done)` in the plan, report what landed, and name the next step.
+- 等用户呼叫一个步骤 ID。精确起草那一步，写进草稿块上方的页面里。
+- 写之前对照源码验证每个事实；一次便宜的 grep 胜过信任。参考内容在围栏中原样展示原始契约（templates、instructions、config），并链接到 GitHub 上的文件，而不是改写它。
+- 保持同级章节使用可重复的子结构，让页面能作为一个系统被扫读。
+- 在计划中把步骤标记为 `(done)`，报告落了什么，并点名下一步。
 
-## 4. Consolidation and cleanup
+## 4. 整合与清理
 
-- **Consolidation**: update everything that points at the page. The README goal line (verbatim match with the page's `>` line), the message map, the sync config (`website/docs.sync.config.mjs`), and any cross-links found by grepping the tree. Run `node website/scripts/sync-docs.mjs` to validate.
-- **Cleanup**: delete the scratch block, run the retrievability and glance tests from `write-openspec-docs` at desktop and narrow widths, and flip the page's message-map row to Answered if its prose landed.
+- **整合**：更新一切指向该页面的东西。README 的目标行（与页面 `>` 行逐字一致）、消息映射、同步配置（`website/docs.sync.config.mjs`），以及通过 grep 文档树发现的任何交叉链接。运行 `node website/scripts/sync-docs.mjs` 来验证。
+- **清理**：删除草稿块，在桌面和窄宽度下运行 `write-openspec-docs` 的可检索性和一瞥测试，如果页面的行文已落地，把它的 message-map 行翻转为 Answered。

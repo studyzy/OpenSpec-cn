@@ -1,6 +1,6 @@
 # Stores
 
-> The files behind multi-repo stores: registry.yaml and store.yaml, and which root a command uses.
+> 多仓库 store 背后的文件：registry.yaml 与 store.yaml，以及命令使用哪个根目录。
 
 <!-- Skeleton: headings only. Beta, like the multi-repo group. Machine-maintained
 rather than hand-edited; documented so readers can inspect and repair them. The
@@ -17,6 +17,8 @@ inside each checkout. The glossary's "OpenSpec root" row links here. -->
 
 ## store.yaml
 
-## Locations
+## 位置
 
-## Root resolution
+<a id="root-resolution"></a>
+
+## 根目录解析

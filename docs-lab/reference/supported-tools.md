@@ -1,18 +1,14 @@
-# Supported tools
+# 支持的工具
 
-> Which AI coding tools OpenSpec supports, and each one's command syntax.
+> OpenSpec 支持哪些 AI 编码工具，以及每个工具的命令语法。
 
-Every tool in the matrix runs the same OpenSpec workflows. A skill and its command are
-the same workflow instructions. The only difference is what you type. Which form init
-installs is the delivery setting, covered in
-[Set up your project](../start/setup.md#the-workflow-files-skills-and-commands).
+矩阵中的每个工具都运行相同的 OpenSpec 工作流。一个 skill 和它的 command 是同一份工作流指令。唯一的区别是你输入什么。init 安装哪种形式由 delivery 设置决定，详见[设置你的项目](../start/setup.md#the-workflow-files-skills-and-commands)。
 
-## Support matrix
+## 支持矩阵
 
-Invocations are shown for the apply workflow. Every workflow follows the same shape.
-The id goes to `openspec init --tools <id>` to skip the picker ([CLI](cli.md)).
+调用以 apply 工作流为例展示。每个工作流都遵循相同的结构。id 传给 `openspec-cn init --tools <id>` 可跳过选择器（[CLI](cli.md)）。
 
-| Tool | `--tools` id | Skills | Skill invocation | Commands | Command invocation |
+| 工具 | `--tools` id | Skills | 技能调用 | 命令 | 命令调用 |
 |---|---|---|---|---|---|
 | Amazon Q Developer | `amazon-q` | `.amazonq/skills/` | `/openspec-apply-change` | `.amazonq/prompts/` | `@opsx-apply` |
 | Antigravity | `antigravity` | `.agents/skills/` | `/openspec-apply-change` | `.agents/workflows/` | `/opsx-apply` |
@@ -51,82 +47,51 @@ The id goes to `openspec init --tools <id>` to skip the picker ([CLI](cli.md)).
 | Zoo Code | `roocode` | `.roo/skills/` | `/openspec-apply-change` | `.roo/commands/` | `/opsx-apply` |
 | Shared `.agents` skills | `agents` | `.agents/skills/` | `/openspec-apply-change` | none | none |
 
-- **Skill invocation**: whether a tool registers skills as typed entries is the tool's
-  own behavior. The column shows the spelling OpenSpec uses in generated files and in
-  the hint init prints. Check your tool's docs if typing it does nothing.
-- **Command file formats**: most tools take `.md` command files. Gemini CLI takes
-  `.toml`, Continue `.prompt`, Kiro and GitHub Copilot `.prompt.md`. The spelling you
-  type is the same either way.
+- **技能调用**：工具是否把 skills 注册为键入项，是该工具自身的行为。这一列展示 OpenSpec 在生成文件和 init 打印的提示中使用的拼写。如果输入后没有反应，请查阅你的工具文档。
+- **命令文件格式**：大多数工具使用 `.md` 命令文件。Gemini CLI 使用 `.toml`，Continue 使用 `.prompt`，Kiro 和 GitHub Copilot 使用 `.prompt.md`。你输入的内容无论哪种形式都一样。
 
-## Per-tool notes
+## 各工具说明
 
-A tool not listed here behaves exactly as its row reads.
+未在此列出的工具，其行为与表中该行所述完全一致。
 
 ### Antigravity
 
-- **Current folder**: Antigravity v1.20.5 and later read workspace skills and
-  workflows from `.agents/`.
-- **Legacy folder**: after OpenSpec writes replacements, it removes equivalent
-  generated files from `.agent/`. Custom files and changed generated files stay in
-  `.agent/` for you to review.
-- **Shared skills**: Antigravity shares `.agents/skills/` with Codex, Zed Agent, and
-  the `agents` target. OpenSpec writes that skill tree once while still writing
-  Antigravity commands to `.agents/workflows/`.
+- **当前目录**：Antigravity v1.20.5 及更高版本从 `.agents/` 读取工作区 skills 和工作流。
+- **旧目录**：OpenSpec 写入替换文件后，会移除 `.agent/` 中等价的生成文件。自定义文件和被修改过的生成文件会留在 `.agent/` 中供你查看。
+- **共享 skills**：Antigravity 与 Codex、Zed Agent 及 `agents` 目标共享 `.agents/skills/`。OpenSpec 只写一次该 skill 树，同时仍会把 Antigravity 命令写入 `.agents/workflows/`。
 
 ### Cline
 
-Cline reads commands from `.clinerules/workflows/`, not from its `.cline/` folder.
-Skills stay in `.cline/skills/`.
+Cline 从 `.clinerules/workflows/` 读取命令，而不是从它的 `.cline/` 目录。skills 仍放在 `.cline/skills/`。
 
 ### Codex
 
-- **Invocation**: type `$openspec-<skill>`. Codex does not recognize the
-  `/openspec-<skill>` form ([upstream issue](https://github.com/openai/codex/issues/11817)).
-- **No command files**: Codex runs skills directly, so init skips commands even when
-  delivery includes them and prints `Commands skipped for: codex (uses skills)`.
-- **Shared folder**: Codex skills land in `.agents/skills/`, the same tree Antigravity,
-  Zed Agent, and the `agents` target use. Selecting more than one keeps a single
-  compatible tree, and its handoffs spell both `$openspec-*` and `/openspec-*` when
-  Codex owns it.
-- **Legacy path**: skills installed under `.codex/skills/` by older versions are
-  migrated on the next `openspec update`.
+- **调用**：输入 `$openspec-<skill>`。Codex 不识别 `/openspec-<skill>` 形式（[上游问题](https://github.com/openai/codex/issues/11817)）。
+- **无命令文件**：Codex 直接运行 skills，因此即使 delivery 包含命令，init 也会跳过命令并打印 `Commands skipped for: codex (uses skills)`。
+- **共享目录**：Codex skills 落在 `.agents/skills/`，与 Antigravity、Zed Agent 和 `agents` 目标使用同一目录树。选择多个目标时保留单一兼容树，当 Codex 拥有该树时，其交接会同时写成 `$openspec-*` 和 `/openspec-*`。
+- **旧路径**：旧版本安装到 `.codex/skills/` 下的 skills 会在下一次 `openspec-cn update` 时迁移。
 
-### Devin Desktop (formerly Windsurf)
+### Devin Desktop（原 Windsurf）
 
-- **Two agents**: command files in `.devin/workflows/` work only in Devin Desktop.
-  Devin Local runs skills only, so generated skills reference `/openspec-<skill>`,
-  which works in both.
-- **Rename**: `--tools windsurf` still resolves to `devin`. A project holding
-  OpenSpec files in the legacy `.windsurf/` folder is offered the move on the next
-  `openspec update`.
+- **两个 Agent**：`.devin/workflows/` 中的命令文件只在 Devin Desktop 中生效。Devin Local 只运行 skills，因此生成的 skills 引用 `/openspec-<skill>`，在两者中都可用。
+- **重命名**：`--tools windsurf` 仍会解析为 `devin`。项目在旧版 `.windsurf/` 目录中持有 OpenSpec 文件时，会在下一次 `openspec-cn update` 时提供迁移选项。
 
 ### GitHub Copilot
 
-Prompt files register as slash commands in the Copilot IDE extensions (VS Code,
-JetBrains, Visual Studio). Copilot CLI does not read `.github/prompts/`.
+提示文件在 Copilot IDE 扩展（VS Code、JetBrains、Visual Studio）中注册为斜杠命令。Copilot CLI 不读取 `.github/prompts/`。
 
 ### Hermes Agent
 
-Hermes loads skills only from `~/.hermes/skills/` by default. Add the project's
-`.hermes/skills/` folder to `skills.external_dirs` in `~/.hermes/config.yaml`;
-init prints this reminder after install.
+Hermes 默认只从 `~/.hermes/skills/` 加载 skills。把项目的 `.hermes/skills/` 目录加入 `~/.hermes/config.yaml` 的 `skills.external_dirs`；init 会在安装后打印这一提示。
 
 ### MiniMax Code
 
-- **Global only**: skills go to `~/.minimax/skills/`. Nothing is written inside
-  the repo.
-- **Safe across projects**: a commands-only delivery leaves the global skills in
-  place, so one project's setting cannot remove skills another project uses.
+- **仅全局**：skills 写入 `~/.minimax/skills/`。仓库内不写入任何内容。
+- **跨项目安全**：仅命令的 delivery 会保留全局 skills 不动，因此一个项目的设置不会移除另一个项目使用的 skills。
 
-### Shared `.agents` skills
+### 共享的 `.agents` skills
 
-- **When it fits**: any tool that reads the shared `.agents/skills/` folder,
-  including tools with no row in the matrix.
-- **Alongside other targets**: Antigravity, Codex, Zed Agent, and this target share
-  one physical skill tree. OpenSpec records one writer in `.openspec-target` and
-  writes the tree once per run. Each tool's separate command files are still
-  generated.
-- **What OpenSpec claims**: only the `openspec-*` folders and the
-  `.openspec-target` marker. Anything else under `.agents/` is left alone.
-- **`AGENTS.md`**: not created or edited. The target is the `.agents/` folder, not
-  the file.
+- **适用场景**：任何读取共享 `.agents/skills/` 目录的工具，包括矩阵中没有行的工具。
+- **与其他目标共存**：Antigravity、Codex、Zed Agent 和此目标共享同一个物理 skill 树。OpenSpec 在 `.openspec-target` 中记录一个写入者，每次运行只写一次该树。每个工具各自的命令文件仍会生成。
+- **OpenSpec 认领的范围**：只有 `openspec-*` 目录和 `.openspec-target` 标记。`.agents/` 下的其他任何内容都不动。
+- **`AGENTS.md`**：不会创建或编辑。目标是 `.agents/` 目录，不是该文件。

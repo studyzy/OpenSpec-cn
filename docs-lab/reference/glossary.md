@@ -1,40 +1,40 @@
-# Glossary
+# 术语表
 
-> Every OpenSpec term, one line each.
+> 每个 OpenSpec 术语，各一行。
 
-OpenSpec reuses words that mean something else in git, CI, and agent tooling. Each row gives the OpenSpec meaning, and the last column links to the page that teaches the term.
+OpenSpec 复用了一些在 git、CI 和 Agent 工具中含义不同的词。每一行给出 OpenSpec 中的含义，最后一列链接到讲解该术语的页面。
 
-| Term | Definition | More |
+| 术语 | 定义 | 更多 |
 |---|---|---|
-| **Apply** | Implement the tasks in a change proposal. Skill: `openspec-apply-change`. | [Apply a change](../guides/apply.md) |
-| **Archive** | Complete a change proposal: merge its deltas into the main specs and move its folder to `openspec/changes/archive/`. | [Quickstart](../start/quickstart.md) |
-| **Artifact** | A planning document inside a change proposal: `proposal.md`, delta specs, `design.md`, `tasks.md`. Not a build output. | [Concepts](../guides/concepts.md) |
-| **Capability** | One behavior area of your system. Each has one spec at `openspec/specs/<capability>/spec.md`. | [Concepts](../guides/concepts.md) |
-| **Change proposal** | One unit of work: a folder under `openspec/changes/<name>/` holding its planning artifacts. Often shortened to "change". Not a git commit. | [Concepts](../guides/concepts.md) |
-| **Command** | A typed entry point for a workflow. Spelling varies per tool (`/opsx:propose`, `/opsx-propose`). The docs name workflows by skill instead. | [Supported tools](supported-tools.md) |
-| **Continue** | Create the next planning artifact for an existing change proposal. Skill: `openspec-continue-change`. | [Skills](skills.md) |
-| **Delivery** | How workflows are installed: as skills, commands, or both. | [Set up your project](../start/setup.md) |
-| **Delta spec** | A spec inside a change proposal listing only what changes, under `ADDED`, `MODIFIED`, `REMOVED`, and `RENAMED` headers. | [Delta specs](schemas/spec-driven/index.md#delta-specs-specmd) |
-| **Explore** | Think an idea through with the agent before proposing. Writes no code. Skill: `openspec-explore`. | [Explore an idea](../guides/explore.md) |
-| **Fast-forward** | Create a change proposal with every planning artifact in one pass, ready to implement. Skill: `openspec-ff-change`. Not a git fast-forward. | [Skills](skills.md) |
-| **Legacy workflow** | The pre-OPSX `/openspec:*` commands. | [Migration](../help/legacy/migration.md) |
-| **Loop** | The cycle a change proposal moves through: explore, propose, review, apply, archive. | [Quickstart](../start/quickstart.md) |
-| **Main specs** | The `openspec/specs/` tree: the current, agreed behavior of your system. Archiving merges deltas into it. | [Concepts](../guides/concepts.md) |
-| **OpenSpec root** | The `openspec/` tree a command resolves to and operates on: your repo's, or a store's. | [Stores](configuration/stores.md) |
-| **OPSX** | The current OpenSpec workflow system, and the command prefix it installs (`/opsx:`). | [Architecture](architecture/index.md) |
-| **Profile** | Which workflows init installs: `core` or `custom`. | [Profiles](../customize/profiles.md) |
-| **Propose** | Create a change proposal and generate all its planning artifacts in one step. Skill: `openspec-propose`. | [Quickstart](../start/quickstart.md) |
-| **Registry** | The machine-level list of registered stores, in `registry.yaml`. Not a package registry. | [Stores](configuration/stores.md) |
-| **Requirement** | One behavior the system must have, written with SHALL: `### Requirement:` in a spec. | [Delta specs](schemas/spec-driven/index.md#delta-specs-specmd) |
-| **Scenario** | A testable example under a requirement, in WHEN/THEN form. | [Delta specs](schemas/spec-driven/index.md#delta-specs-specmd) |
-| **Schema** | The definition of which artifacts a change proposal produces, and in what order. Not JSON Schema. | [Schemas](schemas/index.md) |
-| **Skill** | A workflow's instructions, installed where your AI tool reads them (`.agents/skills/`, ...). | [Skills](skills.md) |
-| **Spec** | A file describing how one capability behaves today, at `openspec/specs/<capability>/spec.md`. | [Concepts](../guides/concepts.md) |
-| **spec-driven** | The default schema: proposal, then delta specs, then design, then tasks. | [spec-driven](schemas/spec-driven/index.md) |
-| **Store** | A standalone OpenSpec repo registered on your machine, for planning that spans repositories. Not a data store. | [Stores (beta)](../multi-repo/stores.md) |
-| **Sync** | Merge implemented deltas into the main specs without archiving. Skill: `openspec-sync-specs`. | [Skills](skills.md) |
-| **Template** | The starting content a schema gives each artifact. | [Schemas](../customize/schemas.md) |
-| **Update** | As a skill (`openspec-update-change`): revise a change proposal's planning artifacts. As a CLI command (`openspec update`): refresh OpenSpec's installed files. | [Change course](../guides/change-course.md), [CLI](cli.md) |
-| **Verify** | Check the implementation matches a change proposal's artifacts before archiving. Skill: `openspec-verify-change`. | [Skills](skills.md) |
-| **Workflow** | A named OpenSpec action (propose, apply, archive, ...), installed into your AI tool as a skill or command. | [Set up your project](../start/setup.md) |
-| **Workset** | A personal, local group of folders opened together in one tool. Not a store, and nothing is shared. | [Worksets (beta)](../multi-repo/worksets.md) |
+| **Apply** | 实现变更提案中的任务。Skill：`openspec-apply-change`。 | [应用变更](../guides/apply.md) |
+| **Archive** | 完成一个变更提案：将其增量规范（delta specs）合并到主 spec，并把它的目录移到 `openspec/changes/archive/`。 | [快速开始](../start/quickstart.md) |
+| **Artifact** | 变更提案内的规划文档：`proposal.md`、增量规范（delta specs）、`design.md`、`tasks.md`。不是构建产物。 | [核心概念](../guides/concepts.md) |
+| **Capability** | 你系统的一个行为领域。每个能力在 `openspec/specs/<capability>/spec.md` 有一个 spec。 | [核心概念](../guides/concepts.md) |
+| **Change proposal** | 一个工作单元：`openspec/changes/<name>/` 下的一个目录，存放其规划制品。常简称为"变更"。不是 git 提交。 | [核心概念](../guides/concepts.md) |
+| **Command** | 工作流的键入式入口。各工具的拼写不同（`/opsx:propose`、`/opsx-propose`）。本文档改用技能名来称呼工作流。 | [支持的工具](supported-tools.md) |
+| **Continue** | 为现有变更提案创建下一个规划制品。Skill：`openspec-continue-change`。 | [技能](skills.md) |
+| **Delivery** | 工作流如何安装：作为 skills、命令，还是两者。 | [设置你的项目](../start/setup.md) |
+| **Delta spec** | 变更提案中的一个 spec，只列出变化的内容，位于 `ADDED`、`MODIFIED`、`REMOVED` 和 `RENAMED` 标题之下。 | [增量规范（delta specs）](schemas/spec-driven/index.md#delta-specs-specmd) |
+| **Explore** | 在提议之前，先与 Agent 一起把想法想清楚。不写代码。Skill：`openspec-explore`。 | [探索想法](../guides/explore.md) |
+| **Fast-forward** | 一次性创建带有全部规划制品的变更提案，即可直接进入实现。Skill：`openspec-ff-change`。不是 git 的 fast-forward。 | [技能](skills.md) |
+| **Legacy workflow** | OPSX 之前的 `/openspec:*` 命令。 | [迁移](../help/legacy/migration.md) |
+| **Loop** | 变更提案经历的一个循环：explore、propose、review、apply、archive。 | [快速开始](../start/quickstart.md) |
+| **Main specs** | `openspec/specs/` 目录树：你系统当前已达成一致的行为。归档会把增量规范（delta specs）合并进去。 | [核心概念](../guides/concepts.md) |
+| **OpenSpec root** | 命令解析并操作的 `openspec/` 目录树：你仓库的，或某个 store 的。 | [Stores](configuration/stores.md) |
+| **OPSX** | 当前的 OpenSpec 工作流系统，以及它安装的命令前缀（`/opsx:`）。 | [架构](architecture/index.md) |
+| **Profile** | init 安装哪些工作流：`core` 或 `custom`。 | [Profiles](../customize/profiles.md) |
+| **Propose** | 一步创建变更提案并生成其全部规划制品。Skill：`openspec-propose`。 | [快速开始](../start/quickstart.md) |
+| **Registry** | 机器级已注册 store 列表，位于 `registry.yaml`。不是包注册表。 | [Stores](configuration/stores.md) |
+| **Requirement** | 系统必须具备的一个行为，用 SHALL 书写：spec 中的 `### Requirement:`。 | [增量规范（delta specs）](schemas/spec-driven/index.md#delta-specs-specmd) |
+| **Scenario** | 需求下一个可测试的示例，以 WHEN/THEN 形式书写。 | [增量规范（delta specs）](schemas/spec-driven/index.md#delta-specs-specmd) |
+| **Schema** | 定义变更提案产生哪些制品以及按什么顺序产生。不是 JSON Schema。 | [Schemas](schemas/index.md) |
+| **Skill** | 一个工作流的指令，安装到你的 AI 工具读取的位置（`.agents/skills/` 等）。 | [技能](skills.md) |
+| **Spec** | 描述某个能力当前如何行为的文件，位于 `openspec/specs/<capability>/spec.md`。 | [核心概念](../guides/concepts.md) |
+| **spec-driven** | 默认 schema：proposal，然后增量规范（delta specs），然后 design，然后 tasks。 | [spec-driven](schemas/spec-driven/index.md) |
+| **Store** | 注册在你机器上的独立 OpenSpec 仓库，用于跨仓库规划。不是数据存储。 | [Stores（beta）](../multi-repo/stores.md) |
+| **Sync** | 在不归档的情况下，将已实现的增量规范（delta specs）合并到主 spec。Skill：`openspec-sync-specs`。 | [技能](skills.md) |
+| **Template** | schema 提供给每个制品的起始内容。 | [Schemas](../customize/schemas.md) |
+| **Update** | 作为技能（`openspec-update-change`）：修订变更提案的规划制品。作为 CLI 命令（`openspec-cn update`）：刷新 OpenSpec 已安装的文件。 | [调整方向](../guides/change-course.md)、[CLI](cli.md) |
+| **Verify** | 在归档前检查实现是否符合变更提案的制品。Skill：`openspec-verify-change`。 | [技能](skills.md) |
+| **Workflow** | 一个命名的 OpenSpec 动作（propose、apply、archive 等），以 skill 或 command 形式安装到你的 AI 工具中。 | [设置你的项目](../start/setup.md) |
+| **Workset** | 个人本地的一组文件夹，在同一个工具中一起打开。不是 store，也不共享任何内容。 | [Worksets（beta）](../multi-repo/worksets.md) |

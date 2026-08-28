@@ -1,94 +1,73 @@
-Ok these are my notes when reviewing the different sections/file in docs-lab.
-I've written down my thoughts when looking at these sections so we can think about how to update these
-docs with the feedback in mind.
+# 起草笔记
 
+这些是审查 docs-lab 中不同章节/文件时记下的笔记。我写下看到这些章节时的想法，以便根据这些反馈考虑如何更新文档。
 
 ## Start > Overview
 
-Ok the following subtitle here is horrible:
+这个副标题很糟糕：
 
 > OpenSpec gives you and your coding agent a shared, reviewable plan before code is written.
 
-This is not a strong value prop in the day and age of plan mode, but other than that i don't think it sells openspec hard enough
+在 plan mode 的时代这不是一个有力的价值主张，而且除此之外，我觉得它没有足够有力地推销 OpenSpec。
 
-OpenSpec is not really about a shared plan for a single session it's about a keeping things on track and aligned for larger features.
+OpenSpec 其实不是关于单次会话的共享计划，而是关于让较大功能保持在轨道上并保持一致。
 
-what we focus on:
-- making it work for teams
-- git native / things checked into vcs
-- intented behaviour matches the implemented behaviour
-- we help you capture intendede behaviour and match it to the implemented behaviour.
-- it's about correctness, coherence,
+我们关注的是：
+- 让它对团队可用
+- 原生 git / 检入 VCS 的内容
+- 预期行为与已实现行为一致
+- 我们帮你捕获预期行为并将其与已实现行为对齐
+- 这关乎正确性、一致性
 
-Control theory inspiration:
+控制论启发：
 
-Instructors break down how a system measures its current state, compares it to a desired goal, and adjusts its actions to reduce the difference. 
-
-
+讲师们会拆解一个系统如何测量其当前状态、与期望目标比较，并调整其动作以缩小差距。
 
 ## Guides > Explore and idea
 
-I think in this section we should mention:
+我认为这一节应该提到：
 
-This is about exploring the problem space, figuring out what problems you care about and diving deeper into them.
+这关乎探索问题空间，弄清你关心哪些问题，并深入其中。
 
-It was designed with a very different philiosphy in mind of giving you the freedom to explore the problem space and jump around to different ideas and sections.
+它的设计理念截然不同，是给你探索问题空间的自由，可以在不同的想法和章节间跳转。
 
-It serves a similar purpose to other newer entrees in the fields like superpowers or matt pocock's skills.
+它与该领域较新的其他入口（如 superpowers 或 matt pocock 的 skills）目的相似。
 
-We often do see people combining explore with 
+我们经常看到人们把 explore 和 ... 结合使用
 
-Often this is a matter of UX and personal preference. There is no single best skill or method to getting to
-aligment with your agent.
+这往往是 UX 和个人偏好的问题。没有唯一的最佳 skill 或方法能达到与你的 agent 对齐。
 
-Some people prefer a conversing with a thoughtful design partner, others might prefer being asked questions till they have a good understanding of a problem.
+有些人喜欢与一个深思熟虑的设计伙伴交谈，另一些人可能更喜欢被提问，直到他们对问题有充分理解。
 
-Feel free to customize the explore skills to your needs.
+随时按你的需要定制 explore skill。
 
-Unrelated to docs:
+与文档无关：
 
-How do we solve the problem for PM's?
-How do we give them a good home? - what is their job to be done?
-How we efficiently help them achieve that?
+我们如何为 PM 解决这个问题？
+我们如何给他们一个好的归宿？——他们的任务是什么？
+我们如何高效地帮他们完成？
 
-- they're basically turning it into tickets?
+- 他们基本上是在把它变成工单？
 
+这周我们想把什么推过终点线？
 
-What do we want to get across the line this week?
+- spec drift agent？
+- 仪表盘？
 
-- The spec drift agent?
-- The dashboard?
+- 弄清楚我们如何更好地利用 agent 会话和追踪
 
-- figure out how we use agent session and traces better
+## 来自 docs-lab 起草过程（2026-08-19，project-config 页面）
 
+产品问题，不是文档问题：本仓库中已安装的 skills 落后于当前模板。`.claude/skills/openspec-archive-change/SKILL.md` 完全没有 `openspec instructions` 调用，而 `src/core/templates/workflows/archive-change.ts:40` 指示了这一点；已安装的 apply skill 也没有提到它读取的 JSON 中的 `context`/`operationGuidance` 字段。因此配置注入能到达 CLI 输出，但过时的 skill 永远不会告诉 agent 去消费它。运行 `openspec update` 应该会刷新它们。
 
-## From docs-lab drafting (2026-08-19, project-config page)
+## 来自 docs-lab 起草过程（2026-08-19，schemas 页面）
 
-Product issue, not docs: the installed skills in this repo are stale against the current
-templates. `.claude/skills/openspec-archive-change/SKILL.md` has no `openspec instructions`
-call at all, while `src/core/templates/workflows/archive-change.ts:40` instructs one; the
-installed apply skill also doesn't mention the `context`/`operationGuidance` fields in the
-JSON it reads. So config injection reaches the CLI output, but a stale skill never tells
-the agent to consume it. Running `openspec update` should refresh them.
+验证 schema 系统时发现的产品问题（所有文件引用均为今日最新）：
 
+- `schema init` 的下一步输出打印了一个以那种形式不存在的命令："Use with: openspec new --schema <name>"（schema.ts:999）；真实语法是 `openspec new change <name> --schema <name>`。
+- `openspec new change` 的 spinner 打印的是硬编码的默认 schema，而不是解析后的那个（new-change.ts:118）："Creating change 'x' with schema 'spec-driven'..."，然后是 "Schema: lite"。
+- `schema fork` 重新序列化 schema.yaml（字面量 `instruction: |` 变成折叠的 `>`，注释被丢弃），因此将 fork 与上游做 diff 会很吵（schema.ts:706-712）。
+- 所有 `openspec schema` 子命令以及 `openspec schemas`/`templates` 都使用 process.cwd() 且不接受 --store；从子目录运行时它们静默地什么都看不到，与根目录解析的命令不同（schema.ts:383/485/634/768）。
+- `suggestSchemas` 模糊"你是不是想找"辅助函数存在，但没有接入任何东西（project-config.ts:420）。
 
-## From docs-lab drafting (2026-08-19, schemas page)
-
-Product issues found while verifying the schema system (all file refs current as of today):
-
-- `schema init` next-steps output prints a command that doesn't exist in that form:
-  "Use with: openspec new --schema <name>" (schema.ts:999); real syntax is
-  `openspec new change <name> --schema <name>`.
-- `openspec new change` spinner prints the hardcoded default schema, not the resolved one
-  (new-change.ts:118): "Creating change 'x' with schema 'spec-driven'..." then "Schema: lite".
-- `schema fork` re-serializes schema.yaml (literal `instruction: |` becomes folded `>`,
-  comments dropped), so diffing a fork against upstream is noisy (schema.ts:706-712).
-- All `openspec schema` subcommands plus `openspec schemas`/`templates` use process.cwd()
-  and take no --store; they silently see nothing when run from a subdirectory, unlike
-  root-resolved commands (schema.ts:383/485/634/768).
-- `suggestSchemas` fuzzy "did you mean" helper exists but is wired to nothing
-  (project-config.ts:420).
-
-Docs follow-up: the community schema catalog lives only in legacy docs/customization.md
-(#community-schemas); customize/schemas.md links to it on GitHub. When the old docs tree
-retires, the catalog needs a docs-lab home.
+文档后续事项：社区 schema 目录只存在于遗留的 docs/customization.md（#community-schemas）；customize/schemas.md 在 GitHub 上链接到它。当旧 docs 目录退役时，该目录需要一个 docs-lab 归宿。

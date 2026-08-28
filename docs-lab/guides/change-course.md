@@ -1,11 +1,11 @@
-# Change course
+# 调整方向
 
-> Revise a change in flight, or decide it's cleaner to start fresh.
+> 修订进行中的变更，或者判断重新开始是否更干净。
 
 <!-- Skeleton: headings only. -->
 
-## Update or start fresh?
+## 更新还是重新开始？
 
-## Revising artifacts with openspec-update-change
+## 用 openspec-update-change 修订制品
 
-## Advanced: revising mid-implementation
+## 进阶：实施中途修订

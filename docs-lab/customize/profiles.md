@@ -1,52 +1,54 @@
 # Profiles
 
-> Choose which workflows are installed, and whether they install as skills, commands, or both.
+> 选择安装哪些工作流，以及它们以 skills、commands 还是两者形式安装。
 
-A profile is your preference for which OpenSpec workflows (the [skills and commands](../start/setup.md#the-workflow-files-skills-and-commands) in your AI tool) are installed across your machine. The default profile is `core`. Include or exclude workflows and your selection is saved as the `custom` profile.
+profile 是你的偏好：在你机器上安装哪些 OpenSpec 工作流（AI 工具中的 [skills 和 commands](../start/setup.md#the-workflow-files-skills-and-commands)）。默认 profile 是 `core`。包含或排除工作流后，你的选择会保存为 `custom` profile。
 
-## The core set
+## 核心集合
 
-The `core` profile installs six workflows, covering the whole loop from idea to archive:
+`core` profile 安装六个工作流，覆盖从想法到归档的整个循环：
 
-| Workflow | What it's for |
+| 工作流 | 用途 |
 |---|---|
-| [`explore`](../reference/skills.md#openspec-explore) | Think through an idea before it becomes a change proposal |
-| [`propose`](../reference/skills.md#openspec-propose) | Create a change proposal and generate all its planning artifacts in one step |
-| [`apply`](../reference/skills.md#openspec-apply-change) | Implement a change proposal's tasks |
-| [`update`](../reference/skills.md#openspec-update-change) | Revise a change proposal's existing planning artifacts |
-| [`sync`](../reference/skills.md#openspec-sync-specs) | Merge a change proposal's spec updates into `specs/` without archiving it |
-| [`archive`](../reference/skills.md#openspec-archive-change) | Move a finished change proposal to the archive |
+| [`explore`](../reference/skills.md#openspec-explore) | 在想法成为变更提案之前先想清楚 |
+| [`propose`](../reference/skills.md#openspec-propose) | 创建变更提案，并一步生成它的全部规划制品 |
+| [`apply`](../reference/skills.md#openspec-apply-change) | 实施变更提案的任务 |
+| [`update`](../reference/skills.md#openspec-update-change) | 修订变更提案已有的规划制品 |
+| [`sync`](../reference/skills.md#openspec-sync-specs) | 把变更提案的 spec 更新合并进 `specs/`，而不归档它 |
+| [`archive`](../reference/skills.md#openspec-archive-change) | 把完成的变更提案移入归档 |
 
-Each links to its full contract: arguments, what it creates, and what it responds with.
+每个都链接到它的完整契约：参数、它创建什么，以及它如何回应。
 
-## Expanding the set: optional workflows
+## 扩展集合：可选工作流
 
-Six more workflows are available beyond the core set. Three of them (`new`, `continue`, `ff`) create a change proposal artifact by artifact, instead of all at once like `propose`.
+核心集之外还有六个工作流可用。其中三个（`new`、`continue`、`ff`）逐个制品地创建变更提案，而不是像 `propose` 那样一次性创建。
 
-| Workflow | What it's for |
+| 工作流 | 用途 |
 |---|---|
-| [`new`](../reference/skills.md#openspec-new-change) | Start a change proposal as an empty scaffold |
-| [`continue`](../reference/skills.md#openspec-continue-change) | Create the next planning artifact in a change proposal, one at a time |
-| [`ff`](../reference/skills.md#openspec-ff-change) | Create a change proposal and every planning artifact implementation needs, in one pass |
-| [`verify`](../reference/skills.md#openspec-verify-change) | Check that the implementation matches the change proposal's artifacts |
-| [`bulk-archive`](../reference/skills.md#openspec-bulk-archive-change) | Archive several change proposals at once |
-| [`onboard`](../reference/skills.md#openspec-onboard) | Learn the workflow by doing one real change proposal end to end |
+| [`new`](../reference/skills.md#openspec-new-change) | 以空脚手架启动一个变更提案 |
+| [`continue`](../reference/skills.md#openspec-continue-change) | 一次一个地创建变更提案的下一个规划制品 |
+| [`ff`](../reference/skills.md#openspec-ff-change) | 一遍创建变更提案及实现所需的全部规划制品 |
+| [`verify`](../reference/skills.md#openspec-verify-change) | 检查实现是否与变更提案的制品一致 |
+| [`bulk-archive`](../reference/skills.md#openspec-bulk-archive-change) | 一次归档多个变更提案 |
+| [`onboard`](../reference/skills.md#openspec-onboard) | 通过端到端完成一个真实变更提案来学习工作流 |
 
-To change the set, run the interactive picker:
+要改变这个集合，运行交互式选择器：
 
 ```bash
-openspec config profile
+openspec-cn config profile
 ```
 
-The picker asks what to configure ([delivery](#delivery-skills-commands-or-both), workflows, or both), then lists all twelve workflows as checkboxes, with the installed ones checked. Any selection that isn't exactly the core six is saved as the `custom` profile, so you can also uncheck core workflows you don't use.
+选择器会询问要配置什么（[交付方式](#delivery-skills-commands-or-both)、工作流，还是两者），然后把全部十二个工作流列成复选框，已安装的处于勾选状态。任何不是正好核心六个的选择都会保存为 `custom` profile，所以你也可以取消勾选不用的核心工作流。
 
-## Delivery: skills, commands, or both
+<a id="delivery-skills-commands-or-both"></a>
 
-Delivery is a profile setting that lets you choose to have only skills or only commands installed. The default is `both`. [Set up your project](../start/setup.md#the-workflow-files-skills-and-commands) explains the two forms and why both exist. The field's exact contract is in [CLI settings (config.json)](../reference/configuration/config-json.md#delivery).
+## 交付方式：skills、commands 或两者
 
-Two ways to change it:
+交付方式是 profile 的一个设置，让你选择只安装 skills、只安装 commands，还是两者都装。默认是 `both`。[设置你的项目](../start/setup.md#the-workflow-files-skills-and-commands) 解释了这两种形式以及为什么两者都存在。该字段的精确契约在 [CLI settings (config.json)](../reference/configuration/config-json.md#delivery)。
 
-**Interactively**: run `openspec config profile` and choose "Delivery only". Here's switching to skills only:
+两种修改方式：
+
+**交互式**：运行 `openspec-cn config profile` 并选择 "Delivery only"。下面是从 both 切换为仅 skills 的样子：
 
 ```
 Current profile settings
@@ -60,29 +62,29 @@ Config changes:
 ? Apply changes to this project now? (Y/n) y
 ```
 
-**Directly**: one command, no prompts:
+**直接式**：一条命令，没有提示：
 
 ```bash
-openspec config set delivery skills   # or: both, commands
+openspec-cn config set delivery skills   # or: both, commands
 ```
 
-Delivery never changes the profile name. `core` and `custom` describe the workflow set only, and switching back to `core` keeps your delivery setting.
+交付方式绝不会改变 profile 名称。`core` 和 `custom` 只描述工作流集合，切回 `core` 会保留你的交付方式设置。
 
-## Switching profiles
+## 切换 profiles
 
-Switching is two steps: change the profile on your machine, then update each project to apply it.
+切换分两步：先在你机器上更改 profile，然后在每个项目中运行更新来应用它。
 
-1. Change the profile:
-
-   ```bash
-   openspec config profile        # interactive
-   openspec config profile core   # reset to the core six (keeps delivery)
-   ```
-
-2. Run the update in each project you work in:
+1. 更改 profile：
 
    ```bash
-   openspec update
+   openspec-cn config profile        # interactive
+   openspec-cn config profile core   # reset to the core six (keeps delivery)
    ```
 
-When your current directory is an existing OpenSpec project, the interactive flow offers to run step 2 there for you.
+2. 在你工作的每个项目中运行更新：
+
+   ```bash
+   openspec-cn update
+   ```
+
+当你的当前目录是一个已有的 OpenSpec 项目时，交互式流程会主动提出替你在那里执行第 2 步。

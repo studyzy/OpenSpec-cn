@@ -1,161 +1,163 @@
-# OpenSpec docs: the style guide
+# OpenSpec 文档：风格指南
 
-Structure, voice, tone, and language for OpenSpec's user docs. This file is the primary style authority for the docs tree. The tree's own README owns structure (the page map and which page teaches what); when this file and that README disagree, the README wins. `no-ai-slop` owns the generic slop patterns; this file owns what OpenSpec's docs specifically look and sound like.
+OpenSpec 用户文档的结构、语气、口吻和语言。本文件是文档树的首要风格权威。文档树自身的 README 负责结构（页面地图以及哪个页面教什么）；当本文件与那份 README 冲突时，以 README 为准。`no-ai-slop` 负责通用的 slop 模式；本文件负责 OpenSpec 文档具体的样子和声音。
 
-## Six principles
+## 六条原则
 
-Every rule below applies one of these; when rules collide, the principles decide.
+下面每条规则都应用其中一条原则；当规则冲突时，由原则裁决。
 
-- **A page is a retrieval surface, not an essay.** The reader arrives mid-task with a question, scans for the answer, and leaves. Structure decides whether they find it; prose only decides how it reads. Structure wins.
-- **The shortest version that answers is the right length, drafted that way from the start.** Expanding a spare page is cheap; cutting a bloated one is a rewrite. Plain words, and the fewest of them: an idea that fits in one line takes one line.
-- **Dumb sentences, smart structure.** Write the obvious sentence: actor, verb, object, stating the literal event ("Running init creates two things in your project"). Never the version that compresses facts in or takes an angle ("Everything init creates is meant to be committed"). If a sentence needs unpacking, it failed.
-- **One job per slot.** A sentence carries one fact (one carrying three hides two). A list intro only announces its list. A section owns one reader question or lookup target. Related facts get their own slot, never a ride in someone else's.
-- **Ground everything in what the reader can verify.** Name things by path, file, or real output: what the reader could match against `ls`. The concept is the gloss, never the name.
-- **No house template.** Shape follows content: inventories get overview-then-expand, sequences get numbered steps, a single idea gets short paragraphs, and reasoning lives in prose. The universal check is the retrievability test, not bullet count.
+- **页面是检索表面，不是文章。** 读者带着问题中途到来，扫读找答案，然后离开。结构决定他们能否找到；行文只决定读起来如何。结构胜出。
+- **能回答的最短版本就是正确的长度，并且从起草一开始就按这个来。** 扩充一个精简的页面很便宜；砍一个臃肿的页面就是重写。用平实的词，用最少量的词：一个能放进一行的想法就占一行。
+- **笨句子，巧结构。** 写下显而易见的句子：动作主体、动词、宾语，陈述字面事件（"Running init creates two things in your project"）。绝不写压缩事实或夹带立场的版本（"Everything init creates is meant to be committed"）。如果一个句子需要拆解才能懂，它就失败了。
+- **一个槽位一个职责。** 一个句子携带一个事实（一个句子带三个，就有两个被藏起来了）。列表引言只宣告其列表。一个章节只回答一个读者问题或承担一个查表目标。相关事实有自己的槽位，绝不搭别人的便车。
+- **一切都以读者可验证之物落地。** 用路径、文件或真实输出命名事物：读者能对照 `ls` 的东西。概念是释义，绝不是名称。
+- **没有 house 模板。** 形状跟随内容：清单用概述后扩展，序列用编号步骤，单一想法用短段落，推理活在行文中。通用检验是可检索性测试，而不是项目符号数量。
 
-## The retrievability test
+## 可检索性测试
 
-Name the questions or exact product terms a reader would bring to the section ("does init touch `.gitignore`?", "how do I add a tool later?", `generates`). Each answer or term must be findable by scanning, heading to anchor to fact, without reading paragraphs. If finding a fact means reading sentences, restructure; prose that passes needs no bullets, and no amount of bullets saves a section that fails.
+说出读者会带着来这个章节的问题或精确产品术语（"init 是否触碰 `.gitignore`？"、"我以后如何添加一个工具？"、`generates`）。每个答案或术语都必须能通过扫读找到，从标题到锚点到事实，无需阅读段落。如果找到一个事实需要读句子，就重组；通过检验的行文不需要项目符号，而再多的项目符号也救不了一个失败的章节。
 
-## The shortest draft
+## 最短草稿
 
-Brevity happens at drafting time, not review. A page that needs heavy cutting in review gets rewritten, and a rewrite costs more than writing it spare the first time. Start from the shortest version that answers and expand only where a real reader question goes unanswered.
+简洁发生在起草时，而不是评审时。一个在评审中需要大砍的页面会被重写，而重写比第一遍就写得精简更贵。从能回答的最短版本开始，只有在真实读者问题无人回答时才扩展。
 
-Every slot is earned before it's written:
+每个槽位在写出来之前都要挣得：
 
-- **The unit**: it answers a reader question or documents a lookup target, or it doesn't go in. Tight prose on the wrong scope is still the wrong scope.
-- **The sentence**: would any reader come back for it? If not, it spends attention without buying anything; don't write it.
-- **The depth**: an edge case or rationale most readers skip goes behind a link to its canonical page, not inline. The docs keep the depth; this page doesn't charge every reader for it.
-- **The payload**: the command, the real output, the failure and its fix stay whole. Spare means no wind-up and no commentary, never fewer facts.
+- **单元**：它回答一个读者问题或记录一个查表目标，否则就不写。范围错了的精练行文仍然是错的范围。
+- **句子**：会有读者为它回来吗？如果没有，它花了注意力却没买到任何东西；别写它。
+- **深度**：大多数读者跳过的边界情况或理由放到链接后面，指向其规范页面，而不是内联。文档保留深度；这个页面不会让每个读者都为它付费。
+- **载荷**：命令、真实输出、失败及其修复保持完整。精简意味着没有铺垫、没有评论，绝不是更少的事实。
 
-The glance test is the backstop, not the method. Scroll the rendered page and read it as shapes: short units, air between anchors, no screen-filling block of anything. A page that looks like work loses its reader before the first sentence; if yours does, something above got in without earning its slot. For table or layout changes, check both desktop and narrow widths; the Markdown source can't show cramped columns, poor wrapping, or horizontal scrolling.
+一瞥测试是兜底，不是方法。滚动渲染后的页面，把它读成形状：短单元、锚点之间的空隙、没有占满屏幕的整块东西。一个看起来像没做完的活的页面，在第一个句子之前就失去了读者；如果你的页面如此，那上面有某个东西没挣得自己的槽位就进来了。对表格或版式改动，同时检查桌面和窄宽度；Markdown 源展示不出挤在一起的列、糟糕的换行或水平滚动。
 
-## Shape of a section
+## 章节的形状
 
-- **Answer first**: open with the command, the inventory, or the fact in one line. Context and rationale come after, never first.
-- **Inventory, then expand**: when a section covers several things (what init installs, what an uninstall leaves behind), open with a list naming every item in one line each, then expand each in its own unit after the list (a subsection or bold lead-in).
-- **The overview only names**: a count ("two things:") is not an inventory, and expansion never happens inline in the list; the reader sees the whole footprint, then the detail.
-- **Place first, meaning second**: name each on-disk item by its path or folder ("an `openspec/` folder at the repo root"), never by concept alone ("the planning folder"). The concept gloss can wait for the item's expansion. When a location varies (per tool, per OS), anchor it with a real folder or two ("`.agents/`, `.claude/`") and link the full list.
-- **Core before nuance**: inside every unit, the answer, then what to expect, then edge cases last. A reader who stops early still leaves with the core.
-- **One unit per target**: task pages separate different reader questions. Reference pages separate different product elements when readers look them up independently. Two facts with different targets get separate units, even when one elegant sentence could join them.
+- **答案先行**：以一个命令、一个清单或一个事实开头，用一行。上下文和理由在后，绝不在前。
+- **先清单，后扩展**：当一个章节覆盖几样东西（init 安装了什么、卸载留下什么）时，先开一个列表，每个条目一行，然后在列表之后逐条以各自单元扩展（一个小节或加粗引导语）。
+- **概述只点名**：一个计数（"two things:"）不是清单，扩展绝不发生在列表内联处；读者先看到全貌，再看细节。
+- **位置在前，含义在后**：用路径或文件夹命名每个磁盘上的条目（"仓库根目录下的 `openspec/` 文件夹"），绝不只用概念（"规划文件夹"）。概念释义可以等该条目的扩展。当位置因工具、因操作系统而异时，用一两个真实文件夹锚定它（"`.agents/`、`.claude/`"）并链接完整列表。
+- **核心在前，细微在后**：在每个单元内部，先是答案，然后是可预期的东西，边界情况最后。早退场的读者仍带着核心离开。
+- **一个目标一个单元**：任务页面分隔不同的读者问题。参考页面在读者独立查表时分隔不同的产品元素。目标不同的两个事实分属两个单元，哪怕一个优雅的句子本可以把它们连在一起。
 
-## Scan anchors
+## 扫描锚点
 
-Every load-bearing fact sits on an anchor: something the eye lands on without reading. A fact a reader might come back for never lives only in the middle of a paragraph. The anchors these docs use:
+每个承重事实都落在锚点上：一个不用读就能被眼睛落上去的东西。读者可能回头来找的事实绝不只活在段落中间。这些文档使用的锚点：
 
-- Code fences, for commands and real output.
-- Numbered steps with bold lead-ins (`**1. Remove the package.**`) for multi-step tasks.
-- `**Term**: fact` bullets for options, properties, and locations.
-- Tables, when several items share the same attributes (mostly reference pages).
-- File trees with inline annotations for layouts.
+- 代码围栏，用于命令和真实输出。
+- 带加粗引导语的编号步骤（`**1. Remove the package.**`），用于多步任务。
+- `**Term**: fact` 项目符号，用于选项、属性和位置。
+- 表格，当几个条目共享相同属性时（大多是参考页面）。
+- 带行内注释的文件树，用于版式。
 
-A full screen of content with no anchor is a wall, even when every sentence in it is true.
+一整屏没有锚点的内容是一堵墙，哪怕其中每个句子都是真的。
 
-## Choosing the shape
+## 选择形状
 
-No house template: facts go on anchors (enumerable content defaults to a list or table); explanation, reasoning, and judgment go in prose. The content picks the form:
+没有 house 模板：事实放在锚点上（可枚举内容默认进列表或表格）；解释、推理和判断活在行文中。内容决定形式：
 
-- **Sequences**: numbered steps, one bounded action each. Numbers mean order of execution; an inventory of things takes bullets, never numbers. Restate any value a step needs rather than pointing back three steps.
-- **Options, properties, locations**: `**Term**: fact` bullets.
-- **Items sharing the same attributes**: a table.
-- **A single idea** (why a store is worth it, what sync treats as drift): a couple of short paragraphs; that is the right shape.
-- **Connected reasoning**: a paragraph. Shredding a thought into fragments makes it harder to read, not easier; a bullet list of full explanatory sentences is a paragraph in costume, so write the paragraph.
+- **序列**：编号步骤，每步一个有界动作。编号表示执行顺序；对一列东西用项目符号，绝不用编号。需要时重述某步所需的任何值，而不是回头指三步前。
+- **选项、属性、位置**：`**Term**: fact` 项目符号。
+- **共享相同属性的条目**：表格。
+- **单一想法**（store 为什么值得、sync 把什么视为 drift）：几个短段落；那就是正确的形状。
+- **关联推理**：一个段落。把一个想法切成碎片会让它更难读，而不是更容易；一列完整解释句的项目符号是穿了戏服的段落，所以写段落。
 
-Across every form:
+在每种形式中都应如此：
 
-- Cap lists at about five items. Longer than that, split by priority: common path first, edge cases into their own list or a linked page.
-- Keep items parallel: same internal order (name, fact, catch, link), same grammatical shape. Repetition across items is what makes scanning work; never vary structure between items for the sake of the prose.
-- Uniformity is right when the content is uniform (a reference table, an install matrix). When every section on a varied page resolves to the same pattern, some of those lists are disguised paragraphs.
+- 列表控制在约五条以内。更长了就按优先级拆分：常见路径在前，边界情况进自己的列表或一个链接页面。
+- 保持条目平行：相同的内部顺序（名称、事实、注意、链接），相同的语法形状。条目间的重复正是让扫读工作的东西；绝不为行文之故在条目之间变换结构。
+- 内容统一时统一是对的（参考表格、安装矩阵）。当一个多变页面上的每个章节都归到同一个模式，其中一些列表就是伪装成列表的段落。
 
-## Prose budget
+## 行文预算
 
-Paragraphs are glue between anchors, not containers for facts.
+段落是锚点之间的胶水，不是事实的容器。
 
-- One to three lines. Three is the ceiling; a glue line between two anchors is often enough.
-- The list intro has exactly one job: say what the list is ("Running init creates two things in your project:"). Never spend that slot on a different fact, however related; it gets its own line after the list.
-- Parentheses and semicolon riders are for true asides only (a version caveat, a pointer). If a reader might return for the fact, it gets its own anchor.
-- A section that is mostly paragraphs is misshaped, unless the page is genuinely conceptual (Concepts, explanations of the model). Even there, front-load each paragraph and leave air between them.
+- 一到三行。三行是上限；两个锚点之间的一行胶水往往就够了。
+- 列表引言只有一个职责：说出这个列表是什么（"Running init creates two things in your project:"）。绝不把这个槽位花在另一个事实上，哪怕相关；它有自己的行，在列表之后。
+- 括号和分号骑手只留给真正的题外话（一个版本注意事项、一个指针）。如果读者可能为这个事实回来，它就有自己的锚点。
+- 一个大部分是段落的章节是走形的，除非该页面是真正的概念性内容（Concepts、对模型的解释）。即便如此，也要让每个段落重点前置，并在段落之间留出空隙。
 
-## Sentences
+## 句子
 
-- Short sentences, active voice. Default subject is "you" or the tool by name.
-- No preamble. The first sentence of any unit states the thing itself, never wind-up ("Before we get into...", "It's worth understanding that...").
-- No em dashes anywhere in these docs. Use a colon, a comma, parentheses, or two sentences.
-- Write the sentence you would say out loud. A draft that splices clauses with semicolons or colon-stacked fragments ("different documents: fewer of them, different names, different structure") gets rewritten as the spoken version ("when you want these to be different documents, whether that means fewer of them, different names, or a different structure"). Colons still introduce lists, fences, and labels. They don't splice prose.
-- Contractions are fine ("you're set", "doesn't come along"). These docs talk, they don't proclaim.
-- Inside narrative paragraphs, vary sentence length so the prose doesn't read staccato. Paragraphs only; list items stay parallel even when the cadence repeats.
+- 短句，主动语态。默认主语是"你"或具名的工具。
+- 没有开场白。任何单元的第一个句子都陈述事情本身，绝无铺垫（"在我们进入…之前"、"值得理解的是…"）。
+- 这些文档中任何地方都没有破折号。用冒号、逗号、括号或两个句子。
+- 写下你会说出口的句子。一个用分号或冒号堆叠片段拼接从句的草稿（"different documents: fewer of them, different names, different structure"）要重写成口语版（"when you want these to be different documents, whether that means fewer of them, different names, or a different structure"）。冒号仍然引出列表、围栏和标签。它们不拼接行文。
+- 缩略词没问题（"you're set"、"doesn't come along"）。这些文档在说话，不是在宣告。
+- 在叙事段落内部，变化句子长度，让行文不读成断奏。只限段落；列表条目保持平行，哪怕节奏重复。
 
-## Voice
+## 语气
 
-The narrator is a colleague who has run every command on the page, hit the failure modes personally, and is telling you what they know. Not a marketer, not a tutorial host, not a manual.
+叙述者是一位跑过页面上每条命令、亲身踩过那些失败模式、正在把他知道的讲给你的同事。不是营销人员，不是教程主持人，不是手册。
 
-- Calm and specific. The reader wants the fact, the command, and the catch, in that order.
-- Confidence comes from precision, not emphasis. Never "very", "extremely", "critical", bold-for-importance, or exclamation marks.
-- Plain judgment is welcome. The docs may tell the reader what to do and what to skip: "The `openspec/` folder: pause first."
-- Address the reader as "you". OpenSpec, the CLI, and init do things. "We" appears only for project decisions ("we say skills"), never as a tour guide.
-- Dry beats chirpy. No cheerleading, no apologizing, no drama around failures. A failure is a fact with a fix.
+- 平静而具体。读者想要事实、命令和注意点，按这个顺序。
+- 自信来自精确，不是强调。绝不"非常"、"极其"、"关键"、为重要性加粗或感叹号。
+- 平实的判断受欢迎。文档可以告诉读者做什么、跳过什么："The `openspec/` folder: pause first."
+- 以"你"称呼读者。OpenSpec、CLI 和 init 做事情。"我们"只出现在项目决策中（"we say skills"），绝不当导游。
+- 克制胜过聒噪。没有打鸡血，没有道歉，没有围绕失败的戏剧。失败是一个带修复的事实。
 
-## Structure and tone by page type
+## 按页面类型的结构与语气
 
-Same voice everywhere; structure and temperature shift:
+处处是同一个语气；结构与温度有所变化：
 
-- **Start pages**: numbered steps and short units, nothing assumed, every step ends in something visible. Warmest the docs get, which is still plain.
-- **Guides**: peer to peer, skip re-orientation. The judgment calls are the reason guides exist; put them on anchors so they scan.
-- **Reference**: mirror the product, use its exact names as anchors, and cover the contract without compressing it. Tables and fragments are common, but scan speed decides the shape. No motivation or persuasion; the reader is here to look something up and leave.
-- **Troubleshooting**: symptom, cause, fix, in that order, one unit per symptom. Name the error the reader sees. Never "you may notice" or "sometimes it can happen that".
+- **Start 页面**：编号步骤和短单元，什么都不假设，每步都以可见的东西结束。这是文档最温暖的时候，但仍然平实。
+- **Guides**：同行对同行，跳过重新定位。判断抉择正是指南存在的理由；把它们放到锚点上，让它们能扫读。
+- **Reference**：镜像产品，用其精确名称作锚点，完整覆盖契约而不压缩它。表格和片段常见，但扫读速度决定形状。没有动机或说服；读者是来查点东西然后走的。
+- **Troubleshooting**：症状、原因、修复，按此顺序，每个症状一个单元。说出读者看到的错误。绝不"你可能会注意到"或"有时它会发生"。
 
-Guides and Customize pages share one skeleton: a one-line what, a link to the Quickstart (never a recap), the 80% path, then Advanced. The exception is the concepts page, which is an explanation, not a task guide; its shape follows its concerns.
+Guides 和 Customize 页面共享一个骨架：一行"是什么"，一个指向 Quickstart 的链接（绝不是重述），80% 路径，然后是 Advanced。例外是 concepts 页面，它是解释而不是任务指南；它的形状跟随它所关切的内容。
 
-## Reference pages
+## 参考页面
 
-Reference describes the product for a reader who is already working with it. The outline follows the machinery: file, block, field; command group, command, option; object, property, value. Use the product's exact names as headings when readers will search for those names. Reader-question headings belong to task pages unless the question itself is the established lookup term.
+Reference 向一位已在与之打交道的读者描述产品。大纲跟随机制：文件、块、字段；命令组、命令、选项；对象、属性、值。当读者会搜索这些名称时，用产品的精确名称作标题。读者问题的标题属于任务页面，除非问题本身是既定的查表术语。
 
-Cover the full contract without packing several facts into one sentence, cell, or paragraph.
+完整覆盖契约，而不把几个事实塞进一个句子、单元格或段落。
 
-### Draft the contract first
+<a id="reference-pages"></a>
 
-Before writing prose:
+### 先起草契约
 
-1. Inventory the product elements from source.
-2. Arrange them in the same hierarchy as the product.
-3. Write the smallest complete contract for each element.
-4. Expand only the elements whose behavior needs more room.
-5. Add examples that illustrate one rule at a time.
-6. Audit defaults, constraints, failures, ignored input, and validation gaps.
+在写行文之前：
 
-For each field, option, command, or file, record the identity facts that apply:
+1. 从源码盘点产品元素。
+2. 按与产品相同的层级排列它们。
+3. 为每个元素写出最小的完整契约。
+4. 只扩展那些行为需要更多空间的元素。
+5. 添加一次只说明一条规则的示例。
+6. 审计默认值、约束、失败、被忽略的输入和校验缺口。
 
-- Exact name and syntax
-- Type or accepted values
-- Required state and default
-- Scope, location, or base path
+对每个字段、选项、命令或文件，记录适用的身份事实：
 
-Then record the behavior facts that apply:
+- 精确名称和语法
+- 类型或可接受的值
+- 必需状态和默认值
+- 范围、位置或基础路径
 
-- Behavior and side effects
-- Constraints
-- Failure and ignored-input behavior
-- What validation catches and misses
+然后记录适用的行为事实：
 
-Don't create empty sections or table columns for facts that don't apply.
+- 行为和副作用
+- 约束
+- 失败和被忽略输入的行为
+- 校验捕获了什么、漏掉了什么
 
-### Inventory, then expand
+不要为不适用的事实创建空章节或空表列。
 
-Open with a complete table or list. Expand an item below the inventory only when its behavior can't fit cleanly in the overview. Put the expansion under the item's exact name so the table of contents works as an index.
+### 先清单，后扩展
 
-For field and option references, `Field | Contract` is the safe table shape when definitions need sentences. Add more columns only when every cell is short and comparable. If columns split one coherent definition into fragments or wrap badly at a narrow width, use fewer columns or move the detail below the inventory.
+以一个完整表格或列表开头。只有当一个条目的行为无法整洁地放进概述时，才在清单下方扩展它。把扩展放在该条目的精确名称下，让目录能当索引用。
 
-### Examples and edge cases
+对字段和选项参考，当定义需要句子时，`Field | Contract` 是安全的表格形状。只有当每个单元格都短且可比时才加列。如果列把一个连贯定义切成碎片，或在窄宽度下包裹得很糟，就少用几列或把细节移到清单下方。
 
-An example illustrates one mapping, rule, or result. It doesn't become a sequence the reader follows or a narrative about completing a task. A complete example may follow the contract when seeing the elements together helps lookup.
+### 示例和边界情况
 
-Put the concrete default path or value in the primary slot. Put environment variables and uncommon overrides afterward.
+一个示例说明一个映射、规则或结果。它不会变成读者跟随的序列，或一个关于完成任务的叙事。当一个完整示例有助于查表时，它可以在契约之后出现。
 
-State the observable consequence of a limit. If OpenSpec ignores a misspelled field, say that validation passes and the field has no effect. If a value falls back, name the value OpenSpec uses.
+把具体默认路径或值放在主槽位。把环境变量和不常见覆盖放后面。
 
-## Two surfaces
+陈述一个限制的可观察后果。如果 OpenSpec 忽略拼错的字段，就说校验通过且该字段无效果。如果某个值回退，说出 OpenSpec 使用的值。
 
-OpenSpec spans the terminal and the AI chat, and readers mix them up. Label every snippet:
+## 两个表面
+
+OpenSpec 横跨终端和 AI 聊天，读者会把它们搞混。给每个片段加标签：
 
 ```
 In your terminal:
@@ -165,40 +167,40 @@ In your AI chat:
   /opsx:propose add-rate-limit
 ```
 
-Where the reader could doubt it worked (a fresh install, a first run, a command with no output of its own), end with the concrete success signal: the line the command prints, the file that now exists, what the agent says next. Where the outcome is obvious, stop; an unneeded success line is noise.
+在读者可能怀疑它是否成功的地方（全新安装、首次运行、一个本身没有输出的命令），以具体的成功信号结尾：命令打印的那一行、现在存在的那个文件、agent 接下来说的内容。在结果显而易见的地方，停住；一行多余的"成功"是噪音。
 
-## Authoring mechanics
+## 写作机制
 
-Pages are plain markdown; GitHub and the site both render them. JSX components (`<Callout>`, `<Tabs>`, `<details>`) don't render; never use them.
+页面是纯 markdown；GitHub 和站点都能渲染它们。JSX 组件（`<Callout>`、`<Tabs>`、`<details>`）不会渲染；绝不要用它们。
 
-- **Install commands**: write the global npm command once, in a fence whose language is `npm`; the site renders it as npm/pnpm/yarn/bun tabs with a copy button per tab (`remarkNpm` in `website/source.config.ts`, which also persists the reader's choice across blocks). On GitHub the fence degrades to the plain npm command.
-- **Callouts**: GitHub-style blockquote alerts (`> [!NOTE]`, `> [!TIP]`, `> [!IMPORTANT]`, `> [!WARNING]`, `> [!CAUTION]`); GitHub styles them natively and the site renders them as callouts (`remarkGfmAlert` in `website/lib/remark-gfm-alert.ts`). Never place one directly under the page title: the sync lifts the leading blockquote into the page description.
+- **安装命令**：把全局 npm 命令写一次，放在语言为 `npm` 的围栏中；站点把它渲染为 npm/pnpm/yarn/bun 标签页，每个标签页带复制按钮（`website/source.config.ts` 中的 `remarkNpm`，它还会跨代码块记住读者的选择）。在 GitHub 上围栏退化为纯 npm 命令。
+- **提示框**：GitHub 风格的 blockquote 提醒（`> [!NOTE]`、`> [!TIP]`、`> [!IMPORTANT]`、`> [!WARNING]`、`> [!CAUTION]`）；GitHub 原生渲染它们，站点把它们渲染为提示框（`website/lib/remark-gfm-alert.ts` 中的 `remarkGfmAlert`）。绝不要把提示框直接放在页面标题下：同步会把开头的 blockquote 提取进页面描述。
 
-## What earns a developer's trust
+## 什么赢得开发者的信任
 
-- Show the real command and its real output, trimmed honestly. A retouched output is a lie the reader catches on their first run.
-- No hype and no comfort adjectives: easy, simple, just, powerful, seamless, robust. Three lines that show the thing beat any adjective about it.
-- State limits plainly. A named limitation builds more trust than praise: "Your assistant does need to be able to run shell commands; a few IDE integrations can't."
-- Don't generalize. Where you're tempted to write what OpenSpec "helps" with, write what actually happens: which file appears, what the diff shows, what the agent does next.
-- Don't define what you can show. An unfamiliar term whose instances explain themselves (the workflow list: propose, explore, apply...) is introduced by showing the instances with one-phrase glosses; the abstraction can wait.
-- Exact names: flags, paths, config keys, and versions as they exist in source, linked to their canonical page on first use.
+- 展示真实命令和它的真实输出，诚实地修剪。润饰过的输出是一个读者第一次运行就会抓到的谎言。
+- 没有炒作、没有安慰性形容词：easy、simple、just、powerful、seamless、robust。三行展示真实事物的文字胜过任何关于它的形容词。
+- 平实地陈述限制。一个指名道姓的限制比赞美更能建立信任："你的助手确实需要能运行 shell 命令；一些 IDE 集成不能。"
+- 不要泛化。在你想要写 OpenSpec"帮助"做什么的地方，写实际发生什么：哪个文件出现、diff 显示什么、agent 下一步做什么。
+- 不要定义你能展示的东西。一个实例自会说明自己的陌生术语（工作流列表：propose、explore、apply…）通过展示带一句话释义的实例来引入；抽象可以等。
+- 精确名称：标志、路径、配置键和版本都按源码中的样子，首次使用时链接到它们的规范页面。
 
-## Naming and terms
+## 命名与术语
 
-- One term per concept, the glossary's term if the tree has one; today that means "skills", never "slash commands".
-- No invented taxonomy. Product terms (spec, change, delta, profile, store) name real things; use them freely. Any other organizing word in a heading or goal ("layers", "levers", "pillars") must pass one test: would a reader use it to ask their own question? If not, write the reader's question or the plain enumeration ("What you can customize", never "The three layers").
-- Examples invoke workflows by skill: the ask that triggers it ("ask your agent to propose a change") or the skill's name (`openspec-propose`), which is the same in every tool. A command spelling (`/opsx:propose`) appears only as a labeled per-tool example, never as the generic instruction; commands are headed for deprecation and their spellings vary per tool.
-- Prefer the shared `.agents/` folder in file-path examples; a tool-specific folder (`.claude/`) appears only when the example is about that tool.
-- Headings lead with a verb when the section is something the reader does ("Initialize your project"). Found content takes a plain noun phrase ("Install methods"). Never a vague verb ("Understand it") and never a pun.
-- If the page carries a one-line job statement under the title (docs-lab uses a `>` blockquote the site lifts into the page description), keep it plain, concrete, and true of the finished page.
+- 一个概念一个术语，如果文档树有术语表就用它的术语；今天这意味"skills"，绝不用"slash commands"。
+- 没有杜撰的分类学。产品术语（spec、change、delta、profile、store）命名真实事物；自由使用它们。标题或目标中任何其他组织性词汇（"layers"、"levers"、"pillars"）必须通过一个检验：读者会用这个词来问自己的问题吗？如果不会，就写读者的问题或平铺直叙的列举（"What you can customize"，绝不"这三个层级"）。
+- 示例通过 skill 来援引工作流：触发它的请求（"ask your agent to propose a change"）或 skill 的名称（`openspec-propose`），后者在每种工具中都相同。一个命令拼写（`/opsx:propose`）只作为带标签的逐工具示例出现，绝不作为通用指令；commands 即将弃用，且拼写因工具而异。
+- 在文件路径示例中优先用共享的 `.agents/` 文件夹；工具专用文件夹（`.claude/`）只在示例就是关于该工具时出现。
+- 当章节是读者要做的某件事时，标题以动词开头（"Initialize your project"）。已存在的内容用平实名词短语（"Install methods"）。绝不用模糊动词（"Understand it"），绝不用双关语。
+- 如果页面在标题下带一行职责声明（docs-lab 用站点会提取为页面描述的 `>` blockquote），让它平实、具体、对成品页面为真。
 
-## One canonical home
+## 一个规范归宿
 
-A fact lives on exactly one page; everywhere else links to it. A second copy is a future contradiction. The tree's README says which page owns what; when in doubt, link.
+一个事实恰好存在于一个页面上；其他任何地方都链接过去。第二份副本是一个未来的矛盾。文档树的 README 说明哪个页面拥有什么；拿不准就链接。
 
-## Exemplars
+## 范例
 
-When unsure how something should scan or sound, match these:
+不确定某个东西该如何扫读或听起来怎样时，对照这些：
 
-- `docs-lab/start/setup.md`: section shape, inventory-then-expand, enumerable facts on bullets.
-- `docs-lab/start/installation.md`, the Uninstalling section: multi-step tasks with bold numbered lead-ins.
+- `docs-lab/start/setup.md`：章节形状、先清单后扩展、可枚举事实放在项目符号上。
+- `docs-lab/start/installation.md` 的 Uninstalling 章节：带加粗编号引导语的多步任务。

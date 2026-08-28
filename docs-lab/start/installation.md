@@ -1,149 +1,153 @@
-# Installation
+# 安装
 
-> Install the `openspec` CLI on your machine, update it, and uninstall it.
+> 在你的机器上安装 `openspec-cn` CLI、更新它，以及卸载它。
 
 
-## Prerequisites
+<a id="prerequisites"></a>
 
-OpenSpec is a Node.js CLI. You need version 20.19.0 or newer.
+## 前置条件
 
-In your terminal:
+OpenSpec 是一个 Node.js CLI。你需要 20.19.0 或更高版本。
+
+在终端中执行：
 
 ```bash
 node --version
 ```
 
-If that prints `v20.19.0` or higher, you're set. If not, install a newer Node from [nodejs.org](https://nodejs.org) or through your version manager (nvm, fnm, asdf, volta).
+如果输出 `v20.19.0` 或更高，就绪。否则，从 [nodejs.org](https://nodejs.org) 安装更新的 Node，或通过你的版本管理器（nvm、fnm、asdf、volta）安装。
 
-The workflow itself runs inside an AI coding tool: Claude Code, Cursor, or any other tool on the [supported list](../reference/supported-tools.md).
+工作流本身运行在 AI 编程工具内：Claude Code、Cursor，或[支持列表](../reference/supported-tools.md)中的任何其他工具。
 
-## Install with your AI assistant
+## 用你的 AI 助手安装
 
-Paste this into your AI chat:
+把这段内容粘贴到你的 AI 聊天框中：
 
 ```text
-Fetch https://raw.githubusercontent.com/Fission-AI/OpenSpec/main/install.md and follow it.
+Fetch https://raw.githubusercontent.com/studyzy/openspec-cn/main/install.md and follow it.
 ```
 
-Or, in your terminal, pipe it into a CLI agent (Claude Code shown):
+或者，在终端中把它通过管道交给一个 CLI Agent（以 Claude Code 为例）：
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/Fission-AI/OpenSpec/main/install.md | claude
+curl -fsSL https://raw.githubusercontent.com/studyzy/openspec-cn/main/install.md | claude
 ```
 
-That fetches [install.md at the repo root](https://github.com/Fission-AI/OpenSpec/blob/main/install.md), a prompt written for any agent that can run shell commands (a few IDE integrations can't). Expect your assistant to:
+这会获取[仓库根目录下的 install.md](https://github.com/studyzy/openspec-cn/blob/main/install.md)，这是一段为任何能执行 shell 命令的 Agent 编写的提示词（少数 IDE 集成做不到）。你的助手应当会：
 
-1. Check your Node version, and stop if it's older than 20.19.0.
-2. Skip the install if the CLI is already on your machine. Otherwise, show you the install command and wait for your confirmation before running it.
-3. Verify `openspec` is on your PATH.
-4. Name the folder it thinks you mean, suggest the AI tool you're already talking to, and ask which others you use, then run `openspec init` there (the [project setup](setup.md) step).
-5. Report what init created and the exact spelling to invoke OpenSpec in your tool.
+1. 检查你的 Node 版本，如果低于 20.19.0 就停下来。
+2. 如果 CLI 已经在你机器上，跳过安装。否则，把安装命令展示给你，等你确认后才执行。
+3. 验证 `openspec-cn` 在 PATH 上。
+4. 说出它认为你说的那个文件夹，建议你正在对话的这个 AI 工具，并询问你还用哪些工具，然后在那里运行 `openspec-cn init`（即[项目设置](setup.md)这一步）。
+5. 报告 init 创建了什么，以及在你的工具中调用 OpenSpec 的确切拼写。
 
-It stops before anything privileged and never edits your shell startup files. The [manual methods below](#install-methods) are the source of truth, and the prompt runs them for you.
+它会在任何需要特权的操作前停下来，并且绝不修改你的 shell 启动文件。[下面的手动方法](#install-methods)才是事实来源，提示词只是替你执行它们。
 
-This install method is new and can have varying results depending on model used. Only use if you're comfortable correcting AI mistakes. Otherwise we recommend following the standard method below.
+这种安装方式是新的，根据所用模型不同结果可能各异。只有在你愿意纠正 AI 的错误时才使用它。否则我们建议采用下面介绍的标准方法。
 
-## Install methods
+<a id="install-methods"></a>
 
-Install the CLI globally; [setting up your project](setup.md) comes after.
+## 安装方法
 
-In your terminal:
+全局安装 CLI；[设置你的项目](setup.md)在后面。
+
+在终端中执行：
 
 ```npm
-npm install -g @fission-ai/openspec@latest
+npm install -g @studyzy/openspec-cn@latest
 ```
 
 ### Yarn
 
-`yarn global add` is Yarn Classic (1.x) only. Modern Yarn removed global installs, so use npm, pnpm, or bun instead. A global CLI doesn't have to share your project's package manager.
+`yarn global add` 仅适用于 Yarn Classic（1.x）。现代 Yarn 移除了全局安装，所以改用 npm、pnpm 或 bun。全局 CLI 不必与你的项目共享同一个包管理器。
 
 ### Bun
 
-Bun installs OpenSpec but doesn't run it, so you still need Node on your machine (the [prerequisite](#prerequisites) above). Without it, every command fails with `env: node: No such file or directory`. Bun treats [every Node CLI](https://bun.com/docs/pm/bunx#shebangs) this way.
+Bun 会安装 OpenSpec，但不会运行它，所以你仍然需要本机有 Node（见上面的[前置条件](#prerequisites)）。否则，每条命令都会以 `env: node: No such file or directory` 失败。Bun 对待[每个 Node CLI](https://bun.com/docs/pm/bunx#shebangs)都是这样。
 
 ### Deno
 
-Deno installs the CLI from npm and needs explicit permission flags. In your terminal:
+Deno 从 npm 安装 CLI，并且需要显式的权限标志。在终端中执行：
 
 ```bash
 deno install --global \
   --allow-read --allow-write --allow-env --allow-sys=cpus,homedir --allow-net=edge.openspec.dev \
-  npm:@fission-ai/openspec@latest
+  npm:@studyzy/openspec-cn@latest
 ```
 
-Some commands launch another program: [`openspec config edit`](../reference/cli.md) opens your editor. Deno interrupts those with a permission prompt on every run. To stop it asking, add a scoped `--allow-run=<program>` to the install command.
+有些命令会启动另一个程序：[`openspec-cn config edit`](../reference/cli.md) 会打开你的编辑器。Deno 会在每次运行时都用权限提示打断这些命令。要让它不再询问，就在安装命令中加上一个限定范围的 `--allow-run=<program>`。
 
 > [!NOTE]
-> If Deno can't resolve `@latest`, pin a version range instead: `npm:@fission-ai/openspec@^1.7.0`.
+> 如果 Deno 无法解析 `@latest`，改用版本范围固定：`npm:@studyzy/openspec-cn@^1.7.0`。
 
 ### Nix
 
-The OpenSpec repo ships a Nix flake. Install it into your profile. In your terminal:
+OpenSpec 仓库附带一个 Nix flake。把它安装到你的 profile。在终端中执行：
 
 ```bash
-nix profile install github:Fission-AI/OpenSpec
+nix profile install github:studyzy/OpenSpec-cn
 ```
 
-Or run a one-off command first, without installing:
+或者先不安装，直接运行一次：
 
 ```bash
-nix run github:Fission-AI/OpenSpec -- --version
+nix run github:studyzy/OpenSpec-cn -- --version
 ```
 
-That leaves nothing on your PATH, so there's no install to check afterward.
+这不会在 PATH 上留下任何东西，所以事后无需检查安装。
 
-To put OpenSpec in a project dev shell instead, add the flake as an input and use its default package; [flake.nix](https://github.com/Fission-AI/OpenSpec/blob/main/flake.nix) lists the outputs.
+如果想把 OpenSpec 放进项目的开发 shell，则把 flake 添加为 input 并使用它的默认包；[flake.nix](https://github.com/studyzy/openspec-cn/blob/main/flake.nix) 列出了所有 outputs。
 
-### Check it worked
+### 检查是否成功
 
-Whichever method you used, in your terminal:
+无论你用了哪种方法，在终端中执行：
 
 ```bash
-openspec --version
+openspec-cn --version
 ```
 
-If that prints a version number, the CLI is on your PATH. It installs once per machine.
+如果输出了版本号，CLI 就在你的 PATH 上。每台机器只需安装一次。
 
-Next, [set up your project](setup.md). If your assistant already ran init, that page shows what it wrote and how to adjust it.
+接下来，[设置你的项目](setup.md)。如果你的助手已经运行过 init，那页会展示它写了什么以及如何调整。
 
-## Updating
+## 更新
 
-In your terminal, in each project where you ran init:
+在终端中，在每个你运行过 init 的项目里：
 
 ```bash
-openspec update
+openspec-cn update
 ```
 
-When a newer CLI is out, [`openspec update`](../reference/cli.md#openspec-update) says so and can install it for you; that upgrade is once per machine. Every run refreshes the project's generated skills and commands, which never update on their own. A current project prints `✓ All 2 tool(s) up to date (v1.7.0)`.
+当有更新的 CLI 发布时，[`openspec-cn update`](../reference/cli.md#openspec-update) 会提示你，并且可以替你安装；那次升级每台机器只发生一次。每次运行都会刷新项目生成的 skills 和 commands，它们不会自行更新。一个最新的项目会打印 `✓ All 2 tool(s) up to date (v1.7.0)`。
 
 
 > [!WARNING]
-> On Deno, re-run the [Deno install](#deno) with `-f`; it won't overwrite the installed command without it. On Nix, use `nix profile upgrade openspec`.
+> 在 Deno 上，重新执行[Deno 安装](#deno)时要加 `-f`；不加它不会覆盖已安装的命令。在 Nix 上，使用 `nix profile upgrade openspec`。
 
 > [!NOTE]
-> A global npm install belongs to one Node installation. Switch Node versions with nvm and the `openspec` command doesn't come along, so install it again under the new version.
+> 全局 npm 安装归属于某个特定的 Node 安装。用 nvm 切换 Node 版本时 `openspec-cn` 命令不会跟过来，所以要在新版本下重新安装。
 
-## Uninstalling
+## 卸载
 
-To uninstall OpenSpec, run through the steps below; none of them touch your source code. You can also point your agent at this section and let it handle the removal.
+要卸载 OpenSpec，按下面的步骤执行；这些步骤都不会触碰你的源代码。你也可以让 Agent 直接照本节的说明来帮你移除。
 
-**1. Remove [shell completions](../reference/cli.md#openspec-completion)**, if you set them up, while the CLI can still do it. In your terminal:
+**1. 移除 [shell 补全](../reference/cli.md#openspec-completion)**，如果你设置过的话，趁 CLI 还能做这件事。在终端中执行：
 
 ```bash
-openspec completion uninstall
+openspec-cn completion uninstall
 ```
 
-**2. Remove the package.** In your terminal:
+**2. 移除包。** 在终端中执行：
 
 ```npm
-npm uninstall -g @fission-ai/openspec
+npm uninstall -g @studyzy/openspec-cn
 ```
 
-On Deno: `deno uninstall --global openspec`. On Nix: `nix profile remove openspec`. Your shell should no longer find `openspec`.
+在 Deno 上：`deno uninstall --global openspec-cn`。在 Nix 上：`nix profile remove openspec`。你的 shell 应该再也找不到 `openspec-cn` 了。
 
-**3. Delete what's left, or keep it.**
+**3. 删除剩下的部分，或者保留。**
 
-- Generated agent files: `openspec-*` skills and `opsx` commands under directories like `.claude/` or `.agents/`, per project. [Supported tools](../reference/supported-tools.md) lists each tool's paths; MiniMax Code keeps skills in `~/.minimax/skills`.
-- Leftovers from older versions: marker blocks in `CLAUDE.md` or `AGENTS.md` (delete the block, keep the file) and `opsx-*.md` prompts in `~/.codex/prompts`.
-- The `openspec/` folder: pause first. `specs/` and `changes/archive/` are your record of the system, plain Markdown that reads fine without OpenSpec.
-- Per-machine state: settings and the telemetry id in `~/.config/openspec/`; schema overrides and store registrations in `~/.local/share/openspec/` (Windows: `%APPDATA%\openspec`, `%LOCALAPPDATA%\openspec`). Registrations are pointers; the store repos they point to are untouched.
+- 生成的 Agent 文件：目录下的 `openspec-*` skills 和 `opsx` commands，位于 `.claude/` 或 `.agents/` 之类的目录下，按项目区分。[支持的工具](../reference/supported-tools.md) 列出了每种工具的路径；MiniMax Code 把 skills 放在 `~/.minimax/skills`。
+- 旧版本的遗留物：`CLAUDE.md` 或 `AGENTS.md` 中的标记块（删除该块，保留文件）以及 `~/.codex/prompts` 下的 `opsx-*.md` 提示词。
+- `openspec/` 文件夹：先停一下。`specs/` 和 `changes/archive/` 是系统的记录，是即使没有 OpenSpec 也能正常阅读的纯 Markdown。
+- 每台机器的状态：`~/.config/openspec/` 下的设置和遥测 id；`~/.local/share/openspec/` 下的 schema 覆盖和 store 注册（Windows：`%APPDATA%\openspec`、`%LOCALAPPDATA%\openspec`）。注册信息是指针；它们指向的 store 仓库不会被动到。

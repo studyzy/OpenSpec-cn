@@ -1,21 +1,21 @@
 # spec-driven
 
-> The default workflow's artifacts: their order, their formats, and the change folder they produce.
+> 默认工作流的制品：它们的顺序、格式，以及它们产生的变更目录。
 
-`spec-driven` is OpenSpec's built-in default schema. [schema.yaml](../schema-yaml.md) defines the fields it sets.
+`spec-driven` 是 OpenSpec 内置的默认 schema。[schema.yaml](../schema-yaml.md) 定义了它所设置的字段。
 
-## Artifacts
+## 制品
 
-The workflow drafts four artifacts:
+该工作流起草四个制品：
 
-| Artifact | File | Purpose |
+| 制品 | 文件 | 用途 |
 |---|---|---|
-| [`proposal`](#proposalmd) | `proposal.md` | Why the change is needed |
-| [`specs`](#delta-specs-specmd) | `specs/<capability-path>/spec.md`, one per capability | What behavior changes |
-| [`design`](#designmd) | `design.md` | How to build it |
-| [`tasks`](#tasksmd) | `tasks.md` | The implementation checklist |
+| [`proposal`](#proposalmd) | `proposal.md` | 为什么需要这个变更 |
+| [`specs`](#delta-specs-specmd) | `specs/<capability-path>/spec.md`，每个能力一个 | 行为发生了什么变化 |
+| [`design`](#designmd) | `design.md` | 如何构建它 |
+| [`tasks`](#tasksmd) | `tasks.md` | 实现清单 |
 
-## Drafting order
+## 起草顺序
 
 ```text
              ┌─ specs ──┐
@@ -23,16 +23,16 @@ proposal ────┤          ├── tasks ── apply
              └─ design ─┘
 ```
 
-Proposal comes first. Specs and design follow in either order, and tasks needs both. Implementation ([apply](#apply)) starts once `tasks.md` is in place.
+proposal 在最前。specs 和 design 随后，顺序不分先后，而 tasks 两者都需要。实现（[apply](#apply)）在 `tasks.md` 就位后开始。
 
-Two artifacts can be skipped:
+有两个制品可以被跳过：
 
-- **`design`**: when none of [its conditions](#designmd) apply, the agent leaves it out and drafts `tasks` anyway.
-- **`specs`**: set [`skip_specs: true`](../../configuration/change-metadata.md#skip_specs) in the change's `.openspec.yaml`.
+- **`design`**：当它的[条件](#designmd)都不满足时，Agent 会略过它，仍起草 `tasks`。
+- **`specs`**：在变更的 `.openspec.yaml` 中设置 [`skip_specs: true`](../../configuration/change-metadata.md#skip_specs)。
 
-## Example change folder
+## 示例变更目录
 
-A change named `add-user-auth`, with every artifact drafted:
+一个名为 `add-user-auth` 的变更，起草了全部制品：
 
 ```text
 openspec/changes/add-user-auth/
@@ -47,11 +47,11 @@ openspec/changes/add-user-auth/
 
 ## proposal.md
 
-Establishes why the change is needed.
+确立为什么需要这个变更。
 
-### Structure
+### 结构
 
-The template the agent receives as the output format ([templates/proposal.md](https://github.com/Fission-AI/OpenSpec/blob/main/schemas/spec-driven/templates/proposal.md)):
+Agent 作为输出格式收到的模板（[templates/proposal.md](https://github.com/Fission-AI/OpenSpec/blob/main/schemas/spec-driven/templates/proposal.md)）：
 
 ```md
 ## Why
@@ -85,9 +85,9 @@ The template the agent receives as the output format ([templates/proposal.md](ht
 <!-- Affected code, APIs, dependencies, systems -->
 ```
 
-### Instructions
+### 指令
 
-The instruction sent to the agent when it drafts this artifact (from [schema.yaml](https://github.com/Fission-AI/OpenSpec/blob/main/schemas/spec-driven/schema.yaml)):
+Agent 起草该制品时收到的指令（来自 [schema.yaml](https://github.com/Fission-AI/OpenSpec/blob/main/schemas/spec-driven/schema.yaml)）：
 
 ```md
 Create the proposal document that establishes WHY this change is needed.
@@ -118,13 +118,15 @@ implementation details belong in design.md.
 This is the foundation - specs, design, and tasks all build on this.
 ```
 
-## Delta specs (spec.md)
+<a id="delta-specs-specmd"></a>
 
-Defines what behavior changes, with one delta spec per capability the proposal lists.
+## 增量规范（Delta specs / spec.md）
 
-### Structure
+定义行为发生什么变化，proposal 列出的每个能力对应一个增量规范（delta spec）。
 
-The template the agent receives as the output format ([templates/spec.md](https://github.com/Fission-AI/OpenSpec/blob/main/schemas/spec-driven/templates/spec.md)):
+### 结构
+
+Agent 作为输出格式收到的模板（[templates/spec.md](https://github.com/Fission-AI/OpenSpec/blob/main/schemas/spec-driven/templates/spec.md)）：
 
 ```md
 ## Purpose
@@ -140,9 +142,9 @@ The template the agent receives as the output format ([templates/spec.md](https:
 - **THEN** <!-- expected outcome -->
 ```
 
-### Instructions
+### 指令
 
-The instruction sent to the agent when it drafts this artifact (from [schema.yaml](https://github.com/Fission-AI/OpenSpec/blob/main/schemas/spec-driven/schema.yaml)):
+Agent 起草该制品时收到的指令（来自 [schema.yaml](https://github.com/Fission-AI/OpenSpec/blob/main/schemas/spec-driven/schema.yaml)）：
 
 ````md
 Create specification files that define WHAT the system should do.
@@ -234,11 +236,11 @@ Specs should be testable - each scenario is a potential test case.
 
 ## design.md
 
-Explains how to implement the change. Drafted only when the change needs one.
+说明如何实现该变更。只在变更需要时起草。
 
-### Structure
+### 结构
 
-The template the agent receives as the output format ([templates/design.md](https://github.com/Fission-AI/OpenSpec/blob/main/schemas/spec-driven/templates/design.md)):
+Agent 作为输出格式收到的模板（[templates/design.md](https://github.com/Fission-AI/OpenSpec/blob/main/schemas/spec-driven/templates/design.md)）：
 
 ```md
 ## Context
@@ -262,9 +264,9 @@ The template the agent receives as the output format ([templates/design.md](http
 <!-- Known risks and trade-offs -->
 ```
 
-### Instructions
+### 指令
 
-The instruction sent to the agent when it drafts this artifact (from [schema.yaml](https://github.com/Fission-AI/OpenSpec/blob/main/schemas/spec-driven/schema.yaml)):
+Agent 起草该制品时收到的指令（来自 [schema.yaml](https://github.com/Fission-AI/OpenSpec/blob/main/schemas/spec-driven/schema.yaml)）：
 
 ```md
 Create the design document that explains HOW to implement the change.
@@ -298,11 +300,11 @@ Good design docs explain the "why" behind technical decisions.
 
 ## tasks.md
 
-Breaks the implementation into checkable tasks. [apply](#apply) tracks progress here.
+把实现拆分为可勾选的任务。[apply](#apply) 在此跟踪进度。
 
-### Structure
+### 结构
 
-The template the agent receives as the output format ([templates/tasks.md](https://github.com/Fission-AI/OpenSpec/blob/main/schemas/spec-driven/templates/tasks.md)):
+Agent 作为输出格式收到的模板（[templates/tasks.md](https://github.com/Fission-AI/OpenSpec/blob/main/schemas/spec-driven/templates/tasks.md)）：
 
 ```md
 ## 1. <!-- Task Group Name -->
@@ -316,9 +318,9 @@ The template the agent receives as the output format ([templates/tasks.md](https
 - [ ] 2.2 <!-- Task description -->
 ```
 
-### Instructions
+### 指令
 
-The instruction sent to the agent when it drafts this artifact (from [schema.yaml](https://github.com/Fission-AI/OpenSpec/blob/main/schemas/spec-driven/schema.yaml)):
+Agent 起草该制品时收到的指令（来自 [schema.yaml](https://github.com/Fission-AI/OpenSpec/blob/main/schemas/spec-driven/schema.yaml)）：
 
 ````md
 Create the task list that breaks down the implementation work.
@@ -355,15 +357,15 @@ Each task should be verifiable - you know when it's done.
 
 ## Apply
 
-The handoff from planning to implementation. Apply is the phase that works through `tasks.md`, not an artifact.
+从规划到实现的交接。Apply 是推进 `tasks.md` 的阶段，不是制品。
 
-- **Starts**: once `tasks.md` exists and lists at least one task.
-- **Tracks**: the checkboxes in `tasks.md`. Checking them off is the progress record.
-- **Ends**: every checkbox checked. OpenSpec then suggests archiving the change.
+- **开始**：一旦 `tasks.md` 存在并列出至少一个任务。
+- **跟踪**：`tasks.md` 中的复选框。勾选它们就是进度记录。
+- **结束**：每个复选框都已勾选。OpenSpec 随后建议归档该变更。
 
-### Settings
+### 设置
 
-The apply settings (from [schema.yaml](https://github.com/Fission-AI/OpenSpec/blob/main/schemas/spec-driven/schema.yaml)):
+apply 设置（来自 [schema.yaml](https://github.com/Fission-AI/OpenSpec/blob/main/schemas/spec-driven/schema.yaml)）：
 
 ```yaml
 apply:
@@ -372,9 +374,9 @@ apply:
   # instruction: shown below
 ```
 
-### Instructions
+### 指令
 
-The instruction sent to the agent when implementation starts (from [schema.yaml](https://github.com/Fission-AI/OpenSpec/blob/main/schemas/spec-driven/schema.yaml)):
+实现开始时发给 Agent 的指令（来自 [schema.yaml](https://github.com/Fission-AI/OpenSpec/blob/main/schemas/spec-driven/schema.yaml)）：
 
 ```md
 Read context files, work through pending tasks, mark complete as you go.
@@ -383,7 +385,7 @@ Pause if you hit blockers or need clarification.
 
 ## schema.yaml
 
-The complete [schema.yaml](https://github.com/Fission-AI/OpenSpec/blob/main/schemas/spec-driven/schema.yaml), with instruction bodies elided. Each is shown in full in its section above.
+完整的 [schema.yaml](https://github.com/Fission-AI/OpenSpec/blob/main/schemas/spec-driven/schema.yaml)，指令正文已省略。每段都完整展示在对应小节的上面。
 
 ```yaml
 name: spec-driven
