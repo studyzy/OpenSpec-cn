@@ -1,19 +1,19 @@
-# Community Showcase
+# 社区展示
 
-A community-owned awesome list of projects and resources built with and for OpenSpec. Tools, integrations, workflows, and learning resources are welcome. Community members grow and maintain this showcase through pull requests.
+一个由社区维护的"精选列表"，收录基于 OpenSpec 构建的项目与资源。欢迎提交工具、集成、工作流和学习资源。社区成员通过 pull request 共同建设与维护这份展示。
 
-Listed projects are maintained independently. Inclusion does not imply official support or endorsement by OpenSpec. See each project's documentation and issue tracker for setup and support.
+所列项目均为独立维护。收录不代表 OpenSpec 官方支持或背书。设置与支持请查看各项目的文档与 issue 跟踪器。
 
-## Projects and resources
+## 项目与资源
 
-- **[OpenSpec UI](https://github.com/VeryComplexAndLongName/OpenSpec-UI)**: A standalone web dashboard and VS Code extension for browsing OpenSpec changes, archives, specs, and tasks.
+- **[OpenSpec UI](https://github.com/VeryComplexAndLongName/OpenSpec-UI)**：一个独立的 Web 仪表盘和 VS Code 扩展，用于浏览 OpenSpec 的变更、归档、specs 和任务。
 
-## Add your project
+## 添加你的项目
 
-Open a pull request adding one line to this file with your project's name, a direct link, and a short description of how it relates to OpenSpec.
+提交一个 pull request，向本文件添加一行，包括你的项目名称、直接链接，以及一段关于它与 OpenSpec 关系的简短描述。
 
-- Keep entries focused on something built with OpenSpec or supporting its use, rather than general product advertising.
-- Describe what people can use. Avoid promotional claims, referral links, and tracking links.
-- Disclose paid features or required accounts in the entry, if any.
+- 条目应聚焦于用 OpenSpec 构建的内容或支持其使用的内容，而不是一般性的产品宣传。
+- 描述人们能使用什么。避免推广性声明、推荐链接和跟踪链接。
+- 如有条目涉及付费功能或需要注册账户，请在条目中说明。
 
-Corrections and updates to existing entries are welcome too.
+也欢迎对现有条目的更正与更新。

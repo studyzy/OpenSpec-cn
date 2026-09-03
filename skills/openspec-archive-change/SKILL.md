@@ -31,44 +31,35 @@ metadata:
 
    始终宣告："使用变更：<name>"，以及如何覆盖（例如 `/openspec-archive-change <other>`）。
 
-   **Load current archive inputs before the existing archive checks:**
+   **在执行既有归档检查之前，先加载当前归档输入：**
 
-   After resolving the selected change and planning root, run:
+   解析出所选变更与规划主目录后，运行：
    ```bash
    openspec-cn instructions archive --change "<name>" --json
    ```
-   Keep the same selected-root flags on this command. This lookup is advisory and
-   optional: it only supplies extra prompt inputs, so it must never block archiving.
-   If it exits non-zero or returns invalid JSON — for example on an older CLI that
-   does not support this command yet — continue the archive workflow with no
-   context and no operation guidance. Do not report an error and do not stop.
+   在此命令上保留相同的已选根目录标志。该查询是建议性且可选的：
+   它只是提供额外的提示输入，因此绝不能阻塞归档。
+   若它以非零状态退出或返回无效 JSON —— 例如在尚不支持此命令的旧版 CLI 上
+   —— 则在没有 context 与 operation guidance 的情况下继续归档工作流。
+   不要报告错误，也不要停止。
 
-   A successful response may omit both optional fields. Treat `context` as a
-   required prompt-level input: read and consider it, and apply relevant project
-   facts, conventions, and constraints. Treat `operationGuidance` as optional
-   additive advice: read and consider every entry, and follow entries that are
-   applicable and compatible with the built-in archive workflow.
+   成功的响应可能省略这两个可选字段。将 `context` 视为必需的提示级输入：阅读并考虑它，并应用相关的项目事实、约定与约束。将 `operationGuidance` 视为可选的增量建议：阅读并考虑每一条目，遵循那些适用且与内置归档工作流兼容的条目。
 
-   Keep both fields separate from built-in steps, explicit user choices, resolved
-   paths, CLI checks, and command contracts. If context conflicts with one of those
-   controlling inputs, 报告冲突并保留控制值。若 guidance 不适用或与某个控制输入冲突，不要遵循它并解释原因。不要从这些字段推断替换路径、跳过的提示或标志。
-   either field, and do not copy their text verbatim into specs, change artifacts,
-   or archive summaries unless the user separately asks for it. These are
-   prompt-level behavior contracts, not enforceable checks.
+   将这两个字段与内置步骤、用户的显式选择、已解析的路径、CLI 检查和命令契约分开对待。若 context 与其中某个控制输入冲突，报告冲突并保留控制值。若 guidance 不适用或与某个控制输入冲突，不要遵循它并解释原因。不要从这两个字段推断替换路径、跳过的提示或标志，也不要把它们的内容原样复制到 specs、变更制品或归档汇总中，除非用户另行要求。这些是提示级行为契约，不是可强制执行的检查。
 
 2. **检查产出物完成状态**
 
    运行 `openspec-cn status --change "<name>" --json` 检查产出物完成情况。
 
-   Parse the JSON to understand:
-   - `schemaName`: The workflow being used
-   - `planningHome`, `changeRoot`, `artifactPaths`, and `actionContext`: path and scope context
-   - `artifacts`: List of artifacts with their status (`done`, `skipped`, or other)
+   解析 JSON 以了解：
+   - `schemaName`：正在使用的工作流
+   - `planningHome`、`changeRoot`、`artifactPaths` 和 `actionContext`：路径与作用域上下文
+   - `artifacts`：产出物列表及其状态（`done`、`skipped` 或其他）
 
-   **If any artifacts are neither `done` nor `skipped`** (skipped artifacts satisfy the requirement - the change declares skip_specs):
-   - Display warning listing incomplete artifacts
-   - Ask the user to confirm they want to proceed
-   - Proceed if user confirms
+   **若存在既非 `done` 也非 `skipped` 的产出物**（skipped 产出物即满足要求 - 变更声明了 skip_specs）：
+   - 展示警告列出未完成的产出物
+   - 请用户确认是否继续
+   - 用户确认则继续
 
 3. **检查任务完成状态**
 
@@ -76,51 +67,43 @@ metadata:
 
    统计 `- [ ]`（未完成）与 `- [x]`（已完成）任务。
 
-   **If incomplete tasks found:**
-   - Display warning showing count of incomplete tasks
-   - Ask the user to confirm they want to proceed
-   - Proceed if user confirms
+   **若发现未完成任务：**
+   - 展示警告显示未完成任务数
+   - 请用户确认是否继续
+   - 用户确认则继续
 
    **若无任务文件：** 无任务相关警告地继续。
 
 4. **评估 delta spec 同步状态**
 
-   Use `artifactPaths.specs.existingOutputPaths` from status JSON as the only
-   delta-spec source. If the `specs` entry is missing or
-   `existingOutputPaths` is empty, proceed without a sync prompt and do not infer
-   delta specs from other artifacts.
+   使用 status JSON 中的 `artifactPaths.specs.existingOutputPaths` 作为唯一的 delta spec 来源。若 `specs` 条目缺失或 `existingOutputPaths` 为空，则在不提示同步的情况下继续，也不要从其他产出物推断 delta specs。
 
-   **If delta specs exist:**
-   - Compare each delta spec with its corresponding main spec at `<planningHome.root>/openspec/specs/<capability-path>/spec.md` (use the store-aware `planningHome.root` from step 2, not a hardcoded repo path)
-   - Determine what changes would be applied (adds, modifications, removals, renames)
-   - Show a combined summary before prompting
+   **若存在 delta specs：**
+   - 将每个 delta spec 与 `<planningHome.root>/openspec/specs/<capability-path>/spec.md` 处对应的主 spec 比较（使用步骤 2 中感知 store 的 `planningHome.root`，而不是硬编码的仓库路径）
+   - 确定将应用哪些更改（新增、修改、移除、重命名）
+   - 在提示前展示合并摘要
 
    **提示选项：**
    - 若需更改："立即同步（推荐）"、"不同步归档"
    - 若已同步："立即归档"、"仍同步"、"取消"
 
-   Route on the answer:
-   - "Cancel" — stop, do not archive
-   - "Archive without syncing" or "Archive now" — proceed to archive
-   - "Sync now" or "Sync anyway" — sync, then verify (below)
-   - Anything else — ask again rather than archiving
+   根据回答路由：
+   - "取消" — 停止，不归档
+   - "不同步归档" 或 "立即归档" — 继续归档
+   - "立即同步" 或 "仍同步" — 先同步，然后（按下文）验证
+   - 其他任何回答 — 再次询问，而不是归档
 
-   Before a selected sync writes any main spec, run
-   `openspec-cn instructions specs --change "<name>" --json` once with the same
-   selected-root flags. Require a zero exit status and valid artifact-instruction
-   JSON. If the lookup fails or returns invalid JSON, report the error and stop
-   before writing any main spec or moving the change. 省略 `rules` 的有效响应表示未配置制品规则
-   — 这是无规则情况。仅将返回的 `rules` 应用于此合并生成的主 spec 的内容和形式；不要将其用于归档指导、更改 CLI 行为，或将规则文本复制到任何输出文件中。
+   在所选同步写入任何主 spec 之前，用相同的已选根目录标志运行一次 `openspec-cn instructions specs --change "<name>" --json`。要求退出状态为零且返回有效的制品指令 JSON。若查询失败或返回无效 JSON，报告错误并在写入任何主 spec 或移动变更之前停止。省略 `rules` 的有效响应表示未配置制品规则 — 这是无规则情况。仅将返回的 `rules` 应用于此合并生成的主 spec 的内容和形式；不要将其用于归档指导、更改 CLI 行为，或将规则文本复制到任何输出文件中。
 
-   Then run the `openspec-sync-specs` workflow inline (agent-driven intelligent merge) for change '<name>', passing the delta spec analysis and the fetched specs-rule snapshot from above, and wait for it to finish. The inline sync must reuse that snapshot without fetching `specs` instructions again. Do not delegate it to a background task — step 5 would move `changeRoot` out from under a sync that is still reading it, leaving the change archived and the main specs never updated. If your agent can only run it by delegation, delegate synchronously and wait for the result.
+   然后为变更 '<name>' 内联运行 `openspec-sync-specs` 工作流（agent 驱动的智能合并），传入上面的 delta spec 分析和已获取的 specs 规则快照，并等待它完成。内联同步必须复用该快照，不要再次获取 `specs` 指令。不要把它委托给后台任务 —— 步骤 5 会把 `changeRoot` 从一个仍在读取它的同步下方移走，导致变更已归档而主 specs 从未更新。若你的 agent 只能通过委托运行它，请同步委托并等待结果。
 
-   Then re-run the comparison from the top of this step against every capability that has a delta spec in `artifactPaths.specs.existingOutputPaths` — not only the ones the sync reports it touched. A successful sync leaves nothing left to apply, so each capability must now read as already synced:
-   - ADDED requirements present
-   - MODIFIED requirements carrying the scenario and description changes named in the delta, with their other scenarios intact
-   - REMOVED requirements gone — and where this sync retired a capability (removed its last requirement, leaving `## Requirements` empty), its main spec deleted rather than left empty; a spec the sync deliberately kept and reported is also a match
-   - RENAMED requirements present under the new name and absent under the old one
+   然后对本步骤开头针对 `artifactPaths.specs.existingOutputPaths` 中每个拥有 delta spec 的能力重新运行比较 —— 不仅仅是同步报告它触及的那些。成功的同步不会留下任何待应用的内容，因此每个能力现在必须显示为已同步：
+   - ADDED 需求存在
+   - MODIFIED 需求携带 delta 中指明的场景与描述更改，且其其他场景保持完好
+   - REMOVED 需求已消失 —— 若此次同步退役了某个能力（移除了它的最后一条需求，使 `## Requirements` 为空），其主 spec 应被删除而不是留空；同步有意保留并报告过的 spec 也算匹配
+   - RENAMED 需求以新名称存在且旧名称下已消失
 
-   If the sync failed, or any capability does not match, report what differs and stop — do not archive. Nothing has moved and `changeRoot` is intact, so the user can fix the mismatch or re-run the sync and start the archive again.
+   若同步失败，或任何能力不匹配，报告差异并停止 —— 不要归档。没有任何东西被移动且 `changeRoot` 完好无损，用户可以修复不一致或重新运行同步并再次开始归档。
 
 5. **执行归档**
 
@@ -129,7 +112,7 @@ metadata:
    mkdir -p "<planningHome.changesDir>/archive"
    ```
 
-   Generate the target name: 若变更名已以 `YYYY-MM-DD-` 前缀开头则保持原样；否则将当前日期前置为 `YYYY-MM-DD-<change-name>`。绝不叠加第二个日期（与 `openspec-cn archive` 相同的规则）。
+   生成目标名称：若变更名已以 `YYYY-MM-DD-` 前缀开头则保持原样；否则将当前日期前置为 `YYYY-MM-DD-<change-name>`。绝不叠加第二个日期（与 `openspec-cn archive` 相同的规则）。
 
    **检查目标是否已存在：**
    - 是：报错失败，建议重命名现有归档或使用不同日期
@@ -153,25 +136,25 @@ metadata:
 ```markdown
 ## 归档完成
 
-**Change:** <change-name>
-**Schema:** <schema-name>
-**Archived to:** the archive path derived from `planningHome.changesDir`/<target-name>/
-**Specs:** <"✓ Synced to main specs" only if the step 4 verification passed; otherwise "No delta specs" or "Sync skipped">
+**变更：** <change-name>
+**Schema：** <schema-name>
+**归档到：** 从 `planningHome.changesDir`/<target-name>/ 派生的归档路径
+**Specs：** <仅当步骤 4 验证通过时为 "✓ 已同步到主 specs"；否则为 "无 delta specs" 或 "跳过同步">
 
-<"All artifacts complete. All tasks complete." — or, if archived with warnings, list them instead (e.g. "Archived with 2 incomplete tasks")>
+<“所有产出物完成。所有任务完成。” —— 若带警告归档，则改为列出警告（例如“带 2 个未完成任务归档”）>
 ```
 
-**Guardrails**
-- Announce the selected change; prompt for selection when it is ambiguous
-- Use artifact graph (openspec-cn status --json) for completion checking
-- Don't block archive on warnings - just inform and confirm
-- Preserve .openspec.yaml when moving to archive (it moves with the directory)
-- Show clear summary of what happened
-- If sync is requested, run the `openspec-sync-specs` workflow inline (agent-driven)
-- Never archive while a spec sync is still in flight — run the sync inline and verify the main specs before moving `changeRoot`
-- If delta specs exist, always run the sync assessment and show the combined summary before prompting
-- Apply relevant runtime context and report conflicts; operation guidance remains advisory
-- Consider every guidance entry and explain any inapplicable or conflicting advice
-- Existing CLI checks, resolved paths, prompts, and command contracts are unchanged
-- Artifact rules constrain only the specs being written and are never operation guidance
-- Never copy runtime context, operation guidance, or artifact-rule text verbatim into output files
+**护栏**
+- 宣告所选变更；存在歧义时提示选择
+- 使用制品图（openspec-cn status --json）检查完成状态
+- 不要因警告阻塞归档 - 仅告知并确认
+- 移动到归档时保留 .openspec.yaml（它随目录一起移动）
+- 展示清晰的所发生事情的汇总
+- 若请求同步，内联运行 `openspec-sync-specs` 工作流（agent 驱动）
+- 绝不在 spec 同步仍在进行时归档 —— 内联运行同步并在移动 `changeRoot` 前验证主 specs
+- 若存在 delta specs，始终运行同步评估并在提示前展示合并摘要
+- 应用相关的运行时 context 并报告冲突；operation guidance 保持建议性质
+- 考虑每条 guidance 条目，并解释任何不适用或冲突的建议
+- 现有的 CLI 检查、已解析路径、提示与命令契约保持不变
+- 制品规则仅约束正在写入的 specs，绝不是 operation guidance
+- 绝不把运行时 context、operation guidance 或制品规则文本原样复制到输出文件中

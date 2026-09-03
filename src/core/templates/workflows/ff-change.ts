@@ -93,29 +93,29 @@ ${STORE_SELECTION_GUIDANCE}
 
 **输出**
 
-After completing all artifacts, summarize:
-- Change name and location
-- List of artifacts created with brief descriptions, plus any conditional artifact you skipped and why
-- What's ready: "All artifacts needed for implementation are ready."
-- Prompt: "Run \`/opsx:apply\` or ask me to implement to start working on the tasks."
+完成所有产出物后，总结：
+- 变更名称和位置
+- 已创建产出物列表及简要描述，加上跳过的任何条件性产出物及原因
+- 就绪状态："实现所需的所有产出物已就绪。"
+- 提示："运行 \`/opsx:apply\` 或让我实现以开始处理任务。"
 
 **产出物创建指南**
 
 - 遵循来自 \`openspec-cn instructions\` 每个制品类型输出中的 \`instruction\` 字段 — 它是权威指导，即使产出物名称熟悉
 - 若 \`instruction\` 字段指示你使用特定 skill 或命令创建产出物，则调用它而非直接写入产出物
-- The schema defines what each artifact should contain - follow it
-- Read dependency artifacts for context before creating new ones
-- Use \`template\` as the structure for your output file - fill in its sections
-- **IMPORTANT**: \`context\` and \`rules\` are constraints for YOU, not content for the file
-  - Do NOT copy \`<context>\`, \`<rules>\`, \`<project_context>\` blocks into the artifact
-  - These guide what you write, but should never appear in the output
+- schema 定义了每个产出物应包含的内容 - 遵循它
+- 在创建新产出物之前读取依赖产出物以获取上下文
+- 使用 \`template\` 作为输出文件的结构 - 填写其各节
+- **重要提示**：\`context\` 和 \`rules\` 是给你的约束，不是文件内容
+  - 不要将 \`<context>\`、\`<rules>\`、\`<project_context>\` 块复制到产出物中
+  - 这些指导你写什么，但绝不应出现在输出中
 
-**Guardrails**
-- Create every artifact the apply phase transitively depends on, not just the ids listed in \`apply.requires\`
-- Always read dependency artifacts before creating a new one - re-read from disk, not from conversation memory (files may have changed since you last saw them)
-- If context is critically unclear, ask the user - but prefer making reasonable decisions to keep momentum
-- If a change with that name already exists, suggest continuing that change instead
-- Verify each artifact file exists after writing before proceeding to next`,
+**护栏**
+- 创建 apply 阶段传递依赖的每个产出物，不仅仅是 \`apply.requires\` 中列出的 ID
+- 始终在创建新产出物之前读取依赖产出物 - 从磁盘重新读取，而非对话记忆（文件可能自你上次看到后已变更）
+- 若上下文严重不清，询问用户 - 但优先做出合理决定以保持进展
+- 若同名变更已存在，建议继续该变更
+- 在继续下一个之前，验证每个产出物文件在写入后确实存在`,
     license: 'MIT',
     compatibility: '需要 openspec-cn CLI。',
     metadata: { author: 'openspec', version: '1.0' },
@@ -210,28 +210,28 @@ ${STORE_SELECTION_GUIDANCE}
 
 **输出**
 
-After completing all artifacts, summarize:
-- Change name and location
-- List of artifacts created with brief descriptions, plus any conditional artifact you skipped and why
-- What's ready: "All artifacts needed for implementation are ready."
-- Prompt: "Run \`/opsx:apply\` to start implementing."
+完成所有产出物后，总结：
+- 变更名称和位置
+- 已创建产出物列表及简要描述，加上跳过的任何条件性产出物及原因
+- 就绪状态："实现所需的所有产出物已就绪。"
+- 提示："运行 \`/opsx:apply\` 开始实现。"
 
 **产出物创建指南**
 
 - 遵循来自 \`openspec-cn instructions\` 每个制品类型输出中的 \`instruction\` 字段 — 它是权威指导，即使产出物名称熟悉
 - 若 \`instruction\` 字段指示你使用特定 skill 或命令创建产出物，则调用它而非直接写入产出物
-- The schema defines what each artifact should contain - follow it
-- Read dependency artifacts for context before creating new ones
-- Use \`template\` as the structure for your output file - fill in its sections
-- **IMPORTANT**: \`context\` and \`rules\` are constraints for YOU, not content for the file
-  - Do NOT copy \`<context>\`, \`<rules>\`, \`<project_context>\` blocks into the artifact
-  - These guide what you write, but should never appear in the output
+- schema 定义了每个产出物应包含的内容 - 遵循它
+- 在创建新产出物之前读取依赖产出物以获取上下文
+- 使用 \`template\` 作为输出文件的结构 - 填写其各节
+- **重要提示**：\`context\` 和 \`rules\` 是给你的约束，不是文件内容
+  - 不要将 \`<context>\`、\`<rules>\`、\`<project_context>\` 块复制到产出物中
+  - 这些指导你写什么，但绝不应出现在输出中
 
-**Guardrails**
-- Create every artifact the apply phase transitively depends on, not just the ids listed in \`apply.requires\`
-- Always read dependency artifacts before creating a new one - re-read from disk, not from conversation memory (files may have changed since you last saw them)
-- If context is critically unclear, ask the user - but prefer making reasonable decisions to keep momentum
-- If a change with that name already exists, ask if user wants to continue it or create a new one
-- Verify each artifact file exists after writing before proceeding to next`
+**护栏**
+- 创建 apply 阶段传递依赖的每个产出物，不仅仅是 \`apply.requires\` 中列出的 ID
+- 始终在创建新产出物之前读取依赖产出物 - 从磁盘重新读取，而非对话记忆（文件可能自你上次看到后已变更）
+- 若上下文严重不清，询问用户 - 但优先做出合理决定以保持进展
+- 若同名变更已存在，询问用户是想继续还是新建
+- 在继续下一个之前，验证每个产出物文件在写入后确实存在`
   };
 }

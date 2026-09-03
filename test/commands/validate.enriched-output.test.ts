@@ -71,10 +71,10 @@ The system SHALL report the future state.
         const result = await runCLI([...invocation, '--no-interactive'], { cwd: testDir });
 
         expect(result.exitCode).toBe(0);
-        expect(result.stderr).toContain('ℹ [INFO] widgets/spec.md: Archive would refuse this delta:');
+        expect(result.stderr).toContain('ℹ [INFO] widgets/spec.md: 归档将拒绝此增量：');
         expect(result.stderr).toContain('Future state');
-        expect(result.stderr).not.toContain('Next steps:');
-        expect(result.stdout).toMatch(/is valid|0 failed/);
+        expect(result.stderr).not.toContain('后续步骤：');
+        expect(result.stdout).toMatch(/有效|验证通过|失败 0 项/);
       });
 
       it(`keeps archive advice structured and non-blocking for ${invocation.join(' ')} --json`, async () => {
@@ -91,9 +91,9 @@ The system SHALL report the future state.
         expect(report.issues).toContainEqual(expect.objectContaining({
           level: 'INFO',
           path: 'widgets/spec.md',
-          message: expect.stringContaining('Archive would refuse this delta:'),
+          message: expect.stringContaining('归档将拒绝此增量：'),
         }));
-        expect(result.stderr).not.toContain('Archive would refuse this delta:');
+        expect(result.stderr).not.toContain('归档将拒绝此增量：');
         if (args[0] !== 'change') expect(output.summary.totals.failed).toBe(0);
       });
     }
@@ -125,13 +125,13 @@ The system SHALL report the future state.
             expect(output.items[0].issues).toContainEqual(expect.objectContaining({
               level: 'INFO',
               path: 'specs',
-              message: expect.stringContaining('Could not check archive merge conflicts:'),
+              message: expect.stringContaining('无法检查归档合并冲突：'),
             }));
             expect(output.summary.totals).toEqual({ items: 1, passed: 1, failed: 0 });
           } else {
-            expect(result.stdout).toMatch(/is valid|0 failed/);
-            expect(result.stderr).toContain('ℹ [INFO] specs: Could not check archive merge conflicts:');
-            expect(result.stderr).not.toContain('Next steps:');
+            expect(result.stdout).toMatch(/有效|验证通过|失败 0 项/);
+            expect(result.stderr).toContain('ℹ [INFO] specs: 无法检查归档合并冲突：');
+            expect(result.stderr).not.toContain('后续步骤：');
           }
           expect(result.exitCode).toBe(0);
         }
@@ -151,9 +151,9 @@ The system SHALL report the future state.
     const result = await runCLI(['change', 'validate', 'c-archive', '--no-interactive'], { cwd: testDir });
 
     expect(result.exitCode).toBe(1);
-    expect(result.stderr).toContain('ℹ [INFO] widgets/spec.md: Archive would refuse this delta:');
+    expect(result.stderr).toContain('ℹ [INFO] widgets/spec.md: 归档将拒绝此增量：');
     expect(result.stderr).toContain('[ERROR]');
-    expect(result.stderr).toContain('Next steps:');
+    expect(result.stderr).toContain('后续步骤：');
   });
 
   it('prints Next steps footer and guidance on invalid change', async () => {

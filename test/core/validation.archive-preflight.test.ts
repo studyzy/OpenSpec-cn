@@ -43,7 +43,7 @@ describe('validate: deltas archive would refuse (#1112)', () => {
 
   /** The preflight finding, so assertions cannot pass on an unrelated issue. */
   const blocker = (report: { issues: Array<{ level: string; message: string }> }) =>
-    report.issues.find((i) => i.message.startsWith('Archive would refuse this delta:'));
+    report.issues.find((i) => i.message.startsWith('归档将拒绝此增量：'));
 
   /** What archive's merge builder does: null when the delta applies cleanly. */
   const archiveError = async (changeDir: string): Promise<string | null> => {
@@ -87,7 +87,7 @@ describe('validate: deltas archive would refuse (#1112)', () => {
     expect(report.issues).toContainEqual({
       level: 'INFO',
       path: 'specs',
-      message: 'Could not check archive merge conflicts: EIO: cannot discover archive inputs',
+      message: '无法检查归档合并冲突：EIO: cannot discover archive inputs',
     });
     expect(blocker(report)).toBeUndefined();
   });
@@ -114,11 +114,11 @@ describe('validate: deltas archive would refuse (#1112)', () => {
       expect(report.issues).toContainEqual(expect.objectContaining({
         level: 'INFO',
         path: 'specs',
-        message: expect.stringContaining('Could not check archive merge conflicts:'),
+        message: expect.stringContaining('无法检查归档合并冲突：'),
       }));
       if (!validDelta) {
         expect(report.issues).toContainEqual(expect.objectContaining({
-          level: 'ERROR', path: 'widgets/spec.md', message: expect.stringContaining('must include at least one scenario'),
+          level: 'ERROR', path: 'widgets/spec.md', message: expect.stringContaining('必须至少包含一个场景'),
         }));
       }
     }
@@ -132,7 +132,7 @@ describe('validate: deltas archive would refuse (#1112)', () => {
     const outside = path.join(testDir, 'outside-delta.md');
     await fs.rename(delta, outside);
     await fs.symlink(outside, delta);
-    await expect(validate(changeDir)).rejects.toThrow('Path is outside the allowed directory');
+    await expect(validate(changeDir)).rejects.toThrow('路径位于允许的目录之外');
   });
 
   it.each(['EMFILE', 'EIO', 'EACCES'])(
@@ -170,8 +170,8 @@ describe('validate: deltas archive would refuse (#1112)', () => {
     await writeMainSpec('widgets', `${REQUIREMENT}\n\n${REQUIREMENT.replace('Widget state', 'Gadget state')}`);
     const changeDir = await writeChange('c1', 'widgets', '## RENAMED Requirements\n\n- FROM: `### Requirement: Widget state`\n- TO: `### Requirement: Gadget state`\n');
     const error = await archiveError(changeDir);
-    expect(error).toContain('already exists');
-    expect(blocker(await validate(changeDir))?.message).toBe(`Archive would refuse this delta: ${error}`);
+    expect(error).toContain('已存在');
+    expect(blocker(await validate(changeDir))?.message).toBe(`归档将拒绝此增量：${error}`);
   });
 
   it.each([
@@ -180,8 +180,8 @@ describe('validate: deltas archive would refuse (#1112)', () => {
   ])('reports %s against a capability that does not exist', async (_operation, delta) => {
     const changeDir = await writeChange('c1', 'new-capability', delta);
     const error = await archiveError(changeDir);
-    expect(error).toContain('target spec does not exist');
-    expect(blocker(await validate(changeDir))?.message).toBe(`Archive would refuse this delta: ${error}`);
+    expect(error).toContain('目标 spec 不存在');
+    expect(blocker(await validate(changeDir))?.message).toBe(`归档将拒绝此增量：${error}`);
   });
 
   it('keeps library validation unchanged when mainSpecsDir is omitted', async () => {
@@ -219,7 +219,7 @@ describe('validate: deltas archive would refuse (#1112)', () => {
     await writeChange('c1', 'invalid', '## ADDED Requirements\n\nNo entries.\n');
     const report = await validate(changeDir);
     expect(report.issues.filter((issue) => issue.level === 'INFO')).toEqual([
-      expect.objectContaining({ path: 'area/widgets/spec.md', message: `Archive would refuse this delta: ${await archiveError(changeDir)}` }),
+      expect.objectContaining({ path: 'area/widgets/spec.md', message: `归档将拒绝此增量：${await archiveError(changeDir)}` }),
     ]);
   });
 
@@ -246,7 +246,7 @@ describe('validate: deltas archive would refuse (#1112)', () => {
     );
 
     const issue = blocker(await validate(changeDir));
-    expect(issue?.message).toContain('MODIFIED failed for header "### Requirement: Gadget state"');
+    expect(issue?.message).toContain('MODIFIED 失败，标题 "### Requirement: Gadget state"');
     expect(await archiveError(changeDir)).not.toBeNull();
   });
 
@@ -258,7 +258,7 @@ describe('validate: deltas archive would refuse (#1112)', () => {
       `## ADDED Requirements\n\n### Requirement: Widget state\nThe system SHALL report the widget state twice.\n\n#### Scenario: Queried\n- **WHEN** queried\n- **THEN** reported\n`
     );
 
-    expect(blocker(await validate(changeDir))?.message).toContain('already exists');
+    expect(blocker(await validate(changeDir))?.message).toContain('已存在');
     expect(await archiveError(changeDir)).not.toBeNull();
   });
 
@@ -270,7 +270,7 @@ describe('validate: deltas archive would refuse (#1112)', () => {
       `## RENAMED Requirements\n\n- FROM: \`### Requirement: Gadget state\`\n- TO: \`### Requirement: Doodad state\`\n`
     );
 
-    expect(blocker(await validate(changeDir))?.message).toContain('source not found');
+    expect(blocker(await validate(changeDir))?.message).toContain('未找到源');
     expect(await archiveError(changeDir)).not.toBeNull();
   });
 
@@ -340,7 +340,7 @@ describe('validate: deltas archive would refuse (#1112)', () => {
     const changeDir = await writeChange('c1', 'widgets', '# notes\n\nNo delta headers here.\n');
 
     const report = await validate(changeDir);
-    expect(report.issues.some((i) => i.message.startsWith('No delta sections found'))).toBe(true);
+    expect(report.issues.some((i) => i.message.startsWith('未找到 delta 章节'))).toBe(true);
     expect(blocker(report)).toBeUndefined();
   });
 
@@ -348,7 +348,7 @@ describe('validate: deltas archive would refuse (#1112)', () => {
     const changeDir = await writeChange('c1', 'area\\widgets', '# Notes\n\nNo delta headers.\n');
     const report = await validate(changeDir);
     expect(report.issues).toContainEqual(expect.objectContaining({
-      level: 'ERROR', path: 'area/widgets/spec.md', message: expect.stringContaining('No delta sections found'),
+      level: 'ERROR', path: 'area/widgets/spec.md', message: expect.stringContaining('未找到 delta 章节'),
     }));
     expect(blocker(report)).toBeUndefined();
   });
@@ -358,7 +358,7 @@ describe('validate: deltas archive would refuse (#1112)', () => {
     const changeDir = await writeChange('c1', 'widgets', '## ADDED Requirements\n\nNothing here.\n');
 
     const report = await validate(changeDir);
-    expect(report.issues.some((i) => i.message.includes('no requirement entries parsed'))).toBe(true);
+    expect(report.issues.some((i) => i.message.includes('未解析到需求条目'))).toBe(true);
     expect(blocker(report)).toBeUndefined();
   });
 

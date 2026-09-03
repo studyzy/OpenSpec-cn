@@ -1288,7 +1288,7 @@ metadata:
 
         const consoleSpy = vi.spyOn(console, 'log');
         await updateCommand.execute(testDir);
-        expect(consoleSpy.mock.calls.flat().map(String).some((entry) => entry.includes('up to date'))).toBe(true);
+        expect(consoleSpy.mock.calls.flat().map(String).some((entry) => entry.includes('已是最新'))).toBe(true);
       }
     );
 
@@ -1800,7 +1800,7 @@ metadata:
 
       // Cursor succeeded, so its IDE process still needs to reload the changes.
       expect(consoleSpy).toHaveBeenCalledWith(
-        expect.stringContaining('重启 IDE')
+        expect.stringContaining('请重启你的 IDE')
       );
 
       writeSpy.mockRestore();
@@ -1832,7 +1832,7 @@ metadata:
         expect.stringContaining('已更新：Claude Code')
       );
       expect(consoleSpy).not.toHaveBeenCalledWith(
-        expect.stringContaining('重启 IDE')
+        expect.stringContaining('请重启你的 IDE')
       );
     });
   });
@@ -1973,7 +1973,7 @@ metadata:
       await updateCommand.execute(testDir);
 
       expect(consoleSpy).not.toHaveBeenCalledWith(
-        expect.stringContaining('重启 IDE')
+        expect.stringContaining('请重启你的 IDE')
       );
 
       consoleSpy.mockRestore();
@@ -1999,7 +1999,7 @@ metadata:
       await updateCommand.execute(testDir);
 
       expect(consoleSpy).toHaveBeenCalledWith(
-        expect.stringContaining(`请重启你的 IDE 以使新 ${surface === 'commands' ? '命令' : 'skills'} 生效。`)
+        expect.stringContaining(surface === 'commands' ? '请重启你的 IDE 以使新命令生效。' : '请重启你的 IDE 以使新 skills 生效。')
       );
       expect(await FileSystemUtils.fileExists(
         path.join(testDir, '.cursor', 'commands', 'opsx-explore.md')
@@ -2011,8 +2011,8 @@ metadata:
       consoleSpy.mockClear();
       await updateCommand.execute(testDir);
 
-      expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining('up to date'));
-      expect(consoleSpy).not.toHaveBeenCalledWith(expect.stringContaining('重启 IDE'));
+      expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining('已是最新'));
+      expect(consoleSpy).not.toHaveBeenCalledWith(expect.stringContaining('请重启你的 IDE'));
 
       consoleSpy.mockRestore();
     });
@@ -2035,10 +2035,10 @@ metadata:
         )).toBe(false);
         const surface = delivery === 'skills' ? 'skills' : 'commands';
         expect(consoleSpy).toHaveBeenCalledWith(
-          expect.stringContaining(`Restart your IDE to refresh ${surface}.`)
+          expect.stringContaining(surface === 'skills' ? '请重启你的 IDE 以使新 skills 生效。' : '请重启你的 IDE 以使新命令生效。')
         );
         expect(consoleSpy).not.toHaveBeenCalledWith(
-          expect.stringContaining('Restart your IDE for the new')
+          expect.stringContaining('请重启你的 IDE 以刷新新')
         );
       }
     );
@@ -2053,9 +2053,9 @@ metadata:
 
       await updateCommand.execute(testDir);
 
-      expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining('Updated: Claude Code'));
-      expect(consoleSpy).not.toHaveBeenCalledWith(expect.stringContaining('Updated: Cursor'));
-      expect(consoleSpy).not.toHaveBeenCalledWith(expect.stringContaining('Restart your IDE'));
+      expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining('已更新：Claude Code'));
+      expect(consoleSpy).not.toHaveBeenCalledWith(expect.stringContaining('已更新：Cursor'));
+      expect(consoleSpy).not.toHaveBeenCalledWith(expect.stringContaining('请重启你的 IDE'));
     });
   });
 
@@ -2437,7 +2437,7 @@ metadata:
 
       // A configured IDE tool that was not affected must not cause the hint.
       expect(consoleSpy).not.toHaveBeenCalledWith(
-        expect.stringContaining('重启 IDE')
+        expect.stringContaining('请重启你的 IDE')
       );
 
       consoleSpy.mockRestore();
@@ -2660,7 +2660,7 @@ ${OPENSPEC_MARKERS.end}
       expect(menuLines).toHaveLength(1);
       expect(menuLines[0]).toContain('/opsx-propose');
       expect(logCalls.some((entry) => entry.includes('/opsx:propose'))).toBe(false);
-      expect(logCalls.some((entry) => entry.includes('重启 IDE'))).toBe(true);
+      expect(logCalls.some((entry) => entry.includes('请重启你的 IDE'))).toBe(true);
     });
 
     it('should preserve legacy Codex prompts when a configured Codex tool lacks the replacement workflow', async () => {

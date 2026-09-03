@@ -825,7 +825,7 @@ export class Validator {
       return [{
         level: 'INFO',
         path: 'specs',
-        message: `Could not check archive merge conflicts: ${
+        message: `无法检查归档合并冲突：${
           error instanceof Error ? error.message : String(error)
         }`,
       }];
@@ -852,7 +852,7 @@ export class Validator {
         issues.push({
           level: 'INFO',
           path: entryPath,
-          message: `Archive would refuse this delta: ${
+          message: `归档将拒绝此增量：${
             error instanceof Error ? error.message : String(error)
           }`,
         });

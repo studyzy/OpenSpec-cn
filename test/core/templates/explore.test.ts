@@ -56,55 +56,55 @@ function fencedBlockLines(body: string): Array<[number, string]> {
 describe('explore templates', () => {
   it('guides planning without forcing an interview on open-ended exploration (#1017)', () => {
     for (const [label, body] of bodies) {
-      expect(body, label).toContain('When the user is planning a change');
-      expect(body, label).toContain('For open-ended discussion, follow the conversation');
-      expect(body, label).toContain('Stop asking when the user has enough clarity');
-      expect(body, label).toContain('Let them pause, pivot, or defer a decision');
+      expect(body, label).toContain('当用户在规划一个变更时');
+      expect(body, label).toContain('对于开放性讨论，跟随对话走向');
+      expect(body, label).toContain('当用户已有足够清晰度时停止提问');
+      expect(body, label).toContain('允许他们暂停、转向或推迟决策');
       expect(body, label).not.toContain('Relentless Interview Mode');
     }
   });
 
   it('investigates repository facts before asking while acknowledging missing evidence (#1017)', () => {
     for (const [label, body] of bodies) {
-      expect(body, label).toContain('Before asking a factual question, follow the context discovery below');
-      expect(body, label).toContain('relevant OpenSpec artifacts, source, tests, docs, and configuration');
-      expect(body, label).toContain('Do not ask the user to repeat facts you can verify');
-      expect(body, label).toContain('If evidence is missing, conflicting, or inaccessible');
-      expect(body, label).toContain('ask only for the clarification needed to proceed');
+      expect(body, label).toContain('在提出事实性问题之前，先按下面的上下文发现步骤');
+      expect(body, label).toContain('相关的 OpenSpec 制品、源码、测试、文档和配置');
+      expect(body, label).toContain('不要让用户重复你能自行验证的事实');
+      expect(body, label).toContain('如果证据缺失、冲突或无法访问');
+      expect(body, label).toContain('只询问继续推进所必需的澄清');
     }
   });
 
   it('resolves blocking decisions first and revisits dependent assumptions (#1017)', () => {
     for (const [label, body] of bodies) {
-      expect(body, label).toContain('Resolve the next blocking decision before its dependent details');
-      expect(body, label).toContain('Revisit downstream assumptions when an earlier answer changes');
-      expect(body, label).toContain('Skip branches that do not matter to this goal');
+      expect(body, label).toContain('先解决下一个阻塞决策，再处理依赖它的细节');
+      expect(body, label).toContain('当先前的答案变化时，重新审视下游假设');
+      expect(body, label).toContain('跳过与此目标无关的分支');
     }
   });
 
   it('asks one focused question and recommends only when evidence supports a choice (#1017)', () => {
     for (const [label, body] of bodies) {
-      expect(body, label).toContain('Ask one focused question at a time');
-      expect(body, label).toContain('Batch questions only if the user asks for a batch');
-      expect(body, label).toContain('explain why it matters and which decision it unlocks');
-      expect(body, label).toContain('When evidence supports a recommendation');
-      expect(body, label).toContain('Do not invent intent, priorities, or external constraints');
+      expect(body, label).toContain('每次只问一个聚焦的问题');
+      expect(body, label).toContain('只有用户要求时才批量提问');
+      expect(body, label).toContain('简要说明它为什么重要、能解锁哪个决策');
+      expect(body, label).toContain('当证据支持某个建议时');
+      expect(body, label).toContain('不要臆造意图、优先级或外部约束');
     }
   });
 
   it('keeps decisions in the conversation without accepting defaults or authorizing writes (#1017)', () => {
     for (const [label, body] of bodies) {
-      expect(body, label).toContain('Track decisions in the conversation');
-      expect(body, label).toContain('Separate confirmed decisions from proposed defaults and unresolved questions');
-      expect(body, label).toContain('Silence is not acceptance');
-      expect(body, label).toContain('Accepting an answer or a batch of recommendations is not permission to write');
-      expect(body, label).toContain('Keep file-write confirmation separate from discovery questions');
+      expect(body, label).toContain('决策记录在对话中');
+      expect(body, label).toContain('区分已确认的决策、建议的默认值和未解决的问题');
+      expect(body, label).toContain('沉默不等于接受');
+      expect(body, label).toContain('接受某个答案或一批建议不等于授权写入');
+      expect(body, label).toContain('文件写入确认要与探索性问题分开');
     }
   });
 
   it('delivers the same planning guidance exactly once in both templates (#1017)', () => {
     const sections = bodies.map(([label, body]) => {
-      const heading = '## Planning a Change';
+      const heading = '## 规划变更';
       expect(occurrenceCount(body, heading), label).toBe(1);
       const start = body.indexOf(heading);
       const end = body.indexOf('\n---', start);

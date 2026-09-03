@@ -92,32 +92,32 @@ describe('default task guidance', () => {
 describe('planning code inspection (#339)', () => {
   it('inspects the project after loading instructions and dependencies, before creating or delegating artifacts', () => {
     for (const [label, body] of loopBodies) {
-      const instructions = body.indexOf('openspec instructions <artifact-id>');
-      const dependencies = body.indexOf('Read any completed dependency files');
-      const inspection = body.indexOf('**Inspect the relevant project before drafting**');
-      const delegation = body.indexOf('If the `instruction` field delegates creation');
+      const instructions = body.indexOf('openspec-cn instructions <artifact-id>');
+      const dependencies = body.indexOf('读取所有已完成的依赖文件');
+      const inspection = body.indexOf('**起草前先检查相关项目**');
+      const delegation = body.indexOf('若 `instruction` 字段将创建委托给特定 skill 或命令');
       expect(instructions, label).toBeGreaterThanOrEqual(0);
       expect(dependencies, label).toBeGreaterThan(instructions);
       expect(inspection, label).toBeGreaterThan(dependencies);
       expect(delegation, label).toBeGreaterThan(inspection);
 
       const guidance = body.slice(inspection, delegation);
-      expect(guidance, label).toContain('Read `context` and `rules` first');
-      expect(guidance, label).toContain('relevant implementation, nearby tests, configuration, and documentation outside `openspec/`');
-      expect(guidance, label).toContain('Keep inspection read-only and proportional to the change');
-      expect(guidance, label).toContain('reuse findings for later artifacts');
-      expect(guidance, label).toContain('Do this discovery now');
+      expect(guidance, label).toContain('先阅读 `context` 和 `rules`');
+      expect(guidance, label).toContain('再检查 `openspec/` 之外的相关实现、邻近测试、配置和文档');
+      expect(guidance, label).toContain('检查保持只读且与变更规模相称');
+      expect(guidance, label).toContain('复用发现结果供后续产出物使用');
+      expect(guidance, label).toContain('现在就做这些发现');
     }
   });
 
   it('handles separate stores, missing code, and uncertain findings without inventing facts', () => {
     for (const [label, body] of loopBodies) {
-      expect(body, label).toContain('the planning home may be separate from the code');
-      expect(body, label).toContain('If the target is unclear, ask');
-      expect(body, label).toContain('For greenfield or non-code changes, inspect the available structure and relevant documents');
-      expect(body, label).toContain('If source is unavailable, state the limitation');
-      expect(body, label).toContain('Distinguish observed behavior from assumptions and proposed additions');
-      expect(body, label).toContain('surface conflicts with existing specs instead of silently deciding which is correct');
+      expect(body, label).toContain('规划主目录可能与代码分离');
+      expect(body, label).toContain('若目标不明确，询问用户');
+      expect(body, label).toContain('对于绿地项目或非代码变更，检查现有结构和相关文档');
+      expect(body, label).toContain('若源码不可用，说明该局限');
+      expect(body, label).toContain('区分观察到的行为与假设及建议的新增内容');
+      expect(body, label).toContain('与现有规范冲突时显式呈现冲突，而不是默默裁定谁对谁错');
     }
   });
 
@@ -125,12 +125,12 @@ describe('planning code inspection (#339)', () => {
     for (const command of getCommandContents(['propose', 'ff'])) {
       for (const adapter of CommandAdapterRegistry.getAll()) {
         const generated = generateCommand(command, adapter).fileContent;
-        const inspection = generated.indexOf('**Inspect the relevant project before drafting**');
-        const delegation = generated.indexOf('If the `instruction` field delegates creation');
+        const inspection = generated.indexOf('**起草前先检查相关项目**');
+        const delegation = generated.indexOf('若 `instruction` 字段将创建委托给特定 skill 或命令');
         const label = `${adapter.toolId} ${command.id}`;
         expect(inspection, label).toBeGreaterThanOrEqual(0);
         expect(delegation, label).toBeGreaterThan(inspection);
-        expect(generated, label).toContain('Keep inspection read-only and proportional to the change');
+        expect(generated, label).toContain('检查保持只读且与变更规模相称');
       }
     }
   });

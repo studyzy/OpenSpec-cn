@@ -69,7 +69,7 @@ describe('openspec CLI e2e basics', () => {
     expect(JSON.parse(changes.stdout).changes).toEqual([]);
     const specs = await runCLI(['list', '--specs'], { cwd: cloneDir, env });
     expect(specs.exitCode).toBe(0);
-    expect(specs.stdout).toContain('No specs found.');
+    expect(specs.stdout).toContain('未找到规范。');
   });
 
   it('shows help output', async () => {
@@ -129,7 +129,7 @@ describe('openspec CLI e2e basics', () => {
 
       expect(result.exitCode).toBe(0);
       expect(result.stdout).toBe(output);
-      expect(result.stderr).toContain('Warning: "openspec change list" is deprecated. Use "openspec list".');
+      expect(result.stderr).toContain('警告："openspec-cn change ..." 命令已弃用。请优先使用动词前置命令');
     });
 
     it('preserves JSON output and warns on stderr', async () => {
@@ -140,7 +140,7 @@ describe('openspec CLI e2e basics', () => {
       expect(JSON.parse(result.stdout)).toEqual([
         { id: 'c1', title: 'Test Change', deltaCount: 1, taskStatus: { total: 0, completed: 0 } },
       ]);
-      expect(result.stderr).toContain('Warning: "openspec change list" is deprecated. Use "openspec list".');
+      expect(result.stderr).toContain('警告："openspec-cn change ..." 命令已弃用。请优先使用动词前置命令');
     });
 
     it('rejects the unsupported --all option', async () => {

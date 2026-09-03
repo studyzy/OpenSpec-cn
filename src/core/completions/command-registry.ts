@@ -105,11 +105,11 @@ export const COMMAND_REGISTRY: CommandDefinition[] = [
       },
       {
         name: 'archived',
-        description: 'Validate that archived changes have all tasks completed (for pre-commit linting)',
+        description: '验证已归档的更改是否所有任务已完成（用于 pre-commit lint）',
       },
       {
         name: 'report',
-        description: 'Select bulk report content',
+        description: '选择批量报告内容',
         takesValue: true,
         values: ['full', 'findings'],
       },

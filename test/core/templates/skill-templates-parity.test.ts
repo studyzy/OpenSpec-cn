@@ -38,45 +38,45 @@ import {
 import { STORE_SELECTION_GUIDANCE } from '../../../src/core/templates/workflows/store-selection.js';
 
 const EXPECTED_FUNCTION_HASHES: Record<string, string> = {
-  getApplyChangeSkillTemplate: '84155e2d96b07a1a56135481e463b152174721ff7f74748852ef4db2a9950d37',
-  getArchiveChangeSkillTemplate: '27ae04d50ec772c48214f0dbea78e5d669bd6685528acd9d9e31506eaa5ef1bd',
-  getBulkArchiveChangeSkillTemplate: '2a8ab89664e3d93bdc0af08a9d0c00d951804d14cdd9b48216b015f1fa495e9e',
-  getContinueChangeSkillTemplate: 'c0fa4c9eec7fd2f378b868a25ec293ce47d268108d39b66971c06508edc11428',
-  getExploreSkillTemplate: '80b66d1cff21f9687a3643d9ab0e675d543166a87a3336b98c282497de39049f',
-  getFeedbackSkillTemplate: '4d3252e3a359d4769bf36166ac6f486e92d7797e922bf9707808f6437ab022ef',
-  getFfChangeSkillTemplate: '37908d37ef23676a304277e9183dc5fc5cd4a2c1608b6f069274c422b24c41e7',
+  getExploreSkillTemplate: '14cc8b3a9e46fe220f73707a127e38b1d501b022dc1c49f2742bb26c1034fe95',
   getNewChangeSkillTemplate: 'a645c6a2e6bacc62fb0662e2b0be8e632c52f3a6da01a090a05d2e94f4686d01',
-  getOnboardSkillTemplate: 'e7574599b8fbb46f2dd6e34d05031c37547e2eae0557b29089f82d726cdb5db1',
-  getOpsxApplyCommandTemplate: '9b18fa9cfd56d4b7ee28c62f22d3a91ca7097af39cc6167f1af3b39c73dc3516',
-  getOpsxArchiveCommandTemplate: 'bded434a697b86ff3d0acd7efccbc7dc350e5554648c705748666adc96298e60',
-  getOpsxBulkArchiveCommandTemplate: '8e9241d90a48b15d39f7768b8501581fbfeec84d995b336346c22937340662ad',
-  getOpsxContinueCommandTemplate: '241390ddab99a67d3cb5a08bc7ad48671d7c82e2f74975e7555f40e6a6cf031f',
-  getOpsxExploreCommandTemplate: '9fb6544a1954f30759fa0783da4c814591c8d2f24de3ed89505229994af0e24c',
-  getOpsxFfCommandTemplate: 'e81a7959b780dd7eb00651ce9d04f7a5088c89b9cb6f257720dfb929c2bbc476',
-  getOpsxNewCommandTemplate: '3edb14a25e8cd62b8790eb19205e687203d86573a7314f7c144fac0403807f58',
-  getOpsxOnboardCommandTemplate: '036fcce079c61a50170b2a360542f32f6bd33e110c7f3e4692d2c24389000c1d',
-  getOpsxProposeCommandTemplate: '637967458b6ac2c4d0f86b4748aeac11e69d9316500dc5b4d8d740f9ae02f12d',
-  getOpsxProposeSkillTemplate: 'e77aeaf9208f86420a5f0e47961de425267e39fa77cf624956e76bc5355969d5',
-  getOpsxSyncCommandTemplate: '2331948e6e36870d728fae111b24f89e099f3830f879cd8684d96bc2931b7fc8',
-  getOpsxUpdateCommandTemplate: 'b983a10754a4de5026d9b64b1a38d78eb42889ec93510b935cb17587b7afd136',
-  getOpsxVerifyCommandTemplate: 'a0aeb4cbcc8f73bc3c22b62e42cda754ec67f64baa5376eec90548d19a961775',
+  getContinueChangeSkillTemplate: '9c491deff99d2029ab99b75f266b60d3d9788d8decebc02f757a84815ffd17dd',
+  getApplyChangeSkillTemplate: 'd98a7fa3f84dd26c5aeaa2a8bcf4a48908a5ab44f6fcc1fb473bc86062f1c0a9',
+  getFfChangeSkillTemplate: 'fc6c6e8f2dbc928f495791b17528095ad0e3b971f21c83e26fb3538f4762a88c',
   getSyncSpecsSkillTemplate: '984b383bf6b9840f2f497008264a717aefa898b1abdc1a9cda6760dd8e165d24',
-  getUpdateChangeSkillTemplate: '7b34982f30930119e30d915a0567e2d60fa45818f0641325672977e267487754',
+  getOnboardSkillTemplate: 'e7574599b8fbb46f2dd6e34d05031c37547e2eae0557b29089f82d726cdb5db1',
+  getOpsxExploreCommandTemplate: '7f0eb919cf8a9e5d0710df9e8dc3ca6edc7079d8d78be1b78e9e703cb798d049',
+  getOpsxNewCommandTemplate: '3edb14a25e8cd62b8790eb19205e687203d86573a7314f7c144fac0403807f58',
+  getOpsxContinueCommandTemplate: '585c76aa8378791346120fbcae0ddbfaf86643e9206649f7eb06d4bc240e4c29',
+  getOpsxApplyCommandTemplate: 'a60f91b816dd6aaff21459fdaca95703a6d3523db9e4e2dffe9ce463ef1b7995',
+  getOpsxFfCommandTemplate: 'f924a1d1b1c285a90670703de146c913fbf65b916304ea327e88f8c9cada13c4',
+  getArchiveChangeSkillTemplate: 'bc4ffc3e36f5b843872e4ddce773db4703f327fe84c430543de22156dd3e4046',
+  getBulkArchiveChangeSkillTemplate: 'd120a370e9339b45926eb4af8f06dd5a3a5b207934adff94e065a2ef34b2ab8c',
+  getOpsxSyncCommandTemplate: '2331948e6e36870d728fae111b24f89e099f3830f879cd8684d96bc2931b7fc8',
   getVerifyChangeSkillTemplate: '95dd0a094aa9de73882f8a0214c609cf69dbd91980d55b1f7e33c894b5aede99',
+  getOpsxArchiveCommandTemplate: '497521a6c36df4da39de21931ae6feb978cec95bdf7ddd62d6eb54205b291d92',
+  getOpsxOnboardCommandTemplate: '036fcce079c61a50170b2a360542f32f6bd33e110c7f3e4692d2c24389000c1d',
+  getOpsxBulkArchiveCommandTemplate: '5853539eabcdf0af93020cd2790f4c2f4ff08f4b56e883465b74d13d51a4bd10',
+  getOpsxVerifyCommandTemplate: 'a0aeb4cbcc8f73bc3c22b62e42cda754ec67f64baa5376eec90548d19a961775',
+  getOpsxProposeSkillTemplate: '47dfda1d8b10f776747d97f075493fcb2ccd7d640bc0c61ddc63b118587ab0f6',
+  getOpsxProposeCommandTemplate: '9b48ead7bb1dfb026ec0b0df5886c18e8dfa4a804099e28aee01e9d3d9ea777d',
+  getFeedbackSkillTemplate: '4d3252e3a359d4769bf36166ac6f486e92d7797e922bf9707808f6437ab022ef',
+  getUpdateChangeSkillTemplate: '7b34982f30930119e30d915a0567e2d60fa45818f0641325672977e267487754',
+  getOpsxUpdateCommandTemplate: 'b983a10754a4de5026d9b64b1a38d78eb42889ec93510b935cb17587b7afd136',
 };
 
 const EXPECTED_GENERATED_SKILL_CONTENT_HASHES: Record<string, string> = {
-  'openspec-explore': '85d75af2eee7007e93add37a3de5a5d551ca49ca11a29e30c9881cb6de8b2359',
+  'openspec-explore': 'eea7483fadfc14940c005548ce82167bb059b7c26466db8f721feb9643450d99',
   'openspec-new-change': 'ab178f982cd0f11864e09f61f0b400a79a0e0c5d67555ee76d5c864cd7f6d49c',
-  'openspec-continue-change': '80eef9d88132d28943f164380dd4f8a8c501039a82adaa1fe96f4ee8952935ae',
-  'openspec-apply-change': 'dc7618f96b47566538eab1175ffaa4201aa1b91c460da5ba7097f39a668082e8',
-  'openspec-ff-change': '00e755615962be0f2a55aaf589567d7296afe799fa4c26abd5cd5d25c505a725',
+  'openspec-continue-change': '5fa2fb1bf95cc0653e1b2f7bd24cb7fc07cfc156261699feb99168f5bf9f6f90',
+  'openspec-apply-change': 'fa8edf299a2046ed20284fff3aa83ab1d94064196ef51d1827240042b20f2040',
+  'openspec-ff-change': 'd80a4d2f84d2500958afa02651a23daec8389f73d04972511da3dc72c4d57812',
   'openspec-sync-specs': '16ff0411b815ea26e1e3fb4ea5d5b821590b596a156dd8b15a63b4e51486f40d',
-  'openspec-archive-change': '4bd16ae222c0f3a950b6b0ca160138761d00bcbb84800a01419bdf994942ccee',
-  'openspec-bulk-archive-change': 'a7711211e3af72b0269ff67bfdce1f029245a0505b9f91558b1a097330a1190f',
+  'openspec-archive-change': '217cc2cc46da6a264c60640d77bedaec7d4f68d471cd0afbb4ba8663a32f8a45',
+  'openspec-bulk-archive-change': '5cbcf7130357824669260e87d529cf71d35ce2067800c3f50a93eb745a5072d5',
   'openspec-verify-change': 'ccfdd22530212e327931d9cd5a72fe6f50f68d5d669ea374ee6a4ed713ef6b20',
   'openspec-onboard': '7610dae7b8f03ab72c97e9edab58e17b2e79ab8d91d94d53aadcd6e8da08d790',
-  'openspec-propose': 'c5e26f7b4b90f3b7baea641fcd2895132191f89307ed9ce79f34b0dd3f94eaa9',
+  'openspec-propose': '935523441ec60d0f39fc6cb72f725d0570019e8555b6d2435fd91b8576958a74',
   'openspec-update-change': '877fb5e9c34200de86ec92848eccd7bc98d18410564e1d68df149a57277ca1d2',
 };
 
@@ -351,17 +351,17 @@ describe('skill templates split parity', () => {
 
     for (const [label, content] of bulkArchiveVariants) {
       expect(content, label).toContain(
-        'Build a map keyed by `<capability-path>`, the exact path relative to `specs/`'
+        '构建一个以 `<capability-path>`（相对于 `specs/` 的确切路径）为键的映射'
       );
       expect(content, label).toContain(
-        'billing/user-auth  -> [change-c]            <- OK (different full path)'
+        'billing/user-auth  -> [change-c]            <- 正常（完整路径不同）'
       );
       expect(content, label).toContain(
-        'identity/user-auth -> [change-a, change-b]  <- CONFLICT'
+        'identity/user-auth -> [change-a, change-b]  <- 冲突'
       );
       expect(content, label).toContain('identity/user-auth (!)');
       expect(content, label).toContain(
-        'the exact same `<capability-path>`'
+        '对同一个 `<capability-path>` 拥有 delta specs'
       );
       expect(content, label).toContain(
         '按变更和 `<capability-path>`'
@@ -454,8 +454,8 @@ describe('skill templates split parity', () => {
     const commandContent = getOpsxArchiveCommandTemplate().content;
 
     // The single archive skill references openspec-sync-specs; opsx command references /opsx:sync.
-    expect(generatedSkill, 'skill').toContain('run the `openspec-sync-specs` workflow inline');
-    expect(commandContent, 'opsx command').toContain('run the `/opsx:sync` workflow inline');
+    expect(generatedSkill, 'skill').toContain('内联运行 `openspec-sync-specs` 工作流');
+    expect(commandContent, 'opsx command').toContain('内联运行 `/opsx:sync` 工作流');
 
     const variants: Array<[string, string]> = [
       ['skill', generatedSkill],
@@ -463,16 +463,16 @@ describe('skill templates split parity', () => {
     ];
 
     for (const [variant, content] of variants) {
-      expect(content, variant).toContain('Do not delegate it to a background task');
-      expect(content, variant).toContain('Never archive while a spec sync is still in flight');
+      expect(content, variant).toContain('不要把它委托给后台任务');
+      expect(content, variant).toContain('绝不在 spec 同步仍在进行时归档');
 
       // Verification must follow delta semantics.
-      expect(content, variant).toContain('MODIFIED requirements carrying the scenario and description changes');
-      expect(content, variant).toContain('REMOVED requirements gone');
-      expect(content, variant).toContain('RENAMED requirements present under the new name and absent under the old one');
+      expect(content, variant).toContain('MODIFIED 需求携带 delta 中指明的场景与描述更改');
+      expect(content, variant).toContain('REMOVED 需求已消失');
+      expect(content, variant).toContain('RENAMED 需求以新名称存在且旧名称下已消失');
 
       // Verification is bound to the delta specs on disk, not to whatever the sync reports it touched.
-      expect(content, variant).toContain('not only the ones the sync reports it touched');
+      expect(content, variant).toContain('不仅仅是同步报告它触及的那些');
 
       // Main spec paths are store-root aware
       expect(content, variant).toContain('<planningHome.root>/openspec/specs/<capability-path>/spec.md');
@@ -484,8 +484,8 @@ describe('skill templates split parity', () => {
     const commandContent = getOpsxBulkArchiveCommandTemplate().content;
 
     // The bulk archive skill references openspec-sync-specs; opsx command references /opsx:sync.
-    expect(generatedSkill, 'bulk skill').toContain('run the `openspec-sync-specs` workflow inline');
-    expect(commandContent, 'bulk opsx command').toContain('run the `/opsx:sync` workflow inline');
+    expect(generatedSkill, 'bulk skill').toContain('内联运行 `openspec-sync-specs` 工作流');
+    expect(commandContent, 'bulk opsx command').toContain('内联运行 `/opsx:sync` 工作流');
 
     const variants: Array<[string, string]> = [
       ['bulk skill', generatedSkill],
@@ -493,14 +493,14 @@ describe('skill templates split parity', () => {
     ];
 
     for (const [variant, content] of variants) {
-      expect(content, variant).toContain('Do not delegate to a background task');
-      expect(content, variant).toContain('Never archive a change while a spec sync is still in flight');
-      expect(content, variant).toContain('Verify included delta specs before moving changeRoot');
+      expect(content, variant).toContain('不要委托给后台任务');
+      expect(content, variant).toContain('绝不在 spec 同步仍在进行时归档某个变更');
+      expect(content, variant).toContain('在移动 changeRoot 之前验证包含的增量 spec');
 
       // Verification must follow delta semantics.
-      expect(content, variant).toContain('MODIFIED requirements carrying scenario and description changes');
-      expect(content, variant).toContain('REMOVED requirements gone');
-      expect(content, variant).toContain('RENAMED requirements present under the new name and absent under the old one');
+      expect(content, variant).toContain('MODIFIED 需求携带 delta 中指明的场景与描述更改');
+      expect(content, variant).toContain('REMOVED 需求已消失');
+      expect(content, variant).toContain('RENAMED 需求以新名称存在且旧名称下已消失');
 
       // Main spec paths are store-root aware
       expect(content, variant).toContain('<planningHome.root>/openspec/specs/<capability-path>/spec.md');
@@ -530,14 +530,14 @@ describe('skill templates split parity', () => {
         'for each change, passing the delta spec analysis'
       );
       expect(content, variant).toContain(
-        'Re-run the comparison only for delta specs in `includedDeltas`'
+        '仅针对 `includedDeltas` 中的增量 spec'
       );
       expect(content, variant).toContain(
-        'Do not verify delta specs in `excludedDeltas`'
+        '不要验证 `excludedDeltas` 中的增量 spec'
       );
-      expect(content, variant).toContain('report `sync skipped`');
+      expect(content, variant).toContain('报告为 `sync skipped`');
       expect(content, variant).toContain(
-        '`sync skipped` without treating the archive itself as skipped'
+        '`sync skipped`，但不把归档本身视为跳过'
       );
 
       // These three carried no assertion, so deleting any of them from a
@@ -661,49 +661,49 @@ describe('skill templates split parity', () => {
       expect(content, variant).toContain(
         'openspec-cn instructions archive --change "<name>" --json'
       );
-      expect(content, variant).toContain('same selected-root flags');
+      expect(content, variant).toContain('已选根目录标志');
       // The archive-inputs lookup is a new CLI command, so a skill installed
       // ahead of the CLI (skills.sh) must degrade instead of blocking archiving.
-      expect(content, variant).toContain('advisory and\n   optional');
-      expect(content, variant).toContain('must never block archiving');
-      expect(content, variant).toContain('older CLI that\n   does not support this command yet');
+      expect(content, variant).toContain('建议性且可选的');
+      expect(content, variant).toContain('绝不能阻塞归档');
+      expect(content, variant).toContain('尚不支持此命令的旧版 CLI');
       expect(content, variant).toContain(
-        'continue the archive workflow with no\n   context and no operation guidance'
+        '在没有 context 与 operation guidance 的情况下继续归档工作流'
       );
-      expect(content, variant).toContain('Do not report an error and do not stop');
+      expect(content, variant).toContain('不要报告错误，也不要停止');
       expect(content, variant).not.toContain(
         'stop before inspecting or\n   writing specs or moving the change'
       );
-      expect(content, variant).toContain('successful response may omit both optional fields');
+      expect(content, variant).toContain('成功的响应可能省略这两个可选字段');
       expect(content, variant).toContain(
-        'Treat `context` as a\n   required prompt-level input'
+        '将 `context` 视为必需的提示级输入'
       );
       expect(content, variant).toContain(
-        'Treat `operationGuidance` as optional\n   additive advice'
+        '`operationGuidance` 视为可选的增量建议'
       );
-      expect(content, variant).toContain('read and consider every entry');
+      expect(content, variant).toContain('阅读并考虑每一条目');
       expect(content, variant).toContain('报告冲突并保留控制值');
       expect(content, variant).toContain('不要遵循它并解释原因');
       expect(content, variant).toContain(
-        '`artifactPaths.specs.existingOutputPaths` from status JSON as the only'
+        '使用 status JSON 中的 `artifactPaths.specs.existingOutputPaths` 作为唯一的 delta spec 来源'
       );
-      expect(content, variant).toContain('`specs` entry is missing');
-      expect(content, variant).toContain('do not infer\n   delta specs from other artifacts');
+      expect(content, variant).toContain('`specs` 条目缺失');
+      expect(content, variant).toContain('不要从其他产出物推断 delta specs');
       expect(content, variant).toContain(
         'openspec-cn instructions specs --change "<name>" --json'
       );
-      expect(content, variant).toContain('stop\n   before writing any main spec or moving the change');
+      expect(content, variant).toContain('报告错误并在写入任何主 spec 或移动变更之前停止');
       expect(content, variant).toContain('省略 `rules` 的有效响应');
-      expect(content, variant).toContain('inline sync must reuse that snapshot');
+      expect(content, variant).toContain('内联同步必须复用该快照');
       expect(content, variant).toContain('不要将其用于归档指导');
       expect(content, variant).toContain(
-        'Existing CLI checks, resolved paths, prompts, and command contracts are unchanged'
+        '现有的 CLI 检查、已解析路径、提示与命令契约保持不变'
       );
       expect(content, variant).toContain(
-        'Never copy runtime context, operation guidance, or artifact-rule text verbatim'
+        '绝不把运行时 context、operation guidance 或制品规则文本原样复制到输出文件中'
       );
       expect(content, variant).toContain(
-        'Artifact rules constrain only the specs being written and are never operation guidance'
+        '制品规则仅约束正在写入的 specs，绝不是 operation guidance'
       );
     }
 
@@ -735,16 +735,16 @@ describe('skill templates split parity', () => {
     ];
 
     for (const [variant, content] of variants) {
-      expect(content, variant).toContain('archive inputs once for the selected root');
+      expect(content, variant).toContain('为所选根目录一次性加载当前归档输入');
       expect(content, variant).toContain(
         'openspec-cn instructions archive --change "<selected-change>" --json'
       );
       // Same rule as the single-change skill: a missing archive-inputs command
       // must not take down a whole batch.
-      expect(content, variant).toContain('advisory and optional');
-      expect(content, variant).toContain('must never block the batch');
+      expect(content, variant).toContain('建议性且可选');
+      expect(content, variant).toContain('绝不能阻塞批量操作');
       expect(content, variant).toContain(
-        'continue the batch with no context and no operation guidance'
+        '在没有 context 与 operation guidance 的情况下继续批量操作'
       );
       expect(content, variant).not.toContain(
         'stop the whole batch before inspecting specs, writing main specs'
@@ -754,33 +754,33 @@ describe('skill templates split parity', () => {
       );
       expect(content, variant).toContain('缺失或列表为空');
       expect(content, variant).toContain('混合 schema 批次');
-      expect(content, variant).toContain('fetch every\n   required specs-rule snapshot');
+      expect(content, variant).toContain('获取所有需要的 specs 规则快照');
       expect(content, variant).toContain(
-        'Obtain all snapshots before the first write or move'
+        '在第一次写入或移动之前获取所有快照'
       );
       expect(content, variant).toContain(
-        'stop the whole batch before\n   any main-spec write or change move'
+        '在任何主 spec 写入或变更移动之前停止整个批次'
       );
       expect(content, variant).toContain(
-        'sync must reuse it without fetching instructions again'
+        '内联同步必须复用它，不要再次获取指令'
       );
       expect(content, variant).toContain(
-        'Treat\n   `context` as a required prompt-level input across the batch'
+        '`context` 视为整个批次的必需提示级输入'
       );
       expect(content, variant).toContain(
-        'Treat\n   `operationGuidance` as optional additive advice'
+        '`operationGuidance` 视为可选的增量建议'
       );
-      expect(content, variant).toContain('read and consider every');
+      expect(content, variant).toContain('阅读并考虑每一条目');
       expect(content, variant).toContain('报告冲突并保留控制值');
       expect(content, variant).toContain('不要遵循它并解释原因');
       expect(content, variant).toContain(
-        'Keep runtime inputs, conflict analysis, CLI-derived values, and artifact rules separate'
+        '保持运行时输入、冲突分析、CLI 派生值和制品规则彼此分离'
       );
       expect(content, variant).toContain(
-        'Artifact rules constrain only written specs'
+        '制品规则仅约束正在写入的 specs'
       );
       expect(content, variant).toContain(
-        'Never copy runtime input or artifact-rule text verbatim into output files'
+        '绝不把运行时输入或制品规则文本原样复制到输出文件中'
       );
     }
   });
@@ -894,10 +894,10 @@ describe('skill templates split parity', () => {
     for (const [variant, content] of variants) {
       // Offering "Cancel" without routing it let an agent fall straight through
       // to the archive step and move the changes anyway.
-      expect(content, variant).toContain('"Cancel" — stop, do not archive');
+      expect(content, variant).toContain('"取消" — 停止，不归档');
 
       // An unrecognized answer must re-prompt; archiving is never the default.
-      expect(content, variant).toContain('Anything else — ask again rather than archiving');
+      expect(content, variant).toContain('其他任何回答 — 再次询问，而不是归档');
     }
   });
 
@@ -911,15 +911,15 @@ describe('skill templates split parity', () => {
     ];
 
     for (const [variant, content] of variants) {
-      expect(content, variant).toContain('Route on the answer by intent, not by exact label');
+      expect(content, variant).toContain('根据用户回答的意图路由，而不是精确匹配标签');
 
       // The ready-only route has to name where "ready" is decided, or the agent
       // cannot tell which subset to archive.
-      expect(content, variant).toContain('the changes the step 6 table marks');
+      expect(content, variant).toContain('步骤 6 表格中标记为');
 
       // A cancelled batch must archive nothing, reinforced where agents skim.
       expect(content, variant).toContain(
-        'Never archive after the user cancels the confirmation'
+        '用户取消确认后绝不归档'
       );
     }
   });

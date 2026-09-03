@@ -664,9 +664,9 @@ describe('InitCommand', () => {
         }
 
         const logCalls = vi.mocked(console.log).mock.calls.flat().map(String);
-        const startHint = logCalls.find((entry) => entry.includes('Start your first change'));
+        const startHint = logCalls.find((entry) => entry.includes('发起第一个变更'));
         expect(startHint).toContain(delivery === 'skills'
-          ? 'ask SourceCraft Code Assistant to use the openspec-propose skill with "your idea"'
+          ? '让 SourceCraft Code Assistant 使用 the openspec-propose skill'
           : '/opsx-propose');
       }
     );

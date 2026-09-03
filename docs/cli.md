@@ -1260,31 +1260,26 @@ openspec-cn completion generate bash > ~/.bash_completion.d/openspec
 openspec-cn completion uninstall
 ```
 
-**Windows (PowerShell):** Install completions for the current PowerShell host:
+**Windows (PowerShell):** 为当前 PowerShell 主机安装补全:
 
 ```powershell
 $env:PROFILE = $PROFILE
-openspec completion install powershell
+openspec-cn completion install powershell
 . $PROFILE
 ```
 
-`$env:PROFILE` tells OpenSpec which profile to configure in this session. The
-installer creates missing profile directories and adds a managed block that loads
-`OpenSpecCompletion.ps1`. Reloading the profile enables completions immediately.
+`$env:PROFILE` 告诉 OpenSpec 本次会话要配置哪个 profile。安装程序会创建缺失的 profile 目录,并添加一个加载 `OpenSpecCompletion.ps1` 的托管块。重新加载 profile 后补全立即生效。
 
-To uninstall from the current host, run:
+若要从当前主机卸载,运行:
 
 ```powershell
 $env:PROFILE = $PROFILE
-openspec completion uninstall powershell
+openspec-cn completion uninstall powershell
 ```
 
-Restart PowerShell after uninstalling to clear completions from the current session.
+卸载后重启 PowerShell 以清除当前会话中的补全。
 
-Completions are opt-in. The CLI mentions them once, on stderr, the first time you
-run a command in an interactive terminal, and never again — it also stays quiet
-if you already have completions installed. Set `OPENSPEC_NO_COMPLETIONS=1` to
-suppress that tip entirely.
+补全是可主动选择的。CLI 只会提及一次:第一次在交互终端中运行命令时,它会在 stderr 上提示一次,之后不会再提 —— 如果你已经安装了补全,它也会保持安静。设置 `OPENSPEC_NO_COMPLETIONS=1` 可以完全抑制该提示。
 
 ---
 

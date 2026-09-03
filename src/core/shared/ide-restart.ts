@@ -57,7 +57,8 @@ export function formatIdeRestart(
   delivery: Delivery
 ): string | null {
   const surface = resolveIdeRestartSurface(toolIds, delivery);
-  return surface
-    ? `请重启你的 IDE 以使新 ${surface === 'commands' ? '命令' : 'skills'} 生效。`
-    : null;
+  if (!surface) return null;
+  return surface === 'commands'
+    ? '请重启你的 IDE 以使新命令生效。'
+    : '请重启你的 IDE 以使新 skills 生效。';
 }

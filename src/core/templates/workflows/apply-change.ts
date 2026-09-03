@@ -135,7 +135,7 @@ ${STORE_SELECTION_GUIDANCE}
 - [x] 任务 2
 ...
 
-All tasks complete! 你可以用 \`/opsx:archive\` 归档此变更。
+所有任务完成！你可以用 \`/opsx:archive\` 归档此变更。
 \`\`\`
 
 **暂停时输出（遇到问题）**
