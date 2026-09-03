@@ -112,7 +112,7 @@ openspec-cn init [path] [options]
 
 当设置了 `OPENSPEC_NO_ANIMATION` 环境变量(任意值,包括空值)、`NO_COLOR` 被设为非空值,或操作系统启用了减弱动态效果偏好(macOS 的"减弱动态效果"、GNOME 关闭动画)时,欢迎动画同样会被跳过。
 
-**支持的工具 ID(`--tools`)** — `windsurf` 同样被接受,作为 `devin` 的别名:`amazon-q`, `antigravity`, `auggie`, `bob`, `claude`, `cline`, `command-code`, `codeartsagent`, `codex`, `devin`, `forgecode`, `codebuddy`, `continue`, `costrict`, `crush`, `cursor`, `factory`, `gemini`, `github-copilot`, `hermes`, `iflow`, `junie`, `kilocode`, `kimi`, `kiro`, `lingma`, `minimax-code`, `vibe`, `oh-my-pi`, `opencode`, `pi`, `qoder`, `qwen`, `roocode`, `trae`, `zed`, `zcode`, `agents`
+**支持的工具 ID(`--tools`)** — `windsurf` 同样被接受,作为 `devin` 的别名:`amazon-q`, `antigravity`, `auggie`, `bob`, `claude`, `cline`, `command-code`, `codeartsagent`, `codex`, `devin`, `forgecode`, `codebuddy`, `continue`, `costrict`, `crush`, `cursor`, `factory`, `gemini`, `github-copilot`, `hermes`, `iflow`, `junie`, `kilocode`, `kimi`, `kiro`, `lingma`, `minimax-code`, `vibe`, `oh-my-pi`, `opencode`, `pi`, `codeassistant`, `qoder`, `qwen`, `rovodev`, `roocode`, `trae`, `zed`, `zcode`, `agents`
 
 > 该列表与 `src/core/config.ts` 中的 `AI_TOOLS` 对应。各工具的 skill 与命令路径见 [支持的工具](supported-tools.md)。
 
@@ -651,6 +651,22 @@ openspec-cn archive add-dark-mode --yes
 # 归档不影响 specs 的工具类变更
 openspec-cn archive update-ci-config --skip-specs
 ```
+
+**退役一个能力:** 把退役标记加到变更元数据中:
+
+```yaml
+# openspec/changes/retire-legacy/.openspec.yaml
+schema: spec-driven
+retire_capabilities: true
+```
+
+然后正常归档该变更:
+
+```bash
+openspec-cn archive retire-legacy --yes
+```
+
+当该变更移除了此能力的最后一条需求时,OpenSpec 会删除其活跃的 `spec.md`。同一变更中其他能力的增量仍会更新它们的主 spec。若没有该标记,归档会在改动任何文件之前停止,并提示你添加它。
 
 **执行动作:**
 
@@ -1237,12 +1253,33 @@ openspec-cn completion install
 # 为指定 shell 安装
 openspec-cn completion install zsh
 
-# 生成脚本以手动安装
+# 生成脚本以手动安装(bash)
 openspec-cn completion generate bash > ~/.bash_completion.d/openspec
 
 # 卸载
 openspec-cn completion uninstall
 ```
+
+**Windows (PowerShell):** Install completions for the current PowerShell host:
+
+```powershell
+$env:PROFILE = $PROFILE
+openspec completion install powershell
+. $PROFILE
+```
+
+`$env:PROFILE` tells OpenSpec which profile to configure in this session. The
+installer creates missing profile directories and adds a managed block that loads
+`OpenSpecCompletion.ps1`. Reloading the profile enables completions immediately.
+
+To uninstall from the current host, run:
+
+```powershell
+$env:PROFILE = $PROFILE
+openspec completion uninstall powershell
+```
+
+Restart PowerShell after uninstalling to clear completions from the current session.
 
 Completions are opt-in. The CLI mentions them once, on stderr, the first time you
 run a command in an interactive terminal, and never again — it also stays quiet

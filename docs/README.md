@@ -76,6 +76,7 @@ OpenSpec 帮你和你的 AI 编程助手**在写任何代码之前先就“要�
 | [定制化](customization.md) | 项目配置、自定义 schema、共享上下文 |
 | [多语言](multi-language.md) | 生成英语之外其他语言的制品 |
 | [支持的工具](supported-tools.md) | OpenSpec 集成的 30+ 种 AI 工具,以及文件会落到哪里 |
+| [社区展示](community.md) | 基于 OpenSpec 构建的项目与资源 |
 
 ### 当你需要帮助时
 

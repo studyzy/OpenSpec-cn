@@ -20,11 +20,11 @@ OpenSpec 复用了一些在 git、CI 和 Agent 工具中含义不同的词。每
 | **Legacy workflow** | OPSX 之前的 `/openspec:*` 命令。 | [迁移](../help/legacy/migration.md) |
 | **Loop** | 变更提案经历的一个循环：explore、propose、review、apply、archive。 | [快速开始](../start/quickstart.md) |
 | **Main specs** | `openspec/specs/` 目录树：你系统当前已达成一致的行为。归档会把增量规范（delta specs）合并进去。 | [核心概念](../guides/concepts.md) |
-| **OpenSpec root** | 命令解析并操作的 `openspec/` 目录树：你仓库的，或某个 store 的。 | [Stores](configuration/stores.md) |
+| **OpenSpec root** | 命令解析并操作的 `openspec/` 目录树：你仓库的，或某个 store 的。 | [Stores](../multi-repo/stores.md#where-artifacts-get-created-when-using-stores) |
 | **OPSX** | 当前的 OpenSpec 工作流系统，以及它安装的命令前缀（`/opsx:`）。 | [架构](architecture/index.md) |
 | **Profile** | init 安装哪些工作流：`core` 或 `custom`。 | [Profiles](../customize/profiles.md) |
 | **Propose** | 一步创建变更提案并生成其全部规划制品。Skill：`openspec-propose`。 | [快速开始](../start/quickstart.md) |
-| **Registry** | 机器级已注册 store 列表，位于 `registry.yaml`。不是包注册表。 | [Stores](configuration/stores.md) |
+| **Registry** | 机器级已注册 store 列表，位于 `registry.yaml`。不是包注册表。 | [CLI](cli.md#openspec-store) |
 | **Requirement** | 系统必须具备的一个行为，用 SHALL 书写：spec 中的 `### Requirement:`。 | [增量规范（delta specs）](schemas/spec-driven/index.md#delta-specs-specmd) |
 | **Scenario** | 需求下一个可测试的示例，以 WHEN/THEN 形式书写。 | [增量规范（delta specs）](schemas/spec-driven/index.md#delta-specs-specmd) |
 | **Schema** | 定义变更提案产生哪些制品以及按什么顺序产生。不是 JSON Schema。 | [Schemas](schemas/index.md) |

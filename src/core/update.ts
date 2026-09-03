@@ -27,6 +27,7 @@ import {
   resolveToolSkillsDir,
   toolSupportsSkills,
   type ToolVersionStatus,
+  formatIdeRestart,
 } from './shared/index.js';
 import {
   detectLegacyArtifacts,
@@ -501,18 +502,9 @@ export class UpdateCommand {
 
     console.log();
     const affectedToolIds = [...new Set([...newlyConfiguredTools, ...updatedToolIds])];
-    const shouldRestartIde = affectedToolIds.some((toolId) => {
-      const tool = AI_TOOLS.find((candidate) => candidate.value === toolId);
-      return Boolean(
-        tool?.requiresIdeRestart &&
-        (
-          shouldGenerateCommandsForTool(toolId, delivery) ||
-          shouldGenerateSkillsForTool(toolId, delivery)
-        )
-      );
-    });
-    if (shouldRestartIde) {
-      console.log(chalk.dim('重启 IDE 以使更改生效。'));
+    const restartHint = formatIdeRestart(affectedToolIds, delivery);
+    if (restartHint) {
+      console.log(chalk.dim(restartHint));
     }
     if (failedTools.length > 0) {
       throw new Error(`OpenSpec 更新失败：${failedTools.map((tool) => tool.name).join(', ')}`);

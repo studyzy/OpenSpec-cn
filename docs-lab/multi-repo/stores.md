@@ -202,7 +202,7 @@ OpenSpec 把制品写入两个地方之一：你项目的 `openspec/` 文件夹�
 3. **你项目里的 `store:` 行。** store-only 项目记录其 store 的方式。
 4. **你机器上的 `defaultStore`。** 以上都不适用时的回退。
 
-无论哪项生效，OpenSpec 的第一行输出都会说出它操作的文件夹（`Using OpenSpec root: ...`）。确切的规则，包括各种错误情况，见 [配置 › Stores](../reference/configuration/stores.md)。
+当 OpenSpec 选中一个 store 时，它会在命令输出之前打印 `Using OpenSpec root: ...`。确切的规则，包括各种错误情况，见 [配置 › Stores](../reference/configuration/stores.md)。
 
 ### `store:` 那一行（store-only 项目）
 

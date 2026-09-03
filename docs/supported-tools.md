@@ -85,7 +85,8 @@ OpenSpec 生成的文件，以及设置完成后打印的 "Getting started" 提�
 | Oh My Pi (`oh-my-pi`) | `.omp/skills/openspec-*/SKILL.md` | `.omp/commands/opsx-<id>.md` |
 | OpenCode (`opencode`) | `.opencode/skills/openspec-*/SKILL.md` | `.opencode/commands/opsx-<id>.md` |
 | Pi (`pi`) | `.pi/skills/openspec-*/SKILL.md` | `.pi/prompts/opsx-<id>.md` |
-| Qoder (`qoder`) | `.qoder/skills/openspec-*/SKILL.md` | `.qoder/commands/opsx-<id>.md` |
+| SourceCraft Code Assistant for VS Code (`codeassistant`) | `.codeassistant/skills/openspec-*/SKILL.md` | `.codeassistant/commands/opsx-<id>.md` |
+| Qoder (`qoder`) | `.qoder/skills/openspec-*/SKILL.md` | `.qoder/commands/opsx/<id>.md` |
 | Qwen Code (`qwen`) | `.qwen/skills/openspec-*/SKILL.md` | `.qwen/commands/opsx-<id>.md` |
 | [Rovo Dev CLI](https://support.atlassian.com/rovo/docs/use-rovo-dev-cli/) (`rovodev`) | `.rovodev/skills/openspec-*/SKILL.md` | 不生成。Rovo 没有斜杠命令入口 —— 它会自动匹配 skills，或通过提示词匹配（例如"使用 openspec-propose skill"）；`/skills` 只用于管理它们。生成的内容按名称引用 skills，绝不会写成 `/openspec-*` 命令。 |
 | [Zoo Code](https://github.com/Zoo-Code-Org/Zoo-Code) (`roocode`) | `.roo/skills/openspec-*/SKILL.md` | `.roo/commands/opsx-<id>.md` |
@@ -99,6 +100,10 @@ OpenSpec 生成的文件，以及设置完成后打印的 "Getting started" 提�
 \*\*\* Hermes 默认从 `~/.hermes/skills/` 加载 skills。若要使用项目本地的 OpenSpec skills，请把项目的 `.hermes/skills/` 目录加入 `~/.hermes/config.yaml` 中的 `skills.external_dirs`；此后 Hermes 会以面向用户的斜杠调用形式暴露这些 skills，例如 `/openspec-propose`。
 
 \*\*\*\* Windsurf 已于 2026 年 6 月 2 日[更名为 Devin Desktop](https://docs.devin.ai/desktop/devin-desktop-faq)，其配置目录也随之迁移：`.devin/` 是首选的读写位置，`.windsurf/` 则是仅可读的旧版回退位置。OpenSpec 跟进了这次更名 —— 工具 id 为 `devin`，而 `--tools windsurf` 仍会解析到它，以便既有的配置脚本继续可用。如果某个项目的 OpenSpec 文件仍留在 `.windsurf/` 中，下一次 `openspec-cn update` 时会提示你迁移；拒绝则原样保留，而你自己写的文件永远不会被触碰。工作流按文件名调用，因此 `.devin/workflows/opsx-apply.md` 对应 `/opsx-apply`。[Devin Local Agent 不支持工作流](https://docs.devin.ai/desktop/devin-local) —— 它只支持 skills，且完全不读取 `.windsurf/` —— 因此每当 OpenSpec 写入 Devin skills 时，都会让它们的正文以及 getting-started 提示保持使用 `/openspec-*` 这种 skill 调用形式，这在两个 Agent 上都能用。在仅 commands 的交付模式下不会写入任何 skills，两者都回退到 `/opsx-*`。
+
+SourceCraft Code Assistant 支持面向其 VS Code 扩展。它的[自定义命令](https://sourcecraft.dev/portal/docs/en/code-assistant/operations/agent/slash-commands)和[技能](https://sourcecraft.dev/portal/docs/ru/code-assistant/operations/agent/skills)仅在 VS Code 中可用。此集成不会配置 SourceCraft 网页版或 JetBrains。
+
+在仅 skills 的交付模式下，请让 Code Assistant 使用 `openspec-propose` skill 并附上你的想法。skills 通过请求匹配激活；OpenSpec 不会为此工具生成 `/openspec-*` 命令。
 
 MiniMax Code 是一个全局的、仅支持 skills 的集成。OpenSpec 只会在
 `~/.minimax/skills/` 下写入它的 `openspec-*` 目录；它不会创建仓库本地的
@@ -171,7 +176,7 @@ openspec-cn init --tools none
 openspec-cn init --profile core
 ```
 
-**可用工具 ID(`--tools`)** —— `windsurf` 也可接受，作为 `devin` 的别名：`amazon-q`, `antigravity`, `auggie`, `bob`, `claude`, `cline`, `command-code`, `codeartsagent`, `codex`, `devin`, `forgecode`, `codebuddy`, `continue`, `costrict`, `crush`, `cursor`, `factory`, `gemini`, `github-copilot`, `hermes`, `iflow`, `junie`, `kilocode`, `kimi`, `kiro`, `lingma`, `minimax-code`, `vibe`, `oh-my-pi`, `opencode`, `pi`, `qoder`, `qwen`, `roocode`, `trae`, `zed`, `zcode`, `agents`
+**可用工具 ID(`--tools`)** —— `windsurf` 也可接受，作为 `devin` 的别名：`amazon-q`, `antigravity`, `auggie`, `bob`, `claude`, `cline`, `command-code`, `codeartsagent`, `codex`, `devin`, `forgecode`, `codebuddy`, `continue`, `costrict`, `crush`, `cursor`, `factory`, `gemini`, `github-copilot`, `hermes`, `iflow`, `junie`, `kilocode`, `kimi`, `kiro`, `lingma`, `minimax-code`, `vibe`, `oh-my-pi`, `opencode`, `pi`, `codeassistant`, `qoder`, `qwen`, `rovodev`, `roocode`, `trae`, `zed`, `zcode`, `agents`
 
 ## 依赖工作流的安装
 

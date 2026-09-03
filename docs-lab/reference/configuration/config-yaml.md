@@ -56,7 +56,7 @@ operations:
 
 ### store
 
-用作 OpenSpec 根目录的 store id，仅当此 openspec/ 目录为纯配置（没有 specs/ 或 changes/）时才查询。它是回退，绝不是覆盖。完整的解析阶梯参见 [根目录解析](stores.md#root-resolution)。
+用作 OpenSpec 根目录的 store id，仅当此 openspec/ 目录为纯配置（没有 specs/ 或 changes/）时才查询。它是回退，绝不是覆盖。完整的解析阶梯参见 [根目录解析](../../multi-repo/stores.md#where-artifacts-get-created-when-using-stores)。
 
 ### references
 

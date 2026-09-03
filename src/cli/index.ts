@@ -514,6 +514,7 @@ program
   .option('--changes', '验证所有更改')
   .option('--specs', '验证所有规范')
   .option('--archived', '验证已归档的更改是否所有任务已完成（用于 pre-commit lint）')
+  .option('--report <full|findings>', '选择批量报告内容：full|findings；配合 --json 输出 JSON')
   .option('--type <type>', '当项目类型不明确时指定类型：change|spec')
   .option('--strict', '启用严格验证模式')
   .option('--json', '以JSON格式输出验证报告')
@@ -521,7 +522,7 @@ program
   .option('--no-interactive', '禁用交互式提示')
   .option('--store <id>', STORE_OPTION_DESCRIPTION)
   .addOption(hiddenStorePathOption())
-  .action(async (itemName?: string, options?: { all?: boolean; changes?: boolean; specs?: boolean; archived?: boolean; type?: string; strict?: boolean; json?: boolean; noInteractive?: boolean; concurrency?: string; store?: string; storePath?: string }) => {
+  .action(async (itemName?: string, options?: { all?: boolean; changes?: boolean; specs?: boolean; archived?: boolean; report?: string; type?: string; strict?: boolean; json?: boolean; noInteractive?: boolean; concurrency?: string; store?: string; storePath?: string }) => {
     try {
       const validateCommand = new ValidateCommand();
       await validateCommand.execute(itemName, options);

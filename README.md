@@ -180,6 +180,7 @@ Now talk to your AI:
 → **[概念](docs/concepts.md)**：整体如何运转<br>
 → **[多语言](docs/multi-language.md)**：多语言支持<br>
 → **[自定义](docs/customization.md)**：打造你的版本<br>
+→ **[社区展示](docs/community.md)**：基于 OpenSpec 构建的项目与资源<br>
 → **[FAQ](docs/faq.md)** · **[故障排查](docs/troubleshooting.md)** · **[术语表](docs/glossary.md)**：快速帮助
 
 

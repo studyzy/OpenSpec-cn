@@ -36,7 +36,7 @@ init 将工作流作为 skills、斜杠命令还是两者安装。默认为 `bot
 
 ### defaultStore
 
-根目录解析的机器级回退 store id，仅在无 `--store` 标志、本地 `openspec/` 或项目 `store:` 指针可解析时才会用到。完整的解析阶梯参见 [根目录解析](stores.md#root-resolution)。
+根目录解析的机器级回退 store id，仅在无 `--store` 标志、本地 `openspec/` 或项目 `store:` 指针可解析时才会用到。完整的解析阶梯参见 [根目录解析](../../multi-repo/stores.md#where-artifacts-get-created-when-using-stores)。
 
 ### openers
 

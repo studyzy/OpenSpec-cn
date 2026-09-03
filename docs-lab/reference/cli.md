@@ -650,22 +650,38 @@ openspec-cn validate --all            # 每个变更和 spec
 | `--all` | 校验每个变更和 spec。 |
 | `--changes` | 校验每个变更。 |
 | `--specs` | 校验每个 spec。 |
+| `--archived` | 检查已归档变更中的任务完成情况，不校验其已应用的 spec 增量。 |
 | `--strict` | 将警告视为失败。 |
 | `--type <change\|spec>` | 当变更和 spec 同名时选择类型。 |
 | `--json` | 打印结构化报告而不是文本。 |
+| `--report <mode>` | 批量输出：`full`（默认）或 `findings`。需要显式的批量范围。 |
 | `--concurrency <n>` | 批量运行中的最大并行校验数。默认：`OPENSPEC_CONCURRENCY`，否则 6。 |
 | `--no-interactive` | 绝不提示：名称缺失或不明确即报错。 |
 | `--store <id>` | 使用已注册的 store 作为 OpenSpec 根目录，而不是当前项目。 |
 
 **输出**
 
-每个项目一行。批量运行以总计结尾：
+批量运行会为每个项目打印一行状态，随后打印所有发现，最后以总计结尾：
 
 ```
 ✓ change/add-rate-limit
 ✓ spec/api
 Totals: 2 passed, 0 failed (2 items)
 ```
+
+**归档合并发现**
+
+对于变更，validate 会针对当前主 specs 运行归档的合并构建器（不写任何文件）。它把合并冲突——例如缺少 `MODIFIED` 目标或存在冲突的 `ADDED` 需求——报告为 `INFO`：
+
+```text
+ℹ [INFO] api/spec.md: Archive would refuse this delta: api MODIFIED failed for header "### Requirement: Rate limiting" - not found
+```
+
+即使校验通过，这些发现也会出现，文本和 JSON 输出皆是如此。`INFO` 永远不会改变退出码，包括在 `--strict` 下也是如此：缺失的目标可能属于一个尚未归档的兄弟变更。已同步进主 specs 的增量遵循归档现有的合并规则。
+
+此检查不会运行归档后续的合并后 spec 校验或退役检查。干净的报告不保证归档一定会成功。
+
+若合并预检无法启动，一条 `INFO` 发现会解释原因。已有的校验发现和退出码保持不变。
 
 失败的项目列出每个问题及修复方法：
 
@@ -717,8 +733,141 @@ Next steps:
 
 **退出码**
 
-- `0`：每个已校验项目都通过。
-- `1`：某个项目失败，或本次运行无法校验任何内容（名称未知、没有可校验的内容）。
+- `0`：每个已校验项目都通过，包括空的批量范围。
+- `1`：某个项目失败、报告请求无效，或本次运行失败（例如名称未知或没有 OpenSpec 根目录）。
+
+### --report full|findings
+
+为显式的批量校验范围选择输出：
+
+- **`full`**：每个项目。这是默认值。显式的 `--report full` 保持现有输出形态，不添加报告元数据。
+- **`findings`**：只输出有问题的项目，包括带警告或信息级发现的通过项目。每个项目仍会被校验。总计、严格模式行为和退出码均不变。
+
+```bash
+openspec-cn validate --all --report findings
+openspec-cn validate --archived --report findings --json
+```
+
+**范围**
+
+| 标志 | findings 的 `report.scope` |
+|---|---|
+| `--all` | `all` |
+| `--changes` | `changes` |
+| `--specs` | `specs` |
+| `--changes --specs`，或与其他标志同用的 `--all` | `all` |
+| `--archived` | `archived` |
+
+两种显式报告模式都会拒绝：位置参数 item-name、缺少批量范围，以及 archive 范围与活跃范围组合使用。
+
+#### findings 文本输出
+
+**人类可读输出**：stdout 打印 `Scope: <scope> (<count> items)`，然后是总计。没有带问题的项目时：
+
+```text
+Scope: all (2 items)
+No item findings.
+Totals: 2 passed, 0 failed (2 items)
+```
+
+带问题项目的标签、严重级别标签、路径和消息打印到 stderr。活跃范围失败时在总计之后保留 `Details:` 重跑提示。现有的 root 横幅和进度输出可能出现在报告之前。
+
+#### findings JSON 输出
+
+`--report findings --json` 打印单个文档。本例中有两个干净的项目：
+
+```json
+{
+  "report": {
+    "kind": "validation-findings",
+    "version": "1.0",
+    "scope": "all",
+    "returnedItems": 0,
+    "totalItems": 2
+  },
+  "itemFindings": [],
+  "summary": {
+    "totals": { "items": 2, "passed": 2, "failed": 0 },
+    "byType": {
+      "change": { "items": 1, "passed": 1, "failed": 0 },
+      "spec": { "items": 1, "passed": 1, "failed": 0 }
+    }
+  },
+  "root": { "path": "/Users/you/projects/my-app", "source": "nearest" }
+}
+```
+
+- **`report.kind` 与 `report.version`**：标识 `validation-findings` 形态，版本 `1.0`。没有顶层 `version` 或 `items`。
+- **`report.returnedItems` 与 `report.totalItems`**：分别统计返回的记录数和所有已校验项目数。
+- **`itemFindings`**：`issues` 数组非空的完整项目记录。包含 `ERROR`、`WARNING` 和 `INFO` 问题。每条记录保留 `id`、`type`、`valid`、`issues` 和 `durationMs`。已归档项目使用 `type: "change"`。
+- **`summary`**：完整运行的总计与按类型计数，而不是返回子集的计数。空范围的总计为零并退出 0。
+- **`root`**：与完整报告相同的已选根目录元数据。
+
+**记录保真**：返回的项目保持其在完整报告中的顺序以及项目或问题上的任何附加字段。过滤不会改写消息或位置，包括可选的 `line` 和 `column` 字段。
+
+**命令失败**：根目录选择或项目发现失败时保留现有 `status` 诊断并退出 1。它们不会返回已完成的 findings 报告或成功的空报告。
+
+#### 无效的报告请求
+
+两种显式报告模式都会在根目录选择或项目发现之前拒绝这些请求：
+
+- 不支持的 report 值，包括空字符串。
+- 位置参数 item-name，即使带有批量标志。
+- 没有显式的批量范围。
+- `--archived` 与 `--all`、`--changes` 或 `--specs` 组合。
+
+在 JSON 模式下，被拒绝的请求以仅含单元素 `status` 数组的形式退出 1。没有 `root` 或报告载荷：
+
+```bash
+openspec-cn validate --all --report bogus --json
+```
+
+```json
+{
+  "status": [
+    {
+      "severity": "error",
+      "code": "invalid_validation_report_request",
+      "message": "Unknown validation report 'bogus'.",
+      "fix": "Use --report full|findings with --all, --changes, --specs, or --archived, without an item name. Do not combine archived and active scopes."
+    }
+  ]
+}
+```
+
+人类可读模式把错误打印到 stderr。不带值的裸 `--report` 是 Commander 在 stderr 上的语法错误，包括与 `--json` 同用；它不使用这个诊断信封。
+
+#### 从外部过滤完整报告
+
+对于自定义 JSON 视图，使用 `jq` 或 PowerShell 过滤完整报告。这些脚本示例保留校验退出码，并保持命令错误文档原样。
+
+在 Bash 中配合 `jq`：
+
+```bash
+if validation_json=$(openspec-cn validate --all --json); then
+  validation_exit=0
+else
+  validation_exit=$?
+fi
+printf '%s\n' "$validation_json" |
+  jq 'if has("items") then .items |= map(select(.issues | length > 0)) else . end'
+exit "$validation_exit"
+```
+
+在 PowerShell 中：
+
+```powershell
+$validationJson = openspec-cn validate --all --json
+$validationExit = $LASTEXITCODE
+$validationReport = $validationJson | ConvertFrom-Json
+if ($validationReport.PSObject.Properties.Name -contains 'items') {
+  $validationReport.items = @($validationReport.items | Where-Object { $_.issues.Count -gt 0 })
+}
+$validationReport | ConvertTo-Json -Depth 100
+exit $validationExit
+```
+
+这些自定义视图保留完整报告的键，但省略干净的项目。它们既不是完整的 full-v1 报告，也不是版本化的 `--report findings` 形态。
 
 ## openspec-cn archive
 
