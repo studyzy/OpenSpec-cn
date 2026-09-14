@@ -68,7 +68,7 @@
 `ReferenceIndexEntry`：`{ "store_id", "root"?, "specs"?: [{id,summary}], "fetch"?, "status": [] }` —— 已解析的条目携带 root/specs/fetch；未解析的条目携带 store_id + 警告状态。索引上限 50KB（`reference_index_truncated`）。
 
 ### 4.6 `instructions apply --json`
-`{ "changeName", "changeDir", "schemaName", "contextFiles": { "<artifactId>": ["/abs", ...] }, "progress": {total,complete,remaining}, "tasks": [{id,description,done}], "state": "blocked"|"all_done"|"ready", "missingArtifacts"?, "instruction", "references"?, "context"?, "operationGuidance"?, "root" }`。这两个可选字段在每次调用时都会从选中的根目录读取。`context` 是提示词层面的必需输入，其中相关的项目事实、约定与约束必须被应用；`operationGuidance` 是建议性输入，仅当其条目适用且与内置工作流兼容时才遵循。两者都独立于 state、tasks、progress、上下文文件以及内置 instruction。
+`{ "changeName", "changeDir", "schemaName", "contextFiles": { "<artifactId>": ["/abs", ...] }, "progress": {total,complete,remaining}, "tasks": [{id,description,done}], "state": "blocked"|"all_done"|"ready", "missingArtifacts"?, "missingPrerequisites"?, "warnings"?, "instruction", "references"?, "context"?, "operationGuidance"?, "root" }`。`missingArtifacts` 是 apply 被阻塞的原因（schema 的 `apply.requires`）；`missingPrerequisites` 是 apply 能运行前仍需构建的全部内容，按构建顺序排列 —— 即那些 requires 的传递闭包，因此可能是更长的列表。`warnings` 列出变更本身的非阻塞问题 —— 目前是「已就绪可实现，但没有增量规范（delta specs）且没有 `skip_specs: true`」这一会被 `openspec validate` 拒绝的状态。两个可选根目录字段（`context`、`operationGuidance`）在每次调用时都会从选中的根目录读取。`context` 是提示词层面的必需输入，其中相关的项目事实、约定与约束必须被应用；`operationGuidance` 是建议性输入，仅当其条目适用且与内置工作流兼容时才遵循。两者都独立于 state、tasks、progress、上下文文件以及内置 instruction。
 
 ### 4.7 `instructions archive --json`
 `{ "changeName", "context"?, "operationGuidance"?, "root" }`。要求在已解析的仓库/store 根目录中存在有效的 `--change`，并采用与 apply 相同的「必需上下文 / 建议性指引」语义。这是一个只读的运行时输入接口：它不返回静态的归档工作流，不检查或合并增量规范（delta specs），不写入主 specs，也不移动变更。

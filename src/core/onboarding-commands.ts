@@ -10,7 +10,7 @@
  * src/utils/command-references.ts at the call site.
  */
 
-import type { WorkflowId } from './profiles.js';
+import { ALL_WORKFLOWS, type WorkflowId } from './profiles.js';
 
 export type OnboardingCommand = {
   workflow: WorkflowId;
@@ -47,4 +47,33 @@ export function getOnboardingCommands(
 ): OnboardingCommand[] {
   const installed = new Set(workflows);
   return ONBOARDING_COMMANDS.filter((entry) => installed.has(entry.workflow));
+}
+
+/**
+ * Returns the note telling a user which workflows their profile left out, or
+ * null when every workflow is already installed.
+ *
+ * Setup output otherwise never names the workflows that exist but were not
+ * installed, so a user on the default profile has no way to learn that
+ * `/opsx:ff` and friends are one command away. The docs say it; nobody reads
+ * the docs before typing a command that isn't there.
+ */
+export function formatOptionalWorkflowsNote(
+  installedWorkflows: readonly string[]
+): string[] | null {
+  const installed = new Set(installedWorkflows);
+  const missing = ALL_WORKFLOWS.filter((workflow) => !installed.has(workflow));
+
+  if (missing.length === 0) {
+    return null;
+  }
+
+  const pronoun = missing.length === 1 ? '它' : '它们';
+  // `openspec config profile` offers to apply to this project before it
+  // exits, and prints the `openspec update` guidance itself when declined, so
+  // naming a second command here would be one step too many.
+  return [
+    `注意：还有 ${missing.length} 个可用工作流（${missing.join(', ')}）。`,
+    `用 \`openspec-cn config profile\` 添加${pronoun}。`,
+  ];
 }

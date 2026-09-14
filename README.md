@@ -238,9 +238,13 @@ openspec-cn update
 
 **较大改动** —— 对于新功能、重大重构或架构调整，请先提交一个 OpenSpec 变更提案，以便在实现前对齐意图与目标。
 
+打开 PR 之前，请先开启一个 discussion（针对核心设计变更）或 issue，并在 PR 中链接该 issue 或 discussion。
+
 撰写提案时，请牢记 OpenSpec 的理念：我们服务于各种不同的编码代理、模型与使用场景。改动应对所有人都工作良好。
 
 **欢迎 AI 生成代码** —— 只要经过测试与验证即可。包含 AI 生成代码的 PR 应注明使用的编码代理与模型（例如："Generated with Claude Code using claude-opus-4-5-20251101"）。
+
+→ **[CONTRIBUTING.md](CONTRIBUTING.md)**：从提出第一个 issue 到 PR 合入的完整流程
 
 ### 开发
 

@@ -124,6 +124,14 @@ openspec-cn list --json
 - 它们的名称、schema 和状态
 - 用户可能在做什么
 
+那是*变更*列表 - 进行中的工作。它不包含项目持久稳固的能力，所以也要把它们列出来：
+\`\`\`bash
+openspec-cn list --specs
+\`\`\`
+加上 \`--json\` 可获取 id 与需求数量；仅当目标是已注册的独立 store 时才追加 \`--store "<id>"\`。这是项目已声明自身能做什么的清单，而单独的 \`openspec-cn list\` 永远不会显示它。要查看其中一项，运行 \`openspec-cn show "<spec-id>" --type spec --json --no-scenarios\`（\`--store\` 规则同上）- 它会返回该能力的 Purpose 与需求文本，而不会把整个 spec 文件拉进上下文；\`--type spec\` 可防止同名的变更让结果产生歧义。
+
+这种带过滤的读取只是一份概览。在判断哪些内容已被覆盖或应当变更之前，请用 \`openspec-cn show "<spec-id>" --type spec\`（\`--store\` 规则同上）完整阅读每个相关 spec，包括其中的场景。
+
 然后从解析的根路径读取项目自身的上下文 - \`<root.path>/openspec/config.yaml\`（或 \`config.yml\`）。使用上面返回的 \`root.path\`，若两者均不存在则跳过：
 - \`context\`：项目背景 - 技术栈、约定、约束
 - \`rules\`：按制品 ID 索引 - 某个制品的条目仅在你写入该制品时适用
@@ -445,6 +453,14 @@ openspec-cn list --json
 - 是否有活跃变更
 - 它们的名称、schema 和状态
 - 用户可能在做什么
+
+那是*变更*列表 - 进行中的工作。它不包含项目持久稳固的能力，所以也要把它们列出来：
+\`\`\`bash
+openspec-cn list --specs
+\`\`\`
+加上 \`--json\` 可获取 id 与需求数量；仅当目标是已注册的独立 store 时才追加 \`--store "<id>"\`。这是项目已声明自身能做什么的清单，而单独的 \`openspec-cn list\` 永远不会显示它。要查看其中一项，运行 \`openspec-cn show "<spec-id>" --type spec --json --no-scenarios\`（\`--store\` 规则同上）- 它会返回该能力的 Purpose 与需求文本，而不会把整个 spec 文件拉进上下文；\`--type spec\` 可防止同名的变更让结果产生歧义。
+
+这种带过滤的读取只是一份概览。在判断哪些内容已被覆盖或应当变更之前，请用 \`openspec-cn show "<spec-id>" --type spec\`（\`--store\` 规则同上）完整阅读每个相关 spec，包括其中的场景。
 
 然后从解析的根路径读取项目自身的上下文 - \`<root.path>/openspec/config.yaml\`（或 \`config.yml\`）。使用上面返回的 \`root.path\`，若两者均不存在则跳过：
 - \`context\`：项目背景 - 技术栈、约定、约束

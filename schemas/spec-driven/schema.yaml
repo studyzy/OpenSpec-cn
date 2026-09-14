@@ -18,7 +18,17 @@ artifacts:
       - **Impact**：受影响的代码、API、依赖或系统。
 
       重要：Capabilities 章节至关重要。它构成 proposal 阶段与 specs 阶段之间的契约。
-      填写前请先调研既有的 specs。此处列出的每个能力都需要一个对应的 spec 文件。
+      填写前请先调研既有的 specs：运行 `openspec-cn list --specs` 获取项目的能力清单，
+      然后对其中看起来相关的项运行 `openspec-cn show "<spec-id>" --type spec --json --no-scenarios`
+      —— 它会返回某个能力的 Purpose 与需求文本，而不会把整个 spec 文件拉进上下文。
+      仅当目标是已注册的独立 store 时，才给这两条命令追加 `--store "<id>"`，并保留 `--type
+      spec`：否则同名的一个变更和一个 spec 会触发 ambiguous-item 错误。不带 `--specs` 的
+      `openspec list` 列出的是进行中的变更而非 specs —— 它永远不会显示项目已覆盖的内容。
+      应复用既有能力的精确路径，而不是引入近似重复的名称。
+      这种带过滤的读取只是一份概览。在判断哪些内容已被覆盖或应当变更之前，请用
+      `openspec-cn show "<spec-id>" --type spec`（`--store` 规则同上）完整阅读每个相关
+      spec，包括其中的场景。
+      此处列出的每个能力都需要一个对应的 spec 文件。
 
       每个变更要么至少声明一个能力（新增或修改），要么显式声明不需要 specs：
       `openspec-cn validate` 会拒绝零 delta 的变更，除非该变更的 `.openspec.yaml`
@@ -60,7 +70,7 @@ artifacts:
       `<capability-path>` 是相对于 `specs/` 的 spec 目录（例如
       `user-auth` 或 `identity/user-auth`）。请保留完整路径：
       - 新能力：使用 proposal 中给出的精确路径，创建于 `specs/<capability-path>/spec.md`。proposal 中新引入的任何路径片段都必须是 kebab-case。遵循项目现有的组织方式；当项目采用扁平布局时，不要新增一层领域目录。
-      - 修改的能力：在 `specs/<capability-path>/spec.md` 创建 delta 时，使用 `openspec/specs/<capability-path>/` 下已存在的精确路径。不要移动或重命名该能力。
+      - 修改的能力：在 `specs/<capability-path>/spec.md` 创建 delta 时，使用 `openspec/specs/<capability-path>/` 下已存在的精确路径。写 delta 前先运行 `openspec-cn list --specs` 确认该路径，仅当目标是已注册的独立 store 时才追加 `--store "<id>"` —— 路径拼错或臆造会指向一个不存在的能力，而不是你想要的那个。不要移动或重命名该能力。
 
       必须至少有一个 spec 文件，除非该变更的 `.openspec.yaml`
       设置了 `skip_specs: true`（表示没有 spec 层面的行为变化）——
