@@ -16,7 +16,11 @@ console.log('🔨 Building OpenSpec...\n');
 // Clean dist directory
 if (existsSync('dist')) {
   console.log('Cleaning dist directory...');
-  rmSync('dist', { recursive: true, force: true });
+  // `maxRetries`/`retryDelay` cover a transient ENOTEMPTY on macOS: the
+  // directory entries of a just-removed tree can linger briefly, which is the
+  // common case when two builds run back to back (e.g. `make install` runs
+  // `pnpm install`, whose `prepare` script builds, and then `pnpm run build`).
+  rmSync('dist', { recursive: true, force: true, maxRetries: 10, retryDelay: 100 });
 }
 
 // Run TypeScript compiler (use local version explicitly)
