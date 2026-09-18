@@ -62,20 +62,41 @@ export function buildActionContext(input: ActionContextInput): ActionContext {
   };
 }
 
-export function buildNextSteps(input: ChangeNextStepsInput): string[] {
+/**
+ * The one next action for a change, in both the forms the CLI needs.
+ *
+ * `sentence` is what the JSON `nextSteps` contract publishes; `command` is the
+ * bare command the text surface prints. Both are built here so the two
+ * surfaces can never name a different next step.
+ */
+export interface ChangeNextStep {
+  /** Ready-to-run command, including any `--store` flag. */
+  command: string;
+  /** Sentence form carried by the JSON `nextSteps` array. */
+  sentence: string;
+}
+
+export function resolveNextStep(input: ChangeNextStepsInput): ChangeNextStep | undefined {
   const readyArtifact = input.artifactStatuses.find((artifact) => artifact.status === 'ready');
-  const steps: string[] = [];
   const storeFlag = input.storeId ? ` --store ${input.storeId}` : '';
 
   if (readyArtifact) {
-    steps.push(
-      `运行 openspec-cn instructions ${readyArtifact.id} --change "${input.changeName}"${storeFlag} --json，然后再编写该制品。`
-    );
-  } else if (input.allArtifactsComplete) {
-    steps.push(
-      `所有规划制品均已完成。运行 openspec-cn instructions apply --change "${input.changeName}"${storeFlag} --json 以检查实现进度。`
-    );
+    const command = `openspec-cn instructions ${readyArtifact.id} --change "${input.changeName}"${storeFlag} --json`;
+    return { command, sentence: `运行 ${command}，然后再编写该制品。` };
   }
 
-  return steps;
+  if (input.allArtifactsComplete) {
+    const command = `openspec-cn instructions apply --change "${input.changeName}"${storeFlag} --json`;
+    return {
+      command,
+      sentence: `所有规划制品均已完成。运行 ${command} 以检查实现进度。`,
+    };
+  }
+
+  return undefined;
+}
+
+export function buildNextSteps(input: ChangeNextStepsInput): string[] {
+  const step = resolveNextStep(input);
+  return step ? [step.sentence] : [];
 }

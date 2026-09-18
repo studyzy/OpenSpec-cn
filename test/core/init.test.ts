@@ -518,45 +518,60 @@ describe('InitCommand', () => {
         );
       }
 
-      const updateVariants: Array<[string, string]> = [
-        [
-          await fs.readFile(
-            path.join(
-              testDir,
-              '.claude',
-              'skills',
-              'openspec-update-change',
-              'SKILL.md'
-            ),
-            'utf-8'
+      // The default profile installs six workflows; `continue` and `new` are
+      // not among them. Nothing it generates may name them (#1734) - it would
+      // send the agent to a skill that was never written. The CLI fallback is
+      // stated outright instead of behind a runtime availability check.
+      const updateVariants = [
+        await fs.readFile(
+          path.join(
+            testDir,
+            '.claude',
+            'skills',
+            'openspec-update-change',
+            'SKILL.md'
           ),
-          '`/opsx:continue`',
-        ],
-        [
-          await fs.readFile(
-            path.join(testDir, '.claude', 'commands', 'opsx', 'update.md'),
-            'utf-8'
-          ),
-          '`/opsx:continue`',
-        ],
+          'utf-8'
+        ),
+        await fs.readFile(
+          path.join(testDir, '.claude', 'commands', 'opsx', 'update.md'),
+          'utf-8'
+        ),
       ];
 
-      for (const [content, continueReference] of updateVariants) {
-        const availabilityGuidance = content.indexOf(
-          `${continueReference} 是一个可选工作流，可能未安装`
-        );
-        const nextReference = content.indexOf(
-          continueReference,
-          availabilityGuidance + continueReference.length
-        );
-
-        expect(availabilityGuidance).toBeGreaterThanOrEqual(0);
-        expect(content.indexOf(continueReference)).toBe(availabilityGuidance);
-        expect(nextReference).toBeGreaterThan(availabilityGuidance);
+      for (const content of updateVariants) {
+        expect(content).not.toContain('/opsx:continue');
+        expect(content).not.toContain('/opsx:new');
+        expect(content).not.toContain('is an optional workflow and may not be installed');
+        expect(content).toContain('它绝不创建缺失的制品');
         expect(content).toContain('openspec-cn status --change "<name>" --json');
         expect(content).toContain(
           'openspec-cn instructions "<artifact-id>" --change "<name>" --json'
         );
+        expect(content).toContain('openspec-cn new change "<new-change-name>"');
+      }
+
+      const applyVariants = [
+        await fs.readFile(
+          path.join(testDir, '.claude', 'skills', 'openspec-apply-change', 'SKILL.md'),
+          'utf-8'
+        ),
+        await fs.readFile(
+          path.join(testDir, '.claude', 'commands', 'opsx', 'apply.md'),
+          'utf-8'
+        ),
+      ];
+
+      for (const content of applyVariants) {
+        // The core profile has no `continue`, so the blocked-state handoff
+        // must be the CLI recovery in full, not a workflow this install lacks.
+        expect(content).not.toContain('/opsx:continue');
+        expect(content).toContain('openspec-cn status --change "<name>" --json');
+        expect(content).toContain('下一个 `ready` 制品（而非 `skipped` 或 `blocked`）');
+        expect(content).toContain(
+          'openspec-cn instructions "<artifact-id>" --change "<name>" --json'
+        );
+        expect(content).toContain('两条命令都要保留已选中的 `--store <id>`');
       }
 
       const syncFiles = [
@@ -1012,7 +1027,7 @@ describe('InitCommand', () => {
         .map(String);
       expect(logCalls.some((entry) => entry.includes('已创建：Codex'))).toBe(true);
       expect(logCalls.some((entry) => entry.includes('Zed Agent'))).toBe(true);
-      expect(logCalls.some((entry) => entry.includes('Shared .agents skills'))).toBe(true);
+      expect(logCalls.some((entry) => entry.includes('Other / Universal (shared .agents skills)'))).toBe(true);
       expect(
         logCalls.some((entry) => entry.includes('共享 .agents/skills 目录'))
       ).toBe(true);
@@ -1488,6 +1503,22 @@ describe('InitCommand', () => {
 
       await expect(initCommand.execute(testDir)).rejects.toThrow(/未检测到工具且未提供 --tools 参数/);
     });
+
+    it('should name the universal target when no tools are detected non-interactively', async () => {
+      // The scripted counterpart of the picker's empty-search hint (#653):
+      // a bare list of ids does not tell someone whose tool is absent what to do.
+      const initCommand = new InitCommand({ interactive: false });
+
+      await expect(initCommand.execute(testDir)).rejects.toThrow(/--tools agents/);
+    });
+
+    it('should name the universal target when --tools names something unknown', async () => {
+      const initCommand = new InitCommand({ tools: 'turing-corp-plugin', force: true });
+
+      await expect(initCommand.execute(testDir)).rejects.toThrow(
+        /无效工具：turing-corp-plugin[\s\S]*--tools agents/
+      );
+    });
   });
 
   describe('tool-specific adapters', () => {
@@ -1887,6 +1918,42 @@ describe('InitCommand - profile and detection features', () => {
     const githubCopilot = choices.find((choice) => choice.value === 'github-copilot');
 
     expect(githubCopilot?.preSelected).toBe(true);
+  });
+
+  it('should offer the universal target with the search terms an unlisted tool suggests', async () => {
+    // #653: the picker filters on name and id, and this entry is named for a
+    // directory. Without aliases the escape hatch cannot be searched for.
+    searchableMultiSelectMock.mockResolvedValue(['claude']);
+
+    const initCommand = new InitCommand({ force: true });
+    vi.spyOn(initCommand as any, 'canPromptInteractively').mockReturnValue(true);
+
+    await initCommand.execute(testDir);
+
+    const [config] = searchableMultiSelectMock.mock.calls[0] as [
+      { choices: Array<{ value: string; name: string; searchAliases?: string[] }>; emptyHint?: string }
+    ];
+    const universal = config.choices.find((choice) => choice.value === 'agents');
+
+    expect(universal).toBeDefined();
+    expect(universal?.name).toContain('Other / Universal');
+    for (const term of ['universal', 'other', 'generic', 'unlisted']) {
+      expect(universal?.searchAliases).toContain(term);
+    }
+  });
+
+  it('should hand the picker a fallback hint naming the universal target', async () => {
+    searchableMultiSelectMock.mockResolvedValue(['claude']);
+
+    const initCommand = new InitCommand({ force: true });
+    vi.spyOn(initCommand as any, 'canPromptInteractively').mockReturnValue(true);
+
+    await initCommand.execute(testDir);
+
+    const [config] = searchableMultiSelectMock.mock.calls[0] as [{ emptyHint?: string }];
+
+    expect(config.emptyHint).toContain('工具不在列表中？');
+    expect(config.emptyHint).toContain('Other / Universal (shared .agents skills)');
   });
 
   it('interactive init: confirming the cloud prompt writes files and persists the opt-in', async () => {

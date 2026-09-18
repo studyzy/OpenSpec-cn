@@ -1,10 +1,13 @@
 import { Command } from 'commander';
-import { spawn } from 'node:child_process';
+import type { ChildProcess, spawn as nodeSpawn } from 'node:child_process';
 import * as fs from 'node:fs';
+import { createRequire } from 'node:module';
 import * as path from 'node:path';
 import {
   getGlobalConfigPath,
   getGlobalConfig,
+  isConfigRootObject,
+  isGlobalConfigUnreadable,
   saveGlobalConfig,
   GlobalConfig,
 } from '../core/global-config.js';
@@ -26,7 +29,143 @@ import { hasProjectConfigDrift } from '../core/profile-sync-drift.js';
 import { UpdateCommand } from '../core/update.js';
 import { asErrorMessage, isPromptCancellationError } from './shared-output.js';
 
+type EditorOutcome =
+  | { code: number | null; signal: NodeJS.Signals | null }
+  | { error: Error };
+
+// cross-spawn finds `.cmd` shims such as `code.cmd` on Windows and escapes each
+// argument for cmd.exe; elsewhere it is plain spawn. Loaded lazily so other
+// commands skip its module graph.
+let cachedSpawn: typeof nodeSpawn | undefined;
+function loadSpawn(): typeof nodeSpawn {
+  if (cachedSpawn === undefined) {
+    cachedSpawn = createRequire(import.meta.url)('cross-spawn') as typeof nodeSpawn;
+  }
+  return cachedSpawn;
+}
+
+/**
+ * Splits an EDITOR or VISUAL value into a program and its arguments without
+ * running a shell, so `;`, `|`, `$VAR`, `~` and backticks are plain characters.
+ * Double quotes group words. On POSIX, single quotes group words too and a
+ * backslash escapes the next character (inside double quotes only `"` and `\`).
+ * On Windows a backslash is a path separator and a single quote is a plain
+ * character. Returns null when a quote is left open.
+ */
+export function splitEditorCommand(value: string, platform: NodeJS.Platform = process.platform): string[] | null {
+  const posix = platform !== 'win32';
+  const words: string[] = [];
+  let word = '';
+  let inWord = false;
+  let quote: '"' | "'" | null = null;
+
+  for (let i = 0; i < value.length; i++) {
+    const ch = value[i];
+    if (quote === "'") {
+      if (ch === "'") quote = null;
+      else word += ch;
+      continue;
+    }
+    if (posix && ch === '\\' && i + 1 < value.length) {
+      const next = value[i + 1];
+      if (quote === '"' && next !== '"' && next !== '\\') {
+        word += ch;
+      } else {
+        word += next;
+        i++;
+      }
+      inWord = true;
+      continue;
+    }
+    if (quote === '"') {
+      if (ch === '"') quote = null;
+      else word += ch;
+      continue;
+    }
+    if (ch === '"' || (posix && ch === "'")) {
+      quote = ch;
+      inWord = true;
+      continue;
+    }
+    if (/\s/.test(ch)) {
+      if (inWord) words.push(word);
+      word = '';
+      inWord = false;
+      continue;
+    }
+    word += ch;
+    inWord = true;
+  }
+
+  if (quote) return null;
+  if (inWord) words.push(word);
+  return words;
+}
+
+/**
+ * Starts the user's editor on `filePath`, never through a shell.
+ *
+ * EDITOR and VISUAL hold a command line, not a program name: `code --wait`
+ * and `"/path with spaces/subl" -w` are both ordinary values, so the value is
+ * split into words and the file path is appended as its own argument. A value
+ * that is itself the absolute path of an existing file is run as-is, so an
+ * unquoted editor path with spaces keeps working.
+ */
+function spawnEditor(editor: string, filePath: string): ChildProcess {
+  const words = path.isAbsolute(editor) && fs.existsSync(editor) ? [editor] : splitEditorCommand(editor);
+  if (words === null) {
+    throw new Error('the value has an unterminated quote');
+  }
+  if (words.length === 0) {
+    throw new Error('the value is blank');
+  }
+  const [program, ...args] = words;
+  return loadSpawn()(program, [...args, filePath], { stdio: 'inherit', shell: false });
+}
+
+/** Runs the editor on `filePath` and resolves once it has closed or failed to start. */
+function runEditor(editor: string, filePath: string): Promise<EditorOutcome> {
+  return new Promise((resolve) => {
+    try {
+      const child = spawnEditor(editor, filePath);
+      child.once('error', (error) => resolve({ error }));
+      child.once('close', (code, signal) => resolve({ code, signal }));
+    } catch (error) {
+      resolve({ error: error instanceof Error ? error : new Error(String(error)) });
+    }
+  });
+}
+
+function reportEditorFailure(editor: string, outcome: EditorOutcome): void {
+  if ('error' in outcome) {
+    console.error(`错误：无法启动编辑器 "${editor}"：${outcome.error.message}`);
+  } else if (outcome.signal) {
+    console.error(`错误：编辑器 "${editor}" 被信号 ${outcome.signal} 终止`);
+  } else {
+    console.error(`错误：编辑器 "${editor}" 退出，代码为 ${outcome.code}`);
+  }
+  // 只有程序不存在时才给出这条提示：EACCES 或 EPERM 意味着它存在。
+  if ('error' in outcome && (outcome.error as NodeJS.ErrnoException).code === 'ENOENT') {
+    console.error('请将 EDITOR 或 VISUAL 设置为已安装的编辑器命令，例如：export EDITOR="code --wait"');
+  }
+}
+
 type ProfileAction = 'both' | 'delivery' | 'workflows' | 'keep';
+
+/**
+ * A config file that exists but cannot be parsed is still the user's file:
+ * getGlobalConfig() reads it as defaults, and saving those back would erase
+ * every setting in it. Reports the fix instead, and returns true when it did.
+ */
+function refuseUnreadableConfig(): boolean {
+  if (!isGlobalConfigUnreadable()) {
+    return false;
+  }
+  console.error(`错误：${getGlobalConfigPath()} 无法解析，因此保持原样未修改。`);
+  console.error('请使用 "openspec-cn config edit" 修复，或使用 "openspec-cn config reset --all" 重置。');
+  process.exitCode = 1;
+  return true;
+}
 
 interface ProfileState {
   profile: Profile;
@@ -248,7 +387,12 @@ export function registerConfigCommand(program: Command): void {
         let rawConfig: Record<string, unknown> = {};
         try {
           if (fs.existsSync(configPath)) {
-            rawConfig = JSON.parse(fs.readFileSync(configPath, 'utf-8'));
+            const parsed: unknown = JSON.parse(fs.readFileSync(configPath, 'utf-8'));
+            // A non-object root holds no explicit settings, and reading a key
+            // off `null` would crash this read-only command.
+            if (isConfigRootObject(parsed)) {
+              rawConfig = parsed as Record<string, unknown>;
+            }
           }
         } catch {
           // If reading fails, treat all as defaults
@@ -314,6 +458,10 @@ export function registerConfigCommand(program: Command): void {
         return;
       }
 
+      if (refuseUnreadableConfig()) {
+        return;
+      }
+
       const config = getGlobalConfig() as Record<string, unknown>;
       const coercedValue = coerceValue(value, options.string || false);
 
@@ -343,6 +491,10 @@ export function registerConfigCommand(program: Command): void {
     .command('unset <key>')
     .description('移除键（恢复为默认值）')
     .action((key: string) => {
+      if (refuseUnreadableConfig()) {
+        return;
+      }
+
       const config = getGlobalConfig() as Record<string, unknown>;
       const existed = deleteNestedValue(config, key);
 
@@ -391,7 +543,8 @@ export function registerConfigCommand(program: Command): void {
         }
       }
 
-      saveGlobalConfig({ ...DEFAULT_CONFIG });
+      // 重置是唯一一种有意覆盖无法解析文件的写入操作。
+      saveGlobalConfig({ ...DEFAULT_CONFIG }, { replaceUnreadable: true });
       console.log('配置已重置为默认值');
     });
 
@@ -417,24 +570,13 @@ export function registerConfigCommand(program: Command): void {
         saveGlobalConfig({ ...DEFAULT_CONFIG });
       }
 
-      // Spawn editor and wait for it to close
-      // Avoid shell parsing to correctly handle paths with spaces in both
-      // the editor path and config path
-      const child = spawn(editor, [configPath], {
-        stdio: 'inherit',
-        shell: false,
-      });
-
-      await new Promise<void>((resolve, reject) => {
-        child.on('close', (code) => {
-          if (code === 0) {
-            resolve();
-          } else {
-            reject(new Error(`编辑器退出代码 ${code}`));
-          }
-        });
-        child.on('error', reject);
-      });
+      // 等待编辑器关闭；失败时只报告，绝不抛出。
+      const outcome = await runEditor(editor, configPath);
+      if ('error' in outcome || outcome.code !== 0) {
+        reportEditorFailure(editor, outcome);
+        process.exitCode = 1;
+        return;
+      }
 
       try {
         const rawConfig = fs.readFileSync(configPath, 'utf-8');
@@ -463,7 +605,11 @@ export function registerConfigCommand(program: Command): void {
     .command('profile [preset]')
     .description('配置工作流档案（交互式选择器或预设快捷方式）')
     .action(async (preset?: string) => {
-      // Preset shortcut: `openspec-cn config profile core`
+      if (refuseUnreadableConfig()) {
+        return;
+      }
+
+      // 预设快捷方式：`openspec-cn config profile core`
       if (preset === 'core') {
         const config = getGlobalConfig();
         config.profile = 'core';

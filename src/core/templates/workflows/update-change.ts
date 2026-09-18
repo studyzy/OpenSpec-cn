@@ -5,19 +5,87 @@
  * templates file into workflow-focused modules.
  */
 import type { SkillTemplate, CommandTemplate } from '../types.js';
+import { optionalWorkflow } from '../optional-workflow.js';
 import { STORE_SELECTION_GUIDANCE } from './store-selection.js';
+import { PROJECT_ROOT_GUARD } from './project-root.js';
+
+/**
+ * Passages that hand off to `/opsx:continue` or `/opsx:new`. Neither workflow
+ * is in the `core` profile, so each is authored with a CLI fallback and
+ * resolved at generation time (see optional-workflow.ts). Shared by both
+ * surfaces below so the skill and the command cannot drift apart.
+ */
+const CONTINUE_SCOPE_NOTE = optionalWorkflow(
+  'continue',
+  '本工作流仅修订已存在的制品；`/opsx:continue` 负责创建不存在的制品。',
+  '本工作流仅修订已存在的制品；它绝不创建缺失的制品。制品缺失时，`openspec-cn status --change "<name>" --json` 指出下一个制品，`openspec-cn instructions "<artifact-id>" --change "<name>" --json` 解释如何撰写它。'
+);
+
+const CONTINUE_CREATE_THEM = optionalWorkflow(
+  'continue',
+  '引导用户使用 `/opsx:continue` 来创建它们',
+  '引导用户使用 `openspec-cn instructions "<artifact-id>" --change "<name>" --json` 来创建它们'
+);
+
+const CONTINUE_NEXT_STEP = optionalWorkflow(
+  'continue',
+  '建议 `/opsx:continue` 创建它们',
+  '运行 `openspec-cn status --change "<name>" --json` 获取下一个制品，并引导用户使用 `openspec-cn instructions "<artifact-id>" --change "<name>" --json` 来创建它'
+);
+
+const CONTINUE_DEFERRED = optionalWorkflow(
+  'continue',
+  '推迟到 `/opsx:continue` 的任何内容（尚未创建的制品或文件）',
+  '因尚不存在而推迟的任何内容（尚未创建的制品或文件）'
+);
+
+const CONTINUE_FRONTIER = optionalWorkflow(
+  'continue',
+  '那是 `/opsx:continue` 的职责',
+  '创建它们是本工作流之外的独立步骤'
+);
+
+/**
+ * `apply` and `archive` are in the `core` profile but not guaranteed in a
+ * custom one, so their handoffs are resolved the same way.
+ */
+const APPLY_DELTA_HANDOFF = optionalWorkflow(
+  'apply',
+  '建议 `/opsx:apply` 将增量带入代码',
+  '说明代码可能需要更新，并提议将增量带入其中'
+);
+
+const APPLY_GUARDRAIL = optionalWorkflow(
+  'apply',
+  '停止并指向 `/opsx:apply`',
+  '停止并说明修订后的计划现在暗示代码更改；实现它们是本工作流之外的独立步骤'
+);
+
+const ARCHIVE_HANDOFF = optionalWorkflow(
+  'archive',
+  '建议 `/opsx:archive`',
+  '建议用 `openspec-cn archive "<name>"` 归档'
+);
+
+const INTENT_CHANGE_GUARDRAIL = optionalWorkflow(
+  'new',
+  '建议用 `/opsx:new` 重新开始（"更新 vs 重新开始" 启发式）',
+  '请求一个不同的未使用变更名称，并建议改用 `openspec-cn new change "<new-change-name>"`（"更新 vs 重新开始" 启发式）'
+);
 
 export function getUpdateChangeSkillTemplate(): SkillTemplate {
   return {
     name: 'openspec-update-change',
-    description: "修订 OpenSpec 变更的现有规划制品并保持它们之间的一致。当用户想修订变更的计划、将新决定纳入其中，或在编辑后调和其制品时使用。绝不要编辑代码。",
+    description: "修订 OpenSpec 变更的现有规划制品并保持它们之间的一致。当用户想修订变更的计划、将新决定纳入其中，或在编辑后调和其制品时使用。也在用户说 \"openspec update change\" 或 \"opsx update\" 时使用。若用户指的是 openspec update CLI 命令（刷新生成的文件），请改为运行该命令。绝不要编辑代码。",
     instructions: `修订变更的现有规划制品并保持它们之间一致。绝不要编辑代码。
 
 ${STORE_SELECTION_GUIDANCE}
 
+${PROJECT_ROOT_GUARD}
+
 **Input**: 可选地指定变更名称。若省略，检查能否从对话上下文推断。若模糊或歧义，你必须提示用户从可用变更中选择。
 
-\`/opsx:continue\` 是一个可选工作流，可能未安装。在下方任何地方建议它之前，请验证它是否可用。若不可用，\`openspec-cn status --change "<name>" --json\` 显示下一个制品，\`openspec-cn instructions "<artifact-id>" --change "<name>" --json\` 解释如何创建它。
+${CONTINUE_SCOPE_NOTE}
 
 **步骤**
 
@@ -58,13 +126,14 @@ ${STORE_SELECTION_GUIDANCE}
 
 4. **读取并调和**
    - 读取请求涉及的制品以及变更的其他现有制品。
-   - 应用请求的编辑。然后检查所有其他现有制品与其的一致性 — 在任何方向上：对后续制品的编辑可能需要修订前面的制品，而不仅仅是反过来。构建顺序是方便的阅读顺序，而非对哪些制品可被修订的约束。
+   - 在对话中起草请求的编辑，而非在文件中。明确它究竟改变了什么；步骤 5 负责所有写入。然后对照起草的编辑检查每个其他现有制品 — 在任何方向上：对后续制品的编辑可能需要修订前面的制品，而不仅仅是反过来。构建顺序是方便的阅读顺序，而非对哪些制品可被修订的约束。
    - 记录所有现在不一致、缺失或矛盾的内容。
-   - 仅修订已存在的文件（\`existingOutputPaths\`）。不要创建尚不存在的制品，且不要在 glob 制品下创建新文件 — 指出它们并引导用户使用 \`/opsx:continue\` 来创建。
+   - 仅修订已存在的文件（\`existingOutputPaths\`）。不要创建尚不存在的制品，且不要在 glob 制品下创建新文件 — 指出它们并${CONTINUE_CREATE_THEM}。
    - 若变更已一致，说明情况且不做编辑。
 
 5. **确认并应用，一次一个制品**
-   - 展示每个提议的修订及其原因。仅在用户确认后写入。
+   - 此步骤执行本工作流中的每一次制品写入；此前的步骤都不编辑制品。
+   - 展示每个提议的修订及其原因 — 包括步骤 4 中起草的请求编辑。仅在用户确认后写入。
    - 若用户拒绝修订，不要写入 — 保持该制品不变。
    - 当需要重大重写时，先获取该制品的规则和模板：
      \`\`\`bash
@@ -72,24 +141,24 @@ ${STORE_SELECTION_GUIDANCE}
      \`\`\`
 
 6. **指出下一步（仅供参考 - 绝不要执行）**
-   - 制品仍缺失 -> 建议 \`/opsx:continue\` 来创建它们。
-   - 变更已实现（任务已勾选 / 已 apply） -> 代码可能不再匹配修订后的计划；建议 \`/opsx:apply\` 将增量带入代码。
-   - 一切完成且已实现 -> 建议 \`/opsx:archive\`。
+   - 制品仍缺失 -> ${CONTINUE_NEXT_STEP}。
+   - 变更已实现（任务已勾选 / 已 apply） -> 代码可能不再匹配修订后的计划；${APPLY_DELTA_HANDOFF}。
+   - 一切完成且已实现 -> ${ARCHIVE_HANDOFF}。
 
 **输出**
 
 每次调用后，展示：
 - 修订了哪些制品（以及哪些提议的修订被拒绝）
-- 推迟到 \`/opsx:continue\` 的任何内容（尚未创建的制品或文件）
+- ${CONTINUE_DEFERRED}
 - 变更的状态及推荐的下一步命令
 
 **护栏**
-- 仅规划制品 — 绝不要编辑实现代码。若修订后的计划暗示代码更改，停止并指向 \`/opsx:apply\`。
+- 仅规划制品 — 绝不要编辑实现代码。若修订后的计划暗示代码更改，${APPLY_GUARDRAIL}。
 - 使用 \`openspec-cn status\` 报告的制品 ID 和路径；绝不要基于硬编码的制品名称分支。
 - 仅编辑 \`existingOutputPaths\` 中的具体文件；绝不要写入 glob \`resolvedOutputPath\`。
-- 不要推进构建边界：不创建新制品，不在 glob 制品下创建新文件 — 那是 \`/opsx:continue\` 的职责。
+- 不要推进构建边界：不创建新制品，不在 glob 制品下创建新文件 — ${CONTINUE_FRONTIER}。
 - 在写入前与用户确认每个编辑。
-- 若请求更改的是变更的*意图*而非细化，首先验证可选 \`/opsx:new\` 工作流是否可用。若可用，建议用 \`/opsx:new\` 重新开始（"更新 vs 重新开始" 启发式）。若不可用，请求一个不同的未使用变更名称并建议改用 \`openspec-cn new change "<new-change-name>"\`。`,
+- 若请求更改的是变更的*意图*而非细化，${INTENT_CHANGE_GUARDRAIL}。`,
     license: 'MIT',
     compatibility: '需要 openspec-cn CLI。',
     metadata: { author: 'openspec', version: '1.0' },
@@ -106,9 +175,11 @@ export function getOpsxUpdateCommandTemplate(): CommandTemplate {
 
 ${STORE_SELECTION_GUIDANCE}
 
+${PROJECT_ROOT_GUARD}
+
 **Input**: 可选地在 \`/opsx:update\` 后指定变更名称（例如 \`/opsx:update add-auth\`）。若省略，检查能否从对话上下文推断。若模糊或歧义，你必须提示用户从可用变更中选择。
 
-\`/opsx:continue\` 是一个可选工作流，可能未安装。在下方任何地方建议它之前，请验证它是否可用。若不可用，\`openspec-cn status --change "<name>" --json\` 显示下一个制品，\`openspec-cn instructions "<artifact-id>" --change "<name>" --json\` 解释如何创建它。
+${CONTINUE_SCOPE_NOTE}
 
 **步骤**
 
@@ -149,13 +220,14 @@ ${STORE_SELECTION_GUIDANCE}
 
 4. **读取并调和**
    - 读取请求涉及的制品以及变更的其他现有制品。
-   - 应用请求的编辑。然后检查所有其他现有制品与其的一致性 — 在任何方向上：对后续制品的编辑可能需要修订前面的制品，而不仅仅是反过来。构建顺序是方便的阅读顺序，而非对哪些制品可被修订的约束。
+   - 在对话中起草请求的编辑，而非在文件中。明确它究竟改变了什么；步骤 5 负责所有写入。然后对照起草的编辑检查每个其他现有制品 — 在任何方向上：对后续制品的编辑可能需要修订前面的制品，而不仅仅是反过来。构建顺序是方便的阅读顺序，而非对哪些制品可被修订的约束。
    - 记录所有现在不一致、缺失或矛盾的内容。
-   - 仅修订已存在的文件（\`existingOutputPaths\`）。不要创建尚不存在的制品，且不要在 glob 制品下创建新文件 — 指出它们并引导用户使用 \`/opsx:continue\` 来创建。
+   - 仅修订已存在的文件（\`existingOutputPaths\`）。不要创建尚不存在的制品，且不要在 glob 制品下创建新文件 — 指出它们并${CONTINUE_CREATE_THEM}。
    - 若变更已一致，说明情况且不做编辑。
 
 5. **确认并应用，一次一个制品**
-   - 展示每个提议的修订及其原因。仅在用户确认后写入。
+   - 此步骤执行本工作流中的每一次制品写入；此前的步骤都不编辑制品。
+   - 展示每个提议的修订及其原因 — 包括步骤 4 中起草的请求编辑。仅在用户确认后写入。
    - 若用户拒绝修订，不要写入 — 保持该制品不变。
    - 当需要重大重写时，先获取该制品的规则和模板：
      \`\`\`bash
@@ -163,23 +235,23 @@ ${STORE_SELECTION_GUIDANCE}
      \`\`\`
 
 6. **指出下一步（仅供参考 - 绝不要执行）**
-   - 制品仍缺失 -> 建议 \`/opsx:continue\` 来创建它们。
-   - 变更已实现（任务已勾选 / 已 apply） -> 代码可能不再匹配修订后的计划；建议 \`/opsx:apply\` 将增量带入代码。
-   - 一切完成且已实现 -> 建议 \`/opsx:archive\`。
+   - 制品仍缺失 -> ${CONTINUE_NEXT_STEP}。
+   - 变更已实现（任务已勾选 / 已 apply） -> 代码可能不再匹配修订后的计划；${APPLY_DELTA_HANDOFF}。
+   - 一切完成且已实现 -> ${ARCHIVE_HANDOFF}。
 
 **输出**
 
 每次调用后，展示：
 - 修订了哪些制品（以及哪些提议的修订被拒绝）
-- 推迟到 \`/opsx:continue\` 的任何内容（尚未创建的制品或文件）
+- ${CONTINUE_DEFERRED}
 - 变更的状态及推荐的下一步命令
 
 **护栏**
-- 仅规划制品 — 绝不要编辑实现代码。若修订后的计划暗示代码更改，停止并指向 \`/opsx:apply\`。
+- 仅规划制品 — 绝不要编辑实现代码。若修订后的计划暗示代码更改，${APPLY_GUARDRAIL}。
 - 使用 \`openspec-cn status\` 报告的制品 ID 和路径；绝不要基于硬编码的制品名称分支。
 - 仅编辑 \`existingOutputPaths\` 中的具体文件；绝不要写入 glob \`resolvedOutputPath\`。
-- 不要推进构建边界：不创建新制品，不在 glob 制品下创建新文件 — 那是 \`/opsx:continue\` 的职责。
+- 不要推进构建边界：不创建新制品，不在 glob 制品下创建新文件 — ${CONTINUE_FRONTIER}。
 - 在写入前与用户确认每个编辑。
-- 若请求更改的是变更的*意图*而非细化，首先验证可选 \`/opsx:new\` 工作流是否可用。若可用，建议用 \`/opsx:new\` 重新开始（"更新 vs 重新开始" 启发式）。若不可用，请求一个不同的未使用变更名称并建议改用 \`openspec-cn new change "<new-change-name>"\`。`
+- 若请求更改的是变更的*意图*而非细化，${INTENT_CHANGE_GUARDRAIL}。`
   };
 }

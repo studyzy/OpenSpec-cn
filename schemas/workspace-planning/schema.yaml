@@ -37,6 +37,21 @@ artifacts:
       - **RENAMED Requirements**：仅名称变更；使用 FROM:/TO: 格式。
 
       每条需求都必须使用 SHALL/MUST 措辞，并且至少包含一个 `#### Scenario:` 块。
+
+      示例：
+      ```
+      # Spec Delta
+
+      ## ADDED Requirements
+
+      ### Requirement: <workspace 需求名称>
+      The workspace plan SHALL describe the required behavior and affected area without creating repo-local artifacts during planning.
+
+      #### Scenario: <场景名称>
+      - **GIVEN** <上下文>
+      - **WHEN** <动作>
+      - **THEN** <可观测的结果>
+      ```
     requires:
       - proposal
 
@@ -59,6 +74,17 @@ artifacts:
       创建 workspace 协作任务列表。
 
       按阶段或受影响领域分组任务（视需要而定）。每个可执行项都必须是使用 `- [ ]` 的复选框。当实现任务是领域专属时，写明受影响领域，并在后续实现工作流选定允许编辑的根目录之前，将任务保持在规划粒度。
+
+      示例：
+      ```
+      # Tasks
+
+      ## 1. Workspace 规划
+
+      - [ ] 1.1 确认共享的产品目标与尚未解决的范围问题。
+      - [ ] 1.2 识别受影响领域，适用时使用已注册的 workspace 链接名称。
+      - [ ] 1.3 在选定实现领域之前，评审 workspace 范围的 specs 与 design。
+      ```
     requires:
       - specs
       - design

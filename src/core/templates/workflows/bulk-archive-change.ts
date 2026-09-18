@@ -5,17 +5,40 @@
  * templates file into workflow-focused modules.
  */
 import type { SkillTemplate, CommandTemplate } from '../types.js';
+import { optionalWorkflow } from '../optional-workflow.js';
 import { STORE_SELECTION_GUIDANCE } from './store-selection.js';
+import { PROJECT_ROOT_GUARD } from './project-root.js';
+
+/**
+ * Archiving must merge delta specs into the main specs; the `sync` workflow is
+ * how it normally does that. A profile that selects `archive` gets `sync`
+ * injected (see getProfileWorkflows), but an install whose workflow set was
+ * read back off disk can still be missing it — in which case the merge has to
+ * happen inline rather than be handed to a workflow that is not there.
+ */
+const SYNC_INLINE_HANDOFF = optionalWorkflow(
+  'sync',
+  '内联运行 `/opsx:sync` 工作流（由 agent 驱动的智能合并）',
+  '自行内联执行 delta 到主 spec 的合并（由 agent 驱动的智能合并）'
+);
+
+const SYNC_GUARDRAIL = optionalWorkflow(
+  'sync',
+  '内联运行 `/opsx:sync` 工作流（由 agent 驱动）',
+  '自行内联执行 delta 到主 spec 的合并（由 agent 驱动）'
+);
 
 export function getBulkArchiveChangeSkillTemplate(): SkillTemplate {
   return {
     name: 'openspec-bulk-archive-change',
-    description: '一次性归档多个已完成的变更。当需要归档多个并行变更时使用。',
+    description: '一次性归档多个已完成的变更。当需要归档多个并行变更时使用。也用于复数形式的归档请求 —— "openspec bulk-archive"、"opsx bulk-archive"、"openspec archive all" 或 "openspec archive these changes"。',
     instructions: `在单次操作中归档多个已完成的变更。
 
 此技能允许您批量归档变更，通过检查代码库判断实际已实现的内容，从而智能处理 spec 冲突。
 
 ${STORE_SELECTION_GUIDANCE}
+
+${PROJECT_ROOT_GUARD}
 
 \`<capability-path>\` 是相对于 \`specs/\` 的 spec 目录（例如 \`user-auth\` 或 \`identity/user-auth\`）。在解析主 spec 时保留每个增量 spec 的完整路径。
 
@@ -64,7 +87,9 @@ ${STORE_SELECTION_GUIDANCE}
       - 记录哪些产出物为 \`done\`，哪些为其他状态
 
    b. **任务完成情况** - 从状态 JSON 读取 \`artifactPaths.tasks.existingOutputPaths\`
-      - 统计 \`- [ ]\`（未完成）与 \`- [x]\`（已完成）
+      - 完成意味着方括号内只有 \`x\`/\`X\`，忽略空格
+        （\`- [ x]\` 视为完成）；其他任何标记都是未完成（\`- [ ]\`、
+        \`- []\`，以及 \`- [~]\` 或 \`- [-]\` 等不熟悉的标记）
       - 若无任务文件，记为"无任务"
 
    c. **Delta specs** - 从状态 JSON 检查 \`artifactPaths.specs.existingOutputPaths\`
@@ -72,7 +97,15 @@ ${STORE_SELECTION_GUIDANCE}
       - 对每个，提取需求名称（匹配 \`### Requirement: <name>\` 的行）
       - 将此列表作为唯一的增量 spec 来源。若 \`specs\` 条目
         缺失或列表为空，对该变更不执行 spec 同步或 specs-instruction 查找；不要从无关制品推断增量 spec。
-      - 对每个变更独立评估，包括某些 schema 没有 \`specs\` 制品的混合 schema 批次。当某个变更没有增量 spec 或其 schema 不含 specs 时，对该变更继续而不进行 spec 同步（与单个变更跳过相同）。
+      - 对每个变更独立评估，包括某些 schema 没有 \`specs\` 制品的混合 schema 批次。
+
+   d. **归档目标** - 每个变更的目标名称只计算一次，并记录为该变更的 \`<target-name>\`
+      - 若变更名已以 \`YYYY-MM-DD-\` 前缀开头则原样使用；否则将当前日期前置为 \`YYYY-MM-DD-<name>\`（与 \`openspec-cn archive\` 相同的规则）
+      - 检查 \`<planningHome.changesDir>/archive/<target-name>\` 是否已存在
+      - 若已存在，或另一个所选变更解析出相同的目标名称，将所有这些变更标记为 \`受阻\`，原因为 \`归档目录已存在\`
+      - 受阻的变更绝不被同步或移动：在步骤 6 表格中显示为 \`受阻\`，将其排除在冲突解决之外（仅用其他变更来解决冲突），并在步骤 8d 中记为失败
+      - 在此处检查（任何主 spec 写入之前）与 \`openspec-cn archive\` 一致：同步之后才发现冲突会导致主 specs 被改写，而归档却从未发生
+
 4. **检测 spec 冲突**
 
    构建一个以 \`<capability-path>\`（相对于 \`specs/\` 的确切路径）为键的映射：
@@ -145,8 +178,8 @@ ${STORE_SELECTION_GUIDANCE}
    根据用户回答的意图路由，而不是精确匹配标签 —— 标签是你自己写的，
    所以匹配用户选择的选项，而非上面的措辞：
    - "取消" — 停止，不归档。报告未归档任何变更并跳过其余步骤。
-   - "归档全部"选项 — 对每个已选变更继续
-   - "仅就绪"选项 — 只继续步骤 6 表格中标记为 \`就绪\` 或 \`就绪*\` 的变更，其余在步骤 8d 中记为"跳过"。若某个 \`就绪*\` 变更的冲突对象被跳过，则仅基于将要归档的变更重新推导该冲突的解决方案。
+   - "归档全部"选项 — 对每个未被 \`受阻\` 的已选变更继续
+   - "仅就绪"选项 — 只继续步骤 6 表格中标记为 \`就绪\` 或 \`就绪*\` 的变更，其余在步骤 8d 中记为"跳过"，但 \`受阻\` 的变更保持为失败并附上 \`归档目录已存在\`。若某个 \`就绪*\` 变更的冲突对象被跳过，则仅基于将要归档的变更重新推导该冲突的解决方案。
    - 其他任何回答 — 再次询问，而不是归档
 
    在步骤 8 写入第一个主 spec 或移动任何变更之前，为已确认的批次获取所有需要的 specs 规则快照。对每个将要同步具体 \`artifactPaths.specs.existingOutputPaths\` 的变更，用相同的已选根目录标志运行 \`openspec-cn instructions specs --change "<name>" --json\` 恰好一次。在第一次写入或移动之前获取所有快照。若任何查询以非零状态退出或返回无效的制品指令 JSON，找出受影响的变更，报告错误，并在任何主 spec 写入或变更移动之前停止整个批次。不要把查询失败当作省略了规则。没有 \`rules\` 的有效响应就是无规则情况。
@@ -180,12 +213,19 @@ ${STORE_SELECTION_GUIDANCE}
 
    c. **执行归档**：
 
-      目标名称：若变更名已以 \`YYYY-MM-DD-\` 前缀开头则保持原样；否则将当前日期前置为 \`YYYY-MM-DD-<name>\`（与 \`openspec-cn archive\` 相同的规则）。
+      目标名称：使用步骤 3d 中为该变更记录的 \`<target-name>\`，保持不变。绝不在此重新计算：跨过午夜的批次会在步骤 3 检查一个日期，却在移动时使用另一个。
+
+      **检查目标是否已存在：**
+      - 即使步骤 3 已检查过，在移动前立即再检查一次：目标可能在批次进行中出现
+      - 是：将该变更记为失败并附上 \`归档目录已存在\`，保持 \`changeRoot\` 原位不动，报告步骤 8a 已为它同步过的主 specs，并继续处理其余变更
+      - 否：移动 \`changeRoot\` 到归档目录
 
       \`\`\`bash
       mkdir -p "<planningHome.changesDir>/archive"
       mv "<changeRoot>" "<planningHome.changesDir>/archive/<target-name>"
       \`\`\`
+
+      **确认移动没有嵌套：** 即使目标在检查之后才出现，\`mv\` 也会以 0 退出，把变更移动*到*它内部。若 \`<planningHome.changesDir>/archive/<target-name>/<change-directory-name>\` 现在存在（\`changeRoot\` 的最后一段路径），将该目录移回 \`changeRoot\`，并把此变更记为失败并附上 \`归档目录已存在\`。绝不要报告它为已归档。
 
    d. **记录每个变更的结果**：
       - 成功：归档成功
@@ -301,8 +341,9 @@ Spec 同步汇总：
 - 用户取消确认后绝不归档 —— 被取消的批次不归档任何内容
 - 跟踪并报告所有结果（成功/跳过/失败）
 - 移动到归档时保留 .openspec.yaml
-- 归档目录目标使用当前日期：YYYY-MM-DD-<name>；已以 \`YYYY-MM-DD-\` 前缀开头的名称保持原样（绝不叠加第二个日期）
+- 归档目录目标使用当前日期，在步骤 3d 中计算一次并在移动时复用：YYYY-MM-DD-<name>；已以 \`YYYY-MM-DD-\` 前缀开头的名称保持原样（绝不叠加第二个日期）
 - 若归档目标已存在，使该变更失败但继续处理其他变更
+- 在步骤 3 中检查每个归档目标（在第一次主 spec 写入之前）；目标已存在的变更绝不被同步或移动
 - 若请求同步，为每个包含增量 spec 的变更内联运行 \`openspec-sync-specs\` 工作流（agent 驱动）
 - 将每个 delta 的 \`includedDeltas\` 和 \`excludedDeltas\` 决策带入执行；仅同步和验证包含的 delta
 - 将每个被排除的增量报告为 \`sync skipped\`，但不把归档本身视为跳过
@@ -334,6 +375,8 @@ export function getOpsxBulkArchiveCommandTemplate(): CommandTemplate {
 此技能允许您批量归档变更，通过检查代码库判断实际已实现的内容，从而智能处理 spec 冲突。
 
 ${STORE_SELECTION_GUIDANCE}
+
+${PROJECT_ROOT_GUARD}
 
 \`<capability-path>\` 是相对于 \`specs/\` 的 spec 目录（例如 \`user-auth\` 或 \`identity/user-auth\`）。在解析主 spec 时保留每个增量 spec 的完整路径。
 
@@ -382,7 +425,9 @@ ${STORE_SELECTION_GUIDANCE}
       - 记录哪些产出物为 \`done\`，哪些为其他状态
 
    b. **任务完成情况** - 从状态 JSON 读取 \`artifactPaths.tasks.existingOutputPaths\`
-      - 统计 \`- [ ]\`（未完成）与 \`- [x]\`（已完成）
+      - 完成意味着方括号内只有 \`x\`/\`X\`，忽略空格
+        （\`- [ x]\` 视为完成）；其他任何标记都是未完成（\`- [ ]\`、
+        \`- []\`，以及 \`- [~]\` 或 \`- [-]\` 等不熟悉的标记）
       - 若无任务文件，记为"无任务"
 
    c. **Delta specs** - 从状态 JSON 检查 \`artifactPaths.specs.existingOutputPaths\`
@@ -390,6 +435,13 @@ ${STORE_SELECTION_GUIDANCE}
       - 对每个，提取需求名称（匹配 \`### Requirement: <name>\` 的行）
       - 将此列表作为唯一的增量 spec 来源。若 \`specs\` 条目缺失或列表为空，对该变更不执行 spec 同步或 specs-instruction 查找；不要从无关制品推断增量 spec。
       - 对每个变更独立评估，包括某些 schema 没有 \`specs\` 制品的混合 schema 批次。
+
+   d. **归档目标** - 每个变更的目标名称只计算一次，并记录为该变更的 \`<target-name>\`
+      - 若变更名已以 \`YYYY-MM-DD-\` 前缀开头则原样使用；否则将当前日期前置为 \`YYYY-MM-DD-<name>\`（与 \`openspec-cn archive\` 相同的规则）
+      - 检查 \`<planningHome.changesDir>/archive/<target-name>\` 是否已存在
+      - 若已存在，或另一个所选变更解析出相同的目标名称，将所有这些变更标记为 \`受阻\`，原因为 \`归档目录已存在\`
+      - 受阻的变更绝不被同步或移动：在步骤 6 表格中显示为 \`受阻\`，将其排除在冲突解决之外（仅用其他变更来解决冲突），并在步骤 8d 中记为失败
+      - 在此处检查（任何主 spec 写入之前）与 \`openspec-cn archive\` 一致：同步之后才发现冲突会导致主 specs 被改写，而归档却从未发生
 
 4. **检测 spec 冲突**
 
@@ -463,8 +515,8 @@ ${STORE_SELECTION_GUIDANCE}
    根据用户回答的意图路由，而不是精确匹配标签 —— 标签是你自己写的，
    所以匹配用户选择的选项，而非上面的措辞：
    - "取消" — 停止，不归档。报告未归档任何变更并跳过其余步骤。
-   - "归档全部"选项 — 对每个已选变更继续
-   - "仅就绪"选项 — 只继续步骤 6 表格中标记为 \`就绪\` 或 \`就绪*\` 的变更，其余在步骤 8d 中记为"跳过"。若某个 \`就绪*\` 变更的冲突对象被跳过，则仅基于将要归档的变更重新推导该冲突的解决方案。
+   - "归档全部"选项 — 对每个未被 \`受阻\` 的已选变更继续
+   - "仅就绪"选项 — 只继续步骤 6 表格中标记为 \`就绪\` 或 \`就绪*\` 的变更，其余在步骤 8d 中记为"跳过"，但 \`受阻\` 的变更保持为失败并附上 \`归档目录已存在\`。若某个 \`就绪*\` 变更的冲突对象被跳过，则仅基于将要归档的变更重新推导该冲突的解决方案。
    - 其他任何回答 — 再次询问，而不是归档
 
    在步骤 8 写入第一个主 spec 或移动任何变更之前，为已确认的批次获取所有需要的 specs 规则快照。对每个将要同步具体 \`artifactPaths.specs.existingOutputPaths\` 的变更，用相同的已选根目录标志运行 \`openspec-cn instructions specs --change "<name>" --json\` 恰好一次。在第一次写入或移动之前获取所有快照。若任何查询以非零状态退出或返回无效的制品指令 JSON，找出受影响的变更，报告错误，并在任何主 spec 写入或变更移动之前停止整个批次。不要把查询失败当作省略了规则。没有 \`rules\` 的有效响应就是无规则情况。
@@ -479,7 +531,7 @@ ${STORE_SELECTION_GUIDANCE}
    按确定的顺序处理各变更（遵循冲突解决方案）：
 
    a. **同步包含的增量 spec**：
-      - 仅为有条目在 \`includedDeltas\` 中的变更内联运行 \`/opsx:sync\` 工作流（智能驱动合并），仅传递包含的 delta 路径，并明确指示忽略该变更的 \`excludedDeltas\`。等待其完成。
+      - ${SYNC_INLINE_HANDOFF}，仅针对 \`includedDeltas\` 中有条目的变更，仅传递包含的 delta 路径，并明确指示忽略该变更的 \`excludedDeltas\`。等待其完成。
       - 对冲突，按已解析的顺序应用。
       - 把该变更已获取的 specs 规则快照传入内联同步；内联同步必须复用它，不要再次获取指令
       - 制品规则仅应用于该变更生成的主 spec。它们不改变冲突解决方案、归档行为或 CLI 契约，其文本也不会被复制到输出文件中
@@ -498,12 +550,19 @@ ${STORE_SELECTION_GUIDANCE}
 
    c. **执行归档**：
 
-      目标名称：若变更名已以 \`YYYY-MM-DD-\` 前缀开头则保持原样；否则将当前日期前置为 \`YYYY-MM-DD-<name>\`（与 \`openspec-cn archive\` 相同的规则）。
+      目标名称：使用步骤 3d 中为该变更记录的 \`<target-name>\`，保持不变。绝不在此重新计算：跨过午夜的批次会在步骤 3 检查一个日期，却在移动时使用另一个。
+
+      **检查目标是否已存在：**
+      - 即使步骤 3 已检查过，在移动前立即再检查一次：目标可能在批次进行中出现
+      - 是：将该变更记为失败并附上 \`归档目录已存在\`，保持 \`changeRoot\` 原位不动，报告步骤 8a 已为它同步过的主 specs，并继续处理其余变更
+      - 否：移动 \`changeRoot\` 到归档目录
 
       \`\`\`bash
       mkdir -p "<planningHome.changesDir>/archive"
       mv "<changeRoot>" "<planningHome.changesDir>/archive/<target-name>"
       \`\`\`
+
+      **确认移动没有嵌套：** 即使目标在检查之后才出现，\`mv\` 也会以 0 退出，把变更移动*到*它内部。若 \`<planningHome.changesDir>/archive/<target-name>/<change-directory-name>\` 现在存在（\`changeRoot\` 的最后一段路径），将该目录移回 \`changeRoot\`，并把此变更记为失败并附上 \`归档目录已存在\`。绝不要报告它为已归档。
 
    d. **记录每个变更的结果**：
       - 成功：归档成功
@@ -619,9 +678,10 @@ Spec 同步汇总：
 - 用户取消确认后绝不归档 —— 被取消的批次不归档任何内容
 - 跟踪并报告所有结果（成功/跳过/失败）
 - 移动到归档时保留 .openspec.yaml
-- 归档目录目标使用当前日期：YYYY-MM-DD-<name>；已以 \`YYYY-MM-DD-\` 前缀开头的名称保持原样（绝不叠加第二个日期）
+- 归档目录目标使用当前日期，在步骤 3d 中计算一次并在移动时复用：YYYY-MM-DD-<name>；已以 \`YYYY-MM-DD-\` 前缀开头的名称保持原样（绝不叠加第二个日期）
 - 若归档目标已存在，使该变更失败但继续处理其他变更
-- 若请求同步，为每个包含增量 spec 的变更内联运行 \`/opsx:sync\` 工作流（agent 驱动）
+- 在步骤 3 中检查每个归档目标（在第一次主 spec 写入之前）；目标已存在的变更绝不被同步或移动
+- 若请求同步，为每个包含增量 spec 的变更${SYNC_GUARDRAIL}
 - 将每个 delta 的 \`includedDeltas\` 和 \`excludedDeltas\` 决策带入执行；仅同步和验证包含的 delta
 - 将每个被排除的增量报告为 \`sync skipped\`，但不把归档本身视为跳过
 - 绝不在 spec 同步仍在进行时归档某个变更 —— 内联运行同步，并在移动 \`changeRoot\` 之前验证 \`<planningHome.root>/openspec/specs/<capability-path>/spec.md\` 处的主 specs

@@ -45,7 +45,9 @@
 
 ### 4.1 `list --json`
 
-`{ "changes": [ { "name", "completedTasks", "totalTasks", "lastModified", "status": "no-tasks"|"complete"|"in-progress" } ], "root": RootOutput }` —— 注意这里的每个变更 `status` 是字符串枚举。`--specs`：`{ "specs": [ { "id", "requirementCount" } ], "root" }`。
+`{ "changes": [ { "name", "completedTasks", "totalTasks", "lastModified", "status": "no-tasks"|"complete"|"in-progress", "nested"?: ["<area>/<name>", ...] } ], "warnings"?: [ { "code", "name", "nested", "message" } ], "root": RootOutput }` —— 注意这里的每个变更 `status` 是字符串枚举。`--specs`：`{ "specs": [ { "id", "requirementCount" } ], "root" }`。
+
+`warnings`（为空时省略）报告 `changes/` 下不是变更的目录。目前唯一的 code 是 `nested_change_directory`：一个包裹变更目录的命名空间文件夹，OpenSpec 无法定位它，因为变更永远是 `changes/` 直接下级的一个目录。同一条目会在所列变更上附带 `nested`，此时该变更的 `status` 没有意义。不要把这样的条目当作变更；请转述该消息并保持这些目录不动。
 
 ### 4.2 `show <item> --json`
 
@@ -120,7 +122,7 @@ setup/register：`{ "store": {id, root, metadata_path?}, "registry": {path, regi
 
 ### Store setup/register/remove
 
-`store_setup_id_required`, `store_setup_path_required`, `store_setup_path_not_directory`, `store_setup_inside_git_repo`, `store_setup_non_empty_directory`, `store_setup_cancelled`, `store_path_required`, `store_path_missing`, `store_path_not_directory`, `store_root_pointer_declared`, `store_register_root_unhealthy`, `store_register_identity_confirmation_required`, `store_register_cancelled`, `store_remote_empty`, `store_remote_requires_hand_edit`, `store_remove_confirmation_required`, `store_remove_cancelled`, `store_remove_path_not_directory`, `store_remove_metadata_missing`, `store_root_missing`（在 remove 中为 warning，在 doctor 中为 error）, `store_root_not_directory`。
+`store_setup_id_required`, `store_setup_path_required`, `store_setup_path_not_directory`, `store_setup_inside_git_repo`, `store_setup_non_empty_directory`, `store_setup_cancelled`, `store_path_required`, `store_path_missing`, `store_path_not_directory`, `store_root_pointer_declared`, `store_register_root_unhealthy`, `store_register_identity_confirmation_required`, `store_register_cancelled`, `store_remote_empty`, `store_remote_requires_hand_edit`, `store_remove_confirmation_required`, `store_remove_cancelled`, `store_remove_path_not_directory`, `store_remove_metadata_missing`, `store_remove_contains_registered_store`, `store_root_missing`（在 remove 中为 warning，在 doctor 中为 error）, `store_root_not_directory`。
 
 ### Store git
 `store_git_init_failed`, `store_git_identity_missing`, `store_git_commit_failed`, `store_git_no_commits`（warning）, `store_clone_fragile_directories`（warning）, `store_remote_divergence`（info，doctor）, `store_checkout_drift`（info，doctor）。

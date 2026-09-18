@@ -1,6 +1,6 @@
 ---
 name: openspec-sync-specs
-description: 将变更中的增量 spec 同步到主 spec。当用户希望将增量 spec 的变更更新到主 spec 中（而不归档变更）时使用。
+description: 将变更中的增量 spec 同步到主 spec。当用户希望将增量 spec 的变更更新到主 spec 中（而不归档变更）时使用。也在用户说 "openspec sync" 或 "opsx sync" 时使用。
 allowed-tools: Bash(openspec-cn:*)
 license: MIT
 compatibility: 需要 openspec-cn CLI。
@@ -14,6 +14,17 @@ metadata:
 这是一个**智能驱动**的操作 - 你将读取增量 spec 并直接编辑主 spec 以应用变更。这允许智能合并（例如，添加场景而不复制整个需求）。
 
 **存储选择：** 若用户指定了一个存储（存储是注册在本机上的独立 OpenSpec 仓库）或工作位于某个存储中，请运行 `openspec-cn store list --json` 发现已注册的存储 ID，然后在读写 spec 和变更的命令上传递 `--store <id>`（`new change`、`status`、`instructions`、`list`、`show`、`validate`、`archive`、`doctor`、`context`、`schemas`、`view`）。选定后，将 `--store <id>` 视为在当前工作流其余部分中固定不变。以下每个未限定范围的命令示例均为简写形式：运行前请追加该标志。例如，运行 `openspec-cn status --change "<name>" --json --store "<id>"`，而非下面展示的未限定形式。其他命令不接受此标志。命令输出的提示已包含该标志；在后续操作中请保留它。若不指定存储，命令将对最近的本地 `openspec/` 根目录生效。
+
+**项目检查：** 以下步骤期望项目已经在使用 OpenSpec。在第一个会写入任何内容的步骤之前（`new change`、`archive`、`sync specs`，或撰写任何产出物文件），确认项目已有根目录：运行 `openspec-cn list --json`（当选择了 store 时加上 `--store <id>`，因为此时 store 就是根目录），并读取 `root`。root 是一个对象表示项目已配置好。`"root": null` 表示尚未配置 —— 这里没有 `openspec/` 目录，而像 `openspec-cn new change` 这样的写入操作会作为副作用创建它。该命令还会以非零状态退出，这是它给出的答案而不是 CLI 坏了，因此请读取 JSON，不要重试或绕过它。
+
+有一种 `"root": null` 与配置无关：当某条 `status` 错误消息以 `中声明` 或 `中的 store 声明无效` 结尾，并指向本项目的 `openspec/config.yaml`（或 `config.yml`）时，说明本项目确实通过它声明的某个 store 在使用 OpenSpec，只是本机无法解析该 store（store 未注册，或 `store:` 行格式有误）。不要把它当作未初始化而跳过下面的分支：请在写入前停下，把该错误的 `message` 和 `fix` 展示给用户。
+
+否则，在没有根目录的情况下，接下来怎么做取决于这个工作流是如何被触发的：
+
+- **自动选用**：这个工作流是你自己选的，用户没有提到 OpenSpec、没有点名这个 skill，也没有运行它的斜杠命令。停止使用 OpenSpec，按平常方式回答请求，就像没安装 OpenSpec 一样。不要要求他们做任何配置，也不要提及 OpenSpec 配置。
+- **明确要求 OpenSpec**：用户提到了 OpenSpec、点名了这个 skill，或运行了它的斜杠命令。在写入前停下并询问如何继续：为本项目做配置（`openspec-cn init`）、指向他们已有的某个 store（`--store <id>`），还是本次请求不使用 OpenSpec 继续。等待他们的答复。
+
+无论走哪个分支，都绝不能把创建根目录当作副作用：在用户要求之前不要运行 `openspec-cn init`，不要手工创建 `openspec/` 文件，也不要让任何命令创建它。
 
 `<capability-path>` 是相对于 `specs/` 的 spec 目录（例如 `user-auth` 或 `identity/user-auth`）。在解析主 spec 时保留每个增量 spec 的完整路径。
 
@@ -71,6 +82,12 @@ metadata:
 
    b. **读取主 spec** 位于 `<planningHome.root>/openspec/specs/<capability-path>/spec.md`（可能尚不存在）
 
+      **若它尚不存在**（新 capability），与 `openspec-cn archive` 的行为保持一致：
+      只能应用 ADDED 需求 - 步骤 d 会据此创建 spec。
+      MODIFIED 和 RENAMED 没有可作用的需求，因此停止该 capability 的同步，
+      并报告其主 spec 不存在，且新 spec 只允许 ADDED；
+      绝不要凭空捏造缺失的需求。REMOVED 没有可移除的内容 - 跳过并警告。
+
    c. **智能应用变更**：
 
       **ADDED Requirements：**
@@ -104,6 +121,14 @@ metadata:
       - 主 spec 已有一个且它是权威的 - 不要管它（这是 `openspec-cn archive` 的做法；它会警告然后继续）
 
    d. **若 capability 尚不存在则创建新主 spec**：
+      - 仅当增量 spec 有可放入的 ADDED 需求，且步骤 b 中没有 MODIFIED 或
+        RENAMED 需求阻塞此 capability 时才创建。否则什么都不创建，
+        保持 specs 目录不变。对于仅含 REMOVED 的增量 spec，若变更的
+        `.openspec.yaml` 声明了 `retire_capabilities: true`，报告它已退役，
+        并在不重新创建 spec 的情况下继续。没有该标记时，报告同步受阻：
+        `openspec-cn archive` 会以 `Spec must have at least one requirement` 拒绝它。
+        空增量 spec 没有可同步的操作；同样报告为受阻。
+        绝不要写入空的 `## Requirements` 章节。
       - 创建 `<planningHome.root>/openspec/specs/<capability-path>/spec.md`
       - 添加 Purpose 章节：当增量 spec 有 `## Purpose` 时逐字复制其正文（这是 `openspec-cn archive` 的做法）；没有时仅写一个简短的 TBD 占位符
       - 添加 Requirements 章节及 ADDED 需求
@@ -124,6 +149,8 @@ metadata:
 **增量 Spec 格式参考**
 
 ```markdown
+# Spec Delta
+
 ## Purpose
 
 仅用于引入全新 capability 的增量 spec。为新的主 spec 提供种子。

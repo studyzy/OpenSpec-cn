@@ -5,12 +5,75 @@
  * templates file into workflow-focused modules.
  */
 import type { SkillTemplate, CommandTemplate } from '../types.js';
+import { onlyWithWorkflow, optionalWorkflow } from '../optional-workflow.js';
 import { STORE_SELECTION_GUIDANCE } from './store-selection.js';
+import { PROJECT_ROOT_GUARD } from './project-root.js';
+
+/**
+ * The tutorial names other workflows throughout. Which of them exist depends
+ * on the profile, so each mention is resolved at generation time (see
+ * optional-workflow.ts) instead of being listed with an "if installed" caveat
+ * the reader has to check for themselves.
+ */
+const EXPLORE_MODE_NOTE = optionalWorkflow(
+  'explore',
+  '探索模式（`/opsx:explore`）正是为这类思考准备的 —— 在实现之前先调研。任何时候需要把事情想清楚，都可以使用它。',
+  '在实现之前先做调研，只要一个问题需要想透，就值得这么做。'
+);
+
+/**
+ * The command-reference tables. Every row is dropped along with its line when
+ * the profile does not install that workflow, so the table lists exactly the
+ * commands the reader can run — and stays a valid table either way.
+ */
+const COMMAND_REFERENCE_ROWS = [
+  onlyWithWorkflow('propose', ' | `/opsx:propose` | 创建一个变更并生成全部制品 |'),
+  onlyWithWorkflow('explore', ' | `/opsx:explore` | 在动手前/动手过程中想清楚问题  |'),
+  onlyWithWorkflow('apply', ' | `/opsx:apply`   | 实现变更中的任务              |'),
+  onlyWithWorkflow('archive', ' | `/opsx:archive` | 归档已完成的变更                 |'),
+  onlyWithWorkflow('new', ' | `/opsx:new`     | 启动新变更，一次一个制品 |'),
+  onlyWithWorkflow('continue', ' | `/opsx:continue` | 继续处理一个已有的变更    |'),
+  onlyWithWorkflow('ff', ' | `/opsx:ff`      | 快进：一次性创建全部制品 |'),
+  onlyWithWorkflow('verify', ' | `/opsx:verify`  | 验证实现是否与制品一致    |'),
+].join('\n');
+
+const QUICK_REFERENCE_ROWS = [
+  onlyWithWorkflow('propose', ' | `/opsx:propose <name>`  | 创建一个变更并生成全部制品 |'),
+  onlyWithWorkflow('explore', ' | `/opsx:explore`         | 想清楚问题（不改动代码）   |'),
+  onlyWithWorkflow('apply', ' | `/opsx:apply <name>`    | 实现任务                            |'),
+  onlyWithWorkflow('archive', ' | `/opsx:archive <name>`  | 完成后归档                          |'),
+  onlyWithWorkflow('new', ' | `/opsx:new <name>`      | 启动新变更，逐步推进           |'),
+  onlyWithWorkflow('continue', ' | `/opsx:continue <name>` | 继续一个已有的变更                |'),
+  onlyWithWorkflow('ff', ' | `/opsx:ff <name>`       | 快进：一次性创建全部制品        |'),
+  onlyWithWorkflow('verify', ' | `/opsx:verify <name>`   | 验证实现                      |'),
+].join('\n');
+
+/**
+ * Resume hints for a user stopping mid-tutorial. Both are optional, so the
+ * sentence that introduces them stands on its own without either.
+ */
+const RESUME_HINTS = [
+  onlyWithWorkflow('continue', '- `/opsx:continue <name>` - 恢复制品创建'),
+  onlyWithWorkflow('apply', '- `/opsx:apply <name>` - 跳转到实现（若任务已存在）'),
+].join('\n');
+
+/** Where the tutorial points once it is over. */
+const NEXT_STEP_INVITE = optionalWorkflow(
+  'propose',
+  '在你真正想构建的东西上试试 `/opsx:propose`。你现在已经找到节奏了！',
+  '在你真正想构建的东西上试试看。你现在已经找到节奏了！'
+);
+
+const QUICK_REFERENCE_INVITE = optionalWorkflow(
+  'propose',
+  '运行 `/opsx:propose` 开始你的第一个变更。',
+  '准备好了就让我来启动你的第一个变更。'
+);
 
 export function getOnboardSkillTemplate(): SkillTemplate {
   return {
     name: 'openspec-onboard',
-    description: 'OpenSpec 引导式入门 - 通过讲解和真实代码库工作走完一个完整的工作流周期。',
+    description: 'OpenSpec 引导式入门 - 通过讲解和真实代码库工作走完一个完整的工作流周期。也在用户说 "openspec onboard" 或 "opsx onboard" 时使用。',
     instructions: getOnboardInstructions(),
     license: 'MIT',
     compatibility: '需要 openspec-cn CLI。',
@@ -22,6 +85,8 @@ function getOnboardInstructions(): string {
   return `引导用户完成他们的第一个完整 OpenSpec 工作流周期。这是一次教学体验——你将在他们的代码库中做真实工作，同时解释每一步。
 
 ${STORE_SELECTION_GUIDANCE}
+
+${PROJECT_ROOT_GUARD}
 
 ---
 
@@ -164,7 +229,7 @@ git log --oneline -10 2>/dev/null || echo "No git history"
 │   [可选：有帮助的 ASCII 图]            │
 └─────────────────────────────────────────┘
 
-探索模式（\`/opsx:explore\`）就是用于这种思考——在实现之前调查。你可以在需要思考问题时随时使用它。
+${EXPLORE_MODE_NOTE}
 
 现在让我们创建一个变更来承载我们的工作。
 \`\`\`
@@ -226,6 +291,8 @@ Proposal 捕获我们**为什么**做这个变更以及高层面上涉及**什�
 这是草稿 proposal：
 
 ---
+
+# Proposal
 
 ## Why
 
@@ -294,6 +361,8 @@ openspec-cn instructions specs --change "<name>" --json
 
 ---
 
+# Spec Delta
+
 ## ADDED Requirements
 
 ### Requirement: <Name>
@@ -333,6 +402,8 @@ Design 捕获我们**怎么**构建它——技术决策、权衡、方法。
 
 ---
 
+# Design
+
 ## Context
 
 [关于当前状态的简要上下文]
@@ -364,7 +435,7 @@ Design 捕获我们**怎么**构建它——技术决策、权衡、方法。
 
 **解释：**
 \`\`\`
-## Tasks
+# Tasks
 
 最后，我们将工作分解为实现任务——驱动 apply 阶段的复选框。
 
@@ -479,29 +550,17 @@ openspec-cn archive "<name>" --yes
 
 ## 命令参考
 
-**核心工作流：**
+**你已安装的命令：**
 
  | 命令              | 作用                               |
  |-------------------|--------------------------------------------|
- | \`/opsx:propose\` | 创建变更并生成所有产出物 |
- | \`/opsx:explore\` | 在工作前/期间思考问题  |
- | \`/opsx:apply\`   | 从变更中实现任务              |
- | \`/opsx:archive\` | 归档已完成的变更                 |
-
-**Additional commands** (only if installed - availability depends on your profile):
-
- | 命令               | 作用                                             |
- |--------------------|----------------------------------------------------------|
- | \`/opsx:new\`      | 启动新变更，一次一个产出物 |
- | \`/opsx:continue\` | 继续处理现有变更                   |
- | \`/opsx:ff\`       | 快进：一次性创建所有产出物               |
- | \`/opsx:verify\`   | 验证实现是否匹配产出物                  |
+${COMMAND_REFERENCE_ROWS}
 
 ---
 
 ## 接下来？
 
-在你真正想构建的东西上试试 \`/opsx:propose\`。你现在已经有节奏了！
+${NEXT_STEP_INVITE}
 \`\`\`
 
 ---
@@ -515,9 +574,8 @@ openspec-cn archive "<name>" --yes
 \`\`\`
 没问题！你的变更保存在 \`openspec-cn status --change "<name>" --json\` 报告的 \`changeRoot\`。
 
-稍后从我们停下的地方继续：
-- \`/opsx:continue <name>\` - 恢复制品创建（若已安装；否则 \`openspec-cn status --change "<name>" --json\` 显示下一个制品）
-- \`/opsx:apply <name>\` - 跳到实现（若任务存在）
+稍后从我们停下的地方继续：\`openspec-cn status --change "<name>" --json\` 精确显示变更的当前状态。
+${RESUME_HINTS}
 
 工作不会丢失。随时回来。
 \`\`\`
@@ -531,25 +589,13 @@ openspec-cn archive "<name>" --yes
 \`\`\`
 ## OpenSpec 快速参考
 
-**核心工作流：**
+**你已安装的命令：**
 
  | 命令                     | 作用                               |
  |--------------------------|--------------------------------------------|
- | \`/opsx:propose <name>\` | 创建变更并生成所有产出物 |
- | \`/opsx:explore\`        | 思考问题（不更改代码）   |
- | \`/opsx:apply <name>\`   | 实现任务                            |
- | \`/opsx:archive <name>\` | 完成后归档                          |
+${QUICK_REFERENCE_ROWS}
 
-**Additional commands** (only if installed - availability depends on your profile):
-
- | 命令                      | 作用                        |
- |---------------------------|-------------------------------------|
- | \`/opsx:new <name>\`      | 启动新变更，逐步    |
- | \`/opsx:continue <name>\` | 继续现有变更         |
- | \`/opsx:ff <name>\`       | 快进：所有产出物一次性 |
- | \`/opsx:verify <name>\`   | 验证实现               |
-
-试试 \`/opsx:propose\` 启动你的第一个变更。
+${QUICK_REFERENCE_INVITE}
 \`\`\`
 
 优雅退出。

@@ -22,6 +22,10 @@ function relativePathSchema(fieldName: string) {
 }
 
 // Artifact definition schema
+// Upper bound on artifacts in one schema. Keeps `validateNoCycles`' recursive
+// DFS well inside the stack limit for any accepted input.
+const MAX_ARTIFACTS = 1000;
+
 export const ArtifactSchema = z.object({
   id: z.string().min(1, { error: 'Artifact ID is required' }),
   generates: relativePathSchema('generates field'),
@@ -46,7 +50,14 @@ export const SchemaYamlSchema = z.object({
   name: z.string().min(1, { error: 'Schema 名称是必需的' }),
   version: z.number().int().positive({ error: '版本必须是正整数' }),
   description: z.string().optional(),
-  artifacts: z.array(ArtifactSchema).min(1, { error: '至少需要一个产出物' }),
+  artifacts: z
+    .array(ArtifactSchema)
+    .min(1, { error: '至少需要一个产出物' })
+    // 设置上限，避免恶意 Schema 使环检测 DFS 超出 V8 栈限制，
+    // 从而抛出未捕获的 RangeError 而不是校验错误。
+    .max(MAX_ARTIFACTS, {
+      error: `一个 Schema 最多可声明 ${MAX_ARTIFACTS} 个产出物`,
+    }),
   // Optional apply phase configuration (for schema-aware apply instructions)
   apply: ApplyPhaseSchema.optional(),
 });

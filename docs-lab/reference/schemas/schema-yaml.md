@@ -144,9 +144,12 @@ openspec/changes/add-auth/tasks.md
 - [ ] Pending task
 - [x] Completed task
 * [X] Completed task
++ [ ] Pending task
+1. [ ] Pending task
+2) [x] Completed task
 ```
 
-允许前导空格。spec-driven 页面中的 [tasks.md 一节](spec-driven/index.md#tasksmd) 定义了默认 schema 生成的更严格格式。
+任何 Markdown 列表标记都可以：`-`、`*`、`+`，或最多九位数字后跟 `.` 或 `)`。允许前导空格。spec-driven 页面中的 [tasks.md 一节](spec-driven/index.md#tasksmd) 定义了默认 schema 生成的更严格格式。
 
 被跟踪的文件驱动 apply 状态：
 
@@ -206,12 +209,16 @@ apply:
 - 字段类型和必填字段
 - 相对路径
 - 制品 ID、依赖和环
+- `apply.requires` ID：每一个都必须是该 schema 中的某个制品
 - 模板文件
+
+带有未知 `apply.requires` ID 的 schema 无法加载，因此每个用到它的命令都会报告该错误。
+
+当 `apply.tracks` 与某个制品的 `generates` 值不完全相等时，校验会发出警告但不会失败。OpenSpec 通过比较这两个字符串来找到被跟踪的制品，因此任何其他情况都会让它无法判断该文件属于哪个制品的进度。这既包括像 `task.md` 这样的拼写错误，也包括 `tracks: tasks/main.md` 与 `generates: tasks/*.md` 的搭配——glob 确实能产出该文件，但字符串仍然不同。无论哪种情况，apply 仍会读取该文件，但 `openspec list` 和 `openspec status` 会改为统计 `tasks.md`。
 
 校验不会捕获这些错误：
 
 | 错误 | 后果 |
 |---|---|
 | 字段拼写错误，例如 `instrution` | OpenSpec 忽略它。校验不报告该拼写错误。 |
-| `apply.requires` 指向未知的制品 ID | 校验不报告该未知 ID。 |
 | `name` 与 schema 目录名不同 | 校验通过。OpenSpec 仍使用目录名进行查找。 |

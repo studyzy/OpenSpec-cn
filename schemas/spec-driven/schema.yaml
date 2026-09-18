@@ -23,7 +23,7 @@ artifacts:
       —— 它会返回某个能力的 Purpose 与需求文本，而不会把整个 spec 文件拉进上下文。
       仅当目标是已注册的独立 store 时，才给这两条命令追加 `--store "<id>"`，并保留 `--type
       spec`：否则同名的一个变更和一个 spec 会触发 ambiguous-item 错误。不带 `--specs` 的
-      `openspec list` 列出的是进行中的变更而非 specs —— 它永远不会显示项目已覆盖的内容。
+      `openspec-cn list` 列出的是进行中的变更而非 specs —— 它永远不会显示项目已覆盖的内容。
       应复用既有能力的精确路径，而不是引入近似重复的名称。
       这种带过滤的读取只是一份概览。在判断哪些内容已被覆盖或应当变更之前，请用
       `openspec-cn show "<spec-id>" --type spec`（`--store` 规则同上）完整阅读每个相关
@@ -94,12 +94,13 @@ artifacts:
       用一到两句话（50 个字符以上，否则 `openspec-cn validate --strict`
       会报告其过于简略）描述该能力的用途。归档时会将其
       复制到所创建的主 spec 中；缺少它时，新的主 spec 会留下
-      `TBD ... Update Purpose after archive` 占位符，需要手工填写。
+      `TBD - created by archiving change <name>. Update Purpose after archive.`
+      占位符，需要手工填写。
       不要为既有能力的 delta 添加 `## Purpose` ——
       该 spec 已经有一个，delta 中的会被忽略。要修改
       既有能力的 Purpose（包括残留的 `TBD` 占位符），
       请直接编辑 `<planningHome.root>/openspec/specs/<capability-path>/spec.md`。
-      `planningHome.root` 来自 `openspec instructions ... --json` 响应。
+      `planningHome.root` 来自 `openspec-cn instructions ... --json` 响应。
       始终使用它而不是仓库相对路径：只要变更位于某个 store 中
       —— 无论该 store 来自 `--store`、项目中的 `store:` 指针，
       还是全局默认 store —— 它都会解析到该 store；否则解析到当前仓库。
@@ -116,6 +117,8 @@ artifacts:
 
       示例（一个新能力，因此以 `## Purpose` 开头）：
       ```
+      # Spec Delta
+
       ## Purpose
 
       让用户以可移植的格式导出自己在产品中的数据。
@@ -187,7 +190,10 @@ artifacts:
       把未言明的假设固化进任务列表。
 
       **重要：严格遵循下面的模板。** apply 阶段通过解析
-      复选框格式来追踪进度。不使用 `- [ ]` 的任务不会被追踪。
+      复选框格式来追踪进度。只有 `x` 的方框计为已完成，
+      不区分大小写与空格，因此 `- [ x]` 也算完成。其他
+      任何标记，包括 `- [~]`、`- [-]` 和空的 `- []`，都读作
+      未完成。没有复选框的行完全不会被追踪。
 
       指引：
       - 将相关任务归入 ## 编号标题下
@@ -201,6 +207,8 @@ artifacts:
 
       示例：
       ```
+      # Tasks
+
       ## 1. 准备工作
 
       - [ ] 1.1 创建新的模块结构，并验证预期文件已存在

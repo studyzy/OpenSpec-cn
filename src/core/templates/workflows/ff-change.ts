@@ -5,15 +5,39 @@
  * templates file into workflow-focused modules.
  */
 import type { SkillTemplate, CommandTemplate } from '../types.js';
+import { optionalWorkflow } from '../optional-workflow.js';
 import { STORE_SELECTION_GUIDANCE } from './store-selection.js';
+import { PROJECT_ROOT_GUARD } from './project-root.js';
+
+/**
+ * The implementation handoff, resolved at generation time so a profile
+ * without `apply` is not told to run it (see optional-workflow.ts).
+ *
+ * The two surfaces word this differently on purpose (#258): a command-only
+ * tool has no conversational agent to ask, so its prompt names a command or
+ * the CLI and never invites "ask me to implement".
+ */
+const SKILL_APPLY_HANDOFF = optionalWorkflow(
+  'apply',
+  '运行 `/opsx:apply`，或者让我来实现，即可开始处理这些任务。',
+  '让我来实现，即可开始处理这些任务。'
+);
+
+const COMMAND_APPLY_HANDOFF = optionalWorkflow(
+  'apply',
+  '运行 `/opsx:apply` 开始实现。',
+  '运行 `openspec-cn instructions apply --change "<name>" --json` 获取任务列表并开始实现。'
+);
 
 export function getFfChangeSkillTemplate(): SkillTemplate {
   return {
     name: 'openspec-ff-change',
-    description: '快速推进 OpenSpec 产出物创建。当用户想快速创建实现所需的所有产出物而无需逐个处理时使用。',
+    description: '快速推进 OpenSpec 产出物创建。当用户想快速创建实现所需的所有产出物而无需逐个处理时使用。也在用户说 "openspec ff" 或 "opsx ff" 时使用。',
     instructions: `快速推进产出物创建 - 一次性生成开始实现所需的所有内容。
 
 ${STORE_SELECTION_GUIDANCE}
+
+${PROJECT_ROOT_GUARD}
 
 **Input**: 用户的请求应当包含变更名（kebab-case）或对想要构建内容的描述。
 
@@ -97,7 +121,7 @@ ${STORE_SELECTION_GUIDANCE}
 - 变更名称和位置
 - 已创建产出物列表及简要描述，加上跳过的任何条件性产出物及原因
 - 就绪状态："实现所需的所有产出物已就绪。"
-- 提示："运行 \`/opsx:apply\` 或让我实现以开始处理任务。"
+- 提示："${SKILL_APPLY_HANDOFF}"
 
 **产出物创建指南**
 
@@ -131,6 +155,8 @@ export function getOpsxFfCommandTemplate(): CommandTemplate {
     content: `快速推进产出物创建 - 一次性生成开始实现所需的所有内容。
 
 ${STORE_SELECTION_GUIDANCE}
+
+${PROJECT_ROOT_GUARD}
 
 **Input**: \`/opsx:ff\` 之后的参数是变更名（kebab-case），或用户想要构建内容的描述。
 
@@ -214,7 +240,7 @@ ${STORE_SELECTION_GUIDANCE}
 - 变更名称和位置
 - 已创建产出物列表及简要描述，加上跳过的任何条件性产出物及原因
 - 就绪状态："实现所需的所有产出物已就绪。"
-- 提示："运行 \`/opsx:apply\` 开始实现。"
+- 提示："${COMMAND_APPLY_HANDOFF}"
 
 **产出物创建指南**
 

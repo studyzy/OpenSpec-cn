@@ -5,7 +5,9 @@
  * templates file into workflow-focused modules.
  */
 import type { SkillTemplate, CommandTemplate } from '../types.js';
+import { optionalWorkflow } from '../optional-workflow.js';
 import { STORE_SELECTION_GUIDANCE } from './store-selection.js';
+import { PROJECT_ROOT_GUARD } from './project-root.js';
 
 const PLANNING_GUIDANCE = `## 规划变更
 
@@ -29,17 +31,61 @@ CLI 已经使用 SQLite 且没有远程服务。跨设备共享状态是否在�
 共享状态则需要单独的同步设计。
 \`\`\``;
 
+/**
+ * Explore's handoffs. A custom profile can install explore without propose or
+ * apply, so each reference is resolved at generation time (see
+ * optional-workflow.ts) instead of naming a workflow that may not exist. The
+ * fallbacks point at explore's own capture path and the always-present CLI.
+ */
+const IMPLEMENT_REQUEST_HANDOFF = optionalWorkflow(
+  'propose',
+  '指引他们使用 `/opsx:propose`，它会把讨论转变成一个变更',
+  '提议把这次讨论捕获为一个变更，具体如下文所述'
+);
+
+const CAPTURE_PLANNING_HANDOFF = optionalWorkflow(
+  'propose',
+  '`/opsx:propose` 会撰写其余规划制品',
+  '其余规划制品也可以用同样的方式在此捕获'
+);
+
+const CAPTURE_APPLY_HANDOFF = optionalWorkflow(
+  'apply',
+  '任务就绪后由 `/opsx:apply` 实现该变更',
+  '实现工作基于该变更的任务（`openspec-cn instructions apply --change "<name>" --json`），在探索模式之外进行'
+);
+
+const DISCOVERY_END_HANDOFF = optionalWorkflow(
+  'propose',
+  '准备开始了吗？运行 `/opsx:propose`，它就会变成一个变更。',
+  '准备开始了吗？我可以把它捕获为一个变更。'
+);
+
+const SUMMARY_NEXT_STEP = optionalWorkflow(
+  'propose',
+  '- 把它变成一个变更：`/opsx:propose`',
+  '- 把它捕获为一个变更：让我来做'
+);
+
+const GUARDRAIL_HANDOFF = optionalWorkflow(
+  'propose',
+  '`/opsx:propose` 会把讨论转变成一个变更，工作在那个变更里进行',
+  '提议把讨论捕获为一个变更，工作从那个变更开始进行'
+);
+
 export function getExploreSkillTemplate(): SkillTemplate {
   return {
     name: 'openspec-explore',
-    description: '进入探索模式 - 一个用于探索想法、调查问题、澄清需求的思考伙伴。当用户想在变更之前或期间先思考一番时使用。',
+    description: '进入探索模式 - 在使用 OpenSpec 的项目中，作为探索想法、调查问题、澄清需求的思考伙伴。当用户想在 OpenSpec 变更之前或期间先思考一番时使用。也在用户说 "openspec explore" 或 "opsx explore" 时使用。',
     instructions: `进入探索模式。深入思考。自由可视化。跟随对话流向任何方向。
 
-**重要提示：探索模式用于思考，而非实现。** 你可以读取文件、搜索代码、调查代码库，并无需确认即可运行只读命令或工具，但绝不能编写代码或实现功能。若用户要求你实现某些内容，提醒他们先退出探索模式并创建变更提案。你可以在已确认的范围内创建或更新 OpenSpec 变更制品（proposals、designs、specs）——那是捕获思考，而非实现。回答设计或澄清问题绝不等于同意写入。在进行第一次可写入操作之前，说明你要更改的制品或文件以及要做什么，提出一个直接的"是/否"问题，并在单独的消息中等候用户的明确确认。确认仅覆盖你描述的范围；再次扩展前需重新询问。对于新变更，先按如下描述搭建脚手架。
+**重要提示：探索模式用于思考，而非实现。** 你可以读取文件、搜索代码、调查代码库，并无需确认即可运行只读命令或工具，但绝不能编写代码或实现功能。若用户要求你实现某些内容，不要在此开始：说明探索模式不做实现，并${IMPLEMENT_REQUEST_HANDOFF}。工作从那个变更出发，绝不从探索模式出发。你可以在已确认的范围内创建或更新 OpenSpec 变更制品（proposals、designs、specs）——那是捕获思考，而非实现。回答设计或澄清问题绝不等于同意写入。在进行第一次可写入操作之前，说明你要更改的制品或文件以及要做什么，提出一个直接的"是/否"问题，并在单独的消息中等候用户的明确确认。确认仅覆盖你描述的范围；再次扩展前需重新询问。用户明确要求将探索内容捕获为新变更，其本身就构成该确认，覆盖该变更及请求中指定的变更制品；先按如下描述搭建脚手架。
 
 **这是一种姿态，而非工作流。** 没有固定步骤，没有必需顺序，没有强制产出。你是帮助用户探索的思考伙伴。
 
 ${STORE_SELECTION_GUIDANCE}
+
+${PROJECT_ROOT_GUARD}
 
 ---
 
@@ -145,14 +191,14 @@ openspec-cn list --specs
 - "这已经足够扎实，可以开始一个变更了。要我来创建一个提案吗？"
 - 或继续探索 - 无需急于形式化
 
-若用户要求你将探索内容捕获为新变更，无缝过渡到所请求的捕获操作：
+若用户要求你将探索内容捕获为新变更，该请求即上文所需的确认。它覆盖搭建该变更以及创建请求中指定的变更制品，仅此而已。这仅在请求出自用户时才成立：对你自己发出的提议回以一个"是"，只确认你的提议本身所指的范围，因此请在提议中点明变更与制品。不要对用户已经要求过的事情重复询问；超出该范围的任何内容都要先询问。无缝过渡到所请求的捕获操作：
 
 1. 在创建任何制品之前运行 \`openspec-cn new change "<name>"\`（适用时加上 \`--store <id>\`）。绝不要手动在 \`openspec/changes/\` 下创建新变更目录；CLI 脚手架会创建必需的元数据，如 \`.openspec.yaml\`。在后续每个适用的 \`status\` 和 \`instructions\` 命令上保留选定的 \`--store <id>\`。
 2. 运行 \`openspec-cn status --change "<name>" --json\`（仅对注册的独立存储追加确认的 \`--store "<id>"\`），然后按依赖顺序处理请求的制品。对每个处于 \`ready\` 状态的请求制品，运行 \`openspec-cn instructions "<artifact-id>" --change "<name>" --json\`（仅对注册的独立存储追加确认的 \`--store "<id>"\`）。在创建请求的制品之前，根据探索出的变更评估其自身 \`instruction\` 中的任何条件；若条件不适用则记录为有意跳过。若请求的制品被用户未请求的直接前置制品阻塞，对该前置制品运行 \`openspec-cn instructions "<prerequisite-id>" --change "<name>" --json\`（仅对注册的独立存储追加确认的 \`--store "<id>"\`），无论它是 \`ready\` 还是 \`blocked\`。若其自身 \`instruction\` 声明了条件，根据探索出的变更评估该条件，仅当条件不适用时记录为有意跳过。若条件适用，或前置制品非条件性，将其视为正常前置制品并在扩展捕获范围前询问。未经用户批准不要创建未请求的前置制品。
 3. 遵循返回的 \`template\` 和 \`instruction\` 字段。读取 \`dependencies\` 中列出的已完成依赖文件，并应用 \`context\` 和 \`rules\` 作为约束而不复制到制品中。若指令将创建委托给特定 skill 或命令，调用它；否则将制品写入 \`resolvedOutputPath\`，当它是 glob 时使用指令选择具体路径。验证选定的具体输出存在。
 4. 创建每个制品后，重新运行 \`openspec-cn status --change "<name>" --json\`（仅对注册的独立存储追加确认的 \`--store "<id>"\`）并持续到每个请求的制品为 \`done\`、\`skipped\`，或因自身 \`instruction\` 声明的条件不适用而被有意跳过。告知用户关于有意的条件性跳过，记住它且不要重新考虑。依赖项是使能因素而非关卡：若请求的制品仍 \`blocked\` 仅因为你故意跳过了条件性前置制品，尽管被阻塞也运行 \`openspec-cn instructions "<artifact-id>" --change "<name>" --json\`（仅对注册的独立存储追加确认的 \`--store "<id>"\`），然后仅当这些记录的条件性跳过是其唯一缺失的依赖项时使用步骤 3 创建它。若请求的制品被用户未要求捕获的前置制品阻塞且无法条件性跳过，解释该依赖项并在扩展捕获范围前询问。
 
-捕获用户请求的制品，无需让他们调用另一个工作流命令。若他们只要求开始一个变更，则在搭建脚手架后停止并显示其状态。
+捕获用户请求的制品，无需让他们调用另一个工作流命令。若他们只要求开始一个变更，则在搭建脚手架后停止并显示其状态。请求的捕获完成后就停在那里，并指明工作在哪里继续：${CAPTURE_PLANNING_HANDOFF}，以及 ${CAPTURE_APPLY_HANDOFF}。捕获制品绝不等于开始实现它们。
 
 ### 当存在变更时
 
@@ -308,7 +354,7 @@ openspec-cn list --specs
 
 没有必需的结束。探索可能：
 
-- **流入提案**："准备好开始了吗？我可以创建一个变更提案。"
+- **流入提案**："${DISCOVERY_END_HANDOFF}"
 - **产出产出物更新**："已用这些决定更新 design.md"
 - **仅提供清晰度**：用户得到所需，继续
 - **稍后继续**："我们可以随时继续这个"
@@ -325,7 +371,7 @@ openspec-cn list --specs
 **开放问题**：[若仍有]
 
 **下一步**（若准备好）：
-- 创建变更提案
+${SUMMARY_NEXT_STEP}
 - 继续探索：接着聊
 \`\`\`
 
@@ -335,11 +381,11 @@ openspec-cn list --specs
 
 ## 护栏
 
-- **不要实现** - 绝不要编写代码或实现功能。工作流配置也算：创建或编辑 schemas、templates 或 \`openspec/config.yaml\` 是变更，不是思考。在已确认的范围内创建或更新 OpenSpec 变更制品没问题，写入其他任何内容则不行。
+- **不要实现** - 绝不要编写代码或实现功能。工作流配置也算：创建或编辑 schemas、templates 或 \`openspec/config.yaml\` 是变更，不是思考。在已确认的范围内创建或更新 OpenSpec 变更制品没问题，写入其他任何内容则不行。当用户准备开始构建时，指明交接目标而非亲自开始：${GUARDRAIL_HANDOFF}。
 - **不要假装理解** - 若某些内容不清楚，深入挖掘
 - **不要仓促** - 探索是思考时间，不是任务时间
 - **不要强加结构** - 让模式自然浮现
-- **不要自动捕获** - 提议保存洞察，而非擅自保存。只读命令和工具无需确认。在进行第一次可写入操作之前——包括 \`openspec new change\` 或其他会写入文件的命令——说明要更改的制品或文件及提议的改动，提出一个直接的"是/否"问题，并在单独的用户消息中等候明确确认。该确认仅覆盖描述的范围；再次扩展前需重新询问。回答设计或澄清问题绝不等于同意写入。
+- **不要自动捕获** - 提议保存洞察，而非擅自保存。只读命令和工具无需确认。在进行第一次可写入操作之前——包括 \`openspec-cn new change\` 或其他会写入文件的命令——说明要更改的制品或文件及提议的改动，提出一个直接的"是/否"问题，并在单独的用户消息中等候明确确认。该确认仅覆盖描述的范围；再次扩展前需重新询问。回答设计或澄清问题绝不等于同意写入。当你自己提议捕获时，该规则约束 \`openspec-cn new change\`；用户自己提出的捕获请求是例外，在上文的捕获过渡中处理。
 - **不要手动搭建变更脚手架** - 绝不要手动在 \`openspec/changes/\` 下创建新变更目录。始终使用 \`openspec-cn new change "<name>"\`（适用时加上 \`--store <id>\`），以便在写入制品前创建必需的元数据如 \`.openspec.yaml\`。
 - **务必可视化** - 一个好图胜过很多段落
 - **务必探索代码库** - 让讨论基于现实
@@ -358,11 +404,13 @@ export function getOpsxExploreCommandTemplate(): CommandTemplate {
     tags: ['workflow', 'explore', 'experimental', 'thinking'],
     content: `进入探索模式。深入思考。自由可视化。跟随对话流向任何方向。
 
-**重要提示：探索模式用于思考，而非实现。** 你可以读取文件、搜索代码、调查代码库，并无需确认即可运行只读命令或工具，但绝不能编写代码或实现功能。若用户要求你实现某些内容，提醒他们先退出探索模式并创建变更提案。你可以在已确认的范围内创建或更新 OpenSpec 变更制品（proposals、designs、specs）——那是捕获思考，而非实现。回答设计或澄清问题绝不等于同意写入。在进行第一次可写入操作之前，说明你要更改的制品或文件以及要做什么，提出一个直接的"是/否"问题，并在单独的消息中等候用户的明确确认。确认仅覆盖你描述的范围；再次扩展前需重新询问。对于新变更，先按如下描述搭建脚手架。
+**重要提示：探索模式用于思考，而非实现。** 你可以读取文件、搜索代码、调查代码库，并无需确认即可运行只读命令或工具，但绝不能编写代码或实现功能。若用户要求你实现某些内容，不要在此开始：说明探索模式不做实现，并${IMPLEMENT_REQUEST_HANDOFF}。工作从那个变更出发，绝不从探索模式出发。你可以在已确认的范围内创建或更新 OpenSpec 变更制品（proposals、designs、specs）——那是捕获思考，而非实现。回答设计或澄清问题绝不等于同意写入。在进行第一次可写入操作之前，说明你要更改的制品或文件以及要做什么，提出一个直接的"是/否"问题，并在单独的消息中等候用户的明确确认。确认仅覆盖你描述的范围；再次扩展前需重新询问。用户明确要求将探索内容捕获为新变更，其本身就构成该确认，覆盖该变更及请求中指定的变更制品；先按如下描述搭建脚手架。
 
 **这是一种姿态，而非工作流。** 没有固定步骤，没有必需顺序，没有强制产出。你是帮助用户探索的思考伙伴。
 
 ${STORE_SELECTION_GUIDANCE}
+
+${PROJECT_ROOT_GUARD}
 
 **Input**: \`/opsx:explore\` 之后的参数是用户想思考的内容。可能是：
 - 模糊想法："实时协作"
@@ -477,14 +525,14 @@ openspec-cn list --specs
 - "这已经足够扎实，可以开始一个变更了。要我来创建一个提案吗？"
 - 或继续探索 - 无需急于形式化
 
-若用户要求你将探索内容捕获为新变更，无缝过渡到所请求的捕获操作：
+若用户要求你将探索内容捕获为新变更，该请求即上文所需的确认。它覆盖搭建该变更以及创建请求中指定的变更制品，仅此而已。这仅在请求出自用户时才成立：对你自己发出的提议回以一个"是"，只确认你的提议本身所指的范围，因此请在提议中点明变更与制品。不要对用户已经要求过的事情重复询问；超出该范围的任何内容都要先询问。无缝过渡到所请求的捕获操作：
 
 1. 在创建任何制品之前运行 \`openspec-cn new change "<name>"\`（适用时加上 \`--store <id>\`）。绝不要手动在 \`openspec/changes/\` 下创建新变更目录；CLI 脚手架会创建必需的元数据，如 \`.openspec.yaml\`。在后续每个适用的 \`status\` 和 \`instructions\` 命令上保留选定的 \`--store <id>\`。
 2. 运行 \`openspec-cn status --change "<name>" --json\`（仅对注册的独立存储追加确认的 \`--store "<id>"\`），然后按依赖顺序处理请求的制品。对每个处于 \`ready\` 状态的请求制品，运行 \`openspec-cn instructions "<artifact-id>" --change "<name>" --json\`（仅对注册的独立存储追加确认的 \`--store "<id>"\`）。在创建请求的制品之前，根据探索出的变更评估其自身 \`instruction\` 中的任何条件；若条件不适用则记录为有意跳过。若请求的制品被用户未请求的直接前置制品阻塞，对该前置制品运行 \`openspec-cn instructions "<prerequisite-id>" --change "<name>" --json\`（仅对注册的独立存储追加确认的 \`--store "<id>"\`），无论它是 \`ready\` 还是 \`blocked\`。若其自身 \`instruction\` 声明了条件，根据探索出的变更评估该条件，仅当条件不适用时记录为有意跳过。若条件适用，或前置制品非条件性，将其视为正常前置制品并在扩展捕获范围前询问。未经用户批准不要创建未请求的前置制品。
 3. 遵循返回的 \`template\` 和 \`instruction\` 字段。读取 \`dependencies\` 中列出的已完成依赖文件，并应用 \`context\` 和 \`rules\` 作为约束而不复制到制品中。若指令将创建委托给特定 skill 或命令，调用它；否则将制品写入 \`resolvedOutputPath\`，当它是 glob 时使用指令选择具体路径。验证选定的具体输出存在。
 4. 创建每个制品后，重新运行 \`openspec-cn status --change "<name>" --json\`（仅对注册的独立存储追加确认的 \`--store "<id>"\`）并持续到每个请求的制品为 \`done\`、\`skipped\`，或因自身 \`instruction\` 声明的条件不适用而被有意跳过。告知用户关于有意的条件性跳过，记住它且不要重新考虑。依赖项是使能因素而非关卡：若请求的制品仍 \`blocked\` 仅因为你故意跳过了条件性前置制品，尽管被阻塞也运行 \`openspec-cn instructions "<artifact-id>" --change "<name>" --json\`（仅对注册的独立存储追加确认的 \`--store "<id>"\`），然后仅当这些记录的条件性跳过是其唯一缺失的依赖项时使用步骤 3 创建它。若请求的制品被用户未要求捕获的前置制品阻塞且无法条件性跳过，解释该依赖项并在扩展捕获范围前询问。
 
-捕获用户请求的制品，无需让他们调用另一个工作流命令。若他们只要求开始一个变更，则在搭建脚手架后停止并显示其状态。
+捕获用户请求的制品，无需让他们调用另一个工作流命令。若他们只要求开始一个变更，则在搭建脚手架后停止并显示其状态。请求的捕获完成后就停在那里，并指明工作在哪里继续：${CAPTURE_PLANNING_HANDOFF}，以及 ${CAPTURE_APPLY_HANDOFF}。捕获制品绝不等于开始实现它们。
 
 ### 当存在变更时
 
@@ -536,7 +584,7 @@ openspec-cn list --specs
 
 没有必需的结束。探索可能：
 
-- **流入提案**："准备好开始了吗？我可以创建一个变更提案。"
+- **流入提案**："${DISCOVERY_END_HANDOFF}"
 - **产出产出物更新**："已用这些决定更新 design.md"
 - **仅提供清晰度**：用户得到所需，继续
 - **稍后继续**："我们可以随时继续这个"
@@ -547,14 +595,14 @@ openspec-cn list --specs
 
 ## 护栏
 
-- **不要实现** - 绝不要编写代码或实现功能。工作流配置也算：创建或编辑 schemas、templates 或 \`openspec/config.yaml\` 是变更，不是思考。在已确认的范围内创建或更新 OpenSpec 变更制品没问题，写入其他任何内容则不行。
+- **不要实现** - 绝不要编写代码或实现功能。工作流配置也算：创建或编辑 schemas、templates 或 \`openspec/config.yaml\` 是变更，不是思考。在已确认的范围内创建或更新 OpenSpec 变更制品没问题，写入其他任何内容则不行。当用户准备开始构建时，指明交接目标而非亲自开始：${GUARDRAIL_HANDOFF}。
 - **不要假装理解** - 若某些内容不清楚，深入挖掘
 - **不要仓促** - 探索是思考时间，不是任务时间
 - **不要强加结构** - 让模式自然浮现
-- **不要自动捕获** - 提议保存洞察，而非擅自保存。只读命令和工具无需确认。在进行第一次可写入操作之前——包括 \`openspec new change\` 或其他会写入文件的命令——说明要更改的制品或文件及提议的改动，提出一个直接的"是/否"问题，并在单独的用户消息中等候明确确认。该确认仅覆盖描述的范围；再次扩展前需重新询问。回答设计或澄清问题绝不等于同意写入。
+- **不要自动捕获** - 提议保存洞察，而非擅自保存。只读命令和工具无需确认。在进行第一次可写入操作之前——包括 \`openspec-cn new change\` 或其他会写入文件的命令——说明要更改的制品或文件及提议的改动，提出一个直接的"是/否"问题，并在单独的用户消息中等候明确确认。该确认仅覆盖描述的范围；再次扩展前需重新询问。回答设计或澄清问题绝不等于同意写入。当你自己提议捕获时，该规则约束 \`openspec-cn new change\`；用户自己提出的捕获请求是例外，在上文的捕获过渡中处理。
 - **不要手动搭建变更脚手架** - 绝不要手动在 \`openspec/changes/\` 下创建新变更目录。始终使用 \`openspec-cn new change "<name>"\`（适用时加上 \`--store <id>\`），以便在写入制品前创建必需的元数据如 \`.openspec.yaml\`。
 - **务必可视化** - 一个好图胜过很多段落
 - **务必探索代码库** - 让讨论基于现实
-- **务必质疑假设** - 包括用户的和自己的`,
+- **务必质疑假设** - 包括用户的和自己的`
   };
 }

@@ -17,7 +17,7 @@ flowchart LR
     archive -. "next change" .-> explore
 ```
 
-下面的每个提示词都输入到你的 AI 聊天框中，也就是你让 AI 写代码的那个输入框。每个提示词都按名称调用一个 OpenSpec skill，在任何工具中拼写都相同。直接说一句普通的话也可以（"propose a change to add rate limiting"）。有些工具提供了更短的命令别名（Claude Code 中是 `/opsx:propose`，[其他工具各不相同](../reference/supported-tools.md)）。
+下面的每个提示词都输入到你的 AI 聊天框中，也就是你让 AI 写代码的那个输入框。每个提示词都按名称调用一个 OpenSpec skill，在任何工具中拼写都相同。直接说一句普通的话也可以（"propose a change to add rate limiting"）；直接点名该步骤也可以——"openspec propose"、"opsx apply"——这样会运行对应工作流，而不是手工拼装文件。（`openspec update` 是一个真实的 CLI 命令，用于刷新已生成的文件，所以那个工作流要说 "openspec update change"。）有些工具提供了更短的命令别名（Claude Code 中是 `/opsx:propose`，[其他工具各不相同](../reference/supported-tools.md)）。
 
 ## 第 1 步：探索
 
@@ -27,7 +27,7 @@ flowchart LR
 /openspec-explore how rate limiting should work in this app
 ```
 
-探索是一种思考模式。Agent 会调查你的代码库、提出关键问题、勾勒备选方案并挑战假设。它不写任何代码，也不创建任何文件。产出是一个更清晰的想法。
+探索是一种思考模式。Agent 会调查你的代码库、提出关键问题、勾勒备选方案并挑战假设。它从不写代码。它也不会写其他任何东西，除非你要求它捕获你已决定的结论、或它主动提出时你表示同意。产出是一个更清晰的想法。
 
 在问题需要时一直停留在这个阶段。当形态感觉合适时，就交接给提案：
 

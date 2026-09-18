@@ -6,16 +6,19 @@
  */
 import type { SkillTemplate, CommandTemplate } from '../types.js';
 import { STORE_SELECTION_GUIDANCE } from './store-selection.js';
+import { PROJECT_ROOT_GUARD } from './project-root.js';
 
 export function getSyncSpecsSkillTemplate(): SkillTemplate {
   return {
     name: 'openspec-sync-specs',
-    description: '将变更中的增量 spec 同步到主 spec。当用户希望将增量 spec 的变更更新到主 spec 中（而不归档变更）时使用。',
+    description: '将变更中的增量 spec 同步到主 spec。当用户希望将增量 spec 的变更更新到主 spec 中（而不归档变更）时使用。也在用户说 "openspec sync" 或 "opsx sync" 时使用。',
     instructions: `将变更中的增量 spec 同步到主 spec。
 
 这是一个**智能驱动**的操作 - 你将读取增量 spec 并直接编辑主 spec 以应用变更。这允许智能合并（例如，添加场景而不复制整个需求）。
 
 ${STORE_SELECTION_GUIDANCE}
+
+${PROJECT_ROOT_GUARD}
 
 \`<capability-path>\` 是相对于 \`specs/\` 的 spec 目录（例如 \`user-auth\` 或 \`identity/user-auth\`）。在解析主 spec 时保留每个增量 spec 的完整路径。
 
@@ -73,6 +76,12 @@ ${STORE_SELECTION_GUIDANCE}
 
    b. **读取主 spec** 位于 \`<planningHome.root>/openspec/specs/<capability-path>/spec.md\`（可能尚不存在）
 
+      **若它尚不存在**（新 capability），与 \`openspec-cn archive\` 的行为保持一致：
+      只能应用 ADDED 需求 - 步骤 d 会据此创建 spec。
+      MODIFIED 和 RENAMED 没有可作用的需求，因此停止该 capability 的同步，
+      并报告其主 spec 不存在，且新 spec 只允许 ADDED；
+      绝不要凭空捏造缺失的需求。REMOVED 没有可移除的内容 - 跳过并警告。
+
    c. **智能应用变更**：
 
       **ADDED Requirements：**
@@ -106,6 +115,14 @@ ${STORE_SELECTION_GUIDANCE}
       - 主 spec 已有一个且它是权威的 - 不要管它（这是 \`openspec-cn archive\` 的做法；它会警告然后继续）
 
    d. **若 capability 尚不存在则创建新主 spec**：
+      - 仅当增量 spec 有可放入的 ADDED 需求，且步骤 b 中没有 MODIFIED 或
+        RENAMED 需求阻塞此 capability 时才创建。否则什么都不创建，
+        保持 specs 目录不变。对于仅含 REMOVED 的增量 spec，若变更的
+        \`.openspec.yaml\` 声明了 \`retire_capabilities: true\`，报告它已退役，
+        并在不重新创建 spec 的情况下继续。没有该标记时，报告同步受阻：
+        \`openspec-cn archive\` 会以 \`Spec must have at least one requirement\` 拒绝它。
+        空增量 spec 没有可同步的操作；同样报告为受阻。
+        绝不要写入空的 \`## Requirements\` 章节。
       - 创建 \`<planningHome.root>/openspec/specs/<capability-path>/spec.md\`
       - 添加 Purpose 章节：当增量 spec 有 \`## Purpose\` 时逐字复制其正文（这是 \`openspec-cn archive\` 的做法）；没有时仅写一个简短的 TBD 占位符
       - 添加 Requirements 章节及 ADDED 需求
@@ -126,6 +143,8 @@ ${STORE_SELECTION_GUIDANCE}
 **增量 Spec 格式参考**
 
 \`\`\`markdown
+# Spec Delta
+
 ## Purpose
 
 仅用于引入全新 capability 的增量 spec。为新的主 spec 提供种子。
@@ -237,6 +256,8 @@ export function getOpsxSyncCommandTemplate(): CommandTemplate {
 
 ${STORE_SELECTION_GUIDANCE}
 
+${PROJECT_ROOT_GUARD}
+
 \`<capability-path>\` 是相对于 \`specs/\` 的 spec 目录（例如 \`user-auth\` 或 \`identity/user-auth\`）。在解析主 spec 时保留每个增量 spec 的完整路径。
 
 **Input**: 可选地在 \`/opsx:sync\` 后指定变更名称（例如 \`/opsx:sync add-auth\`）。若省略，检查能否从对话上下文推断。若模糊或歧义，你必须提示用户从可用变更中选择。
@@ -293,6 +314,12 @@ ${STORE_SELECTION_GUIDANCE}
 
    b. **读取主 spec** 位于 \`<planningHome.root>/openspec/specs/<capability-path>/spec.md\`（可能尚不存在）
 
+      **若它尚不存在**（新 capability），与 \`openspec-cn archive\` 的行为保持一致：
+      只能应用 ADDED 需求 - 步骤 d 会据此创建 spec。
+      MODIFIED 和 RENAMED 没有可作用的需求，因此停止该 capability 的同步，
+      并报告其主 spec 不存在，且新 spec 只允许 ADDED；
+      绝不要凭空捏造缺失的需求。REMOVED 没有可移除的内容 - 跳过并警告。
+
    c. **智能应用变更**：
 
       **ADDED Requirements：**
@@ -326,6 +353,14 @@ ${STORE_SELECTION_GUIDANCE}
       - 主 spec 已有一个且它是权威的 - 不要管它（这是 \`openspec-cn archive\` 的做法；它会警告然后继续）
 
    d. **若 capability 尚不存在则创建新主 spec**：
+      - 仅当增量 spec 有可放入的 ADDED 需求，且步骤 b 中没有 MODIFIED 或
+        RENAMED 需求阻塞此 capability 时才创建。否则什么都不创建，
+        保持 specs 目录不变。对于仅含 REMOVED 的增量 spec，若变更的
+        \`.openspec.yaml\` 声明了 \`retire_capabilities: true\`，报告它已退役，
+        并在不重新创建 spec 的情况下继续。没有该标记时，报告同步受阻：
+        \`openspec-cn archive\` 会以 \`Spec must have at least one requirement\` 拒绝它。
+        空增量 spec 没有可同步的操作；同样报告为受阻。
+        绝不要写入空的 \`## Requirements\` 章节。
       - 创建 \`<planningHome.root>/openspec/specs/<capability-path>/spec.md\`
       - 添加 Purpose 章节：当增量 spec 有 \`## Purpose\` 时逐字复制其正文（这是 \`openspec-cn archive\` 的做法）；没有时仅写一个简短的 TBD 占位符
       - 添加 Requirements 章节及 ADDED 需求
@@ -346,6 +381,8 @@ ${STORE_SELECTION_GUIDANCE}
 **增量 Spec 格式参考**
 
 \`\`\`markdown
+# Spec Delta
+
 ## Purpose
 
 仅用于引入全新 capability 的增量 spec。为新的主 spec 提供种子。

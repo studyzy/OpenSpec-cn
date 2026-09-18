@@ -1,12 +1,30 @@
 import { describe, expect, it } from 'vitest';
 
 import {
-  getExploreSkillTemplate,
-  getOpsxExploreCommandTemplate,
-} from '../../../src/core/templates/skill-templates.js';
+  getSkillReferenceTransformer,
+  transformCommandInvocations,
+  transformToCodexCompatibleSkillReferences,
+  transformToSkillReferences,
+} from '../../../src/utils/command-references.js';
+import { CommandAdapterRegistry } from '../../../src/core/command-generation/registry.js';
+import {
+  formatCommandInvocation,
+  getInvocationForAdapter,
+} from '../../../src/core/command-generation/invocation.js';
+import { AI_TOOLS } from '../../../src/core/config.js';
+import {
+  generateSkillContent,
+  getCommandContents,
+  getCommandTemplates,
+  getSkillTemplates,
+} from '../../../src/core/shared/skill-generation.js';
+import { generateCommands } from '../../../src/core/command-generation/generator.js';
+import { getProfileWorkflows } from '../../../src/core/profiles.js';
 
-const skill = getExploreSkillTemplate();
-const command = getOpsxExploreCommandTemplate();
+// Bodies as generated with every workflow installed. Profile-dependent
+// handoffs are covered separately below.
+const skill = getSkillTemplates().find(e => e.workflowId === 'explore')!.template;
+const command = getCommandTemplates().find(e => e.id === 'explore')!.template;
 
 // Both delivery surfaces must carry the same contract; every behavioral
 // assertion below runs against each body.
@@ -189,11 +207,187 @@ describe('explore templates', () => {
         '创建或编辑 schemas、templates 或 `openspec/config.yaml` 是变更'
       );
       expect(body, label).toContain(
-        '包括 `openspec new change` 或其他会写入文件的命令'
+        '包括 `openspec-cn new change` 或其他会写入文件的命令'
       );
       expect(body, label).toContain(
         '在已确认的范围内创建或更新 OpenSpec 变更制品没问题，写入其他任何内容则不行'
       );
+    }
+  });
+
+  // Regression for #1828: the #1715 write-confirmation rule named
+  // `openspec new change` as something that needs a separate yes/no, while
+  // the capture branch told the agent to transition "seamlessly" into
+  // running it. Both readings were defensible, so the same request either
+  // wrote files immediately or stopped and asked. The rule now resolves the
+  // conflict in one direction: an explicit capture request IS the
+  // confirmation, for the scope that request names.
+  it('treats an explicit capture request as the write confirmation (#1828)', () => {
+    for (const [label, body] of bodies) {
+      expect(body, label).toContain(
+        '用户明确要求将探索内容捕获为新变更，其本身就构成该确认'
+      );
+      // Scoped to change artifacts, so the carve-out cannot reach the
+      // workflow configuration #1715 reported an agent editing.
+      expect(body, label).toContain(
+        '覆盖该变更及请求中指定的变更制品'
+      );
+    }
+  });
+
+  it('keeps the strict rule for a capture the agent proposed itself (#1828)', () => {
+    for (const [label, body] of bodies) {
+      expect(body, label).toContain(
+        '当你自己提议捕获时，该规则约束 `openspec-cn new change`'
+      );
+      // The guardrail points at the capture transition rather than restating
+      // the contract a third time, so the three sites cannot drift apart.
+      expect(body, label).toContain(
+        '用户自己提出的捕获请求是例外，在上文的捕获过渡中处理'
+      );
+    }
+  });
+
+  it('states the carve-out at the head of the capture branch, before the scaffold step (#1828)', () => {
+    for (const [label, body] of bodies) {
+      const transition = newChangeTransition(body, label);
+      const carveOut = transition.indexOf(
+        '该请求即上文所需的确认'
+      );
+      const scaffold = transition.indexOf('1. 在创建任何制品之前运行 `openspec-cn new change "<name>"`');
+
+      expect(carveOut, label).toBeGreaterThanOrEqual(0);
+      expect(scaffold, label).toBeGreaterThan(carveOut);
+      expect(transition, label).toContain(
+        '创建请求中指定的变更制品，仅此而已'
+      );
+    }
+  });
+
+  // A yes to an offer the agent made looks identical to a user-initiated
+  // capture request at the point the decision is made, so the discriminator
+  // has to live in the branch, not only in the guardrail 190 lines below it.
+  it('carries the agent-proposed discriminator in the branch itself (#1828)', () => {
+    for (const [label, body] of bodies) {
+      const transition = newChangeTransition(body, label);
+
+      expect(transition, label).toContain(
+        '这仅在请求出自用户时才成立'
+      );
+      expect(transition, label).toContain(
+        '对你自己发出的提议回以一个"是"，只确认你的提议本身所指的范围'
+      );
+    }
+  });
+
+  // "Do not ask for a second confirmation" would have contradicted step 2,
+  // nine lines below it, which requires asking before expanding the capture.
+  // Narrow the licence to re-asking for what was already asked for.
+  it('does not license skipping the asks the capture steps still require (#1828)', () => {
+    for (const [label, body] of bodies) {
+      const transition = newChangeTransition(body, label);
+
+      expect(transition, label).toContain(
+        '不要对用户已经要求过的事情重复询问；超出该范围的任何内容都要先询问'
+      );
+      expect(transition, label).not.toContain('Do not ask for a second confirmation');
+      expect(transition, label).toContain('在扩展捕获范围前询问');
+      expect(transition, label).toContain(
+        '未经用户批准不要创建未请求的前置制品'
+      );
+    }
+  });
+
+  // The carve-out must not become a blanket write permit: #1715's guarantee
+  // survives only if everything outside the requested scope still stops.
+  it('keeps the carve-out scoped to what the request named (#1828, #1715)', () => {
+    for (const [label, body] of bodies) {
+      expect(body, label).toContain(
+        '确认仅覆盖你描述的范围；再次扩展前需重新询问'
+      );
+      expect(body, label).toContain(
+        '回答设计或澄清问题绝不等于同意写入'
+      );
+      expect(body, label).toContain(
+        '接受某个答案或一批建议不等于授权写入'
+      );
+      expect(body, label).toContain(
+        '创建或编辑 schemas、templates 或 `openspec/config.yaml` 是变更'
+      );
+    }
+  });
+
+  // #1828 was not a missing sentence. It was a second, contradictory sentence
+  // elsewhere in the same body, and no `toContain` assertion can see one of
+  // those: every pinned string stays present while the new sentence reverses
+  // it. So invert the check. Collect EVERY sentence that couples consent
+  // language to the capture topic and require each to be one the resolution
+  // sanctions, which surfaces a gate added anywhere in the body - Guardrails,
+  // "Planning a Change", either capture branch.
+  //
+  // Limits worth knowing: this is lexical. A sentence that reverses the
+  // resolution without using any consent word - redefining what counts as
+  // "requested", or suspending the carve-out on a condition - is invisible
+  // here and stays a review responsibility.
+  const CONSENT_WORDS =
+    /\b(confirm(?:ation|s|ed)?|yes\/no|approv(?:al|es|ed)|permission|consent)\b/i;
+  const CAPTURE_WORDS = /(openspec new change|scaffold|captur|write-capable|first write)/i;
+
+  const SANCTIONED_CONSENT = [
+    // The stance paragraph: the rule, then the carve-out.
+    /You MAY create or update OpenSpec change artifacts .* within a confirmed scope/,
+    /Before the first write-capable action, name the artifacts or files you would change/,
+    /An explicit request from the user to capture the exploration as a new change is itself that confirmation/,
+    // The capture branch: the carve-out and both of its fences.
+    /that request is the confirmation required above/,
+    /This holds only when the request is theirs/,
+    /a yes to an offer you made confirms only the scope your offer itself named/,
+    /Don't re-ask for what they already asked for/,
+    /Do not create an unrequested prerequisite unless the user approves/,
+    // The guardrail: the rule, and a pointer back to the branch.
+    /Before the first write-capable action—including `openspec new change`/,
+    /That rule governs `openspec new change` whenever you are the one proposing the capture/,
+  ];
+
+  // The `--store` reminder repeats on five steps and says "confirmed" only to
+  // mean "the store id you already resolved", which is not a consent rule.
+  const STORE_REMINDER =
+    /\(append the confirmed `--store "<id>"` only for a registered standalone store\)/g;
+
+  function consentSentences(body: string, requireCaptureTopic: boolean): string[] {
+    return body
+      .replace(STORE_REMINDER, '')
+      .split(/(?<=[.:;])\s+/)
+      .map((sentence) => sentence.replace(/\s+/g, ' ').trim())
+      .filter(
+        (sentence) =>
+          CONSENT_WORDS.test(sentence) &&
+          (!requireCaptureTopic || CAPTURE_WORDS.test(sentence))
+      );
+  }
+
+  it('couples consent to capture only where the resolution sanctions it (#1828)', () => {
+    for (const [label, body] of bodies) {
+      const unsanctioned = consentSentences(body, true).filter(
+        (sentence) => !SANCTIONED_CONSENT.some((allowed) => allowed.test(sentence))
+      );
+
+      expect(unsanctioned, `${label} must add no unsanctioned consent rule`).toEqual([]);
+    }
+  });
+
+  // Inside the capture branch, drop the topic filter entirely: a gate written
+  // there is about the capture whether or not it says so. Without this, a bare
+  // "get a fresh yes/no before running anything" inserted above step 1 reads as
+  // off-topic and reinstates #1828 with the suite green.
+  it('adds no confirmation gate of its own inside the capture branch (#1828)', () => {
+    for (const [label, body] of bodies) {
+      const unsanctioned = consentSentences(
+        newChangeTransition(body, label),
+        false
+      ).filter((sentence) => !SANCTIONED_CONSENT.some((allowed) => allowed.test(sentence)));
+
+      expect(unsanctioned, `${label} capture branch must carry no gate`).toEqual([]);
     }
   });
 
@@ -405,6 +599,249 @@ describe('explore templates', () => {
       expect(recordSkip, label).toBeGreaterThan(evaluateCondition);
       expect(requireExpansion, label).toBeGreaterThan(recordSkip);
       expect(approvalGuard, label).toBeGreaterThan(requireExpansion);
+    }
+  });
+});
+
+// Regression for #869: explore refused to implement and told the agent to
+// "create a change proposal" without ever naming the workflow that does it.
+// With no named exit, agents answered the discovery questions and then went
+// straight to writing code - the failure two reporters hit through Copilot.
+describe('explore handoff to the propose workflow (#869)', () => {
+  it('names the propose workflow when the user asks for implementation', () => {
+    for (const [label, body] of bodies) {
+      expect(body, label).toContain(
+        '指引他们使用 `/opsx:propose`，它会把讨论转变成一个变更'
+      );
+      expect(body, label).toContain('工作从那个变更出发，绝不从探索模式出发');
+      expect(body, label).not.toContain(
+        'remind them to exit explore mode first and create a change proposal'
+      );
+    }
+  });
+
+  it('names the propose workflow where discovery ends', () => {
+    for (const [label, body] of bodies) {
+      expect(body, label).toContain(
+        '**流入提案**："准备开始了吗？运行 `/opsx:propose`，它就会变成一个变更。"'
+      );
+      expect(body, label).not.toContain('I can create a change proposal');
+    }
+  });
+
+  it('pairs the do-not-implement guardrail with the handoff', () => {
+    for (const [label, body] of bodies) {
+      expect(body, label).toContain(
+        '当用户准备开始构建时，指明交接目标而非亲自开始：`/opsx:propose` 会把讨论转变成一个变更，工作在那个变更里进行'
+      );
+    }
+  });
+
+  it('offers the handoff as a next step in the closing summary', () => {
+    expect(skill.instructions).toContain('- 把它变成一个变更：`/opsx:propose`');
+    expect(skill.instructions).not.toContain('- Create a change proposal');
+  });
+
+  // The reference has to be the canonical `/opsx:<id>` form of a known
+  // command id, or the per-tool transformers leave it as written and the
+  // skill advertises an invocation no tool registers (#727, #1307).
+  it('writes the reference so per-tool rendering rewrites it', () => {
+    for (const [label, body] of bodies) {
+      const rendered = transformToSkillReferences(body);
+      expect(rendered, label).toContain('/openspec-propose');
+      expect(rendered, label).not.toContain('/opsx:propose');
+    }
+  });
+});
+
+// The handoff is only useful if every tool renders it as an invocation that
+// tool actually registers. These assertions walk the real registries rather
+// than a hand-picked few, so a new adapter or a changed invocation shape
+// cannot quietly leave explore advertising a command nobody answers to
+// (the #727 / #1307 failure mode).
+describe('explore handoff renders for every delivery surface (#869)', () => {
+  // Both workflows explore hands off to. Each is a `CORE_WORKFLOWS` member,
+  // so naming them does not advertise anything the default profile omits.
+  const HANDOFF_IDS = ['propose', 'apply'] as const;
+
+  function canonicalCount(body: string, commandId: string): number {
+    return occurrenceCount(body, `/opsx:${commandId}`);
+  }
+
+  it('names both handoff workflows in both bodies before any rendering', () => {
+    for (const [label, body] of bodies) {
+      for (const commandId of HANDOFF_IDS) {
+        expect(canonicalCount(body, commandId), `${label} ${commandId}`).toBeGreaterThan(0);
+      }
+    }
+  });
+
+  it('rewrites every reference for each registered command adapter', () => {
+    const adapters = CommandAdapterRegistry.getAll();
+    expect(adapters.length).toBeGreaterThan(0);
+
+    for (const adapter of adapters) {
+      const invocation = getInvocationForAdapter(adapter);
+
+      for (const [label, body] of bodies) {
+        const rendered = transformCommandInvocations(body, invocation);
+
+        for (const commandId of HANDOFF_IDS) {
+          const expected = formatCommandInvocation(invocation, commandId);
+          const where = `${adapter.toolId} ${label} ${commandId}`;
+
+          // Every canonical reference became this tool's spelling. Counting
+          // rather than substring-matching catches a partial rewrite, and it
+          // holds for the namespaced tools whose spelling is the canonical one.
+          expect(occurrenceCount(rendered, expected), where).toBe(
+            canonicalCount(body, commandId)
+          );
+        }
+      }
+    }
+  });
+
+  it('rewrites every reference for each skills-only tool', () => {
+    for (const tool of AI_TOOLS) {
+      const transform = getSkillReferenceTransformer(tool.value);
+
+      for (const [label, body] of bodies) {
+        const rendered = transform(body);
+
+        expect(rendered, `${tool.value} ${label}`).not.toContain('/opsx:');
+        expect(occurrenceCount(rendered, 'openspec-propose'), `${tool.value} ${label}`).toBe(
+          canonicalCount(body, 'propose')
+        );
+        expect(
+          occurrenceCount(rendered, 'openspec-apply-change'),
+          `${tool.value} ${label}`
+        ).toBe(canonicalCount(body, 'apply'));
+      }
+    }
+  });
+
+  it('keeps the handoff readable on the shared .agents tree Codex writes', () => {
+    for (const [label, body] of bodies) {
+      const rendered = transformToCodexCompatibleSkillReferences(body);
+
+      expect(rendered, label).not.toContain('/opsx:');
+      expect(
+        occurrenceCount(rendered, '$openspec-propose (Codex) or /openspec-propose (other agents)'),
+        label
+      ).toBe(canonicalCount(body, 'propose'));
+      expect(
+        occurrenceCount(
+          rendered,
+          '$openspec-apply-change (Codex) or /openspec-apply-change (other agents)'
+        ),
+        label
+      ).toBe(canonicalCount(body, 'apply'));
+    }
+  });
+});
+
+// Regression for #869: the seamless capture path let explore scaffold a
+// change and write artifacts, then said nothing about what came next. An
+// agent holding a fresh proposal inside explore mode has an obvious wrong
+// next move, which is the one the issue reported.
+describe('explore capture path names where the work continues (#869)', () => {
+  it('ends the capture by naming propose and apply', () => {
+    for (const [label, body] of bodies) {
+      const transition = newChangeTransition(body, label);
+
+      expect(transition, label).toContain(
+        '请求的捕获完成后就停在那里，并指明工作在哪里继续'
+      );
+      expect(transition, label).toContain('`/opsx:propose` 会撰写其余规划制品');
+      expect(transition, label).toContain('任务就绪后由 `/opsx:apply` 实现该变更');
+    }
+  });
+
+  it('says that capturing artifacts is not permission to implement them', () => {
+    for (const [label, body] of bodies) {
+      const transition = newChangeTransition(body, label);
+      expect(transition, label).toContain(
+        '捕获制品绝不等于开始实现它们'
+      );
+    }
+  });
+});
+
+// A custom profile can install explore without propose or apply. Explore must
+// then not name a handoff to a workflow that was never generated; the agent
+// would be sent to a command nobody answers to. Checked through the same
+// registries init and update call, on both delivery surfaces.
+describe('explore handoffs follow the installed workflow set (#869)', () => {
+  const PROFILES: Array<[string, string[], Array<'propose' | 'apply'>]> = [
+    ['explore only', ['explore'], ['propose', 'apply']],
+    ['explore + propose without apply', ['explore', 'propose'], ['apply']],
+  ];
+
+  function exploreSkillBody(workflows: string[]): string {
+    const entry = getSkillTemplates(workflows).find(e => e.workflowId === 'explore');
+    expect(entry).toBeDefined();
+    return entry!.template.instructions;
+  }
+
+  function exploreCommandBody(workflows: string[]): string {
+    const entry = getCommandContents(workflows).find(e => e.id === 'explore');
+    expect(entry).toBeDefined();
+    return entry!.body;
+  }
+
+  it.each(PROFILES)('%s: generated skills never name a missing workflow', (_name, workflows, missing) => {
+    const body = exploreSkillBody(workflows);
+    for (const tool of AI_TOOLS) {
+      const content = generateSkillContent(
+        getSkillTemplates(workflows).find(e => e.workflowId === 'explore')!.template,
+        'TEST',
+        getSkillReferenceTransformer(tool.value)
+      );
+      for (const id of missing) {
+        const skillName = id === 'propose' ? 'openspec-propose' : 'openspec-apply-change';
+        expect(content, `${tool.value} ${id}`).not.toContain(skillName);
+      }
+    }
+    for (const id of missing) {
+      expect(body).not.toContain(`/opsx:${id}`);
+      expect(transformToCodexCompatibleSkillReferences(body)).not.toMatch(
+        new RegExp(`openspec-${id}`)
+      );
+    }
+    expect(body).not.toContain('[[opsx:');
+  });
+
+  it.each(PROFILES)('%s: generated commands never name a missing workflow', (_name, workflows, missing) => {
+    const contents = getCommandContents(workflows);
+    for (const adapter of CommandAdapterRegistry.getAll()) {
+      const invocation = getInvocationForAdapter(adapter);
+      const explore = generateCommands(contents, adapter).find(c =>
+        c.fileContent.includes('进入探索模式')
+      );
+      expect(explore, adapter.toolId).toBeDefined();
+      for (const id of missing) {
+        expect(explore!.fileContent, `${adapter.toolId} ${id}`).not.toContain(
+          formatCommandInvocation(invocation, id)
+        );
+        expect(explore!.fileContent, `${adapter.toolId} ${id}`).not.toContain(`/opsx:${id}`);
+      }
+      expect(explore!.fileContent, adapter.toolId).not.toContain('[[opsx:');
+    }
+    expect(exploreCommandBody(workflows)).not.toContain('[[opsx:');
+  });
+
+  it.each(PROFILES)('%s: explore still names a way forward', (_name, workflows) => {
+    for (const body of [exploreSkillBody(workflows), exploreCommandBody(workflows)]) {
+      expect(body).toContain('捕获制品绝不等于开始实现它们');
+      expect(body).toContain('工作从那个变更出发，绝不从探索模式出发');
+    }
+  });
+
+  it('keeps both named handoffs when propose and apply are installed (core profile)', () => {
+    const core = getProfileWorkflows('core');
+    for (const body of [exploreSkillBody([...core]), exploreCommandBody([...core])]) {
+      expect(body).toContain('指引他们使用 `/opsx:propose`');
+      expect(body).toContain('任务就绪后由 `/opsx:apply` 实现该变更');
     }
   });
 });

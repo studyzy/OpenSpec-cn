@@ -78,7 +78,7 @@ AI:  Created openspec/changes/add-dark-mode/
 
 ### `/opsx:explore`
 
-> **当你不确定时,从这里开始。** Explore 是一个零风险的思考伙伴:它阅读你的代码库、对比方案,并在任何变更产生之前,将一个模糊的想法打磨成具体的计划。它随默认 profile 一同提供。完整说明与更多示例见 [Explore First](explore.md) 指南。
+> **当你不确定时,从这里开始。** Explore 是一个零风险的思考伙伴:它阅读你的代码库、对比方案,并在写下任何代码之前,将一个模糊的想法打磨成具体的计划。它随默认 profile 一同提供。完整说明与更多示例见 [Explore First](explore.md) 指南。
 
 在着手变更之前,梳理想法、调查问题并澄清需求。
 
@@ -97,6 +97,7 @@ AI:  Created openspec/changes/add-dark-mode/
 - 调查代码库以回答问题
 - 对比方案与思路
 - 创建可视化图表以理清思路
+- 在你要求时、或你接受它的提议时捕获这次探索:用 `openspec new change` 搭建变更脚手架,并写入你点名的规划制品,或更新某个现有变更的制品
 - 当洞见成型时,可过渡到 `/opsx:propose`(默认)或 `/opsx:new`(扩展工作流)
 
 **示例:**
@@ -119,14 +120,20 @@ AI:  Let me investigate your current auth setup...
 
      Your API already has CORS configured. Which direction interests you?
 
-You: Let's go with JWT. Can we start a change for that?
+You: Let's go with JWT.
 
-AI:  Ready when you are. Run /opsx:propose add-jwt-auth to begin.
+AI:  That's a decision worth keeping. Want me to start a change called
+     add-jwt-auth? Just the change folder, nothing else yet.
+
+You: Yes.
+
+AI:  Started openspec/changes/add-jwt-auth/. Say the word and I'll
+     write the proposal, specs, and tasks from what we just worked out.
 ```
 
 **提示:**
 - 当需求不明确或你需要调查时使用
-- 探索期间不会创建任何制品
+- 它从不写代码,也不会写其他任何东西,除非你要求、或它主动提出时你表示同意
 - 适合在决定前对比多种方案
 - 可以读取文件并搜索代码库
 

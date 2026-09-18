@@ -304,6 +304,15 @@ Pass --allow-unknown to bypass this check.
 Error: Invalid configuration - delivery: Invalid option: expected one of "both"|"skills"|"commands"
 ```
 
+如果配置文件存在但其内容不是 JSON 对象——无论是完全不是有效 JSON，还是其根是 `null`、数组之类的东西——`config set`、`config unset` 和 `config profile` 都会退出 1 并保持文件不变。用 `openspec config edit` 修复它，或用 `openspec config reset --all` 替换它：
+
+```
+Error: /home/you/.config/openspec/config.json could not be parsed, so it was left unchanged.
+Fix it with "openspec config edit", or reset it with "openspec config reset --all".
+```
+
+在修复之前，遥测和更新检查保持关闭。
+
 ### openspec-cn config unset
 
 ```bash
@@ -316,7 +325,7 @@ openspec-cn config unset delivery
 Unset delivery (reverted to default)
 ```
 
-完全没有任何值的键会打印 `Key "featureFlags.nothere" was not set`。两种情况都退出 0。
+完全没有任何值的键会打印 `Key "featureFlags.nothere" was not set`。两种情况都退出 0。无法解析的配置文件则退出 1，与 `config set` 相同。
 
 ### openspec-cn config reset
 
@@ -352,7 +361,11 @@ Configuration reset to defaults
 openspec-cn config edit
 ```
 
-在 `$EDITOR`（回退到 `$VISUAL`）中打开配置文件，缺失时先用默认值创建。编辑器关闭后，文件会被校验。无效的 JSON 或无效的配置退出 1。未配置编辑器时退出 1：
+在 `$EDITOR`（回退到 `$VISUAL`）中打开配置文件，缺失时先用默认值创建。编辑器关闭后，文件会被校验。无效的 JSON 或无效的配置退出 1。
+
+编辑器值可以携带参数和带引号的路径，例如 `code --wait` 或 `"/Applications/Sublime Text.app/Contents/SharedSupport/bin/subl" -w`。它会按词拆分而不经过 shell，因此 `$VAR`、`~` 和 `;` 都按字面传入。编辑器无法启动或非零退出时，会打印一行错误并退出 1。
+
+未配置编辑器时退出 1：
 
 ```
 Error: No editor configured
@@ -450,6 +463,13 @@ Specs:
 ```
 
 空列表打印 `No active changes found.` 或 `No specs found.`，仍以 0 退出。
+
+一个变更就是 `openspec/changes/` 直接下级的一个目录。与 spec 不同，变更不能嵌套在命名空间文件夹中。像 `changes/mobile/` 这样只包裹了一个变更（`changes/mobile/refresh-token/`）的文件夹会以 `not a change` 状态被列出，随后是一条点名这些嵌套目录的警告。`--json` 会给该条目标记一个 `nested` 数组，并添加顶层 `warnings` 数组。`show`、`status`、`validate` 和 `archive` 会用同样的消息拒绝该文件夹。要修复它，把变更上移，并把命名空间并入其名称：
+
+```bash
+mv openspec/changes/mobile/refresh-token openspec/changes/mobile-refresh-token
+rmdir openspec/changes/mobile
+```
 
 **退出码**
 
@@ -668,6 +688,18 @@ openspec-cn validate --all            # 每个变更和 spec
 ✓ spec/api
 Totals: 2 passed, 0 failed (2 items)
 ```
+
+**任务复选框发现**
+
+进度只统计复选框，不统计其他任何东西，因此写成普通项目符号的任务文件会被读作零任务：`openspec list` 和 `openspec status` 报告没有工作，`openspec archive` 也没有任何东西可标记为未完成。Validate 会在每个列出了工作但没有复选框的被跟踪任务文件上报告一条 `WARNING`：
+
+```text
+⚠ [WARNING] tasks.md: This change counts as 0 tasks: no line in its tracked task files is a checkbox, so "openspec list" and "openspec status" report no work and "openspec archive" has nothing to flag as incomplete. Write each task as "- [ ] 1.1 Description".
+```
+
+该警告只在该变更的整个被跟踪集合中一个复选框都没有时才触发。真实清单旁边有一个纯文字文件不会被报告；一旦存在单个复选框，写作中的变更就会保留其进度。`--strict` 会把该警告变为失败。行号在 `--json` 报告中。
+
+围栏代码块、HTML 注释、YAML front matter 和缩进代码不会被扫描，因此粘贴进来的终端示例绝不会被误认为任务清单。
 
 **归档合并发现**
 
@@ -1001,7 +1033,20 @@ Schema: spec-driven
 Next: openspec-cn status --change add-caching
 ```
 
-带 `--json`：
+当没有找到 `openspec/` 目录时，`new change` 会在你当前所在的位置创建一个，并说明这一点：
+
+```
+Created change 'add-caching' at openspec/changes/add-caching/
+Schema: spec-driven
+Next: openspec status --change add-caching
+
+Note: no OpenSpec root was found here, so one was created at openspec/.
+Run `openspec init` to finish setting this project up, or delete that directory if you meant a different project.
+```
+
+该提示会与其他人类可读输出一起写入 stdout，且绝不会在 `--json` 时出现。
+
+带 `--json`，在已存在 `openspec/` 的项目中：
 
 ```json
 {
@@ -1015,6 +1060,15 @@ Next: openspec-cn status --change add-caching
     "path": "/Users/you/projects/my-app",
     "source": "nearest"
   }
+}
+```
+
+当没有找到 `openspec/` 目录且 `new change` 创建了一个时，JSON 结构相同。`root.path` 是你运行命令时所在的目录，`root.source` 读作 `implicit`：
+
+```json
+"root": {
+  "path": "/Users/you/projects/my-app",
+  "source": "implicit"
 }
 ```
 
@@ -1067,7 +1121,23 @@ Progress: 2/4 artifacts complete
 [x] specs
 [ ] design
 [-] tasks (blocked by: design)
+
+Next: openspec instructions design --change "add-rate-limit" --json
 ```
+
+`Next:` 行会点出唯一一个能推进该变更的命令，因此 `openspec status` 足以在新会话中把某个变更重新拾起。规划尚未完成时，它点出下一个就绪的制品；当所有规划制品都存在后，则点出 `openspec instructions apply`：
+
+```
+[x] proposal
+[x] specs
+[x] design
+[x] tasks
+
+All planning artifacts complete!
+Next: openspec instructions apply --change "add-rate-limit" --json
+```
+
+只要解析出的根是 store，它就会带上 `--store <id>`，并点出与 JSON `nextSteps` 句子相同的命令。
 
 `--json` 增加逐制品依赖、解析后的文件路径，以及建议的下一步。已精简：
 
@@ -1418,7 +1488,7 @@ openspec-cn schema validate spec-driven   # 一个 schema，来自任何来源
 openspec-cn schema validate               # 每个项目本地 schema
 ```
 
-它验证 `schema.yaml` 存在且能解析、结构符合 schema 格式、每个制品的模板文件都存在于 schema 的 `templates/` 目录内，以及依赖图没有环或未知引用。
+它验证 `schema.yaml` 存在且能解析、结构符合 schema 格式、每个制品的模板文件都存在于 schema 的 `templates/` 目录内，以及依赖图没有环或未知引用，包括 `apply.requires` 中的引用。`apply.tracks` 的值若与某个制品的 `generates` 值不完全相等，会打印一行 `warning:` 但不会让校验失败，因为此时 OpenSpec 无法判断该文件属于哪个制品的进度。
 
 **选项**
 
@@ -1567,6 +1637,8 @@ openspec-cn store setup team-context --path ~/openspec/team-context
 
 在交互式终端中，setup 会提示缺失的名称和位置，并在创建任何内容前确认。在终端外，缺失名称或 `--path` 会以 1 退出并给出要传入的标志。对已注册的 store 重新运行 setup 会报告 `Registry: already registered`。
 
+当 `--path` 位于另一个 Git 仓库内部时，setup 会以 `store_setup_inside_git_repo` 退出 1，因为在那里初始化 store 会让一个仓库嵌套在另一个仓库里。`--no-init-git` 不创建任何仓库，因此会跳过该检查。当你的主目录本身就是一个 Git 仓库（例如 dotfiles 仓库）时，用它来把 store 保持在 `~/openspec/<id>`。
+
 **参数**
 
 | 参数 | 说明 |
@@ -1689,6 +1761,8 @@ openspec-cn store remove design-system --yes
 Error: Pass --yes to delete store files non-interactively.
 Fix: openspec-cn store remove design-system --yes
 ```
+
+当文件夹缺少匹配的 store 元数据，或它包含另一个已注册的 store（例如作为 Git submodule vendor 进来的 store）时，remove 会退出 1 且不删除任何东西。此时错误是 `store_remove_contains_registered_store`：先运行 `openspec store unregister <nested-id>`，或运行 `openspec store unregister <id>` 来记住该 store 但不删除文件。
 
 **选项**
 
@@ -2127,6 +2201,8 @@ openspec-cn completion generate zsh   # 把脚本打印到 stdout
 | `generate [shell]` | 把补全脚本打印到 stdout。 |
 | `install [shell]` | 写入脚本并配置你的 shell 启动文件。 |
 | `uninstall [shell]` | 移除脚本和配置块。 |
+
+用 Nix 安装时，补全已经就位：flake 包把 Bash、Fish 和 Zsh 脚本放在标准位置，因此无需 `install`（[安装](../start/installation.md#nix)）。
 
 ### openspec-cn completion generate
 

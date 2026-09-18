@@ -17,7 +17,8 @@ once the prose lands. -->
 
 如果它在[支持矩阵](../reference/supported-tools.md)中有对应行，就可以。
 在 init 时选择它的 id。如果它没被列出，但能读取共享的 `.agents/skills/`
-文件夹，就选择 **Shared `.agents` skills**（`--tools agents`）。如果两者都不是，
+文件夹，就选择 **Other / Universal**（`--tools agents`），它由支持矩阵的
+Other / Universal 一节覆盖。如果两者都不是，
 请在 [OpenSpec 仓库](https://github.com/Fission-AI/OpenSpec/issues)中提出请求。
 
 ## 旧的 /openspec:* 命令去哪了？

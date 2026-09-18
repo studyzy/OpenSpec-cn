@@ -1,3 +1,5 @@
+# Spec Delta
+
 ## ADDED Requirements
 
 ### Requirement: <workspace 需求名称>

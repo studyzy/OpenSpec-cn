@@ -5,15 +5,38 @@
  * templates file into workflow-focused modules.
  */
 import type { SkillTemplate, CommandTemplate } from '../types.js';
+import { optionalWorkflow } from '../optional-workflow.js';
 import { STORE_SELECTION_GUIDANCE } from './store-selection.js';
+import { PROJECT_ROOT_GUARD } from './project-root.js';
+
+/**
+ * Archiving must merge delta specs into the main specs; the `sync` workflow is
+ * how it normally does that. A profile that selects `archive` gets `sync`
+ * injected (see getProfileWorkflows), but an install whose workflow set was
+ * read back off disk can still be missing it — in which case the merge has to
+ * happen inline rather than be handed to a workflow that is not there.
+ */
+const SYNC_INLINE_HANDOFF = optionalWorkflow(
+  'sync',
+  '内联运行 `/opsx:sync` 工作流（由 agent 驱动的智能合并）',
+  '自行内联执行 delta 到主 spec 的合并（由 agent 驱动的智能合并）'
+);
+
+const SYNC_GUARDRAIL = optionalWorkflow(
+  'sync',
+  '内联运行 `/opsx:sync` 工作流（由 agent 驱动）',
+  '自行内联执行 delta 到主 spec 的合并（由 agent 驱动）'
+);
 
 export function getArchiveChangeSkillTemplate(): SkillTemplate {
   return {
     name: 'openspec-archive-change',
-    description: '在实验性工作流中归档已完成的变更。当用户想在实现完成后定稿并归档变更时使用。',
+    description: '在实验性工作流中归档已完成的变更。当用户想在实现完成后定稿并归档变更时使用。也在用户说 "openspec archive" 或 "opsx archive" 时使用。',
     instructions: `在实验性工作流中归档已完成的变更。
 
 ${STORE_SELECTION_GUIDANCE}
+
+${PROJECT_ROOT_GUARD}
 
 \`<capability-path>\` 是相对于 \`specs/\` 的 spec 目录（例如 \`user-auth\` 或 \`identity/user-auth\`）。在解析主 spec 时保留每个增量 spec 的完整路径。
 
@@ -67,7 +90,10 @@ ${STORE_SELECTION_GUIDANCE}
 
    读取任务文件（通常 \`tasks.md\`）检查未完成任务。
 
-   统计 \`- [ ]\`（未完成）与 \`- [x]\`（已完成）任务。
+   复选框仅当其内容为 \`x\` 或 \`X\` 时才算完成；方括号内的空格无关紧要，
+   因此 \`- [ x]\` 也算完成。其他任何标记都是未完成 —— \`- [ ]\`、空的 \`- []\`，
+   以及 OpenSpec 未赋予含义的标记如 \`- [~]\` 或 \`- [-]\`。
+   绝不把不熟悉的标记读作已完成。
 
    **若发现未完成任务：**
    - 展示警告显示未完成任务数
@@ -82,24 +108,30 @@ ${STORE_SELECTION_GUIDANCE}
 
    **若存在 delta specs：**
    - 将每个 delta spec 与 \`<planningHome.root>/openspec/specs/<capability-path>/spec.md\` 处对应的主 spec 比较（使用步骤 2 中感知 store 的 \`planningHome.root\`，而不是硬编码的仓库路径）
+   - 主 spec 缺失**并不自动**意味着"已同步"。对于新 capability，主 spec 是同步的*输出*，而非输入：
+     - 若 delta 含 MODIFIED 或 RENAMED 需求，报告只有 ADDED 需求才能创建新主 spec，并将该能力标记为同步受阻。绝不要捏造一个没有当前版本的需求。
+     - 否则，若 delta 仅含 REMOVED 需求且变更的 \`.openspec.yaml\` 声明了 \`retire_capabilities: true\`，该 capability 已退役：计为已同步，警告没有可移除的内容，且不要重新创建主 spec。现在以及在验证已完成的同步时都应用此规则。
+     - 否则，若 delta 没有 ADDED 需求，报告无法同步并将该能力标记为同步受阻。对于仅含 REMOVED 的 delta，警告没有可从其中移除的主 spec，并保持主 spec 树不变。\`openspec-cn archive\` 会以 \`Spec must have at least one requirement\` 拒绝未标记的仅 REMOVED 情况。
+     - 否则，将该 capability 计为需要同步，并在摘要中指明它（\`<capability-path>：将创建新主 spec\`）。若 delta 还含 REMOVED 需求，警告它们将被忽略，因为没有可从其中移除的主 spec。同步仅依据 delta 的 ADDED 需求创建主 spec，与 \`openspec-cn archive\` 的行为完全一致。
    - 确定将应用哪些更改（新增、修改、移除、重命名）
-   - 在提示前展示合并摘要
+   - 即使某个能力同步受阻，也继续评估其余能力。在提示前展示合并摘要。
 
    **提示选项：**
-   - 若需更改："立即同步（推荐）"、"不同步归档"
-   - 若已同步："立即归档"、"仍同步"、"取消"
+   - 若任何能力同步受阻：解释原因，仅提供"不同步归档"、"取消"
+   - 否则，若需更改："立即同步（推荐）"、"不同步归档"
+   - 否则，若已同步："立即归档"、"仍同步"、"取消"
 
    根据回答路由：
    - "取消" — 停止，不归档
    - "不同步归档" 或 "立即归档" — 继续归档
-   - "立即同步" 或 "仍同步" — 先同步，然后（按下文）验证
+   - "立即同步" 或 "仍同步" — 先同步，然后（按下文）验证。在任何能力同步受阻时不要开始同步；解释阻碍并重复可用选项。
    - 其他任何回答 — 再次询问，而不是归档
 
    在所选同步写入任何主 spec 之前，用相同的已选根目录标志运行一次 \`openspec-cn instructions specs --change "<name>" --json\`。要求退出状态为零且返回有效的制品指令 JSON。若查询失败或返回无效 JSON，报告错误并在写入任何主 spec 或移动变更之前停止。省略 \`rules\` 的有效响应表示未配置制品规则 — 这是无规则情况。仅将返回的 \`rules\` 应用于此合并生成的主 spec 的内容和形式；不要将其用于归档指导、更改 CLI 行为，或将规则文本复制到任何输出文件中。
 
    然后为变更 '<name>' 内联运行 \`openspec-sync-specs\` 工作流（agent 驱动的智能合并），传入上面的 delta spec 分析和已获取的 specs 规则快照，并等待它完成。内联同步必须复用该快照，不要再次获取 \`specs\` 指令。不要把它委托给后台任务 —— 步骤 5 会把 \`changeRoot\` 从一个仍在读取它的同步下方移走，导致变更已归档而主 specs 从未更新。若你的 agent 只能通过委托运行它，请同步委托并等待结果。
 
-   然后对本步骤开头针对 \`artifactPaths.specs.existingOutputPaths\` 中每个拥有 delta spec 的能力重新运行比较 —— 不仅仅是同步报告它触及的那些。成功的同步不会留下任何待应用的内容，因此每个能力现在必须显示为已同步：
+   然后对本步骤开头针对 \`artifactPaths.specs.existingOutputPaths\` 中每个拥有 delta spec 的能力重新运行比较（包括显式退役的、主 spec 缺失的情况）—— 不仅仅是同步报告它触及的那些。成功的同步不会留下任何待应用的内容，因此每个能力现在必须显示为已同步：
    - ADDED 需求存在
    - MODIFIED 需求携带 delta 中指明的场景与描述更改，且其其他场景保持完好
    - REMOVED 需求已消失 —— 若此次同步退役了某个能力（移除了它的最后一条需求，使 \`## Requirements\` 为空），其主 spec 应被删除而不是留空；同步有意保留并报告过的 spec 也算匹配
@@ -176,6 +208,8 @@ export function getOpsxArchiveCommandTemplate(): CommandTemplate {
 
 ${STORE_SELECTION_GUIDANCE}
 
+${PROJECT_ROOT_GUARD}
+
 \`<capability-path>\` 是相对于 \`specs/\` 的 spec 目录（例如 \`user-auth\` 或 \`identity/user-auth\`）。在解析主 spec 时保留每个增量 spec 的完整路径。
 
 **Input**: 可选地在 \`/opsx:archive\` 后指定变更名（例如 \`/opsx:archive add-auth\`）。若省略，检查能否从对话上下文推断。若模糊或歧义，必须提示用户从可用变更中选择。
@@ -228,7 +262,10 @@ ${STORE_SELECTION_GUIDANCE}
 
    读取任务文件（通常 \`tasks.md\`）检查未完成任务。
 
-   统计 \`- [ ]\`（未完成）与 \`- [x]\`（已完成）任务。
+   复选框仅当其内容为 \`x\` 或 \`X\` 时才算完成；方括号内的空格无关紧要，
+   因此 \`- [ x]\` 也算完成。其他任何标记都是未完成 —— \`- [ ]\`、空的 \`- []\`，
+   以及 OpenSpec 未赋予含义的标记如 \`- [~]\` 或 \`- [-]\`。
+   绝不把不熟悉的标记读作已完成。
 
    **若发现未完成任务：**
    - 展示警告显示未完成任务数
@@ -243,24 +280,30 @@ ${STORE_SELECTION_GUIDANCE}
 
    **若存在 delta specs：**
    - 将每个 delta spec 与 \`<planningHome.root>/openspec/specs/<capability-path>/spec.md\` 处对应的主 spec 比较（使用步骤 2 中感知 store 的 \`planningHome.root\`，而不是硬编码的仓库路径）
+   - 主 spec 缺失**并不自动**意味着"已同步"。对于新 capability，主 spec 是同步的*输出*，而非输入：
+     - 若 delta 含 MODIFIED 或 RENAMED 需求，报告只有 ADDED 需求才能创建新主 spec，并将该能力标记为同步受阻。绝不要捏造一个没有当前版本的需求。
+     - 否则，若 delta 仅含 REMOVED 需求且变更的 \`.openspec.yaml\` 声明了 \`retire_capabilities: true\`，该 capability 已退役：计为已同步，警告没有可移除的内容，且不要重新创建主 spec。现在以及在验证已完成的同步时都应用此规则。
+     - 否则，若 delta 没有 ADDED 需求，报告无法同步并将该能力标记为同步受阻。对于仅含 REMOVED 的 delta，警告没有可从其中移除的主 spec，并保持主 spec 树不变。\`openspec-cn archive\` 会以 \`Spec must have at least one requirement\` 拒绝未标记的仅 REMOVED 情况。
+     - 否则，将该 capability 计为需要同步，并在摘要中指明它（\`<capability-path>：将创建新主 spec\`）。若 delta 还含 REMOVED 需求，警告它们将被忽略，因为没有可从其中移除的主 spec。同步仅依据 delta 的 ADDED 需求创建主 spec，与 \`openspec-cn archive\` 的行为完全一致。
    - 确定将应用哪些更改（新增、修改、移除、重命名）
-   - 在提示前展示合并摘要
+   - 即使某个能力同步受阻，也继续评估其余能力。在提示前展示合并摘要。
 
    **提示选项：**
-   - 若需更改："立即同步（推荐）"、"不同步归档"
-   - 若已同步："立即归档"、"仍同步"、"取消"
+   - 若任何能力同步受阻：解释原因，仅提供"不同步归档"、"取消"
+   - 否则，若需更改："立即同步（推荐）"、"不同步归档"
+   - 否则，若已同步："立即归档"、"仍同步"、"取消"
 
    根据回答路由：
    - "取消" — 停止，不归档
    - "不同步归档" 或 "立即归档" — 继续归档
-   - "立即同步" 或 "仍同步" — 先同步，然后（按下文）验证
+   - "立即同步" 或 "仍同步" — 先同步，然后（按下文）验证。在任何能力同步受阻时不要开始同步；解释阻碍并重复可用选项。
    - 其他任何回答 — 再次询问，而不是归档
 
    在所选同步写入任何主 spec 之前，用相同的已选根目录标志运行一次 \`openspec-cn instructions specs --change "<name>" --json\`。要求退出状态为零且返回有效的制品指令 JSON。若查询失败或返回无效 JSON，报告错误并在写入任何主 spec 或移动变更之前停止。省略 \`rules\` 的有效响应表示未配置制品规则 — 这是无规则情况。仅将返回的 \`rules\` 应用于此合并生成的主 spec 的内容和形式；不要将其用于归档指导、更改 CLI 行为，或将规则文本复制到任何输出文件中。
 
-   然后为变更 '<name>' 内联运行 \`/opsx:sync\` 工作流（agent 驱动的智能合并），传入上面的 delta spec 分析和已获取的 specs 规则快照，并等待它完成。内联同步必须复用该快照，不要再次获取 \`specs\` 指令。不要把它委托给后台任务 —— 步骤 5 会把 \`changeRoot\` 从一个仍在读取它的同步下方移走，导致变更已归档而主 specs 从未更新。若你的 agent 只能通过委托运行它，请同步委托并等待结果。
+   然后为变更 '<name>' ${SYNC_INLINE_HANDOFF}，传入上面的 delta spec 分析和已获取的 specs 规则快照，并等待它完成。内联同步必须复用该快照，不要再次获取 \`specs\` 指令。不要把它委托给后台任务 —— 步骤 5 会把 \`changeRoot\` 从一个仍在读取它的同步下方移走，导致变更已归档而主 specs 从未更新。若你的 agent 只能通过委托运行它，请同步委托并等待结果。
 
-   然后对本步骤开头针对 \`artifactPaths.specs.existingOutputPaths\` 中每个拥有 delta spec 的能力重新运行比较 —— 不仅仅是同步报告它触及的那些。成功的同步不会留下任何待应用的内容，因此每个能力现在必须显示为已同步：
+   然后对本步骤开头针对 \`artifactPaths.specs.existingOutputPaths\` 中每个拥有 delta spec 的能力重新运行比较（包括显式退役的、主 spec 缺失的情况）—— 不仅仅是同步报告它触及的那些。成功的同步不会留下任何待应用的内容，因此每个能力现在必须显示为已同步：
    - ADDED 需求存在
    - MODIFIED 需求携带 delta 中指明的场景与描述更改，且其其他场景保持完好
    - REMOVED 需求已消失 —— 若此次同步退役了某个能力（移除了它的最后一条需求，使 \`## Requirements\` 为空），其主 spec 应被删除而不是留空；同步有意保留并报告过的 spec 也算匹配
@@ -360,7 +403,7 @@ ${STORE_SELECTION_GUIDANCE}
 - 不要因警告阻塞归档 - 仅告知并确认
 - 移动到归档时保留 .openspec.yaml（它随目录一起移动）
 - 展示清晰的所发生事情的汇总
-- 若请求同步，内联运行 \`/opsx:sync\` 工作流（agent 驱动）
+- 若请求同步，${SYNC_GUARDRAIL}
 - 绝不在 spec 同步仍在进行时归档 —— 内联运行同步并在移动 \`changeRoot\` 前验证主 specs
 - 若存在 delta specs，始终运行同步评估并在提示前展示合并摘要
 - 应用相关的运行时 context 并报告冲突；operation guidance 保持建议性质

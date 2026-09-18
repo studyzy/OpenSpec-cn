@@ -70,7 +70,7 @@ describe('openspec validate --archived checks archived task completion (#205)', 
       expect.objectContaining({
         level: 'ERROR',
         path: 'tasks.md',
-        message: expect.stringContaining('2 incomplete tasks (1/3 completed)'),
+        message: expect.stringContaining('2 个未完成的任务（已完成 1/3）'),
       })
     );
   });

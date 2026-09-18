@@ -7,6 +7,8 @@ import {
 } from '../../src/utils/command-references.js';
 import type { CommandInvocation } from '../../src/core/command-generation/invocation.js';
 import { getApplyChangeSkillTemplate } from '../../src/core/templates/workflows/apply-change.js';
+import { resolveOptionalWorkflows } from '../../src/core/templates/optional-workflow.js';
+import { ALL_WORKFLOWS } from '../../src/core/profiles.js';
 
 const FLAT_SLASH: CommandInvocation = { style: 'flat', prefix: '/' };
 const FLAT_AT: CommandInvocation = { style: 'flat', prefix: '@' };
@@ -344,9 +346,36 @@ describe('apply skill template generates valid per-target invocations', () => {
   it('authors invocation references as transformable /opsx:* tokens', () => {
     expect(skill).toContain('/opsx:apply add-auth');
     expect(skill).toContain('建议使用 `/opsx:continue`');
-    expect(skill).toContain('你可以用 `/opsx:archive` 归档此变更');
+    expect(skill).toContain('你可以使用 `/opsx:archive` 归档此变更。');
     // No bare, non-transformable skill-name prose remains.
     expect(skill).not.toContain('建议使用 openspec-continue-change');
+  });
+
+  // The blocked-state answer for an installation without `continue` (#1734).
+  // The conditional's fallback has to stand on its own: the agent gets no
+  // workflow to hand off to, so it needs the whole CLI recovery, not a
+  // shortened version of the installed branch.
+  it('gives the full CLI recovery when continue is not installed', () => {
+    const withoutContinue = resolveOptionalWorkflows(
+      skill,
+      new Set(ALL_WORKFLOWS.filter((id) => id !== 'continue'))
+    );
+    const blocked = withoutContinue.slice(
+      withoutContinue.indexOf('若 `state: "blocked"`'),
+      withoutContinue.indexOf('若 `state: "all_done"`')
+    );
+
+    expect(blocked).not.toContain('/opsx:continue');
+    expect(blocked).toContain('暂停实现');
+    expect(blocked).toContain('若 `missingArtifacts` 非空');
+    expect(blocked).toContain('openspec-cn status --change "<name>" --json');
+    expect(blocked).toContain('下一个 `ready` 制品（而非 `skipped` 或 `blocked`）');
+    expect(blocked).toContain('openspec-cn instructions "<artifact-id>" --change "<name>" --json');
+    expect(blocked).toContain('两条命令都要保留已选中的 `--store <id>`');
+    expect(blocked).toContain(
+      '遵循 CLI 指令从现有规划制品创建或修复 schema 配置的跟踪文件'
+    );
+    expect(blocked).toContain('在受阻时不要假设另一个制品已就绪，也不要开始实现');
   });
 
   const cases = [

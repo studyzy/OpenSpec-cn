@@ -5,12 +5,35 @@
  * templates file into workflow-focused modules.
  */
 import type { SkillTemplate, CommandTemplate } from '../types.js';
+import { optionalWorkflow } from '../optional-workflow.js';
 import { STORE_SELECTION_GUIDANCE } from './store-selection.js';
+import { PROJECT_ROOT_GUARD } from './project-root.js';
+
+/**
+ * The implementation handoff. `apply` is not guaranteed to be installed, so
+ * the prompt is resolved at generation time (see optional-workflow.ts) rather
+ * than naming a workflow that may not exist.
+ *
+ * The two surfaces word this differently on purpose (#258): a command-only
+ * tool has no conversational agent to ask, so its prompt names a command or
+ * the CLI and never invites "ask me to implement".
+ */
+const SKILL_APPLY_HANDOFF = optionalWorkflow(
+  'apply',
+  '运行 `/opsx:apply`，或者让我来应用这个变更',
+  '让我来应用这个变更'
+);
+
+const COMMAND_APPLY_HANDOFF = optionalWorkflow(
+  'apply',
+  '运行 `/opsx:apply`',
+  '运行 `openspec-cn instructions apply --change "<name>" --json` 获取任务列表'
+);
 
 export function getOpsxProposeSkillTemplate(): SkillTemplate {
   return {
     name: 'openspec-propose',
-    description: '提议新变更并一步生成所有产出物。当用户想快速描述要构建的内容并获取包含 design、specs 和 tasks、可随时进入实现的完整提案时使用。',
+    description: '提议新变更并一步生成所有产出物。当用户想快速描述要构建的内容并获取包含 design、specs 和 tasks、可随时进入实现的完整提案时使用。也在用户说 "openspec propose" 或 "opsx propose" 时使用。',
     instructions: `提议新变更 - 创建变更并一步生成所有产出物。
 
 **规划边界**：此工作流仅创建规划制品。选择或触发此工作流的用户请求仅授权规划，即使其中要求构建或修复某些内容。不要编辑项目代码。规划制品完成后即停止。不要在同一回复中开始实现，即使初始请求如此要求。等待制品展示后的新用户请求；然后启动 apply 工作流。
@@ -29,6 +52,8 @@ export function getOpsxProposeSkillTemplate(): SkillTemplate {
 
 ${STORE_SELECTION_GUIDANCE}
 
+${PROJECT_ROOT_GUARD}
+
 **Input**: 用户的请求应包含变更名称（kebab-case）或对要构建内容的描述。
 
 **步骤**
@@ -46,7 +71,7 @@ ${STORE_SELECTION_GUIDANCE}
 
 2. **加载项目上下文**
 
-   从当前工作目录运行 \`openspec-cn context --json\`（当已显式选择某个已注册的 store 时，使用 \`openspec-cn context --json --store "<store-id>"\`）。将返回的 \`root.path\` 作为权威的 OpenSpec 根目录。若 context 报告 \`no_openspec_root\`，请停止，不要创建或修改任何文件。向用户提议 \`openspec-cn init\` 并等待用户请求初始化。不要自动初始化，也不要运行 \`openspec-cn new change\`。初始化之后，在继续之前重新运行此上下文检查。对于其他任何 context 失败，停止并报告错误；不要在未选定 store 的情况下回退到当前目录或运行后续 OpenSpec 命令。
+   从当前工作目录运行 \`openspec-cn context --json\`（当已显式选择某个已注册的 store 时，使用 \`openspec-cn context --json --store "<store-id>"\`）。将返回的 \`root.path\` 作为权威的 OpenSpec 根目录。若 context 报告 \`no_openspec_root\`，请停止，不要创建或修改任何文件，并按上文的 **项目检查** 处理此工作流的到达方式。仅针对明确的 OpenSpec 请求才提议 \`openspec-cn init\`，并等待用户请求初始化。不要自动初始化，也不要运行 \`openspec-cn new change\`。初始化之后，在继续之前重新运行此上下文检查。对于其他任何 context 失败，停止并报告错误；不要在未选定 store 的情况下回退到当前目录或运行后续 OpenSpec 命令。
 
    仅当 context 返回已解析的 \`root.path\` 时，读取 \`<root.path>/openspec/config.yaml\`。仅当 \`config.yaml\` 不存在时才使用 \`config.yml\`。若两个文件都不存在，则不加载项目上下文继续。若 \`config.yaml\` 不可读或无效，不要回退到 \`config.yml\`。
 
@@ -142,7 +167,7 @@ ${STORE_SELECTION_GUIDANCE}
 - 变更名称和位置
 - 已创建产出物列表及简要描述，加上跳过的任何条件性产出物及原因
 - 就绪状态："实现所需的所有产出物已就绪。"
-- 提示："产出物已就绪，待审核。当你准备就绪时，运行 \`/opsx:apply\` 或让我应用此变更。"
+- 提示："产出物已就绪，待审核。当你准备就绪时，${SKILL_APPLY_HANDOFF}。"
 
 **产出物创建指南**
 
@@ -192,6 +217,8 @@ export function getOpsxProposeCommandTemplate(): CommandTemplate {
 
 ${STORE_SELECTION_GUIDANCE}
 
+${PROJECT_ROOT_GUARD}
+
 **Input**: \`/opsx:propose\` 之后的参数是变更名称（kebab-case），或用户想要构建内容的描述。
 
 **步骤**
@@ -209,7 +236,7 @@ ${STORE_SELECTION_GUIDANCE}
 
 2. **加载项目上下文**
 
-   从当前工作目录运行 \`openspec-cn context --json\`（当已显式选择某个已注册的 store 时，使用 \`openspec-cn context --json --store "<store-id>"\`）。将返回的 \`root.path\` 作为权威的 OpenSpec 根目录。若 context 报告 \`no_openspec_root\`，请停止，不要创建或修改任何文件。向用户提议 \`openspec-cn init\` 并等待用户请求初始化。不要自动初始化，也不要运行 \`openspec-cn new change\`。初始化之后，在继续之前重新运行此上下文检查。对于其他任何 context 失败，停止并报告错误；不要在未选定 store 的情况下回退到当前目录或运行后续 OpenSpec 命令。
+   从当前工作目录运行 \`openspec-cn context --json\`（当已显式选择某个已注册的 store 时，使用 \`openspec-cn context --json --store "<store-id>"\`）。将返回的 \`root.path\` 作为权威的 OpenSpec 根目录。若 context 报告 \`no_openspec_root\`，请停止，不要创建或修改任何文件，并按上文的 **项目检查** 处理此工作流的到达方式。仅针对明确的 OpenSpec 请求才提议 \`openspec-cn init\`，并等待用户请求初始化。不要自动初始化，也不要运行 \`openspec-cn new change\`。初始化之后，在继续之前重新运行此上下文检查。对于其他任何 context 失败，停止并报告错误；不要在未选定 store 的情况下回退到当前目录或运行后续 OpenSpec 命令。
 
    仅当 context 返回已解析的 \`root.path\` 时，读取 \`<root.path>/openspec/config.yaml\`。仅当 \`config.yaml\` 不存在时才使用 \`config.yml\`。若两个文件都不存在，则不加载项目上下文继续。若 \`config.yaml\` 不可读或无效，不要回退到 \`config.yml\`。
 
@@ -305,7 +332,7 @@ ${STORE_SELECTION_GUIDANCE}
 - 变更名称和位置
 - 已创建产出物列表及简要描述，加上跳过的任何条件性产出物及原因
 - 就绪状态："实现所需的所有产出物已就绪。"
-- 提示："产出物已就绪，待审核。当你准备就绪时，运行 \`/opsx:apply\`。"
+- 提示："产出物已就绪，待审核。当你准备就绪时，${COMMAND_APPLY_HANDOFF}。"
 
 **产出物创建指南**
 

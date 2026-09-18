@@ -26,7 +26,7 @@ AI CHAT      /opsx:archive                    (specs 已更新，变更已归档
 
 **Don't want to do the terminal part yourself?** Paste the [setup prompt](installation.md#install-with-your-ai-assistant) into your assistant and it handles both lines, then reports what it created.
 
-> **还不确定要构建什么？从 `/opsx:explore` 开始。** 它是一个零负担的思考伙伴，会阅读你的代码库、权衡选项，并在任何制品或代码诞生之前把一个模糊的想法打磨成具体计划。当画面清晰时，它交接给 `/opsx:propose`。这是与一个否则会自信地构建出错误东西的 AI 共事时，单个最佳习惯。请参阅[探索指南](explore.md)。
+> **还不确定要构建什么？从 `/opsx:explore` 开始。** 它是一个零负担的思考伙伴，会阅读你的代码库、权衡选项，并在写下任何代码之前把一个模糊的想法打磨成具体计划。当画面清晰时，它交接给 `/opsx:propose`。这是与一个否则会自信地构建出错误东西的 AI 共事时，单个最佳习惯。请参阅[探索指南](explore.md)。
 
 ## 它如何运作
 

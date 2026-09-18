@@ -5,7 +5,27 @@
  * templates file into workflow-focused modules.
  */
 import type { SkillTemplate, CommandTemplate } from '../types.js';
+import { optionalWorkflow } from '../optional-workflow.js';
 import { STORE_SELECTION_GUIDANCE } from './store-selection.js';
+import { PROJECT_ROOT_GUARD } from './project-root.js';
+
+/**
+ * `/opsx:continue` is not in the `core` profile, so the blocked-state handoff
+ * is authored with a CLI fallback and resolved at generation time (see
+ * optional-workflow.ts).
+ */
+const BLOCKED_STATE_HANDOFF = optionalWorkflow(
+  'continue',
+  '建议使用 `/opsx:continue` 来创建它们。',
+  '建议补全缺失的制品。运行 `openspec-cn status --change "<name>" --json`，选择下一个 `ready` 制品（而非 `skipped` 或 `blocked`），并使用 `openspec-cn instructions "<artifact-id>" --change "<name>" --json` 获取其规则和模板。两条命令都要保留已选中的 `--store <id>`。'
+);
+
+/** The archive handoff shown once every task is done. */
+const ARCHIVE_HANDOFF = optionalWorkflow(
+  'archive',
+  '你可以使用 `/opsx:archive` 归档此变更。',
+  '你可以运行 `openspec-cn archive "<name>"` 来归档此变更。'
+);
 
 /**
  * The apply workflow instructions, authored once and rendered by both the
@@ -20,6 +40,8 @@ export function getApplyInstructions(): string {
   return `从 OpenSpec 变更中实现任务。
 
 ${STORE_SELECTION_GUIDANCE}
+
+${PROJECT_ROOT_GUARD}
 
 **Input**: 可选地指定变更名称（例如 \`/opsx:apply add-auth\`）。若省略，检查能否从对话上下文推断。若模糊或歧义，你必须提示用户从可用变更中选择。
 
@@ -54,11 +76,14 @@ ${STORE_SELECTION_GUIDANCE}
    - 进度（总计、已完成、剩余）
    - 任务列表及状态
    - 基于当前状态的动态指令
-   - 可选的 \`context\`：来自选定根路径的当前必需项目指令输入
-   - 可选的 \`operationGuidance\`：当前 apply 的咨询性指导
+   - 可选的 \`context\`：来自所选根路径的当前必需项目指令输入
+   - 可选的 \`operationGuidance\`：当前 apply 的建议性指导
+   - \`missingArtifacts\`（存在时）：没有输出的必需制品 ID
 
    **处理状态：**
-   - 若 \`state: "blocked"\`（缺少制品）：显示消息，建议使用 \`/opsx:continue\`（若未安装，运行 \`openspec-cn status --change "<name>" --json\` 查看下一个制品，\`openspec-cn instructions <artifact-id> --change "<name>" --json\` 了解如何创建）
+   - 若 \`state: "blocked"\`：显示消息并暂停实现。
+     - 若 \`missingArtifacts\` 非空：${BLOCKED_STATE_HANDOFF}
+     - 否则，遵循 CLI 指令从现有规划制品创建或修复 schema 配置的跟踪文件。在受阻时不要假设另一个制品已就绪，也不要开始实现。
    - 若 \`state: "all_done"\`：祝贺，建议归档
    - 否则：继续实现
 
@@ -135,7 +160,7 @@ ${STORE_SELECTION_GUIDANCE}
 - [x] 任务 2
 ...
 
-所有任务完成！你可以用 \`/opsx:archive\` 归档此变更。
+所有任务完成！${ARCHIVE_HANDOFF}
 \`\`\`
 
 **暂停时输出（遇到问题）**
@@ -186,7 +211,7 @@ ${STORE_SELECTION_GUIDANCE}
 export function getApplyChangeSkillTemplate(): SkillTemplate {
   return {
     name: 'openspec-apply-change',
-    description: '从 OpenSpec 变更中实现任务。当用户想开始实现、继续实现或处理任务时使用。',
+    description: '从 OpenSpec 变更中实现任务。当用户想开始实现、继续实现或处理任务时使用。也在用户说 "openspec apply"、"opsx apply" 或 "openspec implement" 时使用。',
     instructions: getApplyInstructions(),
     license: 'MIT',
     compatibility: '需要 openspec-cn CLI。',

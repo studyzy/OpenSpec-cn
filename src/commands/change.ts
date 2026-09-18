@@ -9,6 +9,10 @@ import { Change, Delta } from '../core/schemas/index.js';
 import type { RootOutput } from '../core/root-selection.js';
 import { isInteractive } from '../utils/interactive.js';
 import { getActiveChangeIds } from '../utils/item-discovery.js';
+import {
+  describeNestedChange,
+  findNestedChangesIn,
+} from '../utils/nested-change.js';
 import { getTaskProgressForChange } from '../utils/task-progress.js';
 import { FileSystemUtils } from '../utils/file-system.js';
 import { discoverSpecFiles } from '../utils/spec-discovery.js';
@@ -133,6 +137,13 @@ export class ChangeCommand {
         .then((stats) => stats.isDirectory())
         .catch(() => false);
       if (isChangeDirectory) {
+        // A folder holding nested change directories has no proposal of its
+        // own and never will; pointing at `status --change` would send the
+        // user down a second dead end (#1846).
+        const nested = await findNestedChangesIn(changesPath, changeName);
+        if (nested) {
+          throw new Error(describeNestedChange(nested));
+        }
         throw new Error(
           `变更 "${changeName}" 尚无 proposal.md。` +
             `运行 "openspec-cn status --change ${changeName}" 查看下一个制品的创建顺序。`
@@ -562,7 +573,10 @@ if (!isChangeDirectoryName(changesPath, changeDir)) {
 
   private extractTitle(content: string, changeName: string): string {
     const match = content.match(/^#\s+(?:Change:\s+)?(.+)$/im);
-    return match ? match[1].trim() : changeName;
+    const title = match?.[1].trim();
+    // The packaged template opens every proposal with a bare `# Proposal`,
+    // which names the document rather than the change.
+    return title && title.toLowerCase() !== 'proposal' ? title : changeName;
   }
 
   private printNextSteps(issues: Array<{ message: string }> = []): void {

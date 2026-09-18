@@ -39,6 +39,13 @@ profile values are core and custom, so "expanded" reads as a third profile). -->
 - **Core**：默认安装，是主要的规划循环。
 - **Optional**：只有当你通过 [Profiles](../customize/profiles.md) 添加时才安装。
 
+每个 skill 都期望项目已经使用了 OpenSpec。在它第一个会写入任何东西的步骤之前，skill 会检查根目录是否可解析。当根目录不存在时会发生什么，取决于该 skill 是如何被触达的：
+
+- **自动选中**：你的 Agent 自行挑选了这个 skill，你并未点名 OpenSpec。它会放弃 OpenSpec，像没装 OpenSpec 那样正常回答你的请求。
+- **显式发起 OpenSpec 请求**：你点名了 OpenSpec、点名了该 skill，或运行了它的命令。它会在写入前停下，并询问如何进行：在这里运行 `openspec init`、用 `--store <id>` 指向某个 store，或不用 OpenSpec 继续。它会等待你的回答。
+
+命令永远属于第二种情况。如果某项目的 `openspec/config.yaml` 指向了一个本机无法解析的 store（未注册，或 `store:` 行格式错误），该项目不会被当作未初始化：skill 会停下并显示 store 错误及其修复方式。无论哪种情况，任何 skill 都不会自行创建 `openspec/` 目录。下面的条目描述的是根目录就位后每个 skill 的职责。
+
 | Skill | 职责 | 类型 |
 |---|---|---|
 | [openspec-explore](#openspec-explore) | 在想法变成变更提案之前，先把它想清楚 | Core |
@@ -53,6 +60,8 @@ profile values are core and custom, so "expanded" reads as a third profile). -->
 | [openspec-verify-change](#openspec-verify-change) | 检查实现是否符合计划 | Optional |
 | [openspec-bulk-archive-change](#openspec-bulk-archive-change) | 一次归档多个变更提案 | Optional |
 | [openspec-onboard](#openspec-onboard) | 通过完整走完一个真实变更提案来学习工作流 | Optional |
+
+Each entry below names the skill that owns the next step. When your profile leaves that skill out, the installed files never name it: the handoff becomes the equivalent `openspec` command, or a plain request to you, and a line that exists only to point at a missing skill is not written at all. So the skills you have always hand off to skills you have. Which set you get is [Profiles](../customize/profiles.md).
 
 ## openspec-explore
 
@@ -80,9 +89,7 @@ profile values are core and custom, so "expanded" reads as a third profile). -->
 
 | 契约 | 说明 |
 |---|---|
-| **Arguments** | 变更提案名称（`add-auth`），可选。如果目标不明确，它会列出活跃的变更提案并请你选择。 |
-| **Creates** | 代码：每个任务所要求的最小改动，写入你的项目文件。在变更提案中只碰 tasks 文件，逐个勾选完成的任务（`- [ ]` 改为 `- [x]`）。 |
-| **Response** | 每个任务的进度，然后是总体计数（N/M 个任务完成）。全部完成：建议 `openspec-archive-change`。因缺失制品而受阻：指向 `openspec-continue-change`。任务不清晰或出错：暂停并询问。 |
+| **Response** | 每个任务的进度，然后是总体计数（N/M 个任务完成）。全部完成：建议 `openspec-archive-change`。因缺失制品而受阻：指向 `openspec-continue-change`，当该 skill 未安装时（core profile 不含它）则指向 `openspec status` 和 `openspec instructions`。任务不清晰或出错：暂停并询问。 |
 
 ## openspec-update-change
 
@@ -90,9 +97,7 @@ profile values are core and custom, so "expanded" reads as a third profile). -->
 
 | 契约 | 说明 |
 |---|---|
-| **Arguments** | 变更提案名称，可选，外加你想要的修订。未说明修订时，它会做一致性评审：检查制品之间是否存在矛盾、缺口和重复。 |
-| **Creates** | 不创建任何新内容。只编辑已存在的制品文件。缺失的制品是 `openspec-continue-change` 的职责。绝不写代码。 |
-| **Response** | 展示每个建议的修订，并只在你确认后写入，一次一个制品。最后说明修订了什么和下一步；实现等待 `openspec-apply-change`。 |
+| **Creates** | 不创建任何新内容。只编辑已存在的制品文件。缺失的制品是 `openspec-continue-change` 的职责。若没有该 skill（core profile 不含它），则改为指向 `openspec status` 和 `openspec instructions`。绝不写代码。 |
 
 ## openspec-sync-specs
 

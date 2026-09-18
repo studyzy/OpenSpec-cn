@@ -5,15 +5,35 @@
  * templates file into workflow-focused modules.
  */
 import type { SkillTemplate, CommandTemplate } from '../types.js';
+import { optionalWorkflow } from '../optional-workflow.js';
 import { STORE_SELECTION_GUIDANCE } from './store-selection.js';
+import { PROJECT_ROOT_GUARD } from './project-root.js';
+
+/**
+ * Handoffs to `continue`, which is not guaranteed to be installed alongside
+ * `new`; resolved at generation time (see optional-workflow.ts).
+ */
+const FIRST_ARTIFACT_PROMPT = optionalWorkflow(
+  'continue',
+  '运行 `/opsx:continue`，或者直接描述这个变更是关于什么的，我来起草。',
+  '直接描述这个变更是关于什么的，我来起草。'
+);
+
+const EXISTING_CHANGE_HINT = optionalWorkflow(
+  'continue',
+  '建议改用 `/opsx:continue`',
+  '说明情况，并询问是继续该变更还是换一个名称'
+);
 
 export function getNewChangeSkillTemplate(): SkillTemplate {
   return {
     name: 'openspec-new-change',
-    description: '使用实验性产出物工作流启动新的 OpenSpec 变更。当用户想以结构化的分步方法创建新功能、修复或修改时使用。',
+    description: '使用实验性产出物工作流启动新的 OpenSpec 变更。当用户想以结构化的分步方法创建新功能、修复或修改时使用。也在用户说 "openspec new change" 或 "opsx new" 时使用。',
     instructions: `使用实验性产出物驱动方法启动新变更。
 
 ${STORE_SELECTION_GUIDANCE}
+
+${PROJECT_ROOT_GUARD}
 
 **Input**: 用户的请求应当包含变更名（kebab-case）或对想要构建内容的描述。
 
@@ -92,6 +112,8 @@ export function getOpsxNewCommandTemplate(): CommandTemplate {
 
 ${STORE_SELECTION_GUIDANCE}
 
+${PROJECT_ROOT_GUARD}
+
 **Input**: \`/opsx:new\` 之后的参数是变更名（kebab-case），或用户想要构建内容的描述。
 
 **步骤**
@@ -144,13 +166,13 @@ ${STORE_SELECTION_GUIDANCE}
 - 使用的 schema/工作流及其产出物序列
 - 当前状态（0/N 个产出物已完成）
 - 第一个产出物的模板
-- 提示："准备好创建第一个产出物了吗？运行 \`/opsx:continue\`，或直接描述这个变更是关于什么的，我来起草。"
+- 提示："准备好创建第一个产出物了吗？${FIRST_ARTIFACT_PROMPT}"
 
 **护栏**
 - 不要创建任何产出物 - 仅展示指令
 - 不要超出展示第一个产出物模板的范围
 - 若名称无效（非 kebab-case），请求有效名称
-- 若同名变更已存在，建议改用 \`/opsx:continue\`
+- 若同名变更已存在，${EXISTING_CHANGE_HINT}
 - 若使用非默认工作流则传递 --schema`
   };
 }

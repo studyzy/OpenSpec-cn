@@ -55,7 +55,11 @@ function isLexicallyWithin(allowedDirectory: string, targetPath: string): boolea
   );
 }
 
-function resolveTrustedSpecPath(specsRoot: string, specPath: string): {
+function resolveTrustedSpecPath(
+  specsRoot: string,
+  specPath: string,
+  projectRoot?: string
+): {
   root: string;
   file: string;
 } {
@@ -78,6 +82,17 @@ function resolveTrustedSpecPath(specsRoot: string, specPath: string): {
     // Freeze their canonical location as the trust root so later swaps are
     // rejected while a nested spec.md link still cannot escape.
     const root = FileSystemUtils.canonicalizeExistingPath(path.dirname(specPath));
+    // An external capability link is deliberate and supported (see
+    // assertDiscoveredSpecPath), so it is not refused here. What was wrong is
+    // that the write was silent: the CLI reported the in-project path while
+    // writing somewhere else entirely, so a link swapped underneath a repo
+    // left nothing on screen to notice. Name the real destination instead.
+    if (projectRoot && !isLexicallyWithin(FileSystemUtils.canonicalizeExistingPath(projectRoot), root)) {
+      process.emitWarning(
+        `Capability '${path.basename(path.dirname(specPath))}' links outside the project; writing to ${root}`,
+        'OpenSpecExternalSpecWrite'
+      );
+    }
     const file = path.join(root, path.basename(specPath));
     FileSystemUtils.assertPathWithin(root, file);
     return { root, file };
@@ -110,7 +125,14 @@ export async function findSpecUpdates(changeDir: string, mainSpecsDir: string): 
   for (const { id, specFile } of discovered) {
     const targetFile = path.join(mainSpecsDir, ...id.split('/'), 'spec.md');
     const source = resolveTrustedSpecPath(changeSpecsDir, specFile);
-    const target = resolveTrustedSpecPath(mainSpecsDir, targetFile);
+    // Main specs always live at `<project root>/openspec/specs`, so the
+    // project root is the grandparent - a linked capability directory may not
+    // leave it.
+    const target = resolveTrustedSpecPath(
+      mainSpecsDir,
+      targetFile,
+      path.dirname(path.dirname(mainSpecsDir))
+    );
 
     // Check if target exists
     let exists = false;
@@ -197,6 +219,35 @@ export async function buildUpdatedSpec(
   // Parse deltas from the change spec file
   const plan = parseDeltaSpec(changeContent);
   const specName = update.id;
+
+  // A FROM:/TO: line that never formed a pair means the RENAMED section does not
+  // say what the author meant. Refuse rather than apply the pairing the reader
+  // happened to form: with interleaved lines that pairing renames a requirement
+  // the delta never named, under a name written for a different one.
+  if (plan.unpairedRenames.length > 0) {
+    const first = plan.unpairedRenames[0];
+    const missing = first.side === 'FROM' ? 'TO' : 'FROM';
+    throw new Error(
+      `${specName} validation failed - RENAMED entry on line ${first.line} has no matching ${missing}: ` +
+        `for header "### Requirement: ${first.name}". ` +
+        `Write each rename as a FROM: line followed immediately by its TO: line.`
+    );
+  }
+
+  // A well-formed requirement written outside every delta section is not
+  // applied. Say so here as well as in validate: archive is the last point at
+  // which the author can still notice, and the block reads exactly like one
+  // that would have applied.
+  for (const orphan of plan.orphanedRequirements) {
+    const where = orphan.section
+      ? `位于 "## ${orphan.section}" 之下`
+      : '位于第一个 "## " 章节之前';
+    warn(
+      `${specName} - 需求 "${orphan.name}"（第 ${orphan.line} 行）${where}，` +
+        `这不是 delta 章节，因此未被应用。` +
+        `请将其移到 ADDED/MODIFIED/REMOVED/RENAMED Requirements 之下。`
+    );
+  }
 
   // Pre-validate duplicates within sections
   const addedNames = new Set<string>();
@@ -339,7 +390,7 @@ export async function buildUpdatedSpec(
     // Warn about REMOVED requirements being ignored for new specs
     if (plan.removed.length > 0) {
       warn(
-        `${specName} - ${plan.removed.length} REMOVED requirement(s) ignored for new spec (nothing to remove).`
+        `${specName} - 新 spec 中忽略了 ${plan.removed.length} 个 REMOVED 需求（无可移除的内容）。`
       );
     }
     isNewSpec = true;
@@ -402,7 +453,7 @@ export async function buildUpdatedSpec(
         );
         if (nearMiss !== undefined) {
           throw new Error(
-            `${specName} RENAMED failed for header "### Requirement: ${r.from}" - source not found, but "### Requirement: ${nameToBlock.get(nearMiss)!.name}" exists; fix the header to match it exactly`
+            `${specName} RENAMED 失败，标题 "### Requirement: ${r.from}" - 未找到源，但 "### Requirement: ${nameToBlock.get(nearMiss)!.name}" 存在；请修正标题使其完全匹配`
           );
         }
         continue;
@@ -411,6 +462,17 @@ export async function buildUpdatedSpec(
     }
     if (nameToBlock.has(to)) {
       throw new Error(`${specName} RENAMED 失败，标题 "### Requirement: ${r.to}" - 目标已存在`);
+    }
+    // A target that differs from another requirement only in case or interior
+    // whitespace would leave two copies of one requirement. The source itself
+    // is exempt, so a case-only rename of a requirement stays allowed.
+    const targetNearMiss = [...nameToBlock.keys()].find(
+      (k) => k !== from && foldRequirementName(k) === foldRequirementName(to)
+    );
+    if (targetNearMiss !== undefined) {
+      throw new Error(
+        `${specName} RENAMED 失败，标题 "### Requirement: ${r.to}" - "### Requirement: ${nameToBlock.get(targetNearMiss)!.name}" 已存在，仅大小写或空格不同；请选择一个不同的名称`
+      );
     }
     const block = nameToBlock.get(from)!;
     const newHeader = `### Requirement: ${to}`;
@@ -447,11 +509,11 @@ export async function buildUpdatedSpec(
         const nearMiss = [...nameToBlock.keys()].find((k) => foldRequirementName(k) === foldRequirementName(key));
         if (nearMiss !== undefined) {
           throw new Error(
-            `${specName} REMOVED failed for header "### Requirement: ${name}" - not found, but "### Requirement: ${nameToBlock.get(nearMiss)!.name}" exists; fix the header to match it exactly`
+            `${specName} REMOVED 失败，标题 "### Requirement: ${name}" - 未找到，但 "### Requirement: ${nameToBlock.get(nearMiss)!.name}" 存在；请修正标题使其完全匹配`
           );
         }
         warn(
-          `${specName} - REMOVED requirement "${name}" is not in the current spec; treating it as already removed.`
+          `${specName} - REMOVED 需求 "${name}" 不在当前 spec 中；视为已移除。`
         );
       }
       continue;
@@ -504,6 +566,17 @@ export async function buildUpdatedSpec(
         continue;
       }
       throw new Error(`${specName} ADDED 失败，标题 "### Requirement: ${add.name}" - 已存在`);
+    }
+    // A name that differs from an existing requirement only in case or
+    // interior whitespace is that requirement written again: adding it would
+    // leave two contradicting copies in the spec. Like the exact check above,
+    // this compares against the spec as it stands after the earlier operations,
+    // so a variant of a requirement this delta removed or renamed away is fine.
+    const nearMiss = [...nameToBlock.keys()].find((k) => foldRequirementName(k) === foldRequirementName(key));
+    if (nearMiss !== undefined) {
+      throw new Error(
+        `${specName} ADDED 失败，标题 "### Requirement: ${add.name}" - "### Requirement: ${nameToBlock.get(nearMiss)!.name}" 已存在，仅大小写或空格不同；要修改它请使用 MODIFIED 并传入完全一致的标题，或者选择一个不同的名称`
+      );
     }
     nameToBlock.set(key, add);
     addedApplied++;
@@ -1188,14 +1261,34 @@ export async function writeUpdatedSpec(
 /** Blank out `<!-- ... -->` spans, preserving line count so indices stay aligned. */
 function maskHtmlComments(content: string): string {
   const blank = (text: string) => text.replace(/[^\n]/g, ' ');
-  // `--!>` is a comment terminator as well as `-->`.
-  const masked = content.replace(/<!--[\s\S]*?--!?>/g, blank);
-  // A comment that is never closed runs to end of file, so everything after it
-  // is commented out too. Without this an unterminated `<!--` above a
-  // `## Purpose` left the commented-out header looking real (#1413).
-  const unterminated = masked.indexOf('<!--');
-  if (unterminated === -1) return masked;
-  return masked.slice(0, unterminated) + blank(masked.slice(unterminated));
+  // Linear scan: every character is visited once. A `/<!--[\s\S]*?--!?>/g`
+  // replace re-scans to end of file from every `<!--`, which is quadratic on a
+  // spec dense in comment openers.
+  let out = '';
+  let index = 0;
+  for (;;) {
+    const open = content.indexOf('<!--', index);
+    if (open === -1) return out + content.slice(index);
+    out += content.slice(index, open);
+    // `--!>` is a comment terminator as well as `-->`.
+    let close = -1;
+    for (let i = open + 4; i < content.length; i++) {
+      if (content.startsWith('-->', i)) {
+        close = i + 3;
+        break;
+      }
+      if (content.startsWith('--!>', i)) {
+        close = i + 4;
+        break;
+      }
+    }
+    // A comment that is never closed runs to end of file, so everything after
+    // it is commented out too. Without this an unterminated `<!--` above a
+    // `## Purpose` left the commented-out header looking real (#1413).
+    if (close === -1) return out + blank(content.slice(open));
+    out += blank(content.slice(open, close));
+    index = close;
+  }
 }
 
 /**

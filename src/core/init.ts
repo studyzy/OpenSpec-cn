@@ -22,6 +22,8 @@ import { ANCHORED_OPENSPEC_DIRS, ensureDirectoryAnchor } from './openspec-root.j
 import { getSkillReferenceTransformer, getTransformerForTool, usesNaturalLanguageSkillReferences } from '../utils/command-references.js';
 import {
   AI_TOOLS,
+  getUniversalTool,
+  universalToolFallbackHint,
   OPENSPEC_DIR_NAME,
   AIToolOption,
   resolveToolIdAlias,
@@ -632,8 +634,9 @@ export class InitCommand {
       if (detectedToolIds.size > 0) {
         return [...detectedToolIds];
       }
+      const fallbackHint = universalToolFallbackHint(validTools);
       throw new Error(
-        `未检测到工具且未提供 --tools 参数。可用工具：\n  ${validTools.join('\n  ')}\n\n使用 --tools all、--tools none 或 --tools claude,cursor,...`
+        `未检测到工具且未提供 --tools 参数。可用工具：\n  ${validTools.join('\n  ')}\n\n使用 --tools all、--tools none 或 --tools claude,cursor,...${fallbackHint ? `\n${fallbackHint}` : ''}`
       );
     }
 
@@ -657,6 +660,7 @@ export class InitCommand {
         return {
           name: tool?.name || toolId,
           value: toolId,
+          searchAliases: tool?.searchAliases,
           configured,
           detected: detected && !configured,
           preSelected: configured || (shouldPreselectDetected && detected && !configured),
@@ -690,10 +694,19 @@ export class InitCommand {
       console.log(`检测到的工具目录：${detectedOnlyNames.join(', ')}（${detectionLabel}）`);
     }
 
+    // A search that matches nothing is where someone whose assistant is not on
+    // the list gives up (#653), so name the vendor-neutral entry right there.
+    const universalTool = getUniversalTool();
+    const universalHint =
+      universalTool && validTools.includes(universalTool.value)
+        ? `工具不在列表中？清空搜索并选择 "${universalTool.name}"。`
+        : undefined;
+
     const selectedTools = await searchableMultiSelect({
       message: `选择要设置的工具（共 ${validTools.length} 个可用）`,
       pageSize: 15,
       choices: sortedChoices,
+      emptyHint: universalHint,
       validate: (selected: string[]) => selected.length > 0 || '请至少选择一个工具',
     });
 
@@ -753,8 +766,9 @@ export class InitCommand {
     );
 
     if (invalidTokens.length > 0) {
+      const fallbackHint = universalToolFallbackHint([...availableSet]);
       throw new Error(
-        `无效工具：${invalidTokens.join(', ')}。可用值：${availableList}`
+        `无效工具：${invalidTokens.join(', ')}。可用值：${availableList}${fallbackHint ? `\n${fallbackHint}` : ''}`
       );
     }
 

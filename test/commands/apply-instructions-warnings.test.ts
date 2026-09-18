@@ -54,9 +54,9 @@ describe('generateApplyInstructions warnings', () => {
     expect(instructions.warnings).toHaveLength(1);
     expect(instructions.warnings?.[0]).toContain('没有增量规范');
     expect(instructions.warnings?.[0]).toContain('skip_specs: true');
-    expect(instructions.warnings?.[0]).toContain('openspec validate my-change');
+    expect(instructions.warnings?.[0]).toContain('openspec-cn validate my-change');
     expect(instructions.warnings?.[0]).toContain(
-      'openspec instructions specs --change my-change'
+      'openspec-cn instructions specs --change my-change'
     );
     // Not the absolute path: on Windows the CLI resolves `os.tmpdir()`'s short
     // form (C:\Users\RUNNER~1) to its long one, so only the tail is stable.
@@ -197,7 +197,7 @@ describe('generateApplyInstructions warnings', () => {
     // `specs` sent the agent to an artifact this schema does not declare, so
     // the warning dead-ended at the step meant to resolve it.
     expect(instructions.warnings?.[0]).toContain(
-      'openspec instructions contracts --change my-change'
+      'openspec-cn instructions contracts --change my-change'
     );
     expect(instructions.warnings?.[0]).not.toContain('openspec instructions specs');
   });
@@ -245,7 +245,7 @@ describe('generateApplyInstructions warnings', () => {
 
     expect(instructions.warnings).toHaveLength(1);
     expect(instructions.warnings?.[0]).toContain(
-      'openspec instructions <artifact-id> --change my-change'
+      'openspec-cn instructions <artifact-id> --change my-change'
     );
     // Presence of the placeholder is not enough: naming either artifact as
     // well would still be picking one, which is the thing there is no basis

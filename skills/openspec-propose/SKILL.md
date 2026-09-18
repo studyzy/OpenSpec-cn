@@ -1,6 +1,6 @@
 ---
 name: openspec-propose
-description: 提议新变更并一步生成所有产出物。当用户想快速描述要构建的内容并获取包含 design、specs 和 tasks、可随时进入实现的完整提案时使用。
+description: 提议新变更并一步生成所有产出物。当用户想快速描述要构建的内容并获取包含 design、specs 和 tasks、可随时进入实现的完整提案时使用。也在用户说 "openspec propose" 或 "opsx propose" 时使用。
 allowed-tools: Bash(openspec-cn:*)
 license: MIT
 compatibility: 需要 openspec-cn CLI。
@@ -27,6 +27,17 @@ metadata:
 
 **存储选择：** 若用户指定了一个存储（存储是注册在本机上的独立 OpenSpec 仓库）或工作位于某个存储中，请运行 `openspec-cn store list --json` 发现已注册的存储 ID，然后在读写 spec 和变更的命令上传递 `--store <id>`（`new change`、`status`、`instructions`、`list`、`show`、`validate`、`archive`、`doctor`、`context`、`schemas`、`view`）。选定后，将 `--store <id>` 视为在当前工作流其余部分中固定不变。以下每个未限定范围的命令示例均为简写形式：运行前请追加该标志。例如，运行 `openspec-cn status --change "<name>" --json --store "<id>"`，而非下面展示的未限定形式。其他命令不接受此标志。命令输出的提示已包含该标志；在后续操作中请保留它。若不指定存储，命令将对最近的本地 `openspec/` 根目录生效。
 
+**项目检查：** 以下步骤期望项目已经在使用 OpenSpec。在第一个会写入任何内容的步骤之前（`new change`、`archive`、`sync specs`，或撰写任何产出物文件），确认项目已有根目录：运行 `openspec-cn list --json`（当选择了 store 时加上 `--store <id>`，因为此时 store 就是根目录），并读取 `root`。root 是一个对象表示项目已配置好。`"root": null` 表示尚未配置 —— 这里没有 `openspec/` 目录，而像 `openspec-cn new change` 这样的写入操作会作为副作用创建它。该命令还会以非零状态退出，这是它给出的答案而不是 CLI 坏了，因此请读取 JSON，不要重试或绕过它。
+
+有一种 `"root": null` 与配置无关：当某条 `status` 错误消息以 `中声明` 或 `中的 store 声明无效` 结尾，并指向本项目的 `openspec/config.yaml`（或 `config.yml`）时，说明本项目确实通过它声明的某个 store 在使用 OpenSpec，只是本机无法解析该 store（store 未注册，或 `store:` 行格式有误）。不要把它当作未初始化而跳过下面的分支：请在写入前停下，把该错误的 `message` 和 `fix` 展示给用户。
+
+否则，在没有根目录的情况下，接下来怎么做取决于这个工作流是如何被触发的：
+
+- **自动选用**：这个工作流是你自己选的，用户没有提到 OpenSpec、没有点名这个 skill，也没有运行它的斜杠命令。停止使用 OpenSpec，按平常方式回答请求，就像没安装 OpenSpec 一样。不要要求他们做任何配置，也不要提及 OpenSpec 配置。
+- **明确要求 OpenSpec**：用户提到了 OpenSpec、点名了这个 skill，或运行了它的斜杠命令。在写入前停下并询问如何继续：为本项目做配置（`openspec-cn init`）、指向他们已有的某个 store（`--store <id>`），还是本次请求不使用 OpenSpec 继续。等待他们的答复。
+
+无论走哪个分支，都绝不能把创建根目录当作副作用：在用户要求之前不要运行 `openspec-cn init`，不要手工创建 `openspec/` 文件，也不要让任何命令创建它。
+
 **Input**: 用户的请求应包含变更名称（kebab-case）或对要构建内容的描述。
 
 **步骤**
@@ -44,7 +55,7 @@ metadata:
 
 2. **加载项目上下文**
 
-   从当前工作目录运行 `openspec-cn context --json`（当已显式选择某个已注册的 store 时，使用 `openspec-cn context --json --store "<store-id>"`）。将返回的 `root.path` 作为权威的 OpenSpec 根目录。若 context 报告 `no_openspec_root`，请停止，不要创建或修改任何文件。向用户提议 `openspec-cn init` 并等待用户请求初始化。不要自动初始化，也不要运行 `openspec-cn new change`。初始化之后，在继续之前重新运行此上下文检查。对于其他任何 context 失败，停止并报告错误；不要在未选定 store 的情况下回退到当前目录或运行后续 OpenSpec 命令。
+   从当前工作目录运行 `openspec-cn context --json`（当已显式选择某个已注册的 store 时，使用 `openspec-cn context --json --store "<store-id>"`）。将返回的 `root.path` 作为权威的 OpenSpec 根目录。若 context 报告 `no_openspec_root`，请停止，不要创建或修改任何文件，并按上文的 **项目检查** 处理此工作流的到达方式。仅针对明确的 OpenSpec 请求才提议 `openspec-cn init`，并等待用户请求初始化。不要自动初始化，也不要运行 `openspec-cn new change`。初始化之后，在继续之前重新运行此上下文检查。对于其他任何 context 失败，停止并报告错误；不要在未选定 store 的情况下回退到当前目录或运行后续 OpenSpec 命令。
 
    仅当 context 返回已解析的 `root.path` 时，读取 `<root.path>/openspec/config.yaml`。仅当 `config.yaml` 不存在时才使用 `config.yml`。若两个文件都不存在，则不加载项目上下文继续。若 `config.yaml` 不可读或无效，不要回退到 `config.yml`。
 
@@ -140,7 +151,7 @@ metadata:
 - 变更名称和位置
 - 已创建产出物列表及简要描述，加上跳过的任何条件性产出物及原因
 - 就绪状态："实现所需的所有产出物已就绪。"
-- 提示："产出物已就绪，待审核。当你准备就绪时，运行 `/openspec-apply-change` 或让我应用此变更。"
+- 提示："产出物已就绪，待审核。当你准备就绪时，运行 `/openspec-apply-change`，或者让我来应用这个变更。"
 
 **产出物创建指南**
 

@@ -12,7 +12,11 @@ import {
   isSchemaDir,
   listSchemas,
 } from '../core/artifact-graph/resolver.js';
-import { parseSchema, SchemaValidationError } from '../core/artifact-graph/schema.js';
+import {
+  findApplyTracksWarning,
+  parseSchema,
+  SchemaValidationError,
+} from '../core/artifact-graph/schema.js';
 import type { SchemaYaml, Artifact } from '../core/artifact-graph/types.js';
 import { resolveConfigFilePath } from '../core/project-config.js';
 import { FileSystemUtils } from '../utils/file-system.js';
@@ -227,13 +231,20 @@ function validateSchema(
     }
   }
 
-  // Dependency graph validation is already done by parseSchema
-  // (it throws on cycles and invalid references)
+  // Dependency graph validation is already done by parseSchema (it throws on
+  // cycles, invalid references, and an unknown apply.requires id)
   if (verbose) {
     console.log('  依赖图验证通过 (经由 parseSchema)');
   }
 
-  return { valid: issues.length === 0, issues };
+  // An apply.tracks value that matches no generates value exactly still loads
+  // (apply reads the path as written), so it is a warning, not an error.
+  const tracksWarning = findApplyTracksWarning(schema);
+  if (tracksWarning) {
+    issues.push({ level: 'warning', path: 'apply.tracks', message: tracksWarning });
+  }
+
+  return { valid: !issues.some((issue) => issue.level === 'error'), issues };
 }
 
 /**
@@ -740,6 +751,9 @@ export function registerSchemaCommand(program: Command): void {
         } else {
           if (result.valid) {
             console.log(`✓ Schema '${name}' 有效`);
+            for (const issue of result.issues) {
+              console.log(`  ${issue.level}: ${issue.message}`);
+            }
           } else {
             console.log(`✗ Schema '${name}' 存在错误:`);
             for (const issue of result.issues) {
@@ -1408,11 +1422,17 @@ export function registerSchemaCommand(program: Command): void {
 
 /**
  * Create default template content for an artifact.
+ *
+ * Every template opens with a top-level heading so the artifact it produces is
+ * a well-formed markdown document rather than a file whose first line is a
+ * section header (markdownlint MD041, #1138).
  */
 function createDefaultTemplate(artifactId: string): string {
   switch (artifactId) {
     case 'proposal':
-      return `## 为什么
+      return `# Proposal
+
+## 为什么
 
 <!-- 描述此变更的动机 -->
 
@@ -1434,7 +1454,9 @@ function createDefaultTemplate(artifactId: string): string {
 `;
 
     case 'specs':
-      return `## 新增需求
+      return `# Spec Delta
+
+## 新增需求
 
 ### 需求: 示例需求
 
@@ -1446,7 +1468,9 @@ function createDefaultTemplate(artifactId: string): string {
 `;
 
     case 'design':
-      return `## 背景
+      return `# Design
+
+## 背景
 
 <!-- 背景和上下文 -->
 
@@ -1473,7 +1497,9 @@ function createDefaultTemplate(artifactId: string): string {
 `;
 
     case 'tasks':
-      return `## 实施任务
+      return `# Tasks
+
+## 实施任务
 
 - [ ] 任务 1
 - [ ] 任务 2
@@ -1481,7 +1507,7 @@ function createDefaultTemplate(artifactId: string): string {
 `;
 
     default:
-      return `## ${artifactId}
+      return `# ${artifactId}
 
 <!-- 在此添加内容 -->
 `;

@@ -121,6 +121,28 @@ sequenceDiagram
 
 `/opsx:explore` 是默认 profile 的一部分，而非高级功能。探索不会创建任何制品，也不会写入任何代码。它是一场零风险的对话，能把模糊的担忧变成精确的变更，因此提案会更有针对性。如果你已经确切知道想要什么？跳过它，直接 `/opsx:propose`。完整指南见 [Explore First](explore.md)。
 
+对话大致是这样的：
+
+```text
+AI:  What would you like to explore?
+
+You: Our search results feel stale. I'm not sure if it's caching,
+     indexing, or the query itself.
+
+AI:  Let me look... [reads the search service and cache layer]
+     It's the index: it only rebuilds nightly, so edits don't show
+     up until the next day. Two options: rebuild on write (simple,
+     more load) or a short-TTL cache invalidation (more moving parts,
+     less load). Given your write volume is low, rebuild-on-write is
+     the cleaner fix. Want to scope it?
+
+You: Yes.
+
+You: /opsx:propose rebuild-search-index-on-write
+```
+
+Explore 从不写代码，也不会写其他任何东西，除非你要求、或它主动提出时你表示同意。它是一场免费、零风险的对话，能把模糊的担忧变成精确的变更，因此随后的提案会更有针对性。如果你已经确切知道想要什么？跳过它，直接 `/opsx:propose`。完整指南见 [Explore First](explore.md)。
+
 ### 扩展/完整工作流（自定义选择）
 
 如果你想使用显式的"搭建并构建"命令（`/opsx:new`、`/opsx:continue`、`/opsx:ff`、`/opsx:verify`、`/opsx:bulk-archive`、`/opsx:onboard`），用以下方式启用：
@@ -469,7 +491,7 @@ AI:  Let me investigate your current setup and options...
      Your current stack suggests #1 or #2. What's your scale?
 ```
 
-探索能在你创建制品之前理清思路。
+探索能在写下任何代码之前理清思路。
 
 ### 归档前先验证
 

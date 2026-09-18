@@ -59,7 +59,7 @@ describe('main spec paths in the specs instruction (#1702)', () => {
     // Naming `planningHome.root` is not enough on its own: it is a field of the
     // instructions JSON, and an agent that does not know that cannot use it.
     const instruction = instructionFor('specs');
-    expect(instruction).toContain('openspec instructions');
+    expect(instruction).toContain('openspec-cn instructions');
     expect(instruction).toContain('store-aware 根目录');
   });
 

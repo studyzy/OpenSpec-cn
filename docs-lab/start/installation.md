@@ -98,6 +98,11 @@ nix run github:studyzy/OpenSpec-cn -- --version
 
 如果想把 OpenSpec 放进项目的开发 shell，则把 flake 添加为 input 并使用它的默认包；[flake.nix](https://github.com/studyzy/openspec-cn/blob/main/flake.nix) 列出了所有 outputs。
 
+Nix 包把 Bash、Fish 和 Zsh 补全脚本放在标准位置
+（`share/bash-completion/completions`、`share/fish/vendor_completions.d`、
+`share/zsh/site-functions`），因此它们随包一起加载，无需运行
+`openspec completion install`。
+
 ### 检查是否成功
 
 无论你用了哪种方法，在终端中执行：

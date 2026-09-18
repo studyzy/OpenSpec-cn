@@ -1,6 +1,6 @@
 ---
 name: openspec-apply-change
-description: 从 OpenSpec 变更中实现任务。当用户想开始实现、继续实现或处理任务时使用。
+description: 从 OpenSpec 变更中实现任务。当用户想开始实现、继续实现或处理任务时使用。也在用户说 "openspec apply"、"opsx apply" 或 "openspec implement" 时使用。
 allowed-tools: Bash(openspec-cn:*)
 license: MIT
 compatibility: 需要 openspec-cn CLI。
@@ -12,6 +12,17 @@ metadata:
 从 OpenSpec 变更中实现任务。
 
 **存储选择：** 若用户指定了一个存储（存储是注册在本机上的独立 OpenSpec 仓库）或工作位于某个存储中，请运行 `openspec-cn store list --json` 发现已注册的存储 ID，然后在读写 spec 和变更的命令上传递 `--store <id>`（`new change`、`status`、`instructions`、`list`、`show`、`validate`、`archive`、`doctor`、`context`、`schemas`、`view`）。选定后，将 `--store <id>` 视为在当前工作流其余部分中固定不变。以下每个未限定范围的命令示例均为简写形式：运行前请追加该标志。例如，运行 `openspec-cn status --change "<name>" --json --store "<id>"`，而非下面展示的未限定形式。其他命令不接受此标志。命令输出的提示已包含该标志；在后续操作中请保留它。若不指定存储，命令将对最近的本地 `openspec/` 根目录生效。
+
+**项目检查：** 以下步骤期望项目已经在使用 OpenSpec。在第一个会写入任何内容的步骤之前（`new change`、`archive`、`sync specs`，或撰写任何产出物文件），确认项目已有根目录：运行 `openspec-cn list --json`（当选择了 store 时加上 `--store <id>`，因为此时 store 就是根目录），并读取 `root`。root 是一个对象表示项目已配置好。`"root": null` 表示尚未配置 —— 这里没有 `openspec/` 目录，而像 `openspec-cn new change` 这样的写入操作会作为副作用创建它。该命令还会以非零状态退出，这是它给出的答案而不是 CLI 坏了，因此请读取 JSON，不要重试或绕过它。
+
+有一种 `"root": null` 与配置无关：当某条 `status` 错误消息以 `中声明` 或 `中的 store 声明无效` 结尾，并指向本项目的 `openspec/config.yaml`（或 `config.yml`）时，说明本项目确实通过它声明的某个 store 在使用 OpenSpec，只是本机无法解析该 store（store 未注册，或 `store:` 行格式有误）。不要把它当作未初始化而跳过下面的分支：请在写入前停下，把该错误的 `message` 和 `fix` 展示给用户。
+
+否则，在没有根目录的情况下，接下来怎么做取决于这个工作流是如何被触发的：
+
+- **自动选用**：这个工作流是你自己选的，用户没有提到 OpenSpec、没有点名这个 skill，也没有运行它的斜杠命令。停止使用 OpenSpec，按平常方式回答请求，就像没安装 OpenSpec 一样。不要要求他们做任何配置，也不要提及 OpenSpec 配置。
+- **明确要求 OpenSpec**：用户提到了 OpenSpec、点名了这个 skill，或运行了它的斜杠命令。在写入前停下并询问如何继续：为本项目做配置（`openspec-cn init`）、指向他们已有的某个 store（`--store <id>`），还是本次请求不使用 OpenSpec 继续。等待他们的答复。
+
+无论走哪个分支，都绝不能把创建根目录当作副作用：在用户要求之前不要运行 `openspec-cn init`，不要手工创建 `openspec/` 文件，也不要让任何命令创建它。
 
 **Input**: 可选地指定变更名称（例如 `/openspec-apply-change add-auth`）。若省略，检查能否从对话上下文推断。若模糊或歧义，你必须提示用户从可用变更中选择。
 
@@ -46,11 +57,14 @@ metadata:
    - 进度（总计、已完成、剩余）
    - 任务列表及状态
    - 基于当前状态的动态指令
-   - 可选的 `context`：来自选定根路径的当前必需项目指令输入
-   - 可选的 `operationGuidance`：当前 apply 的咨询性指导
+   - 可选的 `context`：来自所选根路径的当前必需项目指令输入
+   - 可选的 `operationGuidance`：当前 apply 的建议性指导
+   - `missingArtifacts`（存在时）：没有输出的必需制品 ID
 
    **处理状态：**
-   - 若 `state: "blocked"`（缺少制品）：显示消息，建议使用 `/openspec-continue-change`（若未安装，运行 `openspec-cn status --change "<name>" --json` 查看下一个制品，`openspec-cn instructions <artifact-id> --change "<name>" --json` 了解如何创建）
+   - 若 `state: "blocked"`：显示消息并暂停实现。
+     - 若 `missingArtifacts` 非空：建议使用 `/openspec-continue-change` 来创建它们。
+     - 否则，遵循 CLI 指令从现有规划制品创建或修复 schema 配置的跟踪文件。在受阻时不要假设另一个制品已就绪，也不要开始实现。
    - 若 `state: "all_done"`：祝贺，建议归档
    - 否则：继续实现
 
@@ -127,7 +141,7 @@ metadata:
 - [x] 任务 2
 ...
 
-所有任务完成！你可以用 `/openspec-archive-change` 归档此变更。
+所有任务完成！你可以使用 `/openspec-archive-change` 归档此变更。
 ```
 
 **暂停时输出（遇到问题）**

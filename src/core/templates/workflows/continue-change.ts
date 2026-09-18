@@ -5,15 +5,34 @@
  * templates file into workflow-focused modules.
  */
 import type { SkillTemplate, CommandTemplate } from '../types.js';
+import { optionalWorkflow } from '../optional-workflow.js';
 import { STORE_SELECTION_GUIDANCE } from './store-selection.js';
+import { PROJECT_ROOT_GUARD } from './project-root.js';
+
+/**
+ * The planning-complete handoff. Neither `apply` nor `archive` is guaranteed
+ * to be installed, so each half is resolved at generation time (see
+ * optional-workflow.ts).
+ */
+const PLANNING_COMPLETE_HANDOFF = optionalWorkflow(
+  'apply',
+  '现在可以用 `/opsx:apply` 实现这个变更。',
+  '现在可以实现这个变更 —— `openspec-cn instructions apply --change "<name>" --json` 会返回任务列表以及如何执行它们。'
+) + ' ' + optionalWorkflow(
+  'archive',
+  '当实现以及所有被追踪的工作都完成后，用 `/opsx:archive` 归档它。',
+  '当实现以及所有被追踪的工作都完成后，用 `openspec-cn archive "<name>"` 归档它。'
+);
 
 export function getContinueChangeSkillTemplate(): SkillTemplate {
   return {
     name: 'openspec-continue-change',
-    description: '通过创建下一个产出物来继续处理 OpenSpec 变更。当用户想推进变更、创建下一个产出物或继续工作流时使用。',
+    description: '通过创建下一个产出物来继续处理 OpenSpec 变更。当用户想推进变更、创建下一个产出物或继续工作流时使用。也在用户说 "openspec continue" 或 "opsx continue" 时使用。',
     instructions: `通过创建下一个产出物来继续处理变更。
 
 ${STORE_SELECTION_GUIDANCE}
+
+${PROJECT_ROOT_GUARD}
 
 **Input**: 可选地指定变更名。若省略，检查能否从对话上下文推断。若模糊或歧义，你必须提示用户从可用变更中选择。
 
@@ -133,6 +152,8 @@ export function getOpsxContinueCommandTemplate(): CommandTemplate {
 
 ${STORE_SELECTION_GUIDANCE}
 
+${PROJECT_ROOT_GUARD}
+
 **Input**: 可选地在 \`/opsx:continue\` 后指定变更名（例如 \`/opsx:continue add-auth\`）。若省略，检查能否从对话上下文推断。若模糊或歧义，你必须提示用户从可用变更中选择。
 
 **步骤**
@@ -171,7 +192,7 @@ ${STORE_SELECTION_GUIDANCE}
    **若所有规划制品已完成（\`isPlanningComplete: true\`，或旧版 \`isComplete: true\`）**：
    - 祝贺用户
    - 展示最终状态，包括使用的 schema
-   - 建议："规划完成！现在可以实现此变更。实现及所有跟踪的工作完成后，归档它。"
+   - 建议："规划完成！${PLANNING_COMPLETE_HANDOFF}"
    - 停止
 
    ---

@@ -19,7 +19,7 @@ OpenSpec 复用了一些在 git、CI 和 Agent 工具中含义不同的词。每
 | **Fast-forward** | 一次性创建带有全部规划制品的变更提案，即可直接进入实现。Skill：`openspec-ff-change`。不是 git 的 fast-forward。 | [技能](skills.md) |
 | **Legacy workflow** | OPSX 之前的 `/openspec:*` 命令。 | [迁移](../help/legacy/migration.md) |
 | **Loop** | 变更提案经历的一个循环：explore、propose、review、apply、archive。 | [快速开始](../start/quickstart.md) |
-| **Main specs** | `openspec/specs/` 目录树：你系统当前已达成一致的行为。归档会把增量规范（delta specs）合并进去。 | [核心概念](../guides/concepts.md) |
+| **Main specs** | `openspec/specs/` 目录树：你系统当前已达成一致的行为。归档会把增量规范（delta specs）合并进去。尚无 spec 的能力会从其 `ADDED` 需求获得一份。 | [核心概念](../guides/concepts.md) |
 | **OpenSpec root** | 命令解析并操作的 `openspec/` 目录树：你仓库的，或某个 store 的。 | [Stores](../multi-repo/stores.md#where-artifacts-get-created-when-using-stores) |
 | **OPSX** | 当前的 OpenSpec 工作流系统，以及它安装的命令前缀（`/opsx:`）。 | [架构](architecture/index.md) |
 | **Profile** | init 安装哪些工作流：`core` 或 `custom`。 | [Profiles](../customize/profiles.md) |

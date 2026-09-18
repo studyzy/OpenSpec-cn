@@ -17,6 +17,7 @@ import {
   type ArtifactInstructions,
 } from '../../core/artifact-graph/index.js';
 import { isSpecsArtifactPath } from '../../core/artifact-graph/outputs.js';
+import { findUnreadDeltaFiles } from '../../utils/spec-discovery.js';
 import {
   getChangeDir,
   resolveCurrentPlanningHomeSync,
@@ -31,8 +32,11 @@ import {
 } from '../../core/root-selection.js';
 import {
   assembleReferenceIndex,
+  escapeEnvelopeAttribute,
+  escapeEnvelopeTags,
   renderReferencedStoresBlock,
   renderReferencedStoresSection,
+  sanitizeInline,
   type ReferenceIndexEntry,
 } from '../../core/references.js';
 import { readRegistrySnapshot } from '../../core/store/registry.js';
@@ -198,8 +202,14 @@ export function printInstructionsText(instructions: ArtifactInstructions, isBloc
     unlocks,
   } = instructions;
 
-  // Opening tag
-  console.log(`<artifact id="${artifactId}" change="${changeName}" schema="${schemaName}">`);
+  // Opening tag. The change name is a directory name read from disk, and the
+  // read path rejects only separators and NUL - a quote in it would otherwise
+  // close the attribute and forge siblings on this tag.
+  console.log(
+    `<artifact id="${escapeEnvelopeAttribute(artifactId)}"` +
+      ` change="${escapeEnvelopeAttribute(changeName)}"` +
+      ` schema="${escapeEnvelopeAttribute(schemaName)}">`
+  );
   console.log();
 
   // Artifacts skipped via skip_specs get no creation directive: emitting the
@@ -226,8 +236,10 @@ export function printInstructionsText(instructions: ArtifactInstructions, isBloc
 
   // Task directive
   console.log('<task>');
-  console.log(`为变更 "${changeName}" 创建 ${artifactId} 产出物。`);
-  console.log(description);
+  console.log(
+    `为变更 "${escapeEnvelopeTags(changeName)}" 创建 ${escapeEnvelopeTags(artifactId)} 产出物。`
+  );
+  console.log(escapeEnvelopeTags(description));
   console.log('</task>');
   console.log();
 
@@ -235,7 +247,7 @@ export function printInstructionsText(instructions: ArtifactInstructions, isBloc
   if (context) {
     console.log('<project_context>');
     console.log('<!-- 以下是供你参考的背景信息。请勿将其包含在你的输出中。 -->');
-    console.log(context);
+    console.log(escapeEnvelopeTags(context));
     console.log('</project_context>');
     console.log();
   }
@@ -251,7 +263,9 @@ export function printInstructionsText(instructions: ArtifactInstructions, isBloc
     console.log('<rules>');
     console.log('<!-- 以下是你需要遵守的约束条件。请勿将其包含在你的输出中。 -->');
     for (const rule of rules) {
-      console.log(`- ${rule}`);
+      // Flattened so a newline cannot forge a sibling bullet, but never
+      // truncated: these are instructions an agent has to follow in full.
+      console.log(`- ${escapeEnvelopeTags(sanitizeInline(rule, Infinity))}`);
     }
     console.log('</rules>');
     console.log();
@@ -276,7 +290,7 @@ export function printInstructionsText(instructions: ArtifactInstructions, isBloc
       const fullPath = path.join(changeDir, dep.path);
       console.log(`<dependency id="${dep.id}" status="${status}">`);
       console.log(`  <path>${fullPath}</path>`);
-      console.log(`  <description>${dep.description}</description>`);
+      console.log(`  <description>${escapeEnvelopeTags(dep.description)}</description>`);
       console.log('</dependency>');
     }
     console.log('</dependencies>');
@@ -292,7 +306,7 @@ export function printInstructionsText(instructions: ArtifactInstructions, isBloc
   // Instruction (guidance)
   if (instruction) {
     console.log('<instruction>');
-    console.log(instruction.trim());
+    console.log(escapeEnvelopeTags(instruction.trim()));
     console.log('</instruction>');
     console.log();
   }
@@ -300,7 +314,10 @@ export function printInstructionsText(instructions: ArtifactInstructions, isBloc
   // Template
   console.log('<template>');
   console.log('<!-- Use this as the structure for your output file. Fill in the sections. -->');
-  console.log(template.trim());
+  // Copied verbatim into the artifact file, so its `<!-- ... -->` comments and
+  // `<placeholder>` markers must survive - only the envelope's own closing
+  // tags are neutralized.
+  console.log(escapeEnvelopeTags(template.trim()));
   console.log('</template>');
   console.log();
 
@@ -436,14 +453,18 @@ function collectMissingPrerequisites(input: {
  * reached tasks yet, the missing specs are the next step rather than a warning.
  * Schemas that declare no spec-producing artifact carry `skip_specs` from
  * creation, so this never fires on them.
+ *
+ * A delta file the merge path never reads (specs/<capability>.md, a note
+ * beside spec.md) still satisfies the specs glob, so it reads as written here
+ * while validate rejects it and archive would drop it. Each one is named.
  */
-function collectApplyWarnings(input: {
+async function collectApplyWarnings(input: {
   state: ApplyInstructions['state'];
   schema: { artifacts: { id: string; generates: string }[] };
   changeDir: string;
   changeName: string;
   skippedArtifacts?: Set<string>;
-}): string[] {
+}): Promise<string[]> {
   const { state, schema, changeDir, changeName, skippedArtifacts } = input;
   if (state === 'blocked') return [];
 
@@ -452,10 +473,15 @@ function collectApplyWarnings(input: {
   );
   if (specArtifacts.length === 0) return [];
   if (specArtifacts.some((artifact) => skippedArtifacts?.has(artifact.id))) return [];
+  const warnings = (await findUnreadDeltaFiles(path.join(changeDir, 'specs'))).map(
+    (file) =>
+      `specs/${file.path} is not a capability's spec.md, so \`openspec validate ${changeName}\` rejects it and archive never merges it. ` +
+      `Move its requirements into specs/${file.expected}.`
+  );
   const hasDeltas = specArtifacts.some(
     (artifact) => resolveArtifactOutputs(changeDir, artifact.generates).length > 0
   );
-  if (hasDeltas) return [];
+  if (hasDeltas) return warnings;
 
   const metadataPath = path.join(changeDir, METADATA_FILENAME);
   // The command names the artifact this schema actually declares, never the
@@ -466,8 +492,9 @@ function collectApplyWarnings(input: {
   // a placeholder rather than a guess.
   const specTarget = specArtifacts.length === 1 ? specArtifacts[0].id : '<artifact-id>';
   return [
-    `此变更没有增量规范（delta specs），也未声明 \`skip_specs: true\`，因此 \`openspec validate ${changeName}\` 会校验失败。` +
-      `在实现前先编写增量规范（\`openspec instructions ${specTarget} --change ${changeName}\`），` +
+    ...warnings,
+    `此变更没有增量规范（delta specs），也未声明 \`skip_specs: true\`，因此 \`openspec-cn validate ${changeName}\` 会校验失败。` +
+      `在实现前先编写增量规范（\`openspec-cn instructions ${specTarget} --change ${changeName}\`），` +
       `或者，如果此变更确实没有改变任何已指定的行为，则在 ${metadataPath} 中添加 \`skip_specs: true\`。`,
   ];
 }
@@ -608,7 +635,7 @@ export async function generateApplyInstructions(
     instruction = schemaInstruction?.trim() ?? '阅读上下文文件，按顺序处理待办任务，完成一项就标记一项。\n遇到阻塞或需要澄清时暂停。';
   }
 
-  const warnings = collectApplyWarnings({
+  const warnings = await collectApplyWarnings({
     state,
     schema,
     changeDir,
@@ -814,6 +841,8 @@ function printOperationInputsText(inputs: {
 }): void {
   if (inputs.context) {
     console.log('### 项目上下文（必填的指令输入）');
+    // Printed verbatim on purpose. Escaping a leading `#` would also fire inside
+    // fenced code (`# install deps`), so heading forgery is not guarded here.
     console.log(inputs.context);
     console.log();
   }
@@ -821,7 +850,7 @@ function printOperationInputsText(inputs: {
   if (inputs.operationGuidance && inputs.operationGuidance.length > 0) {
     console.log('### 操作指引（建议性）');
     for (const guidance of inputs.operationGuidance) {
-      console.log(`- ${guidance}`);
+      console.log(`- ${sanitizeInline(guidance, Infinity)}`);
     }
     console.log();
   }

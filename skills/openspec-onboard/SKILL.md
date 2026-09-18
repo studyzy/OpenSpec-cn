@@ -1,6 +1,6 @@
 ---
 name: openspec-onboard
-description: OpenSpec 引导式入门 - 通过讲解和真实代码库工作走完一个完整的工作流周期。
+description: OpenSpec 引导式入门 - 通过讲解和真实代码库工作走完一个完整的工作流周期。也在用户说 "openspec onboard" 或 "opsx onboard" 时使用。
 allowed-tools: Bash(openspec-cn:*)
 license: MIT
 compatibility: 需要 openspec-cn CLI。
@@ -12,6 +12,17 @@ metadata:
 引导用户完成他们的第一个完整 OpenSpec 工作流周期。这是一次教学体验——你将在他们的代码库中做真实工作，同时解释每一步。
 
 **存储选择：** 若用户指定了一个存储（存储是注册在本机上的独立 OpenSpec 仓库）或工作位于某个存储中，请运行 `openspec-cn store list --json` 发现已注册的存储 ID，然后在读写 spec 和变更的命令上传递 `--store <id>`（`new change`、`status`、`instructions`、`list`、`show`、`validate`、`archive`、`doctor`、`context`、`schemas`、`view`）。选定后，将 `--store <id>` 视为在当前工作流其余部分中固定不变。以下每个未限定范围的命令示例均为简写形式：运行前请追加该标志。例如，运行 `openspec-cn status --change "<name>" --json --store "<id>"`，而非下面展示的未限定形式。其他命令不接受此标志。命令输出的提示已包含该标志；在后续操作中请保留它。若不指定存储，命令将对最近的本地 `openspec/` 根目录生效。
+
+**项目检查：** 以下步骤期望项目已经在使用 OpenSpec。在第一个会写入任何内容的步骤之前（`new change`、`archive`、`sync specs`，或撰写任何产出物文件），确认项目已有根目录：运行 `openspec-cn list --json`（当选择了 store 时加上 `--store <id>`，因为此时 store 就是根目录），并读取 `root`。root 是一个对象表示项目已配置好。`"root": null` 表示尚未配置 —— 这里没有 `openspec/` 目录，而像 `openspec-cn new change` 这样的写入操作会作为副作用创建它。该命令还会以非零状态退出，这是它给出的答案而不是 CLI 坏了，因此请读取 JSON，不要重试或绕过它。
+
+有一种 `"root": null` 与配置无关：当某条 `status` 错误消息以 `中声明` 或 `中的 store 声明无效` 结尾，并指向本项目的 `openspec/config.yaml`（或 `config.yml`）时，说明本项目确实通过它声明的某个 store 在使用 OpenSpec，只是本机无法解析该 store（store 未注册，或 `store:` 行格式有误）。不要把它当作未初始化而跳过下面的分支：请在写入前停下，把该错误的 `message` 和 `fix` 展示给用户。
+
+否则，在没有根目录的情况下，接下来怎么做取决于这个工作流是如何被触发的：
+
+- **自动选用**：这个工作流是你自己选的，用户没有提到 OpenSpec、没有点名这个 skill，也没有运行它的斜杠命令。停止使用 OpenSpec，按平常方式回答请求，就像没安装 OpenSpec 一样。不要要求他们做任何配置，也不要提及 OpenSpec 配置。
+- **明确要求 OpenSpec**：用户提到了 OpenSpec、点名了这个 skill，或运行了它的斜杠命令。在写入前停下并询问如何继续：为本项目做配置（`openspec-cn init`）、指向他们已有的某个 store（`--store <id>`），还是本次请求不使用 OpenSpec 继续。等待他们的答复。
+
+无论走哪个分支，都绝不能把创建根目录当作副作用：在用户要求之前不要运行 `openspec-cn init`，不要手工创建 `openspec/` 文件，也不要让任何命令创建它。
 
 ---
 
@@ -154,7 +165,7 @@ git log --oneline -10 2>/dev/null || echo "No git history"
 │   [可选：有帮助的 ASCII 图]            │
 └─────────────────────────────────────────┘
 
-探索模式（`/openspec-explore`）就是用于这种思考——在实现之前调查。你可以在需要思考问题时随时使用它。
+探索模式（`/openspec-explore`）正是为这类思考准备的 —— 在实现之前先调研。任何时候需要把事情想清楚，都可以使用它。
 
 现在让我们创建一个变更来承载我们的工作。
 ```
@@ -216,6 +227,8 @@ Proposal 捕获我们**为什么**做这个变更以及高层面上涉及**什�
 这是草稿 proposal：
 
 ---
+
+# Proposal
 
 ## Why
 
@@ -284,6 +297,8 @@ openspec-cn instructions specs --change "<name>" --json
 
 ---
 
+# Spec Delta
+
 ## ADDED Requirements
 
 ### Requirement: <Name>
@@ -323,6 +338,8 @@ Design 捕获我们**怎么**构建它——技术决策、权衡、方法。
 
 ---
 
+# Design
+
 ## Context
 
 [关于当前状态的简要上下文]
@@ -354,7 +371,7 @@ Design 捕获我们**怎么**构建它——技术决策、权衡、方法。
 
 **解释：**
 ```
-## Tasks
+# Tasks
 
 最后，我们将工作分解为实现任务——驱动 apply 阶段的复选框。
 
@@ -469,29 +486,24 @@ openspec-cn archive "<name>" --yes
 
 ## 命令参考
 
-**核心工作流：**
+**你已安装的命令：**
 
  | 命令              | 作用                               |
  |-------------------|--------------------------------------------|
- | `/openspec-propose` | 创建变更并生成所有产出物 |
- | `/openspec-explore` | 在工作前/期间思考问题  |
- | `/openspec-apply-change`   | 从变更中实现任务              |
+ | `/openspec-propose` | 创建一个变更并生成全部制品 |
+ | `/openspec-explore` | 在动手前/动手过程中想清楚问题  |
+ | `/openspec-apply-change`   | 实现变更中的任务              |
  | `/openspec-archive-change` | 归档已完成的变更                 |
-
-**Additional commands** (only if installed - availability depends on your profile):
-
- | 命令               | 作用                                             |
- |--------------------|----------------------------------------------------------|
- | `/openspec-new-change`      | 启动新变更，一次一个产出物 |
- | `/openspec-continue-change` | 继续处理现有变更                   |
- | `/openspec-ff-change`       | 快进：一次性创建所有产出物               |
- | `/openspec-verify-change`   | 验证实现是否匹配产出物                  |
+ | `/openspec-new-change`     | 启动新变更，一次一个制品 |
+ | `/openspec-continue-change` | 继续处理一个已有的变更    |
+ | `/openspec-ff-change`      | 快进：一次性创建全部制品 |
+ | `/openspec-verify-change`  | 验证实现是否与制品一致    |
 
 ---
 
 ## 接下来？
 
-在你真正想构建的东西上试试 `/openspec-propose`。你现在已经有节奏了！
+在你真正想构建的东西上试试 `/openspec-propose`。你现在已经找到节奏了！
 ```
 
 ---
@@ -505,9 +517,9 @@ openspec-cn archive "<name>" --yes
 ```
 没问题！你的变更保存在 `openspec-cn status --change "<name>" --json` 报告的 `changeRoot`。
 
-稍后从我们停下的地方继续：
-- `/openspec-continue-change <name>` - 恢复制品创建（若已安装；否则 `openspec-cn status --change "<name>" --json` 显示下一个制品）
-- `/openspec-apply-change <name>` - 跳到实现（若任务存在）
+稍后从我们停下的地方继续：`openspec-cn status --change "<name>" --json` 精确显示变更的当前状态。
+- `/openspec-continue-change <name>` - 恢复制品创建
+- `/openspec-apply-change <name>` - 跳转到实现（若任务已存在）
 
 工作不会丢失。随时回来。
 ```
@@ -521,25 +533,20 @@ openspec-cn archive "<name>" --yes
 ```
 ## OpenSpec 快速参考
 
-**核心工作流：**
+**你已安装的命令：**
 
  | 命令                     | 作用                               |
  |--------------------------|--------------------------------------------|
- | `/openspec-propose <name>` | 创建变更并生成所有产出物 |
- | `/openspec-explore`        | 思考问题（不更改代码）   |
- | `/openspec-apply-change <name>`   | 实现任务                            |
- | `/openspec-archive-change <name>` | 完成后归档                          |
+ | `/openspec-propose <name>`  | 创建一个变更并生成全部制品 |
+ | `/openspec-explore`         | 想清楚问题（不改动代码）   |
+ | `/openspec-apply-change <name>`    | 实现任务                            |
+ | `/openspec-archive-change <name>`  | 完成后归档                          |
+ | `/openspec-new-change <name>`      | 启动新变更，逐步推进           |
+ | `/openspec-continue-change <name>` | 继续一个已有的变更                |
+ | `/openspec-ff-change <name>`       | 快进：一次性创建全部制品        |
+ | `/openspec-verify-change <name>`   | 验证实现                      |
 
-**Additional commands** (only if installed - availability depends on your profile):
-
- | 命令                      | 作用                        |
- |---------------------------|-------------------------------------|
- | `/openspec-new-change <name>`      | 启动新变更，逐步    |
- | `/openspec-continue-change <name>` | 继续现有变更         |
- | `/openspec-ff-change <name>`       | 快进：所有产出物一次性 |
- | `/openspec-verify-change <name>`   | 验证实现               |
-
-试试 `/openspec-propose` 启动你的第一个变更。
+运行 `/openspec-propose` 开始你的第一个变更。
 ```
 
 优雅退出。

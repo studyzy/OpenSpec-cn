@@ -149,7 +149,7 @@ openspec-cn init
 
 Now talk to your AI:
 
-- **还不确定要构建什么？** 先用 `/opsx:explore`，一个无风险的思考伙伴，它会阅读你的代码、权衡方案、在写任何东西之前帮你理清思路。（[探索指南](docs/explore.md)）
+- **还不确定要构建什么？** 先用 `/opsx:explore`，一个无风险的思考伙伴，它会阅读你的代码、权衡方案、在写任何代码之前帮你理清思路。（[探索指南](docs/explore.md)）
 - **已经知道自己想要什么？** 直接用 `/opsx:propose <你想要构建的内容>`。
 
 这两者都在默认 profile 中。如果你想要扩展工作流（`/opsx:new`、`/opsx:continue`、`/opsx:ff`、`/opsx:verify`、`/opsx:bulk-archive`、`/opsx:onboard`），请通过 `openspec-cn config profile` 选择，然后运行 `openspec-cn update` 应用。

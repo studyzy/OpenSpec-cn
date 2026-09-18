@@ -6,14 +6,17 @@
  */
 import type { SkillTemplate, CommandTemplate } from '../types.js';
 import { STORE_SELECTION_GUIDANCE } from './store-selection.js';
+import { PROJECT_ROOT_GUARD } from './project-root.js';
 
 export function getVerifyChangeSkillTemplate(): SkillTemplate {
   return {
     name: 'openspec-verify-change',
-    description: '验证实现是否匹配变更产出物。当用户想在归档前确认实现完整、正确且连贯时使用。',
+    description: '验证实现是否匹配变更产出物。当用户想在归档前确认实现完整、正确且连贯时使用。也在用户说 "openspec verify" 或 "opsx verify" 时使用。',
     instructions: `验证实现是否匹配变更产出物（specs、tasks、design）。
 
 ${STORE_SELECTION_GUIDANCE}
+
+${PROJECT_ROOT_GUARD}
 
 **Input**: 可选地指定变更名。若省略，检查能否从对话上下文推断。若模糊或歧义，必须提示用户从可用变更中选择。
 
@@ -62,7 +65,7 @@ ${STORE_SELECTION_GUIDANCE}
 
    **任务完成情况**：
    - 若 \`contextFiles.tasks\` 存在，读取其中每个文件路径
-   - 解析复选框：\`- [ ]\`（未完成）与 \`- [x]\`（已完成）
+   - 解析复选框：完成意味着方括号内只有 \`x\`/\`X\`，忽略空格（\`- [ x]\` 视为完成）；其他任何标记都是未完成（\`- [ ]\`、\`- []\`，以及 \`- [~]\` 或 \`- [-]\` 等不熟悉的标记）
    - 统计已完成与总任务数
    - 若存在未完成任务：
      - 为每个未完成任务添加 CRITICAL 问题
@@ -190,6 +193,8 @@ export function getOpsxVerifyCommandTemplate(): CommandTemplate {
 
 ${STORE_SELECTION_GUIDANCE}
 
+${PROJECT_ROOT_GUARD}
+
 **Input**: 可选地在 \`/opsx:verify\` 后指定变更名（例如 \`/opsx:verify add-auth\`）。若省略，检查能否从对话上下文推断。若模糊或歧义，必须提示用户从可用变更中选择。
 
 **步骤**
@@ -237,7 +242,7 @@ ${STORE_SELECTION_GUIDANCE}
 
    **任务完成情况**：
    - 若 \`contextFiles.tasks\` 存在，读取其中每个文件路径
-   - 解析复选框：\`- [ ]\`（未完成）与 \`- [x]\`（已完成）
+   - 解析复选框：完成意味着方括号内只有 \`x\`/\`X\`，忽略空格（\`- [ x]\` 视为完成）；其他任何标记都是未完成（\`- [ ]\`、\`- []\`，以及 \`- [~]\` 或 \`- [-]\` 等不熟悉的标记）
    - 统计已完成与总任务数
    - 若存在未完成任务：
      - 为每个未完成任务添加 CRITICAL 问题

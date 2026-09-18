@@ -45,7 +45,7 @@
 | Trae | `trae` | `.trae/skills/` | `/openspec-apply-change` | `.trae/commands/` | `/opsx-apply` |
 | ZCode | `zcode` | `.zcode/skills/` | `/openspec-apply-change` | `.zcode/commands/opsx/` | `/opsx:apply` |
 | Zoo Code | `roocode` | `.roo/skills/` | `/openspec-apply-change` | `.roo/commands/` | `/opsx-apply` |
-| Shared `.agents` skills | `agents` | `.agents/skills/` | `/openspec-apply-change` | none | none |
+| Other / Universal | `agents` | `.agents/skills/` | `/openspec-apply-change` | none | none |
 
 - **技能调用**：工具是否把 skills 注册为键入项，是该工具自身的行为。这一列展示 OpenSpec 在生成文件和 init 打印的提示中使用的拼写。如果输入后没有反应，请查阅你的工具文档。
 - **命令文件格式**：大多数工具使用 `.md` 命令文件。Gemini CLI 使用 `.toml`，Continue 使用 `.prompt`，Kiro 和 GitHub Copilot 使用 `.prompt.md`。你输入的内容无论哪种形式都一样。
@@ -89,9 +89,11 @@ Hermes 默认只从 `~/.hermes/skills/` 加载 skills。把项目的 `.hermes/sk
 - **仅全局**：skills 写入 `~/.minimax/skills/`。仓库内不写入任何内容。
 - **跨项目安全**：仅命令的 delivery 会保留全局 skills 不动，因此一个项目的设置不会移除另一个项目使用的 skills。
 
-### 共享的 `.agents` skills
+<a id="other--universal-shared-agents-skills"></a>
 
-- **适用场景**：任何读取共享 `.agents/skills/` 目录的工具，包括矩阵中没有行的工具。
+### Other / Universal（共享的 `.agents` skills）
+
+- **适用场景**：任何读取共享 `.agents/skills/` 目录的工具，包括矩阵中没有行的工具。当你的助手未被列出时，就选这一项。init 选择器的搜索框可以用 `universal`、`other`、`generic`、`custom`、`proprietary`、`unlisted`、`unsupported`、`vendor-neutral` 或 `agents.md` 找到它。
 - **与其他目标共存**：Antigravity、Codex、Zed Agent 和此目标共享同一个物理 skill 树。OpenSpec 在 `.openspec-target` 中记录一个写入者，每次运行只写一次该树。每个工具各自的命令文件仍会生成。
 - **OpenSpec 认领的范围**：只有 `openspec-*` 目录和 `.openspec-target` 标记。`.agents/` 下的其他任何内容都不动。
 - **`AGENTS.md`**：不会创建或编辑。目标是 `.agents/` 目录，不是该文件。
