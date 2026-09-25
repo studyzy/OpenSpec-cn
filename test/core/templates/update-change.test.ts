@@ -243,8 +243,51 @@ describe('update-change templates', () => {
       expect(body, label).toContain('绝不要编辑代码');
       expect(body, label).toContain('绝不要编辑实现代码');
       expect(body, label).toContain('停止并指向 `/opsx:apply`');
-      expect(body, label).toContain('不要创建尚不存在的制品');
-      expect(body, label).toContain('不要创建尚不存在的制品');
+      expect(body, label).toContain('不要推进构建边界');
+      expect(body, label).toContain(
+        '没有现有输出文件且状态为 `ready` 或 `blocked`，指出它并'
+      );
+      expect(body, label).toContain(
+        '`existingOutputPaths` 为空且状态为 `ready` 或 `blocked` 的制品'
+      );
+      expect(body, label).toContain('保持 `skipped` 制品不动');
+      expect(body, label).toContain('不要把它们当作缺失，也不要把它们推迟到 continue 工作流');
+    }
+  });
+
+  it('fills a gap under an already-satisfied glob artifact instead of deferring it (3.3a)', () => {
+    for (const [label, body] of bodies) {
+      expect(body, label).toContain('在至少一个文件匹配后即标记为 `done`');
+      expect(body, label).toContain('continue 工作流只处理 `ready` 制品');
+      expect(body, label).toContain('`existingOutputPaths` 非空');
+      expect(body, label).toContain('并使用其 `instruction` 和 `template`');
+      expect(body, label).toContain('将 `context` 和 `rules` 视为约束；不要把它们复制进文件');
+      expect(body, label).toContain('若 instructions 报告 `skipped: true`，不要创建文件');
+      expect(body, label).toContain('从磁盘读取当前依赖文件');
+      expect(body, label).toContain('若所需的非 skipped 依赖缺失，停止并请用户先恢复它');
+      expect(body, label).toContain('若 `instruction` 把创建委托给另一个 skill 或命令');
+      expect(body, label).toContain('仅当它能遵循确认的路径和这些护栏时才调用；否则停止');
+      expect(body, label).toContain('在 `changeRoot` 内选择一个符合 `artifactPaths.<id>.outputPath`');
+      expect(body, label).toContain('仅在用户确认后创建');
+      expect(body, label).toContain('且尚不存在');
+      expect(body, label).toContain('解析符号链接的父目录后');
+    }
+  });
+
+  it('rechecks new-file scope after confirmation and refuses concurrent overwrites', () => {
+    for (const [label, body] of bodies) {
+      const confirmation = body.indexOf('仅在用户确认后创建');
+      const recheck = body.indexOf('确认后、创建前');
+      const create = body.indexOf('使用一个在目标已存在时会失败的创建操作');
+
+      expect(confirmation, label).toBeGreaterThanOrEqual(0);
+      expect(recheck, label).toBeGreaterThan(confirmation);
+      expect(create, label).toBeGreaterThan(recheck);
+      const writeGuard = body.slice(recheck, create);
+      expect(writeGuard, label).toContain('刷新 status 和 instructions');
+      expect(writeGuard, label).toContain('仍在范围内、未被跳过且已部分填充');
+      expect(writeGuard, label).toContain('重复上述具体路径检查');
+      expect(body, label).toContain('停止并与用户调和，而不是替换现有内容或另选路径');
     }
   });
 
@@ -253,12 +296,17 @@ describe('update-change templates', () => {
       expect(body, label).toContain('artifactPaths.<id>.existingOutputPaths');
       expect(body, label).toContain('不要写入 `resolvedOutputPath`');
       expect(body, label).toContain('它仍是 glob 模式，而非真实文件');
+      expect(body, label).toContain('glob 的 `resolvedOutputPath` 不是有效目标');
+      expect(body, label).toContain('新文件的唯一允许范围');
     }
   });
 
   it('ends with next-step guidance and never acts on it (3.5)', () => {
     for (const [label, body] of bodies) {
       expect(body, label).toContain('仅供参考 - 绝不要执行');
+      expect(body, label).toContain(
+        '`existingOutputPaths` 为空且状态为 `ready` 或 `blocked` 的制品 -> 建议 `/opsx:continue`'
+      );
       expect(body, label).toContain('建议 `/opsx:continue`');
       expect(body, label).toContain('建议 `/opsx:apply`');
       expect(body, label).toContain('建议 `/opsx:archive`');
@@ -299,6 +347,9 @@ describe('update-change templates', () => {
 
   it('confirms every edit and redirects intent changes to /opsx:new when installed', () => {
     for (const [label, body] of bodies) {
+      const reconciliation = body.slice(body.indexOf('4. **读取并调和**'), body.indexOf('5. **确认并应用'));
+      expect(reconciliation, label).toContain('在对话中起草请求的编辑，而非在文件中');
+      expect(reconciliation, label).not.toContain('应用请求的编辑');
       expect(body, label).toContain('仅在用户确认后写入');
       expect(body, label).toContain('若用户拒绝修订，不要写入');
       expect(body, label).toContain('建议用 `/opsx:new` 重新开始');

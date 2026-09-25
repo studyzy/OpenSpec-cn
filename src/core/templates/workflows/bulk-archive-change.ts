@@ -55,7 +55,7 @@ ${PROJECT_ROOT_GUARD}
 2. **提示选择变更**
 
    请用户选择变更（多选）：
-   - 展示每个变更及其 schema
+   - 展示列表输出中每个变更的名称和任务状态
    - 包含"全部变更"选项
    - 允许任意数量的选择（1+ 可以，2+ 是典型用例）
 
@@ -80,17 +80,23 @@ ${PROJECT_ROOT_GUARD}
 
 3. **批量校验 - 收集所有所选变更的状态**
 
+   用相同的已选根目录标志运行一次 \`openspec-cn list --json\` 以获取任务进度。
+   若查询失败、返回无效 JSON、遗漏任何所选变更、包含重复的所选变更、
+   或返回无效计数，报告问题并在同步或归档该批次之前停止。
+
    对每个所选变更，收集：
 
    a. **产出物状态** - 运行 \`openspec-cn status --change "<name>" --json\`
       - 解析 \`schemaName\`、\`artifacts\`、\`planningHome\`、\`changeRoot\`、\`artifactPaths\` 和 \`actionContext\`
       - 记录哪些产出物为 \`done\`，哪些为其他状态
 
-   b. **任务完成情况** - 从状态 JSON 读取 \`artifactPaths.tasks.existingOutputPaths\`
-      - 完成意味着方括号内只有 \`x\`/\`X\`，忽略空格
-        （\`- [ x]\` 视为完成）；其他任何标记都是未完成（\`- [ ]\`、
-        \`- []\`，以及 \`- [~]\` 或 \`- [-]\` 等不熟悉的标记）
-      - 若无任务文件，记为"无任务"
+   b. **任务完成情况** - 从列表响应中找到 \`name\` 与该变更完全匹配的 \`changes\` 条目
+      - 要求 \`totalTasks\` 与 \`completedTasks\` 为非负整数，且 \`completedTasks <= totalTasks\`
+      - 未完成任务数 = \`totalTasks - completedTasks\`
+      - CLI 会解析 schema 追踪的任务文件，包括自定义制品名、输出路径和 glob
+      - 不要从制品状态、\`tasks\` 制品 ID 或顶层 \`tasks.md\` 的缺失推断任务完成情况
+      - CLI 只把 \`x\`/\`X\` 复选框标记计为完成；其他标记保持未完成
+      - 若 \`totalTasks\` 为零，记为"无任务"
 
    c. **Delta specs** - 从状态 JSON 检查 \`artifactPaths.specs.existingOutputPaths\`
       - 列出存在哪些 capability spec
@@ -194,7 +200,7 @@ ${PROJECT_ROOT_GUARD}
    按确定的顺序处理各变更（遵循冲突解决方案）：
 
    a. **同步包含的增量 spec**：
-      - 仅为有条目在 \`includedDeltas\` 中的变更内联运行 \`openspec-sync-specs\` 工作流（智能驱动合并），仅传递包含的 delta 路径，并明确指示忽略该变更的 \`excludedDeltas\`。等待其完成。
+      - 仅为有条目在 \`includedDeltas\` 中的变更${optionalWorkflow('sync', '内联运行 `openspec-sync-specs` 工作流（agent 驱动的智能合并）', '自行内联执行 delta 到主 spec 的合并（agent 驱动的智能合并）')}，仅传递包含的 delta 路径，并明确指示忽略该变更的 \`excludedDeltas\`。等待其完成。
       - 对冲突，按已解析的顺序应用。
       - 把该变更已获取的 specs 规则快照传入内联同步；内联同步必须复用它，不要再次获取指令
       - 制品规则仅应用于该变更生成的主 spec。它们不改变冲突解决方案、归档行为或 CLI 契约，其文本也不会被复制到输出文件中
@@ -344,7 +350,7 @@ Spec 同步汇总：
 - 归档目录目标使用当前日期，在步骤 3d 中计算一次并在移动时复用：YYYY-MM-DD-<name>；已以 \`YYYY-MM-DD-\` 前缀开头的名称保持原样（绝不叠加第二个日期）
 - 若归档目标已存在，使该变更失败但继续处理其他变更
 - 在步骤 3 中检查每个归档目标（在第一次主 spec 写入之前）；目标已存在的变更绝不被同步或移动
-- 若请求同步，为每个包含增量 spec 的变更内联运行 \`openspec-sync-specs\` 工作流（agent 驱动）
+- 若请求同步，为每个包含增量 spec 的变更${optionalWorkflow('sync', '内联运行 `openspec-sync-specs` 工作流（agent 驱动）', '内联执行 delta 到主 spec 的合并（agent 驱动）')}
 - 将每个 delta 的 \`includedDeltas\` 和 \`excludedDeltas\` 决策带入执行；仅同步和验证包含的 delta
 - 将每个被排除的增量报告为 \`sync skipped\`，但不把归档本身视为跳过
 - 绝不在 spec 同步仍在进行时归档某个变更 —— 内联运行同步，并在移动 \`changeRoot\` 之前验证 \`<planningHome.root>/openspec/specs/<capability-path>/spec.md\` 处的主 specs
@@ -393,7 +399,7 @@ ${PROJECT_ROOT_GUARD}
 2. **提示选择变更**
 
    请用户选择变更（多选）：
-   - 展示每个变更及其 schema
+   - 展示列表输出中每个变更的名称和任务状态
    - 包含"全部变更"选项
    - 允许任意数量的选择（1+ 可以，2+ 是典型用例）
 
@@ -418,17 +424,23 @@ ${PROJECT_ROOT_GUARD}
 
 3. **批量校验 - 收集所有所选变更的状态**
 
+   用相同的已选根目录标志运行一次 \`openspec-cn list --json\` 以获取任务进度。
+   若查询失败、返回无效 JSON、遗漏任何所选变更、包含重复的所选变更、
+   或返回无效计数，报告问题并在同步或归档该批次之前停止。
+
    对每个所选变更，收集：
 
    a. **产出物状态** - 运行 \`openspec-cn status --change "<name>" --json\`
       - 解析 \`schemaName\`、\`artifacts\`、\`planningHome\`、\`changeRoot\`、\`artifactPaths\` 和 \`actionContext\`
       - 记录哪些产出物为 \`done\`，哪些为其他状态
 
-   b. **任务完成情况** - 从状态 JSON 读取 \`artifactPaths.tasks.existingOutputPaths\`
-      - 完成意味着方括号内只有 \`x\`/\`X\`，忽略空格
-        （\`- [ x]\` 视为完成）；其他任何标记都是未完成（\`- [ ]\`、
-        \`- []\`，以及 \`- [~]\` 或 \`- [-]\` 等不熟悉的标记）
-      - 若无任务文件，记为"无任务"
+   b. **任务完成情况** - 从列表响应中找到 \`name\` 与该变更完全匹配的 \`changes\` 条目
+      - 要求 \`totalTasks\` 与 \`completedTasks\` 为非负整数，且 \`completedTasks <= totalTasks\`
+      - 未完成任务数 = \`totalTasks - completedTasks\`
+      - CLI 会解析 schema 追踪的任务文件，包括自定义制品名、输出路径和 glob
+      - 不要从制品状态、\`tasks\` 制品 ID 或顶层 \`tasks.md\` 的缺失推断任务完成情况
+      - CLI 只把 \`x\`/\`X\` 复选框标记计为完成；其他标记保持未完成
+      - 若 \`totalTasks\` 为零，记为"无任务"
 
    c. **Delta specs** - 从状态 JSON 检查 \`artifactPaths.specs.existingOutputPaths\`
       - 列出存在哪些 capability spec

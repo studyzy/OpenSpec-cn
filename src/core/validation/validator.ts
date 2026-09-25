@@ -16,7 +16,8 @@ import {
   foldRequirementName,
   normalizeRequirementName,
   extractRequirementsSection,
-  findMissingCurrentScenarios,
+  diffScenarioNames,
+  describeScenarioBalance,
   type RequirementBlock,
 } from '../parsers/requirement-blocks.js';
 import {
@@ -739,15 +740,16 @@ export class Validator {
       if (renamedAway.has(key)) continue;
       const current = currentBlockFor(key);
       if (!current) continue;
-      const missing = findMissingCurrentScenarios(current, block);
-      if (missing.length === 0) continue;
+      const diff = diffScenarioNames(current, block);
+      if (diff.missing.length === 0) continue;
       issues.push({
         level: 'ERROR',
         path: entryPath,
         message:
           `MODIFIED "${block.name}" 遗漏了当前 spec 中仍存在的场景： ` +
-          `${missing.map(name => `"${name}"`).join('、')}。` +
-          '请将它们复制到 MODIFIED 块中（MODIFIED 需求会整块替换原需求，因此归档会拒绝丢弃这些场景）。',
+          `${diff.missing.map(name => `"${name}"`).join('、')}。` +
+          `${describeScenarioBalance(diff)} ` +
+          '请将遗漏的场景复制到 MODIFIED 块中（MODIFIED 需求会整块替换原需求，因此归档会拒绝丢弃这些场景）。',
       });
     }
     return issues;

@@ -21,11 +21,15 @@ export const continueAdapter: ToolCommandAdapter = {
   },
 
   formatFile(content: CommandContent): string {
+    // Continue injects an invoked prompt into the model context. Smaller local
+    // models can otherwise mistake the workflow name for a tool to call (#925).
     return `---
 name: ${escapeYamlValue(`opsx-${content.id}`)}
 description: ${escapeYamlValue(content.description)}
 invokable: true
 ---
+
+此工作流提示已处于激活状态。请直接遵循其指令，不要调用以该工作流命名的工具。
 
 ${content.body}
 `;

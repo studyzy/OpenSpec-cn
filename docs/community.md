@@ -6,7 +6,8 @@
 
 ## 项目与资源
 
-- **[OpenSpec UI](https://github.com/VeryComplexAndLongName/OpenSpec-UI)**：一个独立的 Web 仪表盘和 VS Code 扩展，用于浏览 OpenSpec 的变更、归档、specs 和任务。
+- **[OpenSpec Workbench](https://github.com/VeryComplexAndLongName/OpenSpec-UI)**：在 OpenSpec 变更上运行和监督 agent。
+- **[openspec-guard](https://github.com/guillaume-flambard/spec-guard)**：一个 CLI 和 GitHub Action，无需运行测试即可报告哪些 OpenSpec 场景被 Vitest 或 Jest 测试覆盖。
 
 ## 添加你的项目
 

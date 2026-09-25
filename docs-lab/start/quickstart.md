@@ -1,8 +1,18 @@
 # 快速入门
 
-> 在现有仓库上完成你的第一个变更，从想法到归档。
+> 在新项目或现有项目中完成你的第一个变更，从想法到归档。
 
 开始之前，你需要在本机安装 CLI（[安装](installation.md)），并在项目中初始化 OpenSpec（[设置你的项目](setup.md)）。
+
+## 从空项目开始
+
+即使还没有选定技术栈、也没有完整的架构，你也可以开始。在项目文件夹中初始化 OpenSpec，然后让 Agent 和你一起探索各种选项。在你的 AI 聊天框中：
+
+```text
+Help me explore a task tracker from scratch. I have not picked a stack. Compare the options and help me choose the first behavior to build.
+```
+
+确定第一个变更需要什么，把后续的架构决策留到以后。让 Agent 提议这一个变更，然后按下面的步骤操作。随着项目成长，你可以随时重新审视架构。
 
 ## 循环一览
 
@@ -17,14 +27,14 @@ flowchart LR
     archive -. "next change" .-> explore
 ```
 
-下面的每个提示词都输入到你的 AI 聊天框中，也就是你让 AI 写代码的那个输入框。每个提示词都按名称调用一个 OpenSpec skill，在任何工具中拼写都相同。直接说一句普通的话也可以（"propose a change to add rate limiting"）；直接点名该步骤也可以——"openspec propose"、"opsx apply"——这样会运行对应工作流，而不是手工拼装文件。（`openspec update` 是一个真实的 CLI 命令，用于刷新已生成的文件，所以那个工作流要说 "openspec update change"。）有些工具提供了更短的命令别名（Claude Code 中是 `/opsx:propose`，[其他工具各不相同](../reference/supported-tools.md)）。
+下面的每个提示词都输入到你的 AI 聊天框中，也就是你让 AI 写代码的那个输入框。示例使用普通语言，因此可在各种工具中通用。你也可以直接调用 skill；语法因工具而异（[支持的工具](../reference/supported-tools.md)）。
 
 ## 第 1 步：探索
 
 在要计划之前，先和你的 Agent 一起把想法想清楚。在 AI 聊天框中输入：
 
 ```text
-/openspec-explore how rate limiting should work in this app
+Help me explore how rate limiting should work in this app.
 ```
 
 探索是一种思考模式。Agent 会调查你的代码库、提出关键问题、勾勒备选方案并挑战假设。它从不写代码。它也不会写其他任何东西，除非你要求它捕获你已决定的结论、或它主动提出时你表示同意。产出是一个更清晰的想法。
@@ -32,7 +42,7 @@ flowchart LR
 在问题需要时一直停留在这个阶段。当形态感觉合适时，就交接给提案：
 
 ```text
-/openspec-propose
+Propose the change we just discussed.
 ```
 
 这一行会替你启动提案，并带着你已经确定的所有内容。跳过第 2 步中的第一个提示词。
@@ -42,7 +52,7 @@ flowchart LR
 提案把想法变成一份可评审的计划。如果从探索过来，它已经在运行了。如果是冷启动，当变更在你脑中已经清晰时，直接提问。在 AI 聊天框中输入：
 
 ```text
-/openspec-propose add rate limiting
+Propose a change to add rate limiting.
 ```
 
 Agent 会问它需要了解的问题，然后写入一个变更文件夹：
@@ -75,7 +85,7 @@ openspec/changes/add-rate-limiting/
 实施把计划变成代码。开一个新的会话，因为在干净的上下文窗口上实施效果更好。在 AI 聊天框中输入：
 
 ```text
-/openspec-apply-change add-rate-limiting
+Apply the add-rate-limiting change.
 ```
 
 Agent 读取变更文件夹，然后按 `tasks.md` 逐项推进，每完成一项就勾选一项。
@@ -91,7 +101,7 @@ Agent 读取变更文件夹，然后按 `tasks.md` 逐项推进，每完成一�
 当 `tasks.md` 中的每个复选框都被勾选后，在 AI 聊天框中输入：
 
 ```text
-/openspec-archive-change add-rate-limiting
+Archive the add-rate-limiting change.
 ```
 
 逐步看一下归档做了什么：
@@ -146,14 +156,11 @@ Agent 读取变更文件夹，然后按 `tasks.md` 逐项推进，每完成一�
           └── 2026-08-08-add-rate-limiting/
 ```
 
-Git 是另一件独立的事。把变更文件夹和代码一起提交，除此之外你的工作流没有任何变化。归档相对于 PR 的时机是团队约定；[团队](../guides/teams.md) 指南里有相应的权衡。
+Git 是另一件独立的事。把变更文件夹和代码一起提交，除此之外你的工作流没有任何变化。
 
 ## 更进一步
 
-- [概念](../guides/concepts.md)：两种制品各是什么，增量（delta）如何描述一个变更。
-- [探索](../guides/explore.md)：更好地发挥探索模式。
-- [实施](../guides/apply.md)：节奏、上下文窗口、长变更的续跑。
-- [评审计划](../guides/review-the-plan.md)：在构建前，specs 里要看什么。
+- [Delta specs](../reference/schemas/spec-driven/index.md#delta-specs-specmd)：如何在 delta spec 中编写行为变更。
 - [Profiles](../customize/profiles.md)：核心集之外的可选工作流（归档前验证、增量规划）。
 
 ## 高级指南

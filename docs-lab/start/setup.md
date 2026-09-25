@@ -55,7 +55,7 @@ openspec/
     └── archive/    completed changes move here
 ```
 
-[概念](../guides/concepts.md) 解释了这两种制品；[项目配置](../customize/project-config.md) 覆盖了 `config.yaml`。
+[项目配置](../customize/project-config.md) 覆盖了 `config.yaml`。
 
 <a id="the-workflow-files-skills-and-commands"></a>
 
@@ -113,5 +113,27 @@ Config changes:
 ```
 
 回答 yes 会立即应用到当前项目。其他项目在下次 `openspec-cn update` 时才会生效。该设置是全局的，按机器保存。
+
+#### Claude Code 不显示工作流
+
+Claude Code 根据你的 delivery 设置，从以下一个或两个项目路径加载 OpenSpec 工作流：
+
+- **Skills**：`.claude/skills/openspec-*/SKILL.md`
+- **Commands**：`.claude/commands/opsx/<id>.md`
+
+若文件缺失，刷新项目。在终端中：
+
+```bash
+openspec-cn update
+```
+
+若命令文件存在但 `/opsx:` 没有显示 OpenSpec 命令，更新 Claude Code 并重启它。若命令仍未加载，同时启用 skills。在终端中：
+
+```bash
+openspec-cn config set delivery both
+openspec-cn update
+```
+
+重启 Claude Code，然后在它的聊天中运行 `/openspec-propose`。若只缺少部分工作流，[更改你的 profile](../customize/profiles.md#expanding-the-set-optional-workflows)。
 
 设置完成。[快速入门](quickstart.md) 从这里带你走完第一个变更。

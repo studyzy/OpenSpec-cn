@@ -31,7 +31,7 @@
 | Hermes Agent | `hermes` | `.hermes/skills/` | `/openspec-apply-change` | none | none |
 | iFlow | `iflow` | `.iflow/skills/` | `/openspec-apply-change` | `.iflow/commands/` | `/opsx-apply` |
 | Junie | `junie` | `.junie/skills/` | `/openspec-apply-change` | `.junie/commands/` | `/opsx-apply` |
-| Kilo Code | `kilocode` | `.kilocode/skills/` | `/openspec-apply-change` | `.kilocode/workflows/` | `/opsx-apply` |
+| Kilo Code | `kilocode` | `.kilocode/skills/` | `/openspec-apply-change` | `.kilo/command/` | `/opsx-apply` |
 | Kimi Code | `kimi` | `.kimi-code/skills/` | `/skill:openspec-apply-change` | none | none |
 | Kiro | `kiro` | `.kiro/skills/` | `/openspec-apply-change` | `.kiro/prompts/` | `/opsx-apply` |
 | Lingma | `lingma` | `.lingma/skills/` | `/openspec-apply-change` | `.lingma/commands/opsx/` | `/opsx:apply` |
@@ -66,7 +66,8 @@ Cline 从 `.clinerules/workflows/` 读取命令，而不是从它的 `.cline/` �
 
 ### Codex
 
-- **调用**：输入 `$openspec-<skill>`。Codex 不识别 `/openspec-<skill>` 形式（[上游问题](https://github.com/openai/codex/issues/11817)）。
+- **CLI 与 IDE 扩展**：带着你的想法提到 `$openspec-propose`，或运行 `/skills` 选择该 skill。Codex 不识别 `/openspec-propose` 形式（[上游问题](https://github.com/openai/codex/issues/11817)）。
+- **桌面应用**：在侧边栏打开 Skills 并选择 `openspec-propose`。[OpenAI 的 skills 文档](https://learn.chatgpt.com/docs/build-skills)描述了这两种界面。
 - **无命令文件**：Codex 直接运行 skills，因此即使 delivery 包含命令，init 也会跳过命令并打印 `Commands skipped for: codex (uses skills)`。
 - **共享目录**：Codex skills 落在 `.agents/skills/`，与 Antigravity、Zed Agent 和 `agents` 目标使用同一目录树。选择多个目标时保留单一兼容树，当 Codex 拥有该树时，其交接会同时写成 `$openspec-*` 和 `/openspec-*`。
 - **旧路径**：旧版本安装到 `.codex/skills/` 下的 skills 会在下一次 `openspec-cn update` 时迁移。
@@ -78,7 +79,8 @@ Cline 从 `.clinerules/workflows/` 读取命令，而不是从它的 `.cline/` �
 
 ### GitHub Copilot
 
-提示文件在 Copilot IDE 扩展（VS Code、JetBrains、Visual Studio）中注册为斜杠命令。Copilot CLI 不读取 `.github/prompts/`。
+- **IDE 扩展（命令 delivery）**：VS Code、JetBrains 和 Visual Studio 将 `.github/prompts/opsx-<id>.prompt.md` 加载为 `/opsx-<id>`。若命令消失而文件仍在，重启 IDE。
+- **Copilot CLI（skill delivery）**：CLI 不读取 `.github/prompts/`，而是加载 `.github/skills/openspec-*/SKILL.md`。以 `/openspec-<skill>` 形式调用 skill。若 skill 消失而文件仍在，运行 `/skills reload`，再用 `/skills info openspec-propose` 确认已被发现。
 
 ### Hermes Agent
 

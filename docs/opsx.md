@@ -213,7 +213,9 @@ rules:
 ```
 /opsx:update add-dark-mode - we're storing the theme in a cookie now
 ```
-修订变更既有的规划制品并保持一致——可朝任意方向（一处 design 编辑可能回荡到 proposal）。仅限规划制品：它从不编辑代码，也从不创建缺失的制品（那是 `/opsx:continue`）。每次编辑都先与你确认。如果变更已实现，它会建议 `/opsx:apply` 以便代码追上修订后的计划。若你的修订改变了变更的*意图*，则重新开始——见[何时更新 vs. 重新开始](#何时更新-vs-重新开始)。
+修订变更既有的规划制品并保持一致——可朝任意方向（一处 design 编辑可能回荡到 proposal）。它从不编辑代码。每次编辑都先与你确认。参见[更新参考](commands.md#opsxupdate)了解它如何在不新建制品的情况下处理缺失文件。
+
+如果变更已实现，它会建议 `/opsx:apply` 以便代码追上修订后的计划。若你的修订改变了变更的*意图*，则重新开始——见[何时更新 vs. 重新开始](#何时更新-vs-重新开始)。
 
 ### 同步增量规范（sync delta specs）
 ```text

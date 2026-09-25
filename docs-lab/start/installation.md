@@ -5,7 +5,7 @@
 
 <a id="prerequisites"></a>
 
-## 前置条件
+OpenSpec 需要 Node.js 20.19.0 或更高版本。Homebrew 会把 Node.js 作为依赖安装，Nix 包则自带运行时。在使用其他安装方式之前，请先检查已安装的版本。
 
 OpenSpec 是一个 Node.js CLI。你需要 20.19.0 或更高版本。
 
@@ -15,7 +15,7 @@ OpenSpec 是一个 Node.js CLI。你需要 20.19.0 或更高版本。
 node --version
 ```
 
-如果输出 `v20.19.0` 或更高，就绪。否则，从 [nodejs.org](https://nodejs.org) 安装更新的 Node，或通过你的版本管理器（nvm、fnm、asdf、volta）安装。
+如果输出 `v20.19.0` 或更高，就绪。否则，从 [nodejs.org](https://nodejs.org) 安装更新的 Node，或通过你的版本管理器（nvm、fnm、asdf、volta）安装。通过 Homebrew 或 Nix 安装时可以跳过这一检查。
 
 工作流本身运行在 AI 编程工具内：Claude Code、Cursor，或[支持列表](../reference/supported-tools.md)中的任何其他工具。
 
@@ -56,6 +56,16 @@ curl -fsSL https://raw.githubusercontent.com/studyzy/openspec-cn/main/install.md
 ```npm
 npm install -g @studyzy/openspec-cn@latest
 ```
+
+### Homebrew
+
+Homebrew installs OpenSpec and its Node.js dependency on macOS or Linux. In your terminal:
+
+```bash
+brew install openspec
+```
+
+The formula is published in [homebrew-core](https://formulae.brew.sh/formula/openspec), so you don't need to add a tap.
 
 ### Yarn
 
@@ -127,7 +137,7 @@ openspec-cn update
 
 
 > [!WARNING]
-> 在 Deno 上，重新执行[Deno 安装](#deno)时要加 `-f`；不加它不会覆盖已安装的命令。在 Nix 上，使用 `nix profile upgrade openspec`。
+> 在 Homebrew 上，运行 `brew upgrade openspec`。在 Deno 上，重新执行[Deno 安装](#deno)时要加 `-f`；不加它不会覆盖已安装的命令。在 Nix 上，使用 `nix profile upgrade openspec`。
 
 > [!NOTE]
 > 全局 npm 安装归属于某个特定的 Node 安装。用 nvm 切换 Node 版本时 `openspec-cn` 命令不会跟过来，所以要在新版本下重新安装。
@@ -148,7 +158,7 @@ openspec-cn completion uninstall
 npm uninstall -g @studyzy/openspec-cn
 ```
 
-在 Deno 上：`deno uninstall --global openspec-cn`。在 Nix 上：`nix profile remove openspec`。你的 shell 应该再也找不到 `openspec-cn` 了。
+在 Homebrew 上：`brew uninstall openspec`。在 Deno 上：`deno uninstall --global openspec-cn`。在 Nix 上：`nix profile remove openspec`。你的 shell 应该再也找不到 `openspec-cn` 了。
 
 **3. 删除剩下的部分，或者保留。**
 

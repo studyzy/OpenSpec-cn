@@ -47,7 +47,6 @@ ${PROJECT_ROOT_GUARD}
 
    提示时，展示最近修改的前 3-4 个变更作为选项，显示：
    - 变更名称
-   - Schema（来自 \`schema\` 字段，若无则为 "spec-driven"）
    - 状态（例如 "0/5 tasks"、"complete"、"no tasks"）
    - 最近修改时间（来自 \`lastModified\` 字段）
 
@@ -167,7 +166,6 @@ ${PROJECT_ROOT_GUARD}
 
    提示时，展示最近修改的前 3-4 个变更作为选项，显示：
    - 变更名称
-   - Schema（来自 \`schema\` 字段，若无则为 "spec-driven"）
    - 状态（例如 "0/5 tasks"、"complete"、"no tasks"）
    - 最近修改时间（来自 \`lastModified\` 字段）
 

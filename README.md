@@ -130,12 +130,18 @@ OpenSpec is built with OpenSpec — browse this repo's live [specs](openspec/spe
 
 ## 快速开始
 
-**需要 Node.js 20.19.0 或更高版本。**
+**需要 Node.js 20.19.0 或更高版本。** Homebrew 会将其作为依赖一并安装。
 
 全局安装 openspec-cn：
 
 ```bash
 npm install -g @studyzy/openspec-cn@latest
+```
+
+也可以在 macOS 或 Linux 上安装官方的 [Homebrew formula](https://formulae.brew.sh/formula/openspec)：
+
+```bash
+brew install openspec
 ```
 
 然后进入你的项目目录并初始化：
@@ -145,7 +151,7 @@ cd your-project
 openspec-cn init
 ```
 
-> **Want your AI to do it?** Paste the [setup prompt](docs/installation.md#install-with-your-ai-assistant) into your coding assistant — it installs the CLI, runs `openspec init`, and verifies the result.
+> **Want your AI to do it?** Paste the [setup prompt](docs-lab/start/installation.md#install-with-your-ai-assistant) into your coding assistant — it installs the CLI, runs `openspec init`, and verifies the result.
 
 Now talk to your AI:
 
@@ -159,7 +165,7 @@ Now talk to your AI:
 > [!NOTE]
 > Not sure if your tool is supported? [View the full list](docs/supported-tools.md) – we support 30+ tools and growing.
 >
-> 同样支持 pnpm、yarn、bun 和 nix。可查看 [安装选项](docs/installation.md)。
+> 同样支持 Homebrew、pnpm、yarn、bun 和 Nix。可查看 [安装选项](docs-lab/start/installation.md)。
 
 ## 文档
 
@@ -214,6 +220,12 @@ AI 编程助手很强大，但当需求只存在于聊天记录里时，结果�
 
 ```bash
 npm install -g @studyzy/openspec-cn@latest
+```
+
+若你是通过 Homebrew 安装的 OpenSpec：
+
+```bash
+brew upgrade openspec
 ```
 
 **刷新代理指令（agent instructions）**

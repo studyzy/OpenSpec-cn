@@ -397,6 +397,9 @@ describe('command-generation/adapters', () => {
       expect(output).toContain('name: "opsx-explore"');
       expect(output).toContain('description: "Enter explore mode for thinking"');
       expect(output).toContain('invokable: true');
+      expect(output).toContain(
+        '---\n\n此工作流提示已处于激活状态。请直接遵循其指令，不要调用以该工作流命名的工具。\n\nThis is the command body.'
+      );
       expect(output).toContain('---\n\n');
       expect(output).toContain('This is the command body.');
     });
@@ -580,7 +583,7 @@ describe('command-generation/adapters', () => {
 
     it('should generate correct file path', () => {
       const filePath = kilocodeAdapter.getFilePath('explore');
-      expect(filePath).toBe(path.join('.kilocode', 'workflows', 'opsx-explore.md'));
+      expect(filePath).toBe(path.join('.kilo', 'command', 'opsx-explore.md'));
     });
 
     it('should format file without frontmatter', () => {

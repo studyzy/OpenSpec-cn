@@ -12,7 +12,6 @@ import {
   loadChangeContext,
   generateInstructions,
   resolveSchema,
-  resolveArtifactOutputPath,
   resolveArtifactOutputs,
   type ArtifactInstructions,
 } from '../../core/artifact-graph/index.js';
@@ -569,15 +568,27 @@ export async function generateApplyInstructions(
     }
   }
 
-  // Parse tasks if tracking file exists
+  // Parse every concrete file matched by apply.tracks. A tracking path may be
+  // a glob owned by an artifact with any ID, so treating it as one literal
+  // path loses task evidence for valid custom schemas.
   let parsedTasks: ParsedTask[] = [];
+  const unavailableTrackingFiles: Array<{ path: string; reason: string }> = [];
   let tracksFileExists = false;
   if (tracksFile) {
-    const tracksPath = resolveArtifactOutputPath(changeDir, tracksFile);
-    tracksFileExists = fs.existsSync(tracksPath);
-    if (tracksFileExists) {
-      const tasksContent = await fs.promises.readFile(tracksPath, 'utf-8');
-      parsedTasks = parseTaskLines(tasksContent);
+    const tracksPaths = resolveArtifactOutputs(changeDir, tracksFile);
+    tracksFileExists = tracksPaths.length > 0;
+    for (const tracksPath of tracksPaths) {
+      try {
+        const tasksContent = await fs.promises.readFile(tracksPath, 'utf-8');
+        parsedTasks.push(...parseTaskLines(tasksContent));
+      } catch (error) {
+        const code = (error as NodeJS.ErrnoException)?.code;
+        const message = error instanceof Error ? error.message : String(error);
+        unavailableTrackingFiles.push({
+          path: tracksPath,
+          reason: code && !message.includes(code) ? `${code}: ${message}` : message,
+        });
+      }
     }
   }
   const tasks = toTaskItems(parsedTasks);
@@ -615,6 +626,9 @@ export async function generateApplyInstructions(
     instruction =
       `${tracksFilename} 文件缺失，必须先创建。` +
       `\n${describeArtifactRemedy(changeName, findArtifactIdFor(schema, tracksFile))}`;
+  } else if (tracksFile && unavailableTrackingFiles.length > 0 && tasks.length === 0) {
+    state = 'blocked';
+    instruction = '没有可读取的任务描述。';
   } else if (tracksFile && tracksFileExists && tasks.length === 0) {
     // Tracking file exists but lists nothing an agent can work on: either no
     // checkboxes at all, or only checkboxes with no text after them.
@@ -623,7 +637,12 @@ export async function generateApplyInstructions(
     instruction =
       `${tracksFilename} 文件已存在，但其中没有可执行的任务。` +
       `\n向 ${tracksFilename} 中添加任务，或重建它：${describeArtifactRemedy(changeName, findArtifactIdFor(schema, tracksFile))}`;
-  } else if (tracksFile && remaining === 0 && total > 0) {
+  } else if (
+    tracksFile &&
+    unavailableTrackingFiles.length === 0 &&
+    remaining === 0 &&
+    total > 0
+  ) {
     state = 'all_done';
     instruction = '所有任务已完成！此变更可以归档了。\n归档前请考虑运行测试并审查变更。';
   } else if (!tracksFile) {
@@ -633,6 +652,13 @@ export async function generateApplyInstructions(
   } else {
     state = 'ready';
     instruction = schemaInstruction?.trim() ?? '阅读上下文文件，按顺序处理待办任务，完成一项就标记一项。\n遇到阻塞或需要澄清时暂停。';
+  }
+
+  if (unavailableTrackingFiles.length > 0) {
+    const unavailableDetails = unavailableTrackingFiles
+      .map((file) => `- ${file.path}: ${file.reason}`)
+      .join('\n');
+    instruction += `\n由于无法获取任务追踪证据，任务完成情况未被校验：\n${unavailableDetails}`;
   }
 
   const warnings = await collectApplyWarnings({
@@ -650,6 +676,8 @@ export async function generateApplyInstructions(
     contextFiles,
     progress: { total, complete, remaining },
     tasks,
+    taskTrackingConfigured: tracksFile !== null,
+    ...(unavailableTrackingFiles.length > 0 ? { unavailableTrackingFiles } : {}),
     state,
     missingArtifacts: missingArtifacts.length > 0 ? missingArtifacts : undefined,
     ...(missingPrerequisites.length > 0 ? { missingPrerequisites } : {}),

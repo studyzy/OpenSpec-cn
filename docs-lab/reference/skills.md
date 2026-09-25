@@ -97,7 +97,9 @@ Each entry below names the skill that owns the next step. When your profile leav
 
 | 契约 | 说明 |
 |---|---|
-| **Creates** | 不创建任何新内容。只编辑已存在的制品文件。缺失的制品是 `openspec-continue-change` 的职责。若没有该 skill（core profile 不含它），则改为指向 `openspec status` 和 `openspec instructions`。绝不写代码。 |
+| **Arguments** | 变更提案名称（可选），加上你想要的修订。未说明修订时，它执行一致性审查：制品之间相互检查矛盾、缺口和重复。 |
+| **Creates** | 只编辑已存在的制品文件。一个例外：对于以 glob 形式书写（如 `specs/**/*.md`）且已有至少一个文件的制品，在你确认路径后可以补充一个缺失的伴生文件。尚无文件的制品是 `openspec-continue-change` 的职责。若没有该 skill（core profile 不含它），则改为指向 `openspec status` 和 `openspec instructions`。绝不写代码。 |
+| **Response** | 展示每个提议的修订，仅在你确认后写入，一次一个制品。以修订了什么和下一步收尾；实现等待 `openspec-apply-change`。 |
 
 ## openspec-sync-specs
 

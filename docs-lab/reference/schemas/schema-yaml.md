@@ -78,7 +78,15 @@ openspec/changes/add-auth/proposal.md
 generates: specs/**/*.md
 ```
 
-这会匹配 `openspec/changes/add-auth/specs/` 下的 Markdown 文件。OpenSpec 将包含 `*`、`?` 或 `[` 的值视为 glob。
+这会匹配 `openspec/changes/add-auth/specs/` 下的 Markdown 文件。
+
+OpenSpec 在 `generates` 中识别以下 glob 形式：
+
+- **通配符与字符类**：包含 `*`、`?` 或 `[` 的值，例如 `specs/**/*.md` 和 `review-[ab].md`。
+- **花括号展开**：`review-{api,ui}.md` 这样的备选，以及 `file-{1..3}.md` 这样的范围。
+- **Extglob**：`@(proposal|design).md`、`+(proposal|design).md`、`!(proposal|design).md` 这样的模式。
+
+**字面文件名**：仅有前导 `!` 并不构成 glob。用 `generates: '!review.md'` 来命名该文件。普通括号如 `(proposal|design).md`，以及单元素花括号如 `review-{api}.md`，同样保持字面。
 
 OpenSpec 拒绝绝对路径和包含 `..` 段的路径。
 
@@ -125,7 +133,7 @@ OpenSpec 拒绝绝对路径和包含 `..` 段的路径。
 | 字段 | 契约 |
 |---|---|
 | `requires` | **必需。** 一个非空的制品列表，必须先存在，apply 指令才会就绪。 |
-| `tracks` | 一个可选相对路径，指向变更目录中的 Markdown 任务文件。默认：`null`。 |
+| `tracks` | 一个可选的相对路径或 glob，指向变更目录中的 Markdown 任务文件。默认：`null`。 |
 | `instruction` | 可选的指引，apply 就绪时发送给 Agent。默认使用 OpenSpec 的内置指引。 |
 
 制品的 `requires` 控制规划顺序。`apply.requires` 控制 apply 指令何时就绪。
@@ -138,7 +146,9 @@ OpenSpec 拒绝绝对路径和包含 `..` 段的路径。
 openspec/changes/add-auth/tasks.md
 ```
 
-如果该文件缺失或不包含带任务文本的复选框，apply 会保持受阻。OpenSpec 统计这些复选框形式：
+诸如 `tracks: "**/tasks.md"` 的 glob 会读取每个匹配的文件，例如 `backend/tasks.md` 和 `frontend/tasks.md`。OpenSpec 会合并它们的任务与进度。为制品的 `generates` 字段使用相同的值，让 status 和 list 追踪相同的文件。
+
+若没有文件匹配，或匹配的文件不含带任务文本的复选框，apply 会保持受阻。OpenSpec 统计这些复选框形式：
 
 ```markdown
 - [ ] Pending task
@@ -153,9 +163,11 @@ openspec/changes/add-auth/tasks.md
 
 被跟踪的文件驱动 apply 状态：
 
-- **`blocked`**：文件缺失，或没有带任务文本的复选框。
-- **`ready`**：至少有一个被跟踪的任务待办。
-- **`all_done`**：每个被跟踪的任务都已勾选。
+- **`blocked`**：没有文件匹配，或没有可读文件含有带任务文本的复选框。
+- **`ready`**：至少有一个任务待办，或某个匹配的文件无法读取而另一个文件提供了任务。
+- **`all_done`**：每个被跟踪的任务都已勾选，且每个匹配的文件都已被读取。
+
+若某个匹配的文件无法读取，apply 会保留可读文件的任务与进度，但不会把变更标记为 `all_done`。[Apply JSON 输出](../cli.md#openspec-instructions)会标明每个不可用的文件及其原因。
 
 OpenSpec 拒绝绝对路径和包含 `..` 段的路径。
 

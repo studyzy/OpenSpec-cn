@@ -35,8 +35,8 @@ const CONTINUE_NEXT_STEP = optionalWorkflow(
 
 const CONTINUE_DEFERRED = optionalWorkflow(
   'continue',
-  '推迟到 `/opsx:continue` 的任何内容（尚未创建的制品或文件）',
-  '因尚不存在而推迟的任何内容（尚未创建的制品或文件）'
+  '推迟到 `/opsx:continue` 的任何内容（尚无文件的制品且状态为 `ready` 或 `blocked`，绝不包括 `skipped` 制品）',
+  '因尚不存在而推迟的任何内容（尚无文件的制品且状态为 `ready` 或 `blocked`，绝不包括 `skipped` 制品）'
 );
 
 const CONTINUE_FRONTIER = optionalWorkflow(
@@ -98,7 +98,6 @@ ${CONTINUE_SCOPE_NOTE}
 
    提示时，展示最近修改的前 3-4 个变更作为选项，显示：
    - 变更名称
-   - Schema（来自 \`schema\` 字段，若无则为 "spec-driven"）
    - 状态（例如 "0/5 tasks"、"complete"、"no tasks"）
    - 最近修改时间（来自 \`lastModified\` 字段）
 
@@ -128,8 +127,14 @@ ${CONTINUE_SCOPE_NOTE}
    - 读取请求涉及的制品以及变更的其他现有制品。
    - 在对话中起草请求的编辑，而非在文件中。明确它究竟改变了什么；步骤 5 负责所有写入。然后对照起草的编辑检查每个其他现有制品 — 在任何方向上：对后续制品的编辑可能需要修订前面的制品，而不仅仅是反过来。构建顺序是方便的阅读顺序，而非对哪些制品可被修订的约束。
    - 记录所有现在不一致、缺失或矛盾的内容。
-   - 仅修订已存在的文件（\`existingOutputPaths\`）。不要创建尚不存在的制品，且不要在 glob 制品下创建新文件 — 指出它们并${CONTINUE_CREATE_THEM}。
-   - 若变更已一致，说明情况且不做编辑。
+   - 对已存在的文件（\`existingOutputPaths\`）提出修订。若制品没有现有输出文件且状态为 \`ready\` 或 \`blocked\`，指出它并${CONTINUE_CREATE_THEM}。保持 \`skipped\` 制品不动；不要把它们当作缺失，也不要把它们推迟到 continue 工作流。
+   - glob 制品（例如 \`specs/**/*.md\`）在至少一个文件匹配后即标记为 \`done\`，而 continue 工作流只处理 \`ready\` 制品。当调和发现一个 \`existingOutputPaths\` 非空的 glob 制品缺少文件时：
+     1. 运行 \`openspec-cn instructions "<artifact-id>" --change "<name>" --json\` 并使用其 \`instruction\` 和 \`template\`。将 \`context\` 和 \`rules\` 视为约束；不要把它们复制进文件。若 instructions 报告 \`skipped: true\`，不要创建文件。从磁盘读取当前依赖文件；若所需的非 skipped 依赖缺失，停止并请用户先恢复它。
+     2. 在 \`changeRoot\` 内选择一个符合 \`artifactPaths.<id>.outputPath\` 且尚不存在的具体路径。解析符号链接的父目录后，验证它仍在 \`changeRoot\` 内。glob 的 \`resolvedOutputPath\` 不是有效目标。
+     3. 把新文件纳入步骤 5 提议的修订中，仅在用户确认后创建。
+     4. 确认后、创建前，刷新 status 和 instructions。验证该制品仍在范围内、未被跳过且已部分填充；重复上述具体路径检查。
+     5. 使用一个在目标已存在时会失败的创建操作。若 \`instruction\` 把创建委托给另一个 skill 或命令，仅当它能遵循确认的路径和这些护栏时才调用；否则停止。若任何检查失败或确认的草稿不再有效，停止并与用户调和，而不是替换现有内容或另选路径。
+   - 若变更已一致，说明情况且不提议修订。
 
 5. **确认并应用，一次一个制品**
    - 此步骤执行本工作流中的每一次制品写入；此前的步骤都不编辑制品。
@@ -141,7 +146,7 @@ ${CONTINUE_SCOPE_NOTE}
      \`\`\`
 
 6. **指出下一步（仅供参考 - 绝不要执行）**
-   - 制品仍缺失 -> ${CONTINUE_NEXT_STEP}。
+   - \`existingOutputPaths\` 为空且状态为 \`ready\` 或 \`blocked\` 的制品 -> ${CONTINUE_NEXT_STEP}。
    - 变更已实现（任务已勾选 / 已 apply） -> 代码可能不再匹配修订后的计划；${APPLY_DELTA_HANDOFF}。
    - 一切完成且已实现 -> ${ARCHIVE_HANDOFF}。
 
@@ -149,6 +154,7 @@ ${CONTINUE_SCOPE_NOTE}
 
 每次调用后，展示：
 - 修订了哪些制品（以及哪些提议的修订被拒绝）
+- 在已部分填充的 glob 制品下创建的任何文件
 - ${CONTINUE_DEFERRED}
 - 变更的状态及推荐的下一步命令
 
@@ -156,7 +162,7 @@ ${CONTINUE_SCOPE_NOTE}
 - 仅规划制品 — 绝不要编辑实现代码。若修订后的计划暗示代码更改，${APPLY_GUARDRAIL}。
 - 使用 \`openspec-cn status\` 报告的制品 ID 和路径；绝不要基于硬编码的制品名称分支。
 - 仅编辑 \`existingOutputPaths\` 中的具体文件；绝不要写入 glob \`resolvedOutputPath\`。
-- 不要推进构建边界：不创建新制品，不在 glob 制品下创建新文件 — ${CONTINUE_FRONTIER}。
+- 不要推进构建边界：若制品的 \`existingOutputPaths\` 为空且状态为 \`ready\` 或 \`blocked\`，${CONTINUE_FRONTIER}。保持 \`skipped\` 制品不动。新文件的唯一允许范围是 \`existingOutputPaths\` 非空的 glob 制品下一个已确认的具体路径。
 - 在写入前与用户确认每个编辑。
 - 若请求更改的是变更的*意图*而非细化，${INTENT_CHANGE_GUARDRAIL}。`,
     license: 'MIT',
@@ -192,7 +198,6 @@ ${CONTINUE_SCOPE_NOTE}
 
    提示时，展示最近修改的前 3-4 个变更作为选项，显示：
    - 变更名称
-   - Schema（来自 \`schema\` 字段，若无则为 "spec-driven"）
    - 状态（例如 "0/5 tasks"、"complete"、"no tasks"）
    - 最近修改时间（来自 \`lastModified\` 字段）
 
@@ -222,8 +227,14 @@ ${CONTINUE_SCOPE_NOTE}
    - 读取请求涉及的制品以及变更的其他现有制品。
    - 在对话中起草请求的编辑，而非在文件中。明确它究竟改变了什么；步骤 5 负责所有写入。然后对照起草的编辑检查每个其他现有制品 — 在任何方向上：对后续制品的编辑可能需要修订前面的制品，而不仅仅是反过来。构建顺序是方便的阅读顺序，而非对哪些制品可被修订的约束。
    - 记录所有现在不一致、缺失或矛盾的内容。
-   - 仅修订已存在的文件（\`existingOutputPaths\`）。不要创建尚不存在的制品，且不要在 glob 制品下创建新文件 — 指出它们并${CONTINUE_CREATE_THEM}。
-   - 若变更已一致，说明情况且不做编辑。
+   - 对已存在的文件（\`existingOutputPaths\`）提出修订。若制品没有现有输出文件且状态为 \`ready\` 或 \`blocked\`，指出它并${CONTINUE_CREATE_THEM}。保持 \`skipped\` 制品不动；不要把它们当作缺失，也不要把它们推迟到 continue 工作流。
+   - glob 制品（例如 \`specs/**/*.md\`）在至少一个文件匹配后即标记为 \`done\`，而 continue 工作流只处理 \`ready\` 制品。当调和发现一个 \`existingOutputPaths\` 非空的 glob 制品缺少文件时：
+     1. 运行 \`openspec-cn instructions "<artifact-id>" --change "<name>" --json\` 并使用其 \`instruction\` 和 \`template\`。将 \`context\` 和 \`rules\` 视为约束；不要把它们复制进文件。若 instructions 报告 \`skipped: true\`，不要创建文件。从磁盘读取当前依赖文件；若所需的非 skipped 依赖缺失，停止并请用户先恢复它。
+     2. 在 \`changeRoot\` 内选择一个符合 \`artifactPaths.<id>.outputPath\` 且尚不存在的具体路径。解析符号链接的父目录后，验证它仍在 \`changeRoot\` 内。glob 的 \`resolvedOutputPath\` 不是有效目标。
+     3. 把新文件纳入步骤 5 提议的修订中，仅在用户确认后创建。
+     4. 确认后、创建前，刷新 status 和 instructions。验证该制品仍在范围内、未被跳过且已部分填充；重复上述具体路径检查。
+     5. 使用一个在目标已存在时会失败的创建操作。若 \`instruction\` 把创建委托给另一个 skill 或命令，仅当它能遵循确认的路径和这些护栏时才调用；否则停止。若任何检查失败或确认的草稿不再有效，停止并与用户调和，而不是替换现有内容或另选路径。
+   - 若变更已一致，说明情况且不提议修订。
 
 5. **确认并应用，一次一个制品**
    - 此步骤执行本工作流中的每一次制品写入；此前的步骤都不编辑制品。
@@ -235,7 +246,7 @@ ${CONTINUE_SCOPE_NOTE}
      \`\`\`
 
 6. **指出下一步（仅供参考 - 绝不要执行）**
-   - 制品仍缺失 -> ${CONTINUE_NEXT_STEP}。
+   - \`existingOutputPaths\` 为空且状态为 \`ready\` 或 \`blocked\` 的制品 -> ${CONTINUE_NEXT_STEP}。
    - 变更已实现（任务已勾选 / 已 apply） -> 代码可能不再匹配修订后的计划；${APPLY_DELTA_HANDOFF}。
    - 一切完成且已实现 -> ${ARCHIVE_HANDOFF}。
 
@@ -243,6 +254,7 @@ ${CONTINUE_SCOPE_NOTE}
 
 每次调用后，展示：
 - 修订了哪些制品（以及哪些提议的修订被拒绝）
+- 在已部分填充的 glob 制品下创建的任何文件
 - ${CONTINUE_DEFERRED}
 - 变更的状态及推荐的下一步命令
 
@@ -250,7 +262,7 @@ ${CONTINUE_SCOPE_NOTE}
 - 仅规划制品 — 绝不要编辑实现代码。若修订后的计划暗示代码更改，${APPLY_GUARDRAIL}。
 - 使用 \`openspec-cn status\` 报告的制品 ID 和路径；绝不要基于硬编码的制品名称分支。
 - 仅编辑 \`existingOutputPaths\` 中的具体文件；绝不要写入 glob \`resolvedOutputPath\`。
-- 不要推进构建边界：不创建新制品，不在 glob 制品下创建新文件 — ${CONTINUE_FRONTIER}。
+- 不要推进构建边界：若制品的 \`existingOutputPaths\` 为空且状态为 \`ready\` 或 \`blocked\`，${CONTINUE_FRONTIER}。保持 \`skipped\` 制品不动。新文件的唯一允许范围是 \`existingOutputPaths\` 非空的 glob 制品下一个已确认的具体路径。
 - 在写入前与用户确认每个编辑。
 - 若请求更改的是变更的*意图*而非细化，${INTENT_CHANGE_GUARDRAIL}。`
   };

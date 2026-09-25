@@ -348,11 +348,17 @@ AI:  Implementing add-dark-mode...
 
 **作用:**
 
-- 通过 `openspec status --change <name> --json` 读取该变更的制品
-- 应用你请求的修订;若你未指定,则审查制品寻找矛盾之处
-- 朝任意方向协调其他已有制品(对 design 的修改可能回荡影响到 proposal)
+- 通过 `openspec-cn status --change <name> --json` 读取该变更的制品
+- 应用你请求的修订；若你未指定，则审查制品寻找矛盾之处
+- 朝任意方向协调其他已有制品（对 design 的修改可能回荡影响到 proposal）
 - 在写入前逐个制品与你确认
-- 结束时建议下一步:`/opsx:continue`(制品缺失)、`/opsx:apply`(将修订后的计划带入代码)或 `/opsx:archive`(全部完成)
+- 结束时建议下一步：`/opsx:continue`（未开始的制品）、`/opsx:apply`（将修订后的计划带入代码）或 `/opsx:archive`（全部完成）
+
+**缺失文件：**
+
+- 对于以 glob 形式书写（如 `specs/**/*.md`）且已有至少一个文件的制品，update 可以提议补充一个缺失的伴生文件。它使用 schema 的指引，并在创建前请你确认具体路径。
+- 尚无文件的制品仍归 `/opsx:continue` 管。被有意跳过的制品保持不动。
+- 新文件必须留在变更目录内。若在创建之前确认的路径上出现了文件，update 会停止，而不是覆盖它。
 
 **示例:**
 
@@ -373,9 +379,9 @@ AI:  Reading add-dark-mode artifacts...
 
 **提示:**
 
-- 它不会创建缺失的制品——那是 `/opsx:continue` 的职责
-- 若变更已经实现,用 `/opsx:apply` 跟进,使代码与修订后的计划一致
-- 若你的修订改变了变更的*意图*,不如从头开始一个新变更(见 [何时 Update 与从头开始](opsx.md#when-to-update-vs-start-fresh))
+- 它不会开始一个尚无文件的制品。为此启用 `/opsx:continue`；若该可选工作流未安装，则使用 `openspec-cn status` 和 `openspec-cn instructions`。
+- 若变更已经实现，用 `/opsx:apply` 跟进，使代码与修订后的计划一致
+- 若你的修订改变了变更的*意图*，不如从头开始一个新变更（见 [何时 Update 与从头开始](opsx.md#when-to-update-vs-start-fresh)）
 
 ---
 

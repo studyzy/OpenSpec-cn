@@ -1360,9 +1360,13 @@ export class InitCommand {
           // Tools with no slash surface (e.g. Rovo Dev) reference skills as
           // prose ("the openspec-propose skill"); phrase the hint so it reads
           // as an instruction rather than a dead command with an argument.
-          hint = usesNaturalLanguageSkillReferences(tool.value)
-            ? `发起第一个变更：让 ${tool.name} 使用 ${skillReference}，输入"你的想法"`
-            : `发起第一个变更：${skillReference} "你的想法"`;
+          if (usesNaturalLanguageSkillReferences(tool.value)) {
+            hint = `发起第一个变更：让 ${tool.name} 使用 ${skillReference}，输入"你的想法"`;
+          } else if (tool.value === 'codex') {
+            hint = `发起第一个变更：${skillReference} "你的想法"（Codex CLI 或 IDE）；在 Codex 桌面应用中，从侧边栏的 Skills 里选择 ${skillReference.slice(1)}`;
+          } else {
+            hint = `发起第一个变更：${skillReference} "你的想法"`;
+          }
         } else {
           continue;
         }

@@ -20,7 +20,7 @@
 
 ### schema
 
-该变更遵循的工作流 schema。它在变更创建时被设置，并且优先于项目配置，因此即使之后 `openspec/config.yaml` 发生变化，变更也会保留自己的 schema。有效的名称列在 [Schemas](../schemas/index.md) 中。
+该变更遵循的工作流 schema。它在变更创建时被设置，并且优先于项目配置，因此即使之后 `openspec/config.yaml` 发生变化，变更也会保留自己的 schema。运行 [`openspec schemas`](../cli.md#openspec-schemas) 可列出可用的 schema 名称。
 
 ### initiative
 
@@ -36,11 +36,11 @@ initiative:
 
 ### skip_specs
 
-声明该变更有意不产生 spec 增量：例如纯重构、工具或文档变更。设置后，校验接受零增量，且本会生成 spec 文件的制品也视为完成。若在 specs/ 下已存在 spec 文件时设置该字段，则是校验错误。它对增量和归档的影响参见 [spec-driven](../schemas/spec-driven/index.md)。
+声明该变更有意不产生 spec 增量：例如纯重构、工具或文档变更。设置后，校验接受零增量，且本会生成 spec 文件的制品也视为完成。若在 specs/ 下已存在 spec 文件时设置该字段，则是校验错误。
 
 ### retire_capabilities
 
-授权归档时退役某项能力。当本变更的 REMOVED 增量移除了某能力所拥有的最后一条需求时，归档会删除该能力的主 spec，而不是中止。此标志之所以存在，是因为删除只能通过 git 恢复，所以由作者决定。归档行为参见 [spec-driven](../schemas/spec-driven/index.md)。
+授权归档时退役某项能力。当本变更的 REMOVED 增量移除了某能力所拥有的最后一条需求时，归档会删除该能力的主 spec，而不是中止。此标志之所以存在，是因为删除只能通过 git 恢复，所以由作者决定。
 
 ## 示例
 

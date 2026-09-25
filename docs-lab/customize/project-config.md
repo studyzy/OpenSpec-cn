@@ -58,8 +58,6 @@ config.yaml 保存的是 Agent 在创建制品或推进工作流时收到的指�
 
 你的配置先出现，然后是 OpenSpec 的内置指令和模板。Rules 是对内置内容的追加，从不替换。对 config.yaml 的编辑会在下次运行时传给 Agent。
 
-[工作流运行](../reference/architecture/workflow-runs.md) 覆盖了从调用到产出制品的完整过程。
-
 ## 字段
 
 三个字段决定 Agent 收到什么。每个字段的精确契约（类型、限制、校验）在 [项目配置 (config.yaml)](../reference/configuration/config-yaml.md) 中。

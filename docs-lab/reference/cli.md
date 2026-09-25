@@ -1290,7 +1290,9 @@ No project context or operation guidance configured.
   ...
 ```
 
-开头，并继续包含 `outputPath`、`existingOutputPaths`、完整的 `instruction` 和 `template` 字符串、`dependencies`、`unlocks` 和 `root`。`apply` 形式携带 `contextFiles`、`progress`、`tasks`、`state`（`blocked`、`ready`、`all_done`）和 `instruction`。
+开头，并继续包含 `outputPath`、`existingOutputPaths`、完整的 `instruction` 和 `template` 字符串、`dependencies`、`unlocks` 和 `root`。`apply` 形式携带 `contextFiles`、`progress`、`tasks`、`taskTrackingConfigured`、`state`（`blocked`、`ready`、`all_done`）和 `instruction`。
+
+`taskTrackingConfigured` 始终是布尔值：当 schema 设置了非空的 [`apply.tracks`](schemas/schema-yaml.md#tracks) 时为 `true`（即使没有文件匹配），否则为 `false`。若某个匹配的追踪文件无法读取，`unavailableTrackingFiles` 会包含其绝对 `path` 和错误 `reason`。当所有匹配的文件都可读取时，省略该字段。可读取的文件仍会贡献到 `tasks` 和 `progress`，但在每个匹配的文件都被读取之前，`state` 不能为 `all_done`。
 
 **退出码**
 

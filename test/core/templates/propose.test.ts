@@ -98,13 +98,52 @@ describe('default task guidance', () => {
     const example = tasks!.instruction.match(/```\s*([\s\S]*?)```/)?.[1];
     expect(example).toBeDefined();
     const numberedTasks = example!.split('\n').filter(line => /^- \[ \] \d+\.\d+ /.test(line));
-    expect(numberedTasks).toHaveLength(4);
+    expect(numberedTasks).toHaveLength(5);
     expect(numberedTasks.every(line => /验证/.test(line))).toBe(true);
     expect(numberedTasks[0]).toContain('预期文件已存在');
     expect(numberedTasks[1]).toContain('包安装成功');
     expect(numberedTasks[2]).toContain('导出测试通过');
     expect(numberedTasks[3]).toContain('单元测试覆盖引号和分隔符');
-    expect(example).not.toMatch(/^- \[ \] \d+\.\d+ (?:验证)\b/im);
+    expect(numberedTasks[4]).toContain('导出 API 文档');
+    expect(example).not.toMatch(/^- \[ \] \d+\.\d+ (?:验证|运行(?:the )?验证)\b/im);
+  });
+
+  // #1952: agents parked testing and documentation in one trailing group, so a
+  // failure seeded in group 1 only surfaced at the end and cascaded into rework.
+  it('keeps tests and documentation inside the group that does the work (#1952)', () => {
+    const tasks = defaultSchema.artifacts.find(artifact => artifact.id === 'tasks');
+    expect(tasks).toBeDefined();
+    expect(tasks!.instruction).toMatch(
+      /每个任务组必须（MUST）把其自身工作所需的测试和文档一并完成/
+    );
+    expect(tasks!.instruction).toMatch(
+      /不要（NOT）把测试或文档堆积到最后一个任务组/
+    );
+    // The rule is scoped to what a group's work actually needs, so the worked
+    // example's scaffolding group can carry no tests or docs without
+    // contradicting it.
+    expect(tasks!.instruction).toMatch(
+      /既不需要测试也不需要文档的组（如脚手架或依赖安装）\s*则两者皆可省略/
+    );
+    expect(tasks!.instruction).toMatch(
+      /最后一个任务组只用于集成检查，\s*不用来偿还前面组欠下的测试和文档/
+    );
+
+    // The worked example has to show a docs task inside the implementation
+    // group, not a trailing "testing and documentation" group of its own.
+    const example = tasks!.instruction.match(/```\s*([\s\S]*?)```/)?.[1];
+    expect(example).toBeDefined();
+    const headings = example!
+      .split('\n')
+      .filter(line => /^## /.test(line.trim()))
+      .map(line => line.trim());
+    expect(headings).toHaveLength(2);
+    expect(headings.some(heading => /\b(test|testing|documentation|docs)\b|测试|文档/i.test(heading))).toBe(
+      false
+    );
+
+    const lastGroup = example!.slice(example!.lastIndexOf(headings[headings.length - 1]));
+    expect(lastGroup).toMatch(/^- \[ \] \d+\.\d+ 在 docs\/export\.md 中编写导出 API/im);
   });
 });
 

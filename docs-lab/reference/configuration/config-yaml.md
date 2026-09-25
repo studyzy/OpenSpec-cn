@@ -23,7 +23,7 @@
 
 ### schema
 
-该项目中每个变更遵循的工作流 schema。有效值为 `spec-driven` 或项目自定义的 schema 名称。名称列在 [Schemas](../schemas/index.md) 中。
+该项目中每个变更遵循的工作流 schema。有效值为 `spec-driven` 或项目自定义的 schema 名称。运行 [`openspec schemas`](../cli.md#openspec-schemas) 可列出可用的 schema 名称。
 
 ### context
 

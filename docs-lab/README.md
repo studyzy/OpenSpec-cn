@@ -38,7 +38,7 @@ docs-lab 中的每个页面都从头手工编写。旧的 `docs/` 目录树只�
 | [Overview](start/overview.md) | _TODO：2026-08-21 为从头重写清空，并从站点撤下（`/docs` 暂时重定向到 Installation）；旧的目标行因作为宣传太弱而被删除。简报见 Notes.md。_ |
 | [Installation](start/installation.md) | 在机器上安装 `openspec` CLI、更新它、卸载它。 |
 | [Set up your project](start/setup.md) | 将 OpenSpec 添加到项目中：运行 init，查看它写了什么，并调整它。 |
-| [Quickstart](start/quickstart.md) | 在你现有仓库上的第一个变更，从想法到归档。 |
+| [Quickstart](start/quickstart.md) | 在新项目或现有项目中的第一个变更，从想法到归档。 |
 
 ### Guides：理解系统、用好它、把它带到你的代码库和团队
 
