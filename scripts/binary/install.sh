@@ -138,8 +138,9 @@ main() {
     base="$releases/download/$version"
   fi
 
-  echo "正在下载 $asset（$version）..."
-  download "$base/$asset" "$tmp/$asset" || fail "无法下载 $base/$asset；$npm_hint"
+  # Braces: macOS bash 3.2 folds the next UTF-8 byte into an unbraced name.
+  echo "正在下载 ${asset}（${version}）..."
+  download "$base/$asset" "$tmp/$asset" || fail "无法下载 $base/${asset}；$npm_hint"
   if [ ! -s "$tmp/SHA256SUMS" ]; then
     download "$base/SHA256SUMS" "$tmp/SHA256SUMS" || fail "无法下载 $base/SHA256SUMS；$npm_hint"
   fi

@@ -35,3 +35,64 @@ jobs:
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: pnpm run release:ci
+
+  # This fork publishes by pushing a tag. release-prepare.yml still only runs
+  # when github.repository is Fission-AI/OpenSpec, so it never creates the
+  # GitHub Release that binaries.yml attaches standalone files to.
+  # A GITHUB_TOKEN release does not start other workflows. Calling binaries.yml
+  # keeps this run red until SHA256SUMS is actually on the release.
+  github-release:
+    name: GitHub Release
+    runs-on: ubuntu-latest
+    outputs:
+      ready: ${{ steps.state.outputs.ready }}
+    permissions:
+      contents: write
+    steps:
+      - id: state
+        name: Create the GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          set -eu
+          tag="${GITHUB_REF_NAME}"
+          if gh release view "$tag" --json assets --jq 'any(.assets[]; .name == "SHA256SUMS")' 2>/dev/null | grep -qx true; then
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+            echo "Release ${tag} already has SHA256SUMS."
+            exit 0
+          fi
+          if ! gh release view "$tag" >/dev/null 2>&1; then
+            case "$tag" in
+              *-* ) gh release create "$tag" --title "$tag" --notes "Release ${tag}." --prerelease ;;
+              * ) gh release create "$tag" --title "$tag" --notes "Release ${tag}." ;;
+            esac
+          fi
+          echo "ready=true" >> "$GITHUB_OUTPUT"
+
+  standalone:
+    name: Standalone binaries
+    needs: github-release
+    if: needs.github-release.outputs.ready == 'true' && github.repository == 'studyzy/OpenSpec-cn'
+    permissions:
+      contents: write
+      id-token: write
+      attestations: write
+      artifact-metadata: write
+    uses: ./.github/workflows/binaries.yml
+    with:
+      tag: ${{ github.ref_name }}
+
+  confirm:
+    name: Require SHA256SUMS
+    needs: [github-release, standalone]
+    if: always() && needs.github-release.result == 'success' && needs.github-release.outputs.ready == 'true' && github.repository == 'studyzy/OpenSpec-cn'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Require SHA256SUMS on the release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: gh release view "$GITHUB_REF_NAME" --json assets --jq 'any(.assets[]; .name == "SHA256SUMS")' | grep -qx true

@@ -14,6 +14,12 @@ on:
       tag:
         description: Existing release tag to build and attach binaries to
         required: true
+  workflow_call:
+    inputs:
+      tag:
+        description: Existing release tag to build and attach binaries to
+        required: true
+        type: string
 
 permissions:
   contents: read
@@ -53,8 +59,10 @@ jobs:
       - run: bun scripts/binary/build.mjs --all
       # The binaries report package.json's version (smoke.sh checks), so this
       # keeps assets off a release they do not belong to.
+      # A reusable call keeps the caller's event name, so a tag push arrives as
+      # push. inputs.tag is set only for that call and workflow_dispatch.
       - name: Check the version matches the release tag
-        if: github.event_name == 'release' || github.event_name == 'workflow_dispatch'
+        if: github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (inputs.tag || '') != ''
         run: |
           version=$(node -p "require('./package.json').version")
           # Tags are v1.2.3, or @studyzy/openspec-cn@1.2.3 as changesets first
@@ -158,6 +166,28 @@ jobs:
         shell: pwsh
         run: |
           Invoke-ScriptAnalyzer -Path scripts/binary/install.ps1 -Severity Warning,Error -ExcludeRule PSAvoidUsingWriteHost -EnableExit
+          # A failing installer is a native exit. Don't hide its output.
+          $PSNativeCommandUseErrorActionPreference = $false
+          # Python does not send charset=utf-8, so irm makes Windows PowerShell 5.1
+          # decode the UTF-8 script as the ANSI code page.
+          function Invoke-Installer([string]$Shell, [string]$Dir, [string]$DownloadUrl, [string]$ReleasesUrl, [string]$Name) {
+            $p = Join-Path $env:RUNNER_TEMP ('i' + [guid]::NewGuid().ToString('n') + '.ps1')
+            $lines = @('$ErrorActionPreference = "Stop"')
+            if ($DownloadUrl) { $lines += "`$env:OPENSPEC_DOWNLOAD_URL = '$DownloadUrl'" }
+            if ($ReleasesUrl) { $lines += "`$env:OPENSPEC_RELEASES_URL = '$ReleasesUrl'" }
+            if ($Name) { $lines += "`$env:OPENSPEC_INSTALL_NAME = '$Name'" }
+            $lines += "`$env:OPENSPEC_INSTALL_DIR = '$Dir'"
+            $lines += @'
+$dest = Join-Path $env:TEMP "openspec-cn-install.ps1"
+Invoke-WebRequest -UseBasicParsing http://127.0.0.1:8765/install.ps1 -OutFile $dest
+$text = [Text.Encoding]::UTF8.GetString([IO.File]::ReadAllBytes($dest))
+if ($text.StartsWith([char]0xFEFF)) { $text = $text.Substring(1) }
+Invoke-Expression $text
+'@
+            Set-Content -Path $p -Value ($lines -join "`n") -Encoding ascii
+            & $Shell -NoProfile -File $p
+            $script:installerExit = $LASTEXITCODE
+          }
           $server = Start-Process python -ArgumentList '-m', 'http.server', '8765', '--directory', 'dist-bin' -PassThru -WindowStyle Hidden
           foreach ($i in 1..40) { try { Invoke-WebRequest -UseBasicParsing http://127.0.0.1:8765/SHA256SUMS | Out-Null; break } catch { Start-Sleep -Milliseconds 500 } }
           # A user PATH entry that relies on expansion must survive untouched.
@@ -168,8 +198,8 @@ jobs:
             foreach ($shell in 'pwsh', 'powershell') {
               $dir = Join-Path $env:RUNNER_TEMP "install $shell"
               foreach ($run in 1, 2) {
-                & $shell -NoProfile -Command "`$env:OPENSPEC_DOWNLOAD_URL='http://127.0.0.1:8765'; `$env:OPENSPEC_INSTALL_DIR='$dir'; irm http://127.0.0.1:8765/install.ps1 | iex"
-                if ($LASTEXITCODE -ne 0) { throw "$shell install run $run failed" }
+                Invoke-Installer $shell $dir 'http://127.0.0.1:8765' $null $null
+                if ($script:installerExit -ne 0) { throw "$shell install run $run failed" }
               }
               $exe = Join-Path $dir 'openspec-cn.exe'
               if ((Get-FileHash $exe).Hash -ne (Get-FileHash "dist-bin/openspec-cn-$env:ASSET.exe").Hash) { throw "$shell installed the wrong file" }
@@ -182,9 +212,9 @@ jobs:
             }
             # A relative folder is saved to PATH as an absolute one; a custom name is kept.
             Push-Location $env:RUNNER_TEMP
-            pwsh -NoProfile -Command "`$env:OPENSPEC_DOWNLOAD_URL='http://127.0.0.1:8765'; `$env:OPENSPEC_INSTALL_DIR='relative install'; `$env:OPENSPEC_INSTALL_NAME='openspec-cn-renamed.exe'; irm http://127.0.0.1:8765/install.ps1 | iex"
+            Invoke-Installer pwsh (Join-Path $env:RUNNER_TEMP 'relative install') 'http://127.0.0.1:8765' $null 'openspec-cn-renamed.exe'
             Pop-Location
-            if ($LASTEXITCODE -ne 0) { throw 'relative install failed' }
+            if ($script:installerExit -ne 0) { throw 'relative install failed' }
             $abs = Join-Path $env:RUNNER_TEMP 'relative install'
             if (-not (Test-Path (Join-Path $abs 'openspec-cn-renamed.exe'))) { throw 'custom name not used' }
             $raw = [string]$key.GetValue('Path', '', 'DoNotExpandEnvironmentNames')
@@ -202,13 +232,17 @@ jobs:
             Set-Content -Path (Join-Path $site 'releases.atom') -Value ('<feed>' + (('v1.2.0', 'v1.1.0' | ForEach-Object { "<link href=""https://github.com/studyzy/OpenSpec-cn/releases/tag/$_""/>" }) -join '') + '</feed>')
             foreach ($shell in 'pwsh', 'powershell') {
               $dir = Join-Path $env:RUNNER_TEMP "fallback $shell"
-              $out = & $shell -NoProfile -Command "`$env:OPENSPEC_RELEASES_URL='http://127.0.0.1:8765/site/releases'; `$env:OPENSPEC_INSTALL_DIR='$dir'; irm http://127.0.0.1:8765/install.ps1 | iex" 2>&1 | Out-String
-              if ($LASTEXITCODE -ne 0) { throw "$shell fallback install failed: $out" }
+              $log = Join-Path $env:RUNNER_TEMP "fallback-$shell.txt"
+              Invoke-Installer $shell $dir $null 'http://127.0.0.1:8765/site/releases' $null *> $log
+              $out = if (Test-Path $log) { Get-Content -Raw $log } else { '' }
+              if ($script:installerExit -ne 0) { throw "$shell fallback install failed: $out" }
               if ($out -notmatch 'v1\.2\.0 is still being prepared; installing v1\.1\.0\.') { throw "$shell did not fall back with a note: $out" }
               if ((Get-FileHash (Join-Path $dir 'openspec-cn.exe')).Hash -ne (Get-FileHash "dist-bin/openspec-cn-$env:ASSET.exe").Hash) { throw "$shell fallback installed the wrong file" }
               # A localhost-looking URL whose real host is remote is refused before any download.
-              $out = & $shell -NoProfile -Command "`$env:OPENSPEC_DOWNLOAD_URL='http://localhost:80@evil.example/x'; `$env:OPENSPEC_INSTALL_DIR='$dir-evil'; irm http://127.0.0.1:8765/install.ps1 | iex" 2>&1 | Out-String
-              if ($LASTEXITCODE -eq 0 -or $out -notmatch 'must use https') { throw "$shell accepted a remote host behind localhost: $out" }
+              $log = Join-Path $env:RUNNER_TEMP "evil-$shell.txt"
+              Invoke-Installer $shell "$dir-evil" 'http://localhost:80@evil.example/x' $null $null *> $log
+              $out = if (Test-Path $log) { Get-Content -Raw $log } else { '' }
+              if ($script:installerExit -eq 0 -or $out -notmatch 'must use https') { throw "$shell accepted a remote host behind localhost: $out" }
               if (Test-Path "$dir-evil/openspec-cn.exe") { throw "$shell installed from a refused source" }
             }
           } finally {
@@ -253,7 +287,7 @@ jobs:
   release:
     name: Attach to release
     needs: verify
-    if: github.repository == 'studyzy/OpenSpec-cn' && (github.event_name == 'release' || github.event_name == 'workflow_dispatch')
+    if: github.repository == 'studyzy/OpenSpec-cn' && (github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (inputs.tag || '') != '')
     runs-on: ubuntu-latest
     timeout-minutes: 10
     permissions:
