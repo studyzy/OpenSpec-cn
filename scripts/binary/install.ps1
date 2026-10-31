@@ -41,7 +41,7 @@
   $releases = if ($env:OPENSPEC_RELEASES_URL) { $env:OPENSPEC_RELEASES_URL.TrimEnd('/') } else { 'https://github.com/studyzy/OpenSpec-cn/releases' }
   Assert-Source 'OPENSPEC_RELEASES_URL' $releases
   if ($env:OPENSPEC_DOWNLOAD_URL) { Assert-Source 'OPENSPEC_DOWNLOAD_URL' $env:OPENSPEC_DOWNLOAD_URL }
-  $npmHint = '或改用 npm 安装（Node.js 20.19+）：npm install -g @studyzy/openspec-cn'
+  $npmHint = '或改用 npm 安装（Node.js 22.12+）：npm install -g @studyzy/openspec-cn'
   $dir = if ($env:OPENSPEC_INSTALL_DIR) { $env:OPENSPEC_INSTALL_DIR } else { Join-Path $env:LOCALAPPDATA 'Programs\openspec-cn' }
   # Absolute, so the user PATH entry works from any directory.
   $dir = $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($dir)
@@ -84,19 +84,36 @@
       $base = "$releases/download/$version"
     }
 
-    Write-Host "正在下载 $asset（$version）..."
     try {
-      Invoke-WebRequest -UseBasicParsing -Uri "$base/$asset" -OutFile $exe
       if (-not (Test-Path $sums)) { Invoke-WebRequest -UseBasicParsing -Uri "$base/SHA256SUMS" -OutFile $sums }
     } catch {
       throw "openspec-cn install: 无法从 ${base} 下载：$($_.Exception.Message)。$npmHint"
     }
 
-    $line = Get-Content $sums | Where-Object { ($_ -split '\s+')[1] -eq $asset } | Select-Object -First 1
-    if (-not $line) { throw "openspec-cn install: SHA256SUMS 中未列出 $asset" }
-    $expected = ($line -split '\s+')[0]
-    $actual = (Get-FileHash -Algorithm SHA256 -Path $exe).Hash
-    if ($actual -ne $expected) { throw "openspec-cn install: $asset 的校验和不匹配；已拒绝安装" }
+    # Releases ship a .zip; v1.15.0 and earlier, the bare .exe.
+    $lines = Get-Content $sums
+    $file = $null
+    $expected = $null
+    foreach ($candidate in "$($asset -replace '\.exe$', '.zip')", $asset) {
+      $line = $lines | Where-Object { ($_ -split '\s+')[1] -eq $candidate } | Select-Object -First 1
+      if ($line) { $file = $candidate; $expected = ($line -split '\s+')[0]; break }
+    }
+    if (-not $file) { throw "openspec-cn install: SHA256SUMS 中未列出 $asset" }
+
+    Write-Host "正在下载 $file（$version）..."
+    $download = Join-Path $tmp $file
+    try {
+      Invoke-WebRequest -UseBasicParsing -Uri "$base/$file" -OutFile $download
+    } catch {
+      throw "openspec-cn install: 无法从 ${base} 下载：$($_.Exception.Message)。$npmHint"
+    }
+    $actual = (Get-FileHash -Algorithm SHA256 -Path $download).Hash
+    if ($actual -ne $expected) { throw "openspec-cn install: $file 的校验和不匹配；已拒绝安装" }
+    if ($file -ne $asset) {
+      $unpacked = Join-Path $tmp 'unpacked'
+      Expand-Archive -Path $download -DestinationPath $unpacked
+      Move-Item -Path (Join-Path $unpacked 'openspec-cn.exe') -Destination $exe
+    }
 
     $installed = $null
     # A binary that cannot start at all throws instead of setting an exit code.

@@ -46,7 +46,7 @@ main() {
   case "$(uname -s)" in
     Linux) os=linux ;;
     Darwin) os=darwin ;;
-    *) fail "不支持的操作系统 $(uname -s)。在 Windows 上，请从发布页下载 openspec-cn-windows-x64.exe。" ;;
+    *) fail "不支持的操作系统 $(uname -s)。在 Windows 上，请使用 install.ps1。" ;;
   esac
   case "$(uname -m)" in
     x86_64 | amd64) arch=x64 ;;
@@ -108,7 +108,7 @@ main() {
     fi
   }
 
-  npm_hint="或改用 npm 安装（Node.js 20.19+）：npm install -g @studyzy/openspec-cn"
+  npm_hint="或改用 npm 安装（Node.js 22.12+）：npm install -g @studyzy/openspec-cn"
   if [ -n "${OPENSPEC_DOWNLOAD_URL:-}" ]; then
     base=${OPENSPEC_DOWNLOAD_URL%/}
   elif [ "$version" != latest ]; then
@@ -138,21 +138,33 @@ main() {
     base="$releases/download/$version"
   fi
 
-  echo "正在下载 $asset（$version）..."
-  download "$base/$asset" "$tmp/$asset" || fail "无法下载 $base/$asset；$npm_hint"
   if [ ! -s "$tmp/SHA256SUMS" ]; then
     download "$base/SHA256SUMS" "$tmp/SHA256SUMS" || fail "无法下载 $base/SHA256SUMS；$npm_hint"
   fi
 
-  expected=$(awk -v f="$asset" '$2 == f { print $1 }' "$tmp/SHA256SUMS")
-  [ -n "$expected" ] || fail "SHA256SUMS 中未列出 $asset"
-  if command -v sha256sum >/dev/null 2>&1; then
-    actual=$(sha256sum "$tmp/$asset" | awk '{ print $1 }')
-  else
-    actual=$(shasum -a 256 "$tmp/$asset" | awk '{ print $1 }')
+  # Releases ship a .tar.gz; v1.15.0 and earlier, the bare binary.
+  file="$asset.tar.gz"
+  expected=$(awk -v f="$file" '$2 == f { print $1 }' "$tmp/SHA256SUMS")
+  if [ -z "$expected" ]; then
+    file=$asset
+    expected=$(awk -v f="$file" '$2 == f { print $1 }' "$tmp/SHA256SUMS")
   fi
-  [ "$actual" = "$expected" ] || fail "$asset 的校验和不匹配；已拒绝安装"
+  [ -n "$expected" ] || fail "SHA256SUMS 中未列出 $asset"
 
+  echo "正在下载 $file（$version）..."
+  download "$base/$file" "$tmp/$file" || fail "无法下载 $base/$file；$npm_hint"
+  if command -v sha256sum >/dev/null 2>&1; then
+    actual=$(sha256sum "$tmp/$file" | awk '{ print $1 }')
+  else
+    actual=$(shasum -a 256 "$tmp/$file" | awk '{ print $1 }')
+  fi
+  [ "$actual" = "$expected" ] || fail "$file 的校验和不匹配；已拒绝安装"
+
+  if [ "$file" != "$asset" ]; then
+    mkdir "$tmp/unpacked"
+    tar -xzf "$tmp/$file" -C "$tmp/unpacked" openspec-cn || fail "无法解包 $file"
+    mv "$tmp/unpacked/openspec-cn" "$tmp/$asset"
+  fi
   chmod 755 "$tmp/$asset"
   if ! installed=$("$tmp/$asset" --version); then
     case "$asset" in

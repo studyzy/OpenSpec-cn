@@ -96,8 +96,9 @@ artifacts:
       - 每个场景：`#### Scenario: <名称>`，采用 WHEN/THEN 格式
       - **关键**：场景必须（MUST）正好使用 4 个井号（`####`）。使用 3 个井号或列表项会静默失败。
       - 每条需求必须（MUST）至少包含一个场景。
+      - 每个场景必须（MUST）包含 WHEN/GIVEN 步骤（其触发条件）和 THEN 步骤（其结果）。只有 AND 行或纯散文的场景仍算作场景，但 `openspec-cn validate` 会将其标记为警告：正常校验仍然通过，但 `openspec-cn validate --strict` 会失败。
       - 每条需求的描述（`### Requirement:` 与其第一个场景之间的文本）保持在 500 个字符以内。
-        `openspec validate` 会在 ADDED 需求和主 spec 中标记更长的描述。这是一个警告：
+        `openspec-cn validate` 会在 ADDED 需求和主 spec 中标记更长的描述。这是一个警告：
         正常校验仍然通过，但 `openspec-cn validate --strict` 会失败。编写新需求时，
         每条需求只陈述一种行为：把示例和边界情况移入场景，把覆盖多种行为的需求拆分为
         各自带有场景的独立 `### Requirement:` 块。在 MODIFIED 下，保持既有需求块完整；

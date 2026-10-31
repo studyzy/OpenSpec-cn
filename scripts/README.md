@@ -73,7 +73,7 @@ Validates package version consistency before publishing.
 
 ## binary/
 
-构建独立的 `openspec-cn` 可执行文件（无需 Node.js），这是用户安装 OpenSpec 的默认方式。`.github/workflows/binaries.yml` 在 Linux 上交叉编译全部资产，在各自的系统和 CPU 上逐一测试，然后把它们与 `SHA256SUMS`、`install.sh`、`install.ps1` 一并附加到每个已发布的发布版。
+构建独立的 `openspec-cn` 可执行文件（无需 Node.js），这是用户安装 OpenSpec 的默认方式。`.github/workflows/binaries.yml` 在 Linux 上交叉编译全部资产，在各自的系统和 CPU 上逐一测试，然后把它们以 `.tar.gz` 压缩包（Windows 上为 `.zip`）的形式连同 `SHA256SUMS` 一并附加到每个已发布的发布版。安装脚本由 main 分支提供。
 
 | 文件 | 说明 |
 |---|---|

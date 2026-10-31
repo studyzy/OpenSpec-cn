@@ -51,7 +51,10 @@ irm https://raw.githubusercontent.com/studyzy/OpenSpec-cn/main/scripts/binary/in
    Node 缺失或版本过低，请告诉我并停下 —— 不要替我安装 Node、切换版本，或重新
    配置我的版本管理器。
 
-2. 安装。使用我 PATH 中已有的包管理器，优先选 npm：
+2. 包管理器（仅当第 1 步没有安装它时）。执行 `node --version`：
+   这需要 Node.js 22.12.0 或更高版本。如果 Node 缺失或版本过低，请告诉我并停下 ——
+   不要替我安装 Node、切换版本，或重新配置我的版本管理器。否则使用我 PATH 中已有
+   的包管理器，优先选 npm：
      npm install -g @studyzy/openspec-cn@latest
      pnpm add -g @studyzy/openspec-cn@latest
      bun add -g @studyzy/openspec-cn@latest
@@ -105,7 +108,7 @@ irm https://raw.githubusercontent.com/studyzy/OpenSpec-cn/main/scripts/binary/in
 
 ## 包管理器
 
-用包管理器安装需要 **Node.js 20.19.0 或更高版本**(用 `node --version` 检查)。
+用包管理器安装需要 **Node.js 22.12.0 或更高版本**（用 `node --version` 检查）。
 
 ### npm
 
@@ -146,8 +149,8 @@ deno install --global \
 
 ### bun
 
-Bun 可以全局安装 OpenSpec,但 OpenSpec 目前运行在 Node.js 上。
-你仍需要在 `PATH` 中提供 Node.js 20.19.0 或更高版本。
+Bun 可以全局安装 OpenSpec，但 OpenSpec 目前运行在 Node.js 上。
+你仍需要在 `PATH` 中提供 Node.js 22.12.0 或更高版本。
 
 ```bash
 bun add -g @studyzy/openspec-cn@latest

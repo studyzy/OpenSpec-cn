@@ -1,4 +1,5 @@
 import { CompletionFactory } from '../core/completions/factory.js';
+import { zshrcDisplayPath } from '../core/completions/installers/zsh-installer.js';
 import { COMMAND_REGISTRY } from '../core/completions/command-registry.js';
 import { detectShell, SupportedShell } from '../utils/shell-detection.js';
 import { CompletionProvider } from '../core/completions/completion-provider.js';
@@ -151,7 +152,7 @@ export class CompletionCommand {
 
           if (configWasUpdated) {
             const configPaths: Record<string, string> = {
-              zsh: '~/.zshrc',
+              zsh: zshrcDisplayPath(),
               bash: '~/.bashrc',
               fish: '~/.config/fish/config.fish',
               powershell: '$PROFILE',
@@ -217,7 +218,8 @@ export class CompletionCommand {
 
       // Get shell-specific config file path
       const configPaths: Record<string, string> = {
-        zsh: '~/.zshrc',
+        // Uninstall also clears a block an older install left in ~/.zshrc.
+        zsh: zshrcDisplayPath() === '~/.zshrc' ? '~/.zshrc' : `${zshrcDisplayPath()} (and ~/.zshrc if an older install wrote there)`,
         bash: '~/.bashrc',
         fish: 'Fish 配置',  // Fish doesn't modify profile, just removes script file
         powershell: '$PROFILE',

@@ -17,15 +17,17 @@ openspec-cn --version
 
 如果你使用了 [AI 辅助安装](installation.md#install-with-your-ai-assistant)，这里正是预期的交接点：那段提示词会让你的助手把需要做的 `PATH` 改动展示给你，而不是自行编辑你的 shell 启动文件。
 
-### "Requires Node.js 20.19.0 or higher"
+### "Requires Node.js 22.12.0 or higher"
 
-OpenSpec 运行于 Node 20.19.0+。检查版本并在需要时升级：
+OpenSpec 运行于 Node 22.12.0+（Node 20 已于 2026 年 4 月停止维护，不再受支持）。检查版本并在需要时升级：
 
 ```bash
 node --version
 ```
 
-如果你用 bun 安装 OpenSpec，注意 OpenSpec 仍然*运行*在 Node 上，所以无论怎样你都需要 `PATH` 上有 Node 20.19.0+。参见 [安装](installation.md)。
+如果你用 bun 安装 OpenSpec，注意 OpenSpec 仍然*运行*在 Node 上，所以无论怎样你都需要 `PATH` 上有 Node 22.12.0+。参见[安装](installation.md)。
+
+如果你无法升级 Node，请安装[独立版二进制](installation.md)，它无需 Node 即可运行。Homebrew 是另一个选择：它仍然在 Node 上运行 OpenSpec，但会作为依赖为你安装并管理一个较新的 Node.js。
 
 ### `openspec-cn init` 没有配置我的 AI 工具
 

@@ -125,31 +125,19 @@ OpenSpec is built with OpenSpec — browse this repo's live [specs](openspec/spe
 
 ## 快速开始
 
-**需要 Node.js 20.19.0 或更高版本。** Homebrew 会将其作为依赖一并安装。
-
-全局安装 openspec-cn：
-
-```bash
-npm install -g @studyzy/openspec-cn@latest
-```
-
-也可以在 macOS 或 Linux 上安装官方的 [Homebrew formula](https://formulae.brew.sh/formula/openspec)：
-
-```bash
-brew install openspec
-```
-
-偏好单文件、无需 Node.js 的独立安装（standalone）？macOS 和 Linux：
+安装 OpenSpec。在 macOS 或 Linux 的终端中：
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/studyzy/OpenSpec-cn/main/scripts/binary/install.sh | sh
 ```
 
-Windows（PowerShell）：
+在 Windows 的 PowerShell 中：
 
 ```powershell
 irm https://raw.githubusercontent.com/studyzy/OpenSpec-cn/main/scripts/binary/install.ps1 | iex
 ```
+
+偏好包管理器？使用 `npm install -g @studyzy/openspec-cn@latest`（需要 Node.js 22.12.0 或更高版本），或安装官方的 [Homebrew formula](https://formulae.brew.sh/formula/openspec)：`brew install openspec`。
 
 然后进入你的项目目录并初始化：
 
