@@ -151,8 +151,10 @@ main() {
   fi
   [ -n "$expected" ] || fail "SHA256SUMS 中未列出 $asset"
 
-  echo "正在下载 $file（$version）..."
-  download "$base/$file" "$tmp/$file" || fail "无法下载 $base/$file；$npm_hint"
+  # Braces: macOS bash 3.2 pulls the following UTF-8 byte into an unbraced
+  # variable name, so a name followed by a full-width bracket reads wrongly.
+  echo "正在下载 ${file}（${version}）..."
+  download "$base/$file" "$tmp/$file" || fail "无法下载 $base/${file}；$npm_hint"
   if command -v sha256sum >/dev/null 2>&1; then
     actual=$(sha256sum "$tmp/$file" | awk '{ print $1 }')
   else
