@@ -7,8 +7,6 @@
 
 ## 安装
 
-OpenSpec 以单个 `openspec-cn` 文件的形式安装，无需 Node.js。
-
 在 macOS 或 Linux 上，在终端中执行：
 
 ```bash
@@ -21,41 +19,7 @@ curl -fsSL https://raw.githubusercontent.com/studyzy/OpenSpec-cn/main/scripts/bi
 irm https://raw.githubusercontent.com/studyzy/OpenSpec-cn/main/scripts/binary/install.ps1 | iex
 ```
 
-- **安装位置**：`~/.local/bin`；Windows 上为 `%LOCALAPPDATA%\Programs\openspec-cn`，安装器会把它加入你的用户 PATH。
-- **它会检查什么**：为你的机器挑选对应文件，并在安装前用该发布版的 `SHA256SUMS` 校验。
-- **安装哪个版本**：文件全部齐全的最新版本。发布后文件仍在上传的那几分钟里，它会安装上一个版本并说明这一点。
-- **Alpine Linux**：先运行 `apk add libstdc++ libgcc`。
-- **选项**：设置 `OPENSPEC_INSTALL_DIR` 可安装到别处，或用 `OPENSPEC_VERSION=v1.15.0` 固定某个版本。
-
-如果安装器提示该文件夹不在你的 PATH 上，按它的提示添加。然后[检查是否成功](#check-it-worked)。
-
-工作流本身运行在 AI 编程工具内：Claude Code、Cursor，或[支持列表](../reference/supported-tools.md)中的任何其他工具。
-
-### 自行下载
-
-每个[发布版本](https://github.com/studyzy/OpenSpec-cn/releases/latest)都为每个平台提供一个文件：
-
-| 平台 | 文件 |
-|---|---|
-| macOS 13+ (Apple silicon / Intel) | `openspec-cn-darwin-arm64` / `openspec-cn-darwin-x64` |
-| Linux, glibc 2.17+ (arm64 / x64) | `openspec-cn-linux-arm64` / `openspec-cn-linux-x64` |
-| Alpine 3.17+ (arm64 / x64) | `openspec-cn-linux-arm64-musl` / `openspec-cn-linux-x64-musl` |
-| Windows 10+ (arm64 / x64) | `openspec-cn-windows-arm64.exe` / `openspec-cn-windows-x64.exe` |
-
-把它重命名为 `openspec-cn`（Windows 上为 `openspec-cn.exe`），在 macOS 或 Linux 上运行 `chmod +x openspec-cn`，并放进 PATH 上的某个文件夹。
-
-> [!NOTE]
-> 在 macOS 上，浏览器下载的文件需要先运行 `xattr -d com.apple.quarantine openspec-cn` 才能使用。上面的安装命令不需要这一步。
-
-### 校验下载
-
-每个发布二进制都附带一份构建它的工作流运行记录，且带签名。使用 [GitHub CLI](https://cli.github.com)，在终端中执行：
-
-```bash
-gh attestation verify openspec-cn-darwin-arm64 --repo studyzy/OpenSpec-cn
-```
-
-它会确认该文件正是那次发布的工作流所构建的文件，否则失败。这一步是可选的；安装器已经用 `SHA256SUMS` 校验过每次下载。
+如果安装器打印了一行 `export PATH=...`，请运行它。然后[检查是否成功](#check-it-worked)。
 
 <a id="install-with-your-ai-assistant"></a>
 
@@ -76,7 +40,7 @@ curl -fsSL https://raw.githubusercontent.com/studyzy/openspec-cn/main/install.md
 这会获取[仓库根目录下的 install.md](https://github.com/studyzy/openspec-cn/blob/main/install.md)，这是一段为任何能执行 shell 命令的 Agent 编写的提示词（少数 IDE 集成做不到）。你的助手应当会：
 
 1. 如果 CLI 已经在你机器上，跳过安装，并按它当初的安装方式提供更新。如果当初是 npm 或 Homebrew，顺带提一次 `openspec-cn install` 可以切换到独立安装，但不要推销。否则，展示上面的安装命令，等你确认后再执行。
-2. 只有在你主动要求、或安装器失败时才改用 npm；如果你的 Node 低于 20.19.0 就停下。
+2. 只有在你主动要求、或安装器失败时才改用 npm；如果你的 Node 低于 22.12.0 就停下。
 3. 验证 `openspec-cn` 在 PATH 上。
 4. 说出它认为你说的那个文件夹，建议你正在对话的这个 AI 工具，并询问你还用哪些工具，然后在那里运行 `openspec-cn init`（即[项目设置](setup.md)这一步）。
 5. 报告 init 创建了什么，以及在你的工具中调用 OpenSpec 的确切拼写。
@@ -89,13 +53,13 @@ curl -fsSL https://raw.githubusercontent.com/studyzy/openspec-cn/main/install.md
 
 ## 包管理器
 
-这些方式把 OpenSpec 作为 Node.js 包安装，所以需要 Node.js 20.19.0 或更高版本（Homebrew 和 Nix 自带运行时）。在终端中执行：
+这些方式把 OpenSpec 作为 Node.js 包安装，所以需要 Node.js 22.12.0 或更高版本（Homebrew 和 Nix 自带运行时）。在终端中执行：
 
 ```bash
 node --version
 ```
 
-如果输出 `v20.19.0` 或更高，就用 npm 安装：
+如果输出 `v22.12.0` 或更高，就用 npm 安装：
 
 ```npm
 npm install -g @studyzy/openspec-cn@latest
@@ -172,6 +136,56 @@ openspec-cn --version
 如果输出了版本号，CLI 就在你的 PATH 上。每台机器只需安装一次。
 
 接下来，[设置你的项目](setup.md)。如果你的助手已经运行过 init，那页会展示它写了什么以及如何调整。
+
+## 安装选项
+
+要指定版本或安装目录，请在 `sh` 之前设置变量：
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/studyzy/OpenSpec-cn/main/scripts/binary/install.sh | OPENSPEC_VERSION=v1.16.0 sh
+```
+
+- **`OPENSPEC_VERSION`**：要安装的发布版，例如 `v1.16.0`。默认是最新的发布版。
+- **`OPENSPEC_INSTALL_DIR`**：安装目录。默认为 `~/.local/bin`（Windows：`%LOCALAPPDATA%\Programs\openspec-cn`）。
+
+在 Windows 上，请先设置变量：
+
+```powershell
+$env:OPENSPEC_VERSION = 'v1.16.0'
+irm https://raw.githubusercontent.com/studyzy/OpenSpec-cn/main/scripts/binary/install.ps1 | iex
+```
+
+在 Alpine Linux 上，安装前先运行 `apk add libstdc++ libgcc`。
+
+### 手动下载
+
+每个发布版为每种机器提供一个文件：
+
+| 机器 | 文件 |
+|---|---|
+| Mac，Apple silicon | `openspec-cn-darwin-arm64.tar.gz` |
+| Mac，Intel | `openspec-cn-darwin-x64.tar.gz` |
+| Linux，arm64 | `openspec-cn-linux-arm64.tar.gz` |
+| Linux，x64 | `openspec-cn-linux-x64.tar.gz` |
+| Alpine，arm64 | `openspec-cn-linux-arm64-musl.tar.gz` |
+| Alpine，x64 | `openspec-cn-linux-x64-musl.tar.gz` |
+| Windows，arm64 | `openspec-cn-windows-arm64.zip` |
+| Windows，x64 | `openspec-cn-windows-x64.zip` |
+
+1. **下载**你的文件：从[最新发布版](https://github.com/studyzy/OpenSpec-cn/releases/latest)获取。文件会在发布版发布几分钟后才附加上去。如果你要的文件还没列出，请稍后刷新，或改用上一个发布版。
+2. **解压**。在终端中执行：`tar -xzf openspec-cn-darwin-arm64.tar.gz`。在 Windows 上，右键点击 `.zip` 并选择"全部提取"。
+3. **在 macOS 上**，在你解压到的目录中运行 `xattr -d com.apple.quarantine openspec-cn`。在此之前，macOS 会阻止运行浏览器下载的文件。
+4. **移动** `openspec-cn` 到 PATH 上的某个文件夹，例如 `~/.local/bin`。在 Windows 上，把 `openspec-cn.exe` 移到你的用户 PATH 上的某个文件夹，例如 `%LOCALAPPDATA%\Programs\openspec-cn`。
+
+### 校验下载
+
+要确认文件确实由 OpenSpec 发布工作流构建，请使用 [GitHub CLI](https://cli.github.com) 运行：
+
+```bash
+gh attestation verify openspec-cn-darwin-arm64.tar.gz --repo studyzy/OpenSpec-cn
+```
+
+如果该文件不是由该工作流构建，它就会失败。安装命令已经用发布版的 `SHA256SUMS` 校验每次下载，所以这一步是可选的。
 
 ## 从 npm 切换到独立安装
 

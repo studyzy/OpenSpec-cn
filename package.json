@@ -1,6 +1,6 @@
 {
   "name": "@studyzy/openspec-cn",
-  "version": "1.15.0",
+  "version": "1.16.0",
   "description": "面向AI编程助手的规范驱动开发框架OpenSpec的简体中文汉化版本",
   "keywords": [
     "openspec",
@@ -59,7 +59,7 @@
     "changeset": "changeset"
   },
   "engines": {
-    "node": ">=20.19.0"
+    "node": ">=22.12.0"
   },
   "devDependencies": {
     "@changesets/changelog-github": "^1.0.0",
@@ -71,7 +71,7 @@
     "smol-toml": "^1.7.1",
     "typescript": "^6.0.3",
     "typescript-eslint": "^8.65.0",
-    "vite": "^7.3.7",
+    "vite": "^8.3.5",
     "vitest": "^4.1.12"
   },
   "dependencies": {

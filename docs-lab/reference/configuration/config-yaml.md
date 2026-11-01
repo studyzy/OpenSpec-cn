@@ -17,7 +17,7 @@
 | `store` | string | No | 当此 openspec/ 仅为纯配置时的回退 OpenSpec 根目录 |
 | `references` | list | No | 其 specs 被编入指令索引的 store |
 
-无效字段永远不会让命令失败。每个字段单独校验，坏值会以警告方式丢弃。
+无效字段永远不会让命令失败。每个字段单独校验，坏值会以警告方式丢弃。无法读取或不是合法 YAML 的文件会以警告方式忽略，但 `openspec-cn validate` 例外：它会以退出码 1 结束，好让 CI 捕获到问题。
 
 这些字段中该写什么，参见 [项目配置](../../customize/project-config.md)。
 

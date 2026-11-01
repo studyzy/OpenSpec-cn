@@ -6,6 +6,25 @@ import { InstallationResult } from '../factory.js';
 import { shellSingleQuote } from './shell-quote.js';
 
 /**
+ * zsh reads its startup files from $ZDOTDIR when it is set, and from $HOME
+ * only otherwise, so a block written to ~/.zshrc under an XDG-style
+ * ZDOTDIR is never loaded (#2138).
+ */
+function zshrcDir(homeDir: string): string {
+  const zdotdir = process.env.ZDOTDIR;
+  // zsh does not expand `~` in ZDOTDIR, and path.join would resolve a relative
+  // or `~/...` value against the current directory, writing a stray .zshrc
+  // into the user's project. Only an absolute ZDOTDIR moves the file.
+  return zdotdir && path.isAbsolute(zdotdir) ? zdotdir : homeDir;
+}
+
+/** The .zshrc zsh will read, as shown to the user: `~/.zshrc` unless ZDOTDIR moves it. */
+export function zshrcDisplayPath(homeDir: string = os.homedir()): string {
+  const zshrcPath = path.join(zshrcDir(homeDir), '.zshrc');
+  return zshrcPath === path.join(homeDir, '.zshrc') ? '~/.zshrc' : zshrcPath;
+}
+
+/**
  * Installer for Zsh completion scripts.
  * Supports both Oh My Zsh and standard Zsh configurations.
  */
@@ -108,7 +127,15 @@ export class ZshInstaller {
    * @returns Path to .zshrc
    */
   private getZshrcPath(): string {
-    return path.join(this.homeDir, '.zshrc');
+    return path.join(zshrcDir(this.homeDir), '.zshrc');
+  }
+
+  /**
+   * Every .zshrc that may hold an OpenSpec block: the one zsh reads, plus
+   * ~/.zshrc, where installs before #2138 wrote it even under ZDOTDIR.
+   */
+  private getZshrcCandidates(): string[] {
+    return [...new Set([this.getZshrcPath(), path.join(this.homeDir, '.zshrc')])];
   }
 
   /**
@@ -170,9 +197,8 @@ export class ZshInstaller {
    *
    * @returns true if .zshrc exists and has markers
    */
-  private async hasZshrcConfig(): Promise<boolean> {
+  private async hasZshrcConfig(zshrcPath: string = this.getZshrcPath()): Promise<boolean> {
     try {
-      const zshrcPath = this.getZshrcPath();
       const content = await fs.readFile(zshrcPath, 'utf-8');
       return content.includes(this.ZSHRC_MARKERS.start) && content.includes(this.ZSHRC_MARKERS.end);
     } catch {
@@ -184,12 +210,11 @@ export class ZshInstaller {
    * Remove .zshrc configuration
    * Used during uninstallation
    *
+   * @param zshrcPath - The .zshrc to clean; defaults to the one zsh reads
    * @returns true if removed successfully, false otherwise
    */
-  async removeZshrcConfig(): Promise<boolean> {
+  async removeZshrcConfig(zshrcPath: string = this.getZshrcPath()): Promise<boolean> {
     try {
-      const zshrcPath = this.getZshrcPath();
-
       // Check if file exists
       try {
         await fs.access(zshrcPath);
@@ -253,16 +278,25 @@ export class ZshInstaller {
       try {
         const existingContent = await fs.readFile(targetPath, 'utf-8');
         if (existingContent === completionScript) {
-          // Already installed and up to date
+          // Already installed and up to date. Still make sure the .zshrc zsh
+          // reads has the block: an install made before #2138 under ZDOTDIR
+          // wrote it to ~/.zshrc, and re-running install is how that's fixed.
+          const zshrcConfigured = isOhMyZsh
+            ? false
+            : await this.configureZshrc(path.dirname(targetPath));
           return {
             success: true,
             installedPath: targetPath,
             isOhMyZsh,
+            zshrcConfigured,
             message: '补全脚本已安装（已是最新）',
-            instructions: [
-              '补全脚本已安装且是最新版本。',
-              '如果补全不工作，尝试：exec zsh',
-            ],
+            instructions:
+              isOhMyZsh || zshrcConfigured
+                ? [
+                    '补全脚本已安装且是最新版本。',
+                    '如果补全不工作，尝试：exec zsh',
+                  ]
+                : this.generateInstructions(false, targetPath),
           };
         }
         // File exists but content is different - this is an update
@@ -372,12 +406,12 @@ export class ZshInstaller {
       ];
     } else {
       const completionsDir = path.dirname(installedPath);
-      const zshrcPath = path.join(this.homeDir, '.zshrc');
+      const zshrcPath = this.getZshrcPath();
 
       return [
         '补全脚本已安装到 ~/.zsh/completions/',
         '',
-        '要启用补全，请将以下内容添加到你的 ~/.zshrc 文件：',
+        `要启用补全，请将以下内容添加到你的 ${zshrcDisplayPath(this.homeDir)} 文件：`,
         '',
         `  # Add completions directory to fpath`,
         `  fpath=(${shellSingleQuote(completionsDir)} $fpath)`,
@@ -414,11 +448,18 @@ export class ZshInstaller {
 
       // Try to remove .zshrc configuration (only for standard Zsh)
       let zshrcWasPresent = false;
-      let zshrcCleaned = false;
+      const cleanedZshrcs: string[] = [];
+      const failedZshrcs: string[] = [];
       if (!isOhMyZsh) {
-        zshrcWasPresent = await this.hasZshrcConfig();
-        if (zshrcWasPresent) {
-          zshrcCleaned = await this.removeZshrcConfig();
+        for (const zshrcPath of this.getZshrcCandidates()) {
+          if (await this.hasZshrcConfig(zshrcPath)) {
+            zshrcWasPresent = true;
+            if (await this.removeZshrcConfig(zshrcPath)) {
+              cleanedZshrcs.push(zshrcPath);
+            } else {
+              failedZshrcs.push(zshrcPath);
+            }
+          }
         }
       }
 
@@ -433,12 +474,21 @@ export class ZshInstaller {
       if (scriptRemoved) {
         messages.push(`补全脚本已从 ${targetPath} 移除`);
       }
-      if (zshrcCleaned && !isOhMyZsh) {
-        messages.push('已从 ~/.zshrc 移除 OpenSpec 配置');
+      const label = (zshrcPath: string) =>
+        zshrcPath === path.join(this.homeDir, '.zshrc') ? '~/.zshrc' : zshrcPath;
+      for (const zshrcPath of cleanedZshrcs) {
+        messages.push(`已从 ${label(zshrcPath)} 移除 OpenSpec 配置`);
+      }
+      // A block left behind keeps loading the completions, so say so instead
+      // of reporting a clean uninstall.
+      for (const zshrcPath of failedZshrcs) {
+        messages.push(
+          `无法从 ${label(zshrcPath)} 移除 OpenSpec 配置块；请手动删除 # OPENSPEC:START 与 # OPENSPEC:END 之间的行`
+        );
       }
 
       return {
-        success: true,
+        success: failedZshrcs.length === 0,
         message: messages.join('. '),
       };
     } catch (error) {

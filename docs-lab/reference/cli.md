@@ -866,7 +866,7 @@ Next steps:
 **退出码**
 
 - `0`：每个已校验项目都通过，包括空的批量范围。
-- `1`：某个项目失败、报告请求无效，或本次运行失败（例如名称未知或没有 OpenSpec 根目录）。
+- `1`：某个项目失败、报告请求无效、`openspec/config.yaml` 无法读取或不是合法 YAML，或本次运行失败（例如名称未知或没有 OpenSpec 根目录）。无法读取或解析的配置会在检查任何项目之前中止运行；配合 `--json` 时，它会作为单条 `status` 条目报告，代码为 `unreadable_config` 或 `unparseable_config`。
 
 ### --report full|findings
 
@@ -2341,7 +2341,7 @@ OpenSpec 1.13.2 (npm, global)
 
 ## openspec-cn install
 
-安装独立的 `openspec-cn`，它是单个文件，无需 Node.js 即可运行。在 npm 或 Homebrew 安装下运行它可切换安装方式；在独立安装下运行则原地升级。
+安装独立的 `openspec-cn`。在 npm 或 Homebrew 安装下运行它可切换安装方式；在独立安装下运行则原地升级。
 
 ```bash
 openspec-cn install          # 最新发布版
@@ -2451,12 +2451,14 @@ _openspec() {
 
 | Shell | 脚本位置 | 编辑的配置 |
 |---|---|---|
-| zsh | `~/.zsh/completions/_openspec` | `~/.zshrc` |
+| zsh | `~/.zsh/completions/_openspec` | `ZDOTDIR` 为绝对路径时写 `$ZDOTDIR/.zshrc`，否则写 `~/.zshrc` |
 | bash | `~/.local/share/bash-completion/completions/openspec` | `~/.bashrc` |
 | fish | `~/.config/fish/completions/openspec.fish` | 无：fish 自动加载。 |
-| powershell | `OpenSpecCompletion.ps1` beside your profile | `$PROFILE` |
+| powershell | 与你的 profile 同目录的 `OpenSpecCompletion.ps1` | `$PROFILE` |
 
 安装了 Oh My Zsh 时，脚本落在 `$ZSH_CUSTOM/completions/_openspec`（默认 `~/.oh-my-zsh/custom/completions/_openspec`）。
+
+相对路径或以 `~` 开头的 `ZDOTDIR` 会被忽略，改为编辑 `~/.zshrc`。当脚本已是最新时再次运行 install，仍会把配置块加入 zsh 实际读取的那个 `.zshrc`。
 
 **选项**
 
@@ -2475,6 +2477,8 @@ Restart your shell or run: exec zsh
 ### openspec-cn completion uninstall
 
 移除脚本和标记的配置块。它会在触碰你的配置前询问（默认：否）。
+
+对 zsh，它会清理 install 所编辑的那个 `.zshrc`；如果较早的安装在 `ZDOTDIR` 下往 `~/.zshrc` 里留下过配置块，也会一并清理。如果某个配置块无法移除，uninstall 会指出该文件并以退出码 1 结束。
 
 **选项**
 

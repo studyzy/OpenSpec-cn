@@ -23,6 +23,7 @@ import { promises as fs } from 'fs';
 import { getTaskProgressDetailForChange, type SchemaGlobCache } from '../utils/task-progress.js';
 import { FileSystemUtils } from '../utils/file-system.js';
 import { folderStyleNameProblem } from '../core/id.js';
+import { readConfigParseError } from '../core/project-config.js';
 
 type ItemType = 'change' | 'spec';
 
@@ -114,6 +115,28 @@ export class ValidateCommand {
       ...(bulk ? { allowImplicitRoot: false } : {}),
     });
     if (!root) {
+      return;
+    }
+
+    // Every other command ignores an unreadable or unparseable config with a
+    // warning, so validate is where CI has to catch it (#1892).
+    const configError = readConfigParseError(root.path);
+    if (configError) {
+      const unreadable = configError.kind === 'read';
+      const message = unreadable
+        ? `无法读取 ${configError.filePath}（${configError.message}）。`
+        : `无法解析 ${configError.filePath}（${configError.message}）。`;
+      const fix = unreadable
+        ? `请把 ${configError.filePath} 变为可读文件，或将其删除。`
+        : `请修复 ${configError.filePath} 中的 YAML 语法。`;
+      const code = unreadable ? 'unreadable_config' : 'unparseable_config';
+      if (options.json) {
+        console.log(JSON.stringify({ status: [{ severity: 'error', code, message, fix }] }, null, 2));
+      } else {
+        console.error(`错误：${message}`);
+        console.error(`修复：${fix}`);
+      }
+      process.exitCode = 1;
       return;
     }
 
