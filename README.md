@@ -137,7 +137,7 @@ curl -fsSL https://raw.githubusercontent.com/studyzy/OpenSpec-cn/main/scripts/bi
 irm https://raw.githubusercontent.com/studyzy/OpenSpec-cn/main/scripts/binary/install.ps1 | iex
 ```
 
-偏好包管理器？使用 `npm install -g @studyzy/openspec-cn@latest`（需要 Node.js 22.12.0 或更高版本），或安装官方的 [Homebrew formula](https://formulae.brew.sh/formula/openspec)：`brew install openspec`。
+偏好包管理器？使用 `npm install -g @studyzy/openspec-cn@latest`（需要 Node.js 22.12.0 或更高版本）。
 
 然后进入你的项目目录并初始化：
 
@@ -160,7 +160,7 @@ openspec-cn init
 > [!NOTE]
 > 不确定你的工具是否受支持？[查看完整列表](https://openspec.dev/docs/supported-tools) —— 我们支持 30+ 种工具且持续增长。
 >
-> 同样支持 Homebrew、pnpm、yarn、bun 和 Nix。可查看[安装选项](https://openspec.dev/docs/installation)。
+> 同样支持 pnpm、yarn、bun 和 Nix。可查看[安装选项](https://openspec.dev/docs/installation)。
 
 ## 文档
 
@@ -207,12 +207,6 @@ AI 编程助手很强大，但当需求只存在于聊天记录里时，结果�
 
 ```bash
 npm install -g @studyzy/openspec-cn@latest
-```
-
-若你是通过 Homebrew 安装的 OpenSpec：
-
-```bash
-brew upgrade openspec
 ```
 
 **刷新代理指令（agent instructions）**

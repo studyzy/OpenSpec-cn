@@ -8,6 +8,9 @@ on:
 jobs:
   release:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write # create the GitHub Release
+      actions: write # dispatch binaries.yml
 
     steps:
       - name: Checkout repository
@@ -16,14 +19,12 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '22.12.0'
           cache: 'pnpm'
           registry-url: 'https://registry.npmjs.org/'
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
-        with:
-          version: 9
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
@@ -35,3 +36,28 @@ jobs:
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: pnpm run release:ci
+
+      # `openspec-cn install` reads releases.atom and only installs a tag whose
+      # SHA256SUMS is attached, so the standalone binaries need a real GitHub
+      # Release. A pushed tag alone is not one.
+      - name: Create GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ github.ref_name }}
+        run: |
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            echo "GitHub Release $TAG already exists; skipping release creation."
+          else
+            gh release create "$TAG" \
+              --generate-notes \
+              --title "$TAG"
+          fi
+
+      # A Release created with GITHUB_TOKEN does not trigger the `release`
+      # event, so binaries.yml is dispatched explicitly. It accepts `tag` as a
+      # workflow_dispatch input, and GITHUB_TOKEN may dispatch workflows.
+      - name: Attach standalone binaries
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ github.ref_name }}
+        run: gh workflow run binaries.yml -f tag="$TAG"
