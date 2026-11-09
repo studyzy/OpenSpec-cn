@@ -171,7 +171,11 @@ jobs:
         if: runner.os == 'Windows'
         shell: pwsh
         run: |
-          Invoke-ScriptAnalyzer -Path scripts/binary/install.ps1 -Severity Warning,Error -ExcludeRule PSAvoidUsingWriteHost -EnableExit
+          # PSUseBOMForUnicodeEncodedFile has to be excluded alongside
+          # PSAvoidUsingWriteHost: the script is UTF-8 with Chinese in it, but a
+          # BOM breaks the documented `irm ... | iex` one-liner, which feeds the
+          # BOM to iex as the first characters of a command.
+          Invoke-ScriptAnalyzer -Path scripts/binary/install.ps1 -Severity Warning,Error -ExcludeRule PSAvoidUsingWriteHost,PSUseBOMForUnicodeEncodedFile -EnableExit
           # Not `python -m http.server`: that labels install.ps1 as bare
           # `text/plain`, and Windows PowerShell 5.1's irm then decodes the
           # UTF-8 Chinese as ANSI. GitHub's raw endpoint sends the charset.
