@@ -5,6 +5,8 @@ import https from 'https';
 import os from 'os';
 import path from 'path';
 import { execFile } from 'child_process';
+import net from 'net';
+import { fileURLToPath } from 'url';
 import { createRequire } from 'module';
 import {
   compareVersions,
@@ -404,6 +406,104 @@ describe('getAvailableCliUpdate', () => {
     }
   });
 
+  describe('an explicit request (version --check)', () => {
+    function withGlobalConfig(contents: string, run: () => Promise<void>) {
+      return async () => {
+        const xdgHome = fs.mkdtempSync(path.join(os.tmpdir(), 'openspec-vc-requested-'));
+        const previousXdg = process.env.XDG_CONFIG_HOME;
+        vi.spyOn(console, 'error').mockImplementation(() => {});
+        try {
+          process.env.XDG_CONFIG_HOME = xdgHome;
+          fs.mkdirSync(path.join(xdgHome, 'openspec'), { recursive: true });
+          fs.writeFileSync(path.join(xdgHome, 'openspec', 'config.json'), contents);
+          await run();
+        } finally {
+          if (previousXdg === undefined) {
+            delete process.env.XDG_CONFIG_HOME;
+          } else {
+            process.env.XDG_CONFIG_HOME = previousXdg;
+          }
+          fs.rmSync(xdgHome, { recursive: true, force: true });
+        }
+      };
+    }
+
+    it('runs when telemetry is off by env, while the passive check stays off', async () => {
+      for (const [key, value] of [
+        ['OPENSPEC_TELEMETRY', '0'],
+        ['DO_NOT_TRACK', '1'],
+      ] as const) {
+        process.env[key] = value;
+        await expect(checkForCliUpdate({ requested: true })).resolves.toEqual({
+          status: 'available',
+          latest: bumpMajor(OPENSPEC_VERSION),
+        });
+        await expect(checkForCliUpdate()).resolves.toEqual({ status: 'disabled', latest: null });
+        delete process.env[key];
+      }
+      expect(requests).toHaveLength(2);
+    });
+
+    it(
+      'runs when telemetry.enabled is false in global config',
+      withGlobalConfig(JSON.stringify({ telemetry: { enabled: false } }), async () => {
+        await expect(checkForCliUpdate({ requested: true })).resolves.toMatchObject({
+          status: 'available',
+        });
+        await expect(checkForCliUpdate()).resolves.toEqual({ status: 'disabled', latest: null });
+        expect(requests).toHaveLength(1);
+      })
+    );
+
+    it(
+      'runs when the global config cannot be parsed',
+      withGlobalConfig('{\n  "telemetry": {\n    "enabled": false\n  },\n}\n', async () => {
+        await expect(checkForCliUpdate({ requested: true })).resolves.toMatchObject({
+          status: 'available',
+        });
+        expect(requests).toHaveLength(1);
+      })
+    );
+
+    it('runs in CI, while the passive check stays off', async () => {
+      process.env.CI = 'true';
+      await expect(checkForCliUpdate({ requested: true })).resolves.toEqual({
+        status: 'available',
+        latest: bumpMajor(OPENSPEC_VERSION),
+      });
+      await expect(checkForCliUpdate()).resolves.toEqual({ status: 'disabled', latest: null });
+      expect(requests).toHaveLength(1);
+    });
+
+    it('still honors the update-check opt-out and the test guard', async () => {
+      process.env.OPENSPEC_TELEMETRY = '0';
+      process.env.CI = 'true';
+      for (const [key, value] of [
+        ['OPENSPEC_NO_UPDATE_CHECK', '1'],
+        ['OPENSPEC_NO_UPDATE_CHECK', ''],
+        ['NODE_ENV', 'test'],
+      ] as const) {
+        process.env[key] = value;
+        await expect(checkForCliUpdate({ requested: true })).resolves.toEqual({
+          status: 'disabled',
+          latest: null,
+        });
+        delete process.env[key];
+      }
+      expect(requests).toHaveLength(0);
+    });
+
+    it('still refuses a rejected registry', async () => {
+      process.env.OPENSPEC_TELEMETRY = '0';
+      process.env.npm_config_registry = 'http://169.254.169.254/';
+      await expect(checkForCliUpdate({ requested: true })).resolves.toEqual({
+        status: 'disabled',
+        latest: null,
+      });
+      expect(requests).toHaveLength(0);
+    });
+  });
+
   it('still runs when CI is explicitly switched off', async () => {
     for (const value of ['false', '0', 'no', '']) {
       process.env.CI = value;
@@ -679,6 +779,56 @@ describe('getAvailableCliUpdate against an unroutable registry', () => {
     expect(stderr).toBe('');
     expect(code).toBe(0);
     expect(Date.now() - startedAt).toBeLessThan(process.platform === 'win32' ? 12000 : 6000);
+  }, 30000);
+});
+
+describe('openspec version --check with telemetry off, in CI', () => {
+  it('still asks the registry', async () => {
+    // Counts connections only: the CLI speaks TLS, so the exchange fails
+    // and the result is "offline" — which proves a request was attempted,
+    // where the telemetry gate would have said "disabled" without one.
+    let connections = 0;
+    const server = net.createServer((socket) => {
+      connections++;
+      socket.destroy();
+    });
+    await new Promise<void>((resolve) => server.listen(0, '127.0.0.1', resolve));
+    const port = (server.address() as net.AddressInfo).port;
+    const xdgHome = fs.mkdtempSync(path.join(os.tmpdir(), 'openspec-vc-cli-'));
+    fs.mkdirSync(path.join(xdgHome, 'openspec'), { recursive: true });
+    fs.writeFileSync(
+      path.join(xdgHome, 'openspec', 'config.json'),
+      JSON.stringify({ telemetry: { enabled: false } })
+    );
+
+    const env: NodeJS.ProcessEnv = {
+      ...process.env,
+      OPENSPEC_TELEMETRY: '0',
+      DO_NOT_TRACK: '1',
+      XDG_CONFIG_HOME: xdgHome,
+      npm_config_registry: `https://127.0.0.1:${port}/`,
+    };
+    delete env.NODE_ENV;
+    delete env.OPENSPEC_NO_UPDATE_CHECK;
+    // A script reading --json often runs in CI; that must not stop it either.
+    env.CI = 'true';
+
+    const cliEntry = fileURLToPath(new URL('../../dist/cli/index.js', import.meta.url));
+    try {
+      const stdout = await new Promise<string>((resolve, reject) => {
+        execFile(
+          process.execPath,
+          [cliEntry, 'version', '--check', '--json'],
+          { env, timeout: 15000 },
+          (error, out) => (error ? reject(error) : resolve(String(out)))
+        );
+      });
+      expect(JSON.parse(stdout).update).toMatchObject({ status: 'offline', latest: null });
+      expect(connections).toBeGreaterThan(0);
+    } finally {
+      await new Promise<void>((resolve) => server.close(() => resolve()));
+      fs.rmSync(xdgHome, { recursive: true, force: true });
+    }
   }, 30000);
 });
 
@@ -1310,5 +1460,206 @@ describe('standalone binary that `openspec-cn` on PATH does not find', () => {
       const { execFileSync } = await import('child_process');
       expect(execFileSync('sh', ['-c', `printf %s ${quoted}`], { encoding: 'utf8' })).toBe(executable);
     }
+  });
+});
+
+/**
+ * The standalone binary updates with `openspec install`, which installs the
+ * newest GitHub release whose files are all attached, not npm's `latest`.
+ * A local server stands in for GitHub (and npm, to prove it is not asked).
+ */
+describe('standalone update check', () => {
+  const ENV_KEYS = [
+    'NODE_ENV',
+    'CI',
+    'OPENSPEC_NO_UPDATE_CHECK',
+    'DO_NOT_TRACK',
+    'OPENSPEC_TELEMETRY',
+    'npm_config_registry',
+  ] as const;
+  const RELEASES = '/studyzy/OpenSpec-cn/releases';
+
+  let server: http.Server;
+  let requests: string[];
+  let routes: Record<string, (res: http.ServerResponse) => void>;
+  let originalEnv: Record<string, string | undefined>;
+
+  function nextMinor(version: string, by = 1): string {
+    const [major, minor] = version.split('.').map((part) => Number.parseInt(part, 10));
+    return `${major}.${minor + by}.0`;
+  }
+
+  function feed(...versions: string[]) {
+    routes[`${RELEASES}.atom`] = (res) => {
+      res.writeHead(200, { 'content-type': 'application/atom+xml' });
+      res.end(
+        `<feed>${versions
+          .map((v) => `<entry><link href="https://github.com${RELEASES}/tag/v${v}"/></entry>`)
+          .join('')}</feed>`
+      );
+    };
+  }
+
+  function complete(version: string) {
+    // GitHub's answer for an attached file: a redirect to its storage.
+    routes[`${RELEASES}/download/v${version}/SHA256SUMS`] = (res) => {
+      res.writeHead(302, { location: '/storage/SHA256SUMS' });
+      res.end();
+    };
+  }
+
+  async function loadStandalone() {
+    vi.resetModules();
+    const versionCheck = await import('../../src/core/version-check.js');
+    versionCheck.markStandaloneBinary(path.join(os.tmpdir(), 'standalone-check', 'openspec'));
+    return versionCheck;
+  }
+
+  beforeEach(async () => {
+    requests = [];
+    routes = {
+      // npm already has a newer version: the window the issue is about.
+      '/@fission-ai/openspec/latest': (res) => {
+        res.writeHead(200, { 'content-type': 'application/json' });
+        res.end(JSON.stringify({ version: bumpMajor(OPENSPEC_VERSION) }));
+      },
+    };
+    server = http.createServer((req, res) => {
+      requests.push(req.url ?? '');
+      const route = routes[req.url ?? ''];
+      if (route) {
+        route(res);
+      } else {
+        res.writeHead(404);
+        res.end();
+      }
+    });
+    await new Promise<void>((resolve) => server.listen(0, '127.0.0.1', resolve));
+    const port = (server.address() as { port: number }).port;
+
+    originalEnv = Object.fromEntries(ENV_KEYS.map((key) => [key, process.env[key]]));
+    for (const key of ENV_KEYS) delete process.env[key];
+    // Every https request, whatever its host, reaches the local server with
+    // its path intact; only the TLS handshake and DNS are stubbed.
+    vi.spyOn(https, 'get').mockImplementation(((target: URL, ...rest: unknown[]) => {
+      const local = new URL(target.toString());
+      local.protocol = 'http:';
+      local.host = `127.0.0.1:${port}`;
+      return (http.get as unknown as (...args: unknown[]) => http.ClientRequest)(local, ...rest);
+    }) as unknown as typeof https.get);
+  });
+
+  afterEach(async () => {
+    for (const [key, value] of Object.entries(originalEnv)) {
+      if (value === undefined) delete process.env[key];
+      else process.env[key] = value;
+    }
+    vi.restoreAllMocks();
+    await new Promise<void>((resolve) => server.close(() => resolve()));
+  });
+
+  it('does not offer a release whose files are still being attached (#2185)', async () => {
+    const newer = nextMinor(OPENSPEC_VERSION);
+    feed(newer, OPENSPEC_VERSION);
+    complete(OPENSPEC_VERSION);
+    const { checkForCliUpdate } = await loadStandalone();
+
+    await expect(checkForCliUpdate()).resolves.toEqual({ status: 'current', latest: OPENSPEC_VERSION });
+    expect(requests).toEqual([`${RELEASES}.atom`, `${RELEASES}/download/v${newer}/SHA256SUMS`]);
+  });
+
+  it('offers the newest release that has its files, as the installer picks', async () => {
+    const preparing = nextMinor(OPENSPEC_VERSION, 2);
+    const ready = nextMinor(OPENSPEC_VERSION, 1);
+    feed(preparing, ready, OPENSPEC_VERSION);
+    complete(ready);
+    const { checkForCliUpdate } = await loadStandalone();
+
+    await expect(checkForCliUpdate()).resolves.toEqual({ status: 'available', latest: ready });
+    // The redirect to the file is not followed: knowing it exists is enough.
+    expect(requests).not.toContain('/storage/SHA256SUMS');
+    expect(requests).not.toContain('/@fission-ai/openspec/latest');
+  });
+
+  it('offers a complete newer release', async () => {
+    const newer = nextMinor(OPENSPEC_VERSION);
+    feed(newer, OPENSPEC_VERSION);
+    complete(newer);
+    const { checkForCliUpdate } = await loadStandalone();
+
+    await expect(checkForCliUpdate()).resolves.toEqual({ status: 'available', latest: newer });
+  });
+
+  it('needs only the feed when nothing in it is newer', async () => {
+    feed(OPENSPEC_VERSION, '0.1.0');
+    const { checkForCliUpdate } = await loadStandalone();
+
+    await expect(checkForCliUpdate()).resolves.toEqual({ status: 'current', latest: OPENSPEC_VERSION });
+    expect(requests).toEqual([`${RELEASES}.atom`]);
+  });
+
+  it('skips prerelease tags, as the installer does', async () => {
+    routes[`${RELEASES}.atom`] = (res) => {
+      res.writeHead(200);
+      res.end(
+        `<link href="${RELEASES}/tag/v${bumpMajor(OPENSPEC_VERSION)}-beta.1"/>` +
+          `<link href="${RELEASES}/tag/v${OPENSPEC_VERSION}"/>`
+      );
+    };
+    const { checkForCliUpdate } = await loadStandalone();
+
+    await expect(checkForCliUpdate()).resolves.toEqual({ status: 'current', latest: OPENSPEC_VERSION });
+  });
+
+  it('reports it could not check, rather than guessing, when GitHub refuses', async () => {
+    const newer = nextMinor(OPENSPEC_VERSION);
+    const rateLimited = (res: http.ServerResponse) => {
+      res.writeHead(403);
+      res.end();
+    };
+    const { checkForCliUpdate } = await loadStandalone();
+
+    routes[`${RELEASES}.atom`] = rateLimited;
+    await expect(checkForCliUpdate()).resolves.toEqual({ status: 'offline', latest: null });
+
+    feed(newer, OPENSPEC_VERSION);
+    routes[`${RELEASES}/download/v${newer}/SHA256SUMS`] = rateLimited;
+    await expect(checkForCliUpdate()).resolves.toEqual({ status: 'offline', latest: null });
+  });
+
+  it('reports it could not check when every newer release is incomplete', async () => {
+    feed(nextMinor(OPENSPEC_VERSION, 2), nextMinor(OPENSPEC_VERSION, 1));
+    const { checkForCliUpdate } = await loadStandalone();
+
+    await expect(checkForCliUpdate()).resolves.toEqual({ status: 'offline', latest: null });
+  });
+
+  it('reports it could not check when GitHub is unreachable', async () => {
+    const { checkForCliUpdate } = await loadStandalone();
+    await new Promise<void>((resolve) => server.close(() => resolve()));
+    // afterEach closes it again; give it a fresh one to close.
+    server = http.createServer();
+    await expect(checkForCliUpdate()).resolves.toEqual({ status: 'offline', latest: null });
+  });
+
+  it('gives up within the same time budget as the registry check', async () => {
+    const newer = nextMinor(OPENSPEC_VERSION);
+    feed(newer, OPENSPEC_VERSION);
+    // A probe that never answers.
+    routes[`${RELEASES}/download/v${newer}/SHA256SUMS`] = () => undefined;
+    const { checkForCliUpdate } = await loadStandalone();
+
+    const startedAt = Date.now();
+    await expect(checkForCliUpdate()).resolves.toEqual({ status: 'offline', latest: null });
+    expect(Date.now() - startedAt).toBeLessThan(2500);
+    server.closeAllConnections();
+  });
+
+  it('is not disabled by a registry setting it never uses', async () => {
+    process.env.npm_config_registry = 'http://registry.internal/';
+    feed(OPENSPEC_VERSION);
+    const { checkForCliUpdate } = await loadStandalone();
+
+    await expect(checkForCliUpdate()).resolves.toEqual({ status: 'current', latest: OPENSPEC_VERSION });
   });
 });

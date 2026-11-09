@@ -374,7 +374,7 @@ Error: /home/you/.config/openspec/config.json could not be parsed, so it was lef
 Fix it with "openspec config edit", or reset it with "openspec config reset --all".
 ```
 
-在修复之前，遥测和更新检查保持关闭。
+在修复之前，遥测和 `openspec-cn update` 中的后台更新检查保持关闭。显式的 `openspec-cn version --check` 仍会运行。
 
 ### openspec-cn config unset
 
@@ -2256,18 +2256,18 @@ Removed workset 'checkout'. Member folders were not touched.
 ```bash
 openspec-cn version                 # 本地版本和安装详情
 openspec-cn version --json          # 结构化的本地报告
-openspec-cn version --check         # 同时检查 registry 是否有更新
+openspec-cn version --check         # 同时检查是否有更新
 openspec-cn version --check --json  # 结构化的本地与更新报告
 ```
 
-不带 `--check` 时，此命令只在本地运行，不会联系 registry。它可以在 OpenSpec 项目之外使用。现有的 `openspec-cn --version` 标志仍是最简形式，只打印纯粹的版本号。
+不带 `--check` 时，此命令只在本地运行，不会发出网络请求。它可以在 OpenSpec 项目之外使用。现有的 `openspec-cn --version` 标志仍是最简形式，只打印纯粹的版本号。
 
 **选项**
 
 | 标志 | 作用 |
 |---|---|
 | `--json` | 打印一份带版本号的 JSON 文档而非文本。 |
-| `--check` | 检查所配置的 registry 是否有更新的发布版本。 |
+| `--check` | 检查是否有更新的发布版。npm、项目和源码安装会查询所配置的 npm registry；独立安装则改为查询 GitHub releases（见下文）。 |
 
 **输出**
 
@@ -2323,14 +2323,14 @@ OpenSpec 1.13.2 (npm, global)
 
 | 状态 | 含义 |
 |---|---|
-| `available` | registry 返回了一个比当前运行版本更新的安全版本。 |
+| `available` | 可以安装一个比当前运行版本更新的安全版本。 |
 | `current` | 检查已完成，未发现更新的版本。 |
-| `disabled` | 已有的隐私或更新检查设置阻止了 registry 访问。`latest` 为 `null`。 |
-| `offline` | registry 不可用或返回了不可用的响应。`latest` 为 `null`。 |
+| `disabled` | 已设置 `OPENSPEC_NO_UPDATE_CHECK`，或（仅 npm 安装）所配置的 registry 覆盖被拒绝。`latest` 为 `null`。 |
+| `offline` | registry 或 GitHub 不可用、拒绝了请求（例如触发速率限制），或返回了不可用的响应。`latest` 为 `null`。 |
 
-对于独立安装，更新命令是 `openspec-cn install`。
+对于独立安装，更新命令是 `openspec-cn install`，其检查与该命令能取到的内容一致：GitHub 上附带了 `SHA256SUMS` 的最新稳定发布版。几分钟前刚发布、文件尚未上传的版本不会被提示。npm registry 设置对此检查不适用。
 
-`DO_NOT_TRACK`、遥测退出选择、`OPENSPEC_NO_UPDATE_CHECK`、CI 检测以及被拒绝的非 HTTPS registry 覆盖都会禁用该检查。禁用和离线的检查仍以 0 退出，因为更新可用性是建议性的。此命令绝不升级 OpenSpec；`canSelfUpgrade` 只报告现有的 `openspec-cn update` 路径能否安全升级当前副本。
+由于 `--check` 是显式请求，即使遥测已关闭（`DO_NOT_TRACK`、`OPENSPEC_TELEMETRY=0`、`telemetry.enabled: false`）或在 CI 中，它也会运行。只有 `OPENSPEC_NO_UPDATE_CHECK`，或（对于 npm 安装）被拒绝的非 HTTPS registry 覆盖，才会关闭它。`openspec-cn update` 中的后台检查在上述所有情况下仍保持关闭。禁用和离线的检查仍以 0 退出，因为更新可用性只是建议性的。此命令绝不升级 OpenSpec；`canSelfUpgrade` 只报告现有的 `openspec-cn update` 路径能否安全升级当前副本。
 
 **退出码**
 

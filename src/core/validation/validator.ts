@@ -21,6 +21,7 @@ import {
   parseScenarioBlocks,
   isScenarioLabeledHeader,
   describeUnappliedContent,
+  isUnrecognizedDeltaSection,
   type RequirementBlock,
 } from '../parsers/requirement-blocks.js';
 import {
@@ -253,12 +254,15 @@ export class Validator {
         // ignored - reported as a WARNING rather than an ERROR because a
         // handful of pre-format archived changes still carry this shape, and
         // the fix is to move the block, not to reject the change outright.
+        // Under an unrecognized `## ... Requirements` header it is an ERROR:
+        // that header reads as a delta operation, so the requirement was meant
+        // to be applied and archive refuses it too (#2195).
         for (const orphan of plan.orphanedRequirements) {
           const where = orphan.section
             ? `位于 "## ${orphan.section}" 之下`
             : '位于第一个 "## " 章节之前';
           issues.push({
-            level: 'WARNING',
+            level: isUnrecognizedDeltaSection(orphan.section) ? 'ERROR' : 'WARNING',
             path: entryPath,
             line: orphan.line,
             message: `需求 "${orphan.name}" ${where}，这不是 delta 章节，因此会被忽略。请将其移到 "## ADDED Requirements"、"## MODIFIED Requirements"、"## REMOVED Requirements" 或 "## RENAMED Requirements" 之下。`,

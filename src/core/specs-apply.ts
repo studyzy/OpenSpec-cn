@@ -15,6 +15,7 @@ import {
   describeScenarioBalance,
   describeUnappliedContent,
   foldRequirementName,
+  isUnrecognizedDeltaSection,
   parseDeltaSpec,
   normalizeRequirementName,
   type RequirementBlock,
@@ -241,7 +242,17 @@ export async function buildUpdatedSpec(
   // A well-formed requirement written outside every delta section is not
   // applied. Say so here as well as in validate: archive is the last point at
   // which the author can still notice, and the block reads exactly like one
-  // that would have applied.
+  // that would have applied. Under an unrecognized `## ... Requirements`
+  // header it was meant as a delta operation, so refuse rather than drop it -
+  // the same verdict validate gives (#2195).
+  const misplaced = plan.orphanedRequirements.find((o) => isUnrecognizedDeltaSection(o.section));
+  if (misplaced) {
+    throw new Error(
+      `${specName} 校验失败 - 需求 "${misplaced.name}"（第 ${misplaced.line} 行）位于 ` +
+        `"## ${misplaced.section}" 之下，这不是 delta 章节，因此不会被应用。` +
+        `请将其移到 ADDED/MODIFIED/REMOVED/RENAMED Requirements 之下。`
+    );
+  }
   for (const orphan of plan.orphanedRequirements) {
     const where = orphan.section
       ? `位于 "## ${orphan.section}" 之下`
@@ -1347,7 +1358,7 @@ function extractPurposeSection(content: string): string | undefined {
   const fenceMask = buildCodeFenceMask(masked);
   const isStructural = (i: number) => !fenceMask[i];
 
-  const start = masked.findIndex((line, i) => isStructural(i) && /^##\s+Purpose\s*$/i.test(line));
+  const start = masked.findIndex((line, i) => isStructural(i) && /^##\s+Purpose(?:[ \t]+#+)?\s*$/i.test(line));
   if (start === -1) return undefined;
 
   let end = masked.length;
