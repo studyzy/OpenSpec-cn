@@ -1,4 +1,4 @@
-﻿# Installs the standalone `openspec-cn.exe` (no Node.js needed) on Windows.
+# Installs the standalone `openspec-cn.exe` (no Node.js needed) on Windows.
 #
 #   irm https://raw.githubusercontent.com/studyzy/OpenSpec-cn/main/scripts/binary/install.ps1 | iex
 #
