@@ -108,7 +108,13 @@ export function installerBase(env: NodeJS.ProcessEnv = process.env): string {
 // environment variable), never as part of the command text.
 const POSIX_RUNNER =
   'f=$(mktemp) || exit 1; { curl -fsSL "$1" -o "$f" 2>/dev/null || wget -q -O "$f" "$1"; } && sh "$f"; s=$?; rm -f "$f"; exit $s';
-const WINDOWS_RUNNER = 'irm $env:OPENSPEC_INSTALLER_URL | iex';
+// 脚本是 UTF-8 且含中文。GitHub raw 返回 text/plain; charset=utf-8，
+// 但镜像或代理可能省略 charset，Windows PowerShell 5.1 就会按 ANSI 解码
+// 导致中文乱码；加 BOM 又会让 iex 把 BOM 当成命令的一部分。这里按字节取回
+// 后显式按 UTF-8 解码。RawContentStream 在 5.1 与 7 上都可用。
+const WINDOWS_RUNNER =
+  '$r = Invoke-WebRequest -UseBasicParsing $env:OPENSPEC_INSTALLER_URL; ' +
+  'iex ([Text.Encoding]::UTF8.GetString($r.RawContentStream.ToArray()))';
 
 /**
  * Downloads and runs the installer with the same tools as the documented

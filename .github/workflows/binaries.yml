@@ -172,7 +172,10 @@ jobs:
         shell: pwsh
         run: |
           Invoke-ScriptAnalyzer -Path scripts/binary/install.ps1 -Severity Warning,Error -ExcludeRule PSAvoidUsingWriteHost -EnableExit
-          $server = Start-Process python -ArgumentList '-m', 'http.server', '8765', '--directory', 'dist-bin' -PassThru -WindowStyle Hidden
+          # Not `python -m http.server`: that labels install.ps1 as bare
+          # `text/plain`, and Windows PowerShell 5.1's irm then decodes the
+          # UTF-8 Chinese as ANSI. GitHub's raw endpoint sends the charset.
+          $server = Start-Process python -ArgumentList 'scripts/binary/serve-utf8.py', 'dist-bin', '8765' -PassThru -WindowStyle Hidden
           foreach ($i in 1..40) { try { Invoke-WebRequest -UseBasicParsing http://127.0.0.1:8765/SHA256SUMS | Out-Null; break } catch { Start-Sleep -Milliseconds 500 } }
           # A user PATH entry that relies on expansion must survive untouched.
           $key = [Microsoft.Win32.Registry]::CurrentUser.OpenSubKey('Environment', $true)
