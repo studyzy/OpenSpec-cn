@@ -93,25 +93,21 @@ bash scripts/binary/e2e.sh dist-bin/openspec-cn-<asset>
 
 ## capture-released-fingerprints.mjs
 
-Records a fingerprint of every file each released OpenSpec version generated,
-and every tool-folder path it wrote, into
-`src/core/shared/released-generated-fingerprints.ts`. `openspec update` uses it
-to tell an untouched file from an earlier release (safe to remove when it is
-no longer needed) from a file the user edited (always kept).
+把每个已发布 OpenSpec 版本生成的所有文件、以及它写过的每个工具目录路径，
+记录其指纹到 `src/core/shared/released-generated-fingerprints.ts`。
+`openspec-cn update` 用它区分"来自早期版本且未被改动的文件"（不再需要时
+可安全删除）与"用户编辑过的文件"（始终保留）。
 
-**When to use**: After every npm release, so the next release recognizes its
-output. A release left out of the list is not unsafe: its untouched files are
-only kept, as if the user had edited them.
+**何时使用**：每次 npm 发布之后，以便下一个版本能识别它的输出。
+未列入清单的发布并不危险：它留下的未改动文件只会被保留，视同用户编辑过。
 
-**Usage**:
+**用法**：
 ```bash
 pnpm build
 node scripts/capture-released-fingerprints.mjs [--cache DIR] [--only 1.16.0]
 pnpm build
 ```
 
-It installs each release from npm into the cache folder, runs
-`init --tools all` in throwaway projects with a throwaway HOME (once per
-profile, former default workflow set and delivery the release supports), and
-rewrites the list. Releases
-before 0.12 have no non-interactive `init` and are skipped.
+它会从 npm 安装每个发布版本到缓存目录，在一次性项目中以一次性 HOME 运行
+`init --tools all`（按该版本支持的每个 profile、旧默认工作流集合和交付方式各运行一次），
+然后重写清单。0.12 之前的版本没有非交互式 `init`，会被跳过。

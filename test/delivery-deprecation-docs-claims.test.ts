@@ -12,8 +12,8 @@ const read = (...segments: string[]) =>
   fs.readFileSync(path.join(REPO_ROOT, 'docs-lab', ...segments), 'utf-8');
 
 const PROFILES = read('customize', 'profiles.md');
-const DELIVERY_SECTION = PROFILES.split('## Delivery: skills, commands, or both')[1].split(
-  '## Switching profiles'
+const DELIVERY_SECTION = PROFILES.split('## 交付方式：skills、commands 或两者')[1].split(
+  '## 切换 profiles'
 )[0];
 const CONFIG_JSON = read('reference', 'configuration', 'config-json.md');
 const DELIVERY_FIELD = CONFIG_JSON.split('### delivery')[1].split('### workflows')[0];
@@ -25,22 +25,22 @@ describe('command deprecation documentation', () => {
   const notice = formatCommandDeprecationNotice(['claude'], 'both').join('\n');
 
   it('names the same release in the notice and every page', () => {
-    expect(notice).toContain('go away in OpenSpec 2.0');
-    expect(DELIVERY_SECTION).toContain('go away in OpenSpec 2.0');
-    expect(DELIVERY_FIELD).toContain('go away in OpenSpec 2.0');
-    expect(SETUP).toContain('go away in OpenSpec 2.0');
+    expect(notice).toContain('将在 OpenSpec 2.0 中移除');
+    expect(DELIVERY_SECTION).toContain('将在 OpenSpec 2.0 中移除');
+    expect(DELIVERY_FIELD).toContain('将在 OpenSpec 2.0 中移除');
+    expect(SETUP).toContain('将在 OpenSpec 2.0 中移除');
   });
 
   it('gives the same way to switch, and the same promise about edited files', () => {
-    expect(notice).toContain('openspec config set delivery skills && openspec update');
-    expect(DELIVERY_SECTION).toContain('set `delivery` to `skills` and run `openspec update`');
-    expect(notice).toContain('any you edited are kept and listed');
-    expect(DELIVERY_SECTION).toContain('any you edited are kept and listed');
+    expect(notice).toContain('openspec-cn config set delivery skills && openspec-cn update');
+    expect(DELIVERY_SECTION).toContain('把 `delivery` 设为 `skills` 并运行 `openspec-cn update`');
+    expect(notice).toContain('你编辑过的文件会被保留并列出');
+    expect(DELIVERY_SECTION).toContain('你编辑过的会保留并列出');
   });
 
   it('offers no way to keep commands, since 2.0 removes them under every setting', () => {
     expect(notice).not.toMatch(/delivery (both|commands)/);
-    expect(DELIVERY_SECTION).not.toMatch(/set `delivery` to `(both|commands)`/);
+    expect(DELIVERY_SECTION).not.toMatch(/把 `delivery` 设为 `(both|commands)`/);
     expect(DELIVERY_FIELD).not.toMatch(/keeps its value/);
   });
 

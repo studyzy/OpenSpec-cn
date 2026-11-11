@@ -184,25 +184,21 @@ export function formatKeptCommandFiles(
   result: Pick<CommandReconcileResult, 'kept' | 'unchecked'>
 ): string[][] {
   const blocks: string[][] = [];
-  const files = (count: number) => `command ${count === 1 ? 'file' : 'files'}`;
+  const files = (count: number) => `${count} 个命令文件`;
 
   if (result.kept.length > 0) {
     blocks.push([
-      `Kept ${result.kept.length} ${files(result.kept.length)} that ${
-        result.kept.length === 1 ? 'does' : 'do'
-      } not match what OpenSpec generated (likely edited):`,
+      `保留了 ${files(result.kept.length)}，其内容与 OpenSpec 生成的不一致（可能已被编辑）：`,
       ...result.kept.map((cmdPath) => `  ${cmdPath}`),
-      'Move anything worth keeping into the skill, then delete by hand.',
+      '把需要保留的内容移入 skill，然后手动删除这些文件。',
     ]);
   }
 
   if (result.unchecked.length > 0) {
     blocks.push([
-      `Left ${result.unchecked.length} ${files(result.unchecked.length)} in place because ${
-        result.unchecked.length === 1 ? 'it' : 'they'
-      } could not be read or removed:`,
+      `保留了 ${files(result.unchecked.length)}，因为它们无法被读取或删除：`,
       ...result.unchecked.map((cmdPath) => `  ${cmdPath}`),
-      'Check the file permissions or symbolic links, then delete by hand.',
+      '请检查文件权限或符号链接，然后手动删除。',
     ]);
   }
 

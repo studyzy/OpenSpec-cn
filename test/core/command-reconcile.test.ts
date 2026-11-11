@@ -106,9 +106,9 @@ describe('reconcileCommandFiles', () => {
     );
     expect(formatKeptCommandFiles(result)).toEqual([
       [
-        'Kept 1 command file that does not match what OpenSpec generated (likely edited):',
+        '保留了 1 个命令文件，其内容与 OpenSpec 生成的不一致（可能已被编辑）：',
         `  ${edited}`,
-        'Move anything worth keeping into the skill, then delete by hand.',
+        '把需要保留的内容移入 skill，然后手动删除这些文件。',
       ],
     ]);
   });
@@ -154,9 +154,9 @@ describe('reconcileCommandFiles', () => {
     expect(result.removed).not.toContain(unreadable);
     expect(formatKeptCommandFiles(result)).toEqual([
       [
-        'Left 1 command file in place because it could not be read or removed:',
+        '保留了 1 个命令文件，因为它们无法被读取或删除：',
         `  ${unreadable}`,
-        'Check the file permissions or symbolic links, then delete by hand.',
+        '请检查文件权限或符号链接，然后手动删除。',
       ],
     ]);
 

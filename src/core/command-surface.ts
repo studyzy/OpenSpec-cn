@@ -70,9 +70,9 @@ export function formatCommandDeprecationNotice(
   }
 
   return [
-    'Command files are deprecated and go away in OpenSpec 2.0. Your OpenSpec skills stay and do the same work.',
-    '  Switch now: openspec config set delivery skills && openspec update',
-    '  This removes only the command files OpenSpec generated; any you edited are kept and listed.',
-    `  Details: ${COMMAND_DEPRECATION_URL}`,
+    '命令文件已弃用，将在 OpenSpec 2.0 中移除。你的 OpenSpec skills 会保留并完成同样的工作。',
+    '  现在切换：openspec-cn config set delivery skills && openspec-cn update',
+    '  这只会删除 OpenSpec 生成的命令文件；你编辑过的文件会被保留并列出。',
+    `  详情：${COMMAND_DEPRECATION_URL}`,
   ];
 }

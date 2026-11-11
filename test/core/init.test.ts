@@ -1416,7 +1416,7 @@ describe('InitCommand', () => {
 
       expect(await fs.readFile(proposeCmd, 'utf-8')).toBe(edited);
       expect(await fileExists(applyCmd)).toBe(false);
-      expect(getConsoleOutput()).toContain('Kept 1 command file that does not match');
+      expect(getConsoleOutput()).toContain('保留了 1 个命令文件');
     });
 
     it('should create skills for multiple tools at once', async () => {

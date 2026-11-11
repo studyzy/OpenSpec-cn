@@ -891,7 +891,7 @@ export class UpdateCommand {
           'after-generation'
         )) {
           if (hasMovableContent(migration)) {
-            this.log(chalk.dim(`Removed old ${describeLegacyMigration(migration)} from ${migration.from}`));
+            this.log(chalk.dim(`已从 ${migration.from} 移除旧的 ${describeLegacyMigration(migration)}`));
           }
           if (reportKept) this.reportKeptInPlace(migration);
         }
@@ -916,7 +916,7 @@ export class UpdateCommand {
         removed.push(rel);
       } catch (error) {
         const message = error instanceof Error ? error.message : String(error);
-        this.log(chalk.yellow(`Could not remove ${rel}: ${message}`));
+        this.log(chalk.yellow(`无法移除 ${rel}：${message}`));
       }
     }
     if (removed.length > 0) {
@@ -925,8 +925,8 @@ export class UpdateCommand {
       }
       this.log(
         chalk.dim(
-          `Removed ${removed.length} unchanged file${removed.length === 1 ? '' : 's'} ` +
-            'an earlier OpenSpec release left where no tool reads them now.'
+          `已移除 ${removed.length} 个未被修改的文件，` +
+            '这些是早期 OpenSpec 版本遗留的、当前已无工具读取的文件。'
         )
       );
     }
@@ -1355,7 +1355,7 @@ export class UpdateCommand {
       (await legacyCleanupDeletesOnlyReleasedOutput(projectPath, detection));
     if (onlyReleasedOutput) {
       this.log(
-        chalk.dim('These are unchanged files from an earlier OpenSpec release, so update removes them.')
+        chalk.dim('这些是早期 OpenSpec 版本遗留且未被修改的文件，因此 update 会移除它们。')
       );
       this.log();
     }
@@ -1374,15 +1374,15 @@ export class UpdateCommand {
       // commands may still need openspec/AGENTS.md, so nothing old is removed.
       if (onlyReleasedOutput && (legacyUpgrade.failedTools ?? []).length > 0) {
         this.legacyCleanupSkipped = true;
-        this.log(chalk.yellow('⚠ Kept the earlier release files because a tool failed to set up. Fix it and run update again.'));
+        this.log(chalk.yellow('⚠ 由于有工具设置失败，已保留早期版本文件。修复后请再次运行 update。'));
         return legacyUpgrade;
       }
       await this.performImmediateLegacyCleanup(projectPath, detection, legacyUpgrade);
       if (onlyReleasedOutput && hasGlobalPrompts) {
         this.log(
           chalk.dim(
-            `Left ${detection.globalSlashCommandFiles.length} OpenSpec prompt file(s) in your home folder: ` +
-              'other projects may still use them. Run "openspec update --force" to remove them.'
+            `已在你的主目录中保留 ${detection.globalSlashCommandFiles.length} 个 OpenSpec 提示文件：` +
+              '其他项目可能仍在使用它们。运行 "openspec-cn update --force" 可移除。'
           )
         );
         return legacyUpgrade;

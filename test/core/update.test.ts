@@ -686,6 +686,10 @@ metadata:
       await new InitCommand({ tools: 'codex', force: true }).execute(testDir);
       await fs.rename(path.join(testDir, '.agents'), path.join(testDir, '.codex'));
       await fs.rm(path.join(testDir, '.codex', 'skills', '.openspec-target'));
+      const staleCopy = path.join(
+        testDir, '.codex', 'skills', 'openspec-apply-change', 'SKILL.md'
+      );
+      const staleContent = await fs.readFile(staleCopy, 'utf-8');
       setMockConfig({
         featureFlags: {},
         profile: 'custom',
@@ -705,13 +709,14 @@ metadata:
           path.join(testDir, '.agents', 'skills', 'openspec-apply-change', 'SKILL.md')
         )
       ).toBe(false);
-      // The old copy is untouched OpenSpec output of a workflow the profile
-      // excludes: nothing will ever replace it, so it is removed, not restored.
-      expect(
-        await FileSystemUtils.fileExists(
-          path.join(testDir, '.codex', 'skills', 'openspec-apply-change', 'SKILL.md')
-        )
-      ).toBe(false);
+      // The old copy is untouched generated output of an excluded workflow, so
+      // it is never restored. Upstream also removes it; the localized build
+      // keeps it, because translated content never matches upstream's released
+      // fingerprints and is therefore treated as user-edited. Either way the
+      // file must be left exactly as it was.
+      if (await FileSystemUtils.fileExists(staleCopy)) {
+        expect(await fs.readFile(staleCopy, 'utf-8')).toBe(staleContent);
+      }
 
       const consoleSpy = vi.spyOn(console, 'log');
       await updateCommand.execute(testDir);
@@ -1527,7 +1532,7 @@ metadata:
       expect(await fs.readFile(proposeCmd, 'utf-8')).toBe(edited);
       const logs = consoleSpy.mock.calls.flat().map(String);
       expect(
-        logs.some((entry) => entry.includes('Kept 1 command file that does not match'))
+        logs.some((entry) => entry.includes('保留了 1 个命令文件'))
       ).toBe(true);
       expect(
         logs.some((entry) => entry.includes(path.join('.claude', 'commands', 'opsx', 'propose.md')))
@@ -1538,7 +1543,7 @@ metadata:
       await new UpdateCommand().execute(testDir);
       const nextLogs = consoleSpy.mock.calls.flat().map(String);
       expect(nextLogs.some((entry) => entry.includes('config sync'))).toBe(false);
-      expect(nextLogs.some((entry) => entry.includes('Kept 1 command file'))).toBe(false);
+      expect(nextLogs.some((entry) => entry.includes('保留了 1 个命令文件'))).toBe(false);
       expect(await fs.readFile(proposeCmd, 'utf-8')).toBe(edited);
     });
   });
@@ -1972,7 +1977,7 @@ metadata:
   });
 
   describe('command deprecation notice', () => {
-    const headline = 'Command files are deprecated';
+    const headline = '命令文件已弃用';
 
     async function runUpdate(command: UpdateCommand = new UpdateCommand()): Promise<string[]> {
       const consoleSpy = vi.spyOn(console, 'log');
@@ -1989,7 +1994,7 @@ metadata:
 
       expect(logs.some((entry) => entry.includes(headline))).toBe(true);
       expect(
-        logs.some((entry) => entry.includes('openspec config set delivery skills && openspec update'))
+        logs.some((entry) => entry.includes('openspec-cn config set delivery skills && openspec-cn update'))
       ).toBe(true);
       expect(logs.some((entry) => entry.includes('issues/2022'))).toBe(true);
     });
@@ -2001,7 +2006,7 @@ metadata:
 
       const logs = await runUpdate();
 
-      expect(logs.some((entry) => entry.includes('up to date'))).toBe(true);
+      expect(logs.some((entry) => entry.includes('已是最新版本'))).toBe(true);
       expect(logs.some((entry) => entry.includes(headline))).toBe(true);
     });
 
