@@ -24,7 +24,7 @@ CLI 将机器级设置存放在 macOS 与 Linux 的 `~/.config/openspec/config.j
 
 ### delivery
 
-init 将工作流作为 skills、斜杠命令还是两者安装。默认为 `both`。
+init 将工作流作为 skills、斜杠命令还是两者安装。默认为 `both`。命令已弃用，将在 OpenSpec 2.0 中移除，届时只安装 skills（[#2022](https://github.com/Fission-AI/OpenSpec/issues/2022)）。
 
 ### workflows
 

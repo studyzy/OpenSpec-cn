@@ -44,6 +44,11 @@ openspec-cn config profile
 
 ## 交付方式：skills、commands 或两者
 
+> [!IMPORTANT]
+> 命令文件已弃用，无论交付方式如何设置，都将在 OpenSpec 2.0 中移除。你的 OpenSpec skills 会保留并完成同样的工作：直接说明要做的任务，或按名称调用 skill（在 Claude Code 中用 `/openspec-propose` 代替 `/opsx:propose`）。在此之前，只要某个已配置的工具会获得命令文件，`openspec-cn update` 每次运行都会提醒你。
+>
+> 现在就想切换的话，把 `delivery` 设为 `skills` 并运行 `openspec-cn update`。它只删除 OpenSpec 生成的命令文件；你编辑过的会保留并列出，这样你可以把需要的内容移入 skill。该设置对你的机器上所有项目生效，所以要在每个项目中都运行一次 `openspec-cn update`。计划进展见 [#2022](https://github.com/Fission-AI/OpenSpec/issues/2022)。
+
 交付方式是 profile 的一个设置，让你选择只安装 skills、只安装 commands，还是两者都装。默认是 `both`。[设置你的项目](../start/setup.md#the-workflow-files-skills-and-commands) 解释了这两种形式以及为什么两者都存在。该字段的精确契约在 [CLI settings (config.json)](../reference/configuration/config-json.md#delivery)。
 
 两种修改方式：

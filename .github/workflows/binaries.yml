@@ -171,11 +171,22 @@ jobs:
         if: runner.os == 'Windows'
         shell: pwsh
         run: |
-          # PSUseBOMForUnicodeEncodedFile has to be excluded alongside
+# PSUseBOMForUnicodeEncodedFile has to be excluded alongside
           # PSAvoidUsingWriteHost: the script is UTF-8 with Chinese in it, but a
           # BOM breaks the documented `irm ... | iex` one-liner, which feeds the
           # BOM to iex as the first characters of a command.
           Invoke-ScriptAnalyzer -Path scripts/binary/install.ps1 -Severity Warning,Error -ExcludeRule PSAvoidUsingWriteHost,PSUseBOMForUnicodeEncodedFile -EnableExit
+          # Each CPU source install.ps1 reads must name this runner's asset on
+          # its own, so the fallback works where RuntimeInformation is empty (#2220).
+          $want = ($env:ASSET -split '-')[1]
+          foreach ($shell in 'pwsh', 'powershell') {
+            $probe = "try { [string][System.Runtime.InteropServices.RuntimeInformation, mscorlib]::OSArchitecture } catch { 'unresolved' }; [Environment]::GetEnvironmentVariable('PROCESSOR_ARCHITECTURE', 'Machine')"
+            $runtime, $machine = & $shell -NoProfile -Command $probe
+            Write-Host "$shell : RuntimeInformation=$runtime PROCESSOR_ARCHITECTURE=$machine"
+            if ($runtime -notin 'unresolved', '' -and $runtime -ne $want) { throw "$shell RuntimeInformation says $runtime, expected $want" }
+            $mapped = if ($machine -eq 'AMD64') { 'x64' } else { "$machine".ToLowerInvariant() }
+            if ($mapped -ne $want) { throw "$shell PROCESSOR_ARCHITECTURE says $machine, expected $want" }
+          }
           # Not `python -m http.server`: that labels install.ps1 as bare
           # `text/plain`, and Windows PowerShell 5.1's irm then decodes the
           # UTF-8 Chinese as ANSI. GitHub's raw endpoint sends the charset.

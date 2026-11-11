@@ -104,7 +104,7 @@ openspec/
 
 有些工具只以 skill 形式安装。当工具能直接运行 skill 时，init 会跳过 commands 并说明（`Commands skipped for: codex (uses skills)`）。
 
-我们更偏好 skills，并预期最终会退役 commands。
+命令已弃用，将在 OpenSpec 2.0 中移除；skills 会保留。[Profiles](../customize/profiles.md#delivery-skills-commands-or-both) 说明了如何立即切换。
 
 #### 更改安装内容
 
