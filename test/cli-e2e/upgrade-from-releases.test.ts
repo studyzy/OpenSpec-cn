@@ -145,7 +145,7 @@ describe.skipIf(!enabled)('upgrading projects from released versions', () => {
 
     const first = run(currentBin, ['update'], box);
     expect(first.status, first.output).toBe(0);
-    expect(first.output).not.toContain('Run with --force to auto-cleanup');
+    expect(first.output).not.toContain('使用 --force 自动清理旧版文件');
     expect(first.output).not.toMatch(/differs? from the copy/);
 
     expect(await findStaleReleasedFiles(box.project)).toEqual([]);
@@ -161,7 +161,7 @@ describe.skipIf(!enabled)('upgrading projects from released versions', () => {
     const before = snapshot(box.project);
     const second = run(currentBin, ['update'], box);
     expect(second.status, second.output).toBe(0);
-    expect(second.output).toContain('up to date');
+    expect(second.output).toContain('已是最新版本');
     expect(snapshot(box.project)).toEqual(before);
   }, 600_000);
 
@@ -200,7 +200,7 @@ describe.skipIf(!enabled)('upgrading projects from released versions', () => {
     expect(leftoversInFormerRoots(box.project)).toEqual([]);
 
     const before = snapshot(box.project);
-    expect(run(currentBin, ['update'], box).output).toContain('up to date');
+    expect(run(currentBin, ['update'], box).output).toContain('已是最新版本');
     expect(snapshot(box.project)).toEqual(before);
   }, 600_000);
 
@@ -220,7 +220,7 @@ describe.skipIf(!enabled)('upgrading projects from released versions', () => {
 
     const result = run(currentBin, ['update'], box);
     expect(result.status, result.output).toBe(0);
-    expect(result.output).not.toMatch(/Kept \d+ command files?/);
+    expect(result.output).not.toMatch(/保留了 \d+ 个命令文件/);
     const commands = listFiles(box.project).filter((rel) => /(^|\/)opsx[-/:][^/]+$/.test(rel));
     expect(commands).toEqual([]);
   }, 600_000);
@@ -279,7 +279,7 @@ describe.skipIf(!enabled)('upgrading projects from released versions', () => {
 
     const result = run(currentBin, ['update'], box);
     expect(result.status, result.output).toBe(0);
-    expect(result.output).toContain('Run with --force to auto-cleanup');
+    expect(result.output).toContain('使用 --force 自动清理旧版文件');
     for (const rel of before) {
       expect(existsSync(path.join(box.project, rel)), rel).toBe(true);
     }
@@ -301,7 +301,7 @@ describe.skipIf(!enabled)('upgrading projects from released versions', () => {
       expect(existsSync(path.join(box.project, '.agents', 'workflows', name)), name).toBe(true);
     }
     expect(leftoversInFormerRoots(box.project)).toEqual([]);
-    expect(run(currentBin, ['update'], box).output).toContain('up to date');
+    expect(run(currentBin, ['update'], box).output).toContain('已是最新版本');
   }, 600_000);
 
   it('removes nothing old when a tool fails to set up', async () => {
@@ -312,7 +312,7 @@ describe.skipIf(!enabled)('upgrading projects from released versions', () => {
 
     const result = run(currentBin, ['update'], box);
     expect(result.status).not.toBe(0);
-    expect(result.output).toContain('Failed to set up Claude Code');
+    expect(result.output).toContain('Claude Code 设置失败');
     expect(snapshot(box.project)).toEqual(before);
   }, 600_000);
 
