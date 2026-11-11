@@ -356,8 +356,8 @@ const RELEASES_URL = 'https://github.com/studyzy/OpenSpec-cn/releases';
  * time, or every listed newer release is still incomplete.
  */
 async function fetchLatestStandaloneRelease(): Promise<string | null> {
-  // The same total budget as the registry check, across every request.
-  const deadline = Date.now() + REQUEST_TIMEOUT_MS;
+  // GitHub's feed and readiness probe share the longer standalone budget.
+  const deadline = Date.now() + VERSION_PROBE_TIMEOUT_MS;
   const feed = await httpsGet(new URL(`${RELEASES_URL}.atom`), { deadline, followRedirects: true });
   if (!feed || feed.status !== 200) return null;
 

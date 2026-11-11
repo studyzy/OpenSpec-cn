@@ -1581,10 +1581,14 @@ describe('standalone update check', () => {
     expect(requests).not.toContain('/@fission-ai/openspec/latest');
   });
 
-  it('offers a complete newer release', async () => {
+  it('allows the feed and file probe to share the five-second budget', async () => {
     const newer = nextMinor(OPENSPEC_VERSION);
     feed(newer, OPENSPEC_VERSION);
     complete(newer);
+    const serveFeed = routes[`${RELEASES}.atom`];
+    routes[`${RELEASES}.atom`] = (res) => setTimeout(() => serveFeed(res), 1000);
+    const serveProbe = routes[`${RELEASES}/download/v${newer}/SHA256SUMS`];
+    routes[`${RELEASES}/download/v${newer}/SHA256SUMS`] = (res) => setTimeout(() => serveProbe(res), 1000);
     const { checkForCliUpdate } = await loadStandalone();
 
     await expect(checkForCliUpdate()).resolves.toEqual({ status: 'available', latest: newer });
@@ -1642,7 +1646,7 @@ describe('standalone update check', () => {
     await expect(checkForCliUpdate()).resolves.toEqual({ status: 'offline', latest: null });
   });
 
-  it('gives up within the same time budget as the registry check', async () => {
+  it('gives up within the five-second budget', async () => {
     const newer = nextMinor(OPENSPEC_VERSION);
     feed(newer, OPENSPEC_VERSION);
     // A probe that never answers.
@@ -1651,9 +1655,9 @@ describe('standalone update check', () => {
 
     const startedAt = Date.now();
     await expect(checkForCliUpdate()).resolves.toEqual({ status: 'offline', latest: null });
-    expect(Date.now() - startedAt).toBeLessThan(2500);
+    expect(Date.now() - startedAt).toBeLessThan(6000);
     server.closeAllConnections();
-  });
+  }, 10000);
 
   it('is not disabled by a registry setting it never uses', async () => {
     process.env.npm_config_registry = 'http://registry.internal/';
