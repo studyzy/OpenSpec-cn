@@ -592,7 +592,7 @@ export async function setupPreparedStore(
   // longer describes reality - refuse and let a rerun re-prepare.
   if (kind === 'missing' && (await fs.access(storeRoot).then(() => true, () => false))) {
     throw new StoreError(
-      `The path ${storeRoot} was created while setup was waiting for confirmation.`,
+      `路径 ${storeRoot} 在 setup 等待确认期间被创建。`,
       'store_setup_path_changed',
       {
         target: 'store.root',
@@ -814,7 +814,7 @@ export async function registerExistingStore(
   const id = metadata?.id ?? explicitId ?? inferStoreIdFromPath(storeRoot);
   if (!metadata && !input.allowCreateIdentity) {
     throw new StoreError(
-      `Turn this OpenSpec root into store '${id}'?`,
+      `将此 OpenSpec 根目录变为 store '${id}' 吗？`,
       'store_register_identity_confirmation_required',
       {
         target: 'store.metadata',
@@ -974,11 +974,11 @@ function assertNoRegisteredStoreInside(
   const listed = nested.map((other) => `'${other.id}' (${other.storeRoot})`).join(', ');
   const unregister = nested.map((other) => `openspec store unregister ${other.id}`).join(', then ');
   throw new StoreError(
-    `Store remove refuses to delete ${storeRoot}: it contains ${nested.length === 1 ? 'another registered store' : 'other registered stores'}: ${listed}.`,
+    `store remove 拒绝删除 ${storeRoot}：其中包含${nested.length === 1 ? '另一个已注册的 store' : '其他已注册的 store'}：${listed}。`,
     'store_remove_contains_registered_store',
     {
       target: 'store.root',
-      fix: `Unregister or remove ${nested.length === 1 ? 'that store' : 'those stores'} first (${unregister}), or run "openspec store unregister ${id}" to forget '${id}' without deleting files.`,
+      fix: `请先注销或移除${nested.length === 1 ? '该 store' : '这些 store'}（${unregister}），或运行 "openspec-cn store unregister ${id}" 仅遗忘 '${id}' 而不删除文件。`,
     }
   );
 }

@@ -26,7 +26,7 @@ export const GlobalConfigSchema = z
       .string()
       .optional()
       .describe(
-        'Store id used as fallback root when no explicit --store, local root, or project-level store: pointer resolves'
+        '在没有显式 --store、本地根目录或项目级 store: 指针时，用作回退根目录的 store id'
       ),
     // passthrough keeps runtime-managed fields (anonymousId, noticeSeen) valid
     // under CLI validate when users only set telemetry.enabled.

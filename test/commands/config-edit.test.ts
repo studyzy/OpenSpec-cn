@@ -208,7 +208,7 @@ describe('config edit', () => {
     await runConfigCommand(['edit']);
 
     expect(process.exitCode).toBe(1);
-    expect(errors()).toContain('unterminated quote');
+    expect(errors()).toContain('未闭合的引号');
     expect(fs.existsSync(fixture.logPath)).toBe(false);
   }, T);
 

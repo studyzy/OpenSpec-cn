@@ -220,7 +220,7 @@ describe('buildUpdatedSpec (RENAMED pairing)', () => {
           '- TO: `### Requirement: Invoice Creation`',
         ].join('\n')
       )
-    ).rejects.toThrow(/RENAMED entry on line 3 has no matching TO:/);
+    ).rejects.toThrow(/RENAMED 条目缺少配对的 TO/);
   });
 
   it('refuses a rename whose TO is written before its FROM', async () => {
@@ -233,7 +233,7 @@ describe('buildUpdatedSpec (RENAMED pairing)', () => {
           '- FROM: `### Requirement: Late Fees`',
         ].join('\n')
       )
-    ).rejects.toThrow(/RENAMED entry on line 3 has no matching FROM:/);
+    ).rejects.toThrow(/RENAMED 条目缺少配对的 FROM/);
   });
 
   it('refuses a trailing FROM with no TO', async () => {
@@ -247,7 +247,7 @@ describe('buildUpdatedSpec (RENAMED pairing)', () => {
           '- FROM: `### Requirement: Invoice Generation`',
         ].join('\n')
       )
-    ).rejects.toThrow(/RENAMED entry on line 5 has no matching TO:/);
+    ).rejects.toThrow(/RENAMED 条目缺少配对的 TO/);
   });
 });
 
@@ -284,7 +284,7 @@ describe('validate <change> (RENAMED pairing)', () => {
     );
 
     const errors = report.issues.filter((issue) => issue.level === 'ERROR');
-    expect(errors.some((issue) => /RENAMED FROM: "Late Fees" has no matching TO:/.test(issue.message))).toBe(
+    expect(errors.some((issue) => /RENAMED FROM: "Late Fees" 缺少配对的 TO:/.test(issue.message))).toBe(
       true
     );
     expect(report.valid).toBe(false);

@@ -345,7 +345,7 @@ describe('findPurposePlaceholderIssue', () => {
       },
       {
         name: 'generated sentence rewrapped across two lines by a formatter',
-        purpose: 'TBD - created by archiving\nchange c1. Update Purpose after archive.',
+        purpose: 'TBD —— 本能力由归档变更\nc1 时自动创建，归档后请手动更新其 Purpose。',
         line: 4,
       },
     ];

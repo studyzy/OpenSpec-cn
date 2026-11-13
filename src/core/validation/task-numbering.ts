@@ -55,7 +55,7 @@ export function findTaskNumberingIssues(
         issues.push({
           path: document.path,
           line: lineNumber,
-          message: `Task "${id}" is under group ${currentGroup}, but its leading number points to group ${taskGroup}. Move it to group ${taskGroup} or renumber it.`,
+          message: `任务 "${id}" 位于分组 ${currentGroup} 下，但其开头编号指向分组 ${taskGroup}。请将其移入分组 ${taskGroup} 或重新编号。`,
         });
       }
 
@@ -63,12 +63,12 @@ export function findTaskNumberingIssues(
       if (firstLocation !== undefined) {
         const firstDeclaration =
           firstLocation.path === document.path
-            ? `on line ${firstLocation.line}`
-            : `in ${firstLocation.path} on line ${firstLocation.line}`;
+            ? `第 ${firstLocation.line} 行`
+            : `${firstLocation.path} 第 ${firstLocation.line} 行`;
         issues.push({
           path: document.path,
           line: lineNumber,
-          message: `Task ID "${id}" is duplicated; it was first declared ${firstDeclaration}.`,
+          message: `任务 ID "${id}" 重复；它首次声明于 ${firstDeclaration}。`,
         });
       } else {
         firstLocationById.set(id, { path: document.path, line: lineNumber });

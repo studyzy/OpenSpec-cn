@@ -157,7 +157,7 @@ export function mergeOpenerTable(
 
     if (row.style === undefined) {
       throw invalidOpenerConfigError(
-        `'${id}' adds a new tool and must set style ('workspace-file' or 'attach-dirs')`,
+        `'${id}' 新增了一个工具，必须设置 style（'workspace-file' 或 'attach-dirs'）`,
         configPath
       );
     }

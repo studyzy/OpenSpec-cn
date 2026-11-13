@@ -639,7 +639,7 @@ describe('resolveOpenSpecRoot', () => {
         resolveOpenSpecRoot({ startPath: scratch, globalDataDir }),
         'unknown_store'
       );
-      expect(error.message).toContain("Global defaultStore 'ghost-plans'");
+      expect(error.message).toContain("全局 defaultStore 'ghost-plans'");
       expect(error.diagnostic.fix).toContain('openspec-cn config unset defaultStore');
     });
 

@@ -1068,7 +1068,7 @@ export class InitCommand {
       const failure = ownFolderErrors.get(other.value);
       if (failure) {
         // As update does: a tool whose folder failed keeps its commands.
-        failedTools.push({ name: `${other.name} (already set up here)`, error: failure });
+        failedTools.push({ name: `${other.name}（此处已配置）`, error: failure });
         continue;
       }
       if (!shouldReconcileCommandFilesForTool(other.value)) continue;
@@ -1085,17 +1085,16 @@ export class InitCommand {
     if (keptOwnSkills.length > 0) {
       console.log(
         chalk.yellow(
-          `Kept ${keptOwnSkills.length} skill folder${keptOwnSkills.length === 1 ? '' : 's'} that ` +
-            `${keptOwnSkills.length === 1 ? 'is' : 'are'} yours (a link, or a file): ${keptOwnSkills.join(', ')}. ` +
-            'Nothing was written there.'
+          `保留了 ${keptOwnSkills.length} 个属于你的 skill 文件夹（链接或文件）：${keptOwnSkills.join(', ')}。 ` +
+            '未向其写入任何内容。'
         )
       );
     }
     if (savedOwnSkills.length > 0) {
       console.log(
         chalk.yellow(
-          `Refreshed ${savedOwnSkills.length} skill${savedOwnSkills.length === 1 ? '' : 's'} you had edited; ` +
-            `your ${savedOwnSkills.length === 1 ? 'copy is' : 'copies are'} saved as ${savedOwnSkills.join(', ')}.`
+          `已刷新你编辑过的 ${savedOwnSkills.length} 个 skill；` +
+            `你的副本已保存为 ${savedOwnSkills.join(', ')}。`
         )
       );
     }

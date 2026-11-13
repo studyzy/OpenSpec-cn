@@ -224,7 +224,7 @@ function collectLegacyToolMigrations(
         );
       } catch {
         console.warn(
-          `Skipping legacy ${legacy.root}/ migration because the directory resolves outside this project.`
+          `跳过旧版 ${legacy.root}/ 的迁移，因为该目录解析到本项目之外。`
         );
         continue;
       }
@@ -302,7 +302,7 @@ function migrateSkillDirs(
     if (requireDestination && !view.exists(destinationSkill)) continue;
     if (!areProjectArtifacts(projectPath, sourceSkill, destinationSkill)) {
       console.warn(
-        `Skipping legacy ${legacyRoot}/skills/${dirName} migration because it resolves outside this project.`
+        `跳过旧版 ${legacyRoot}/skills/${dirName} 的迁移，因为它解析到本项目之外。`
       );
       continue;
     }
@@ -380,7 +380,7 @@ function migrateCommandFiles(
     if (requireDestination && !view.exists(destination)) continue;
     if (!areProjectArtifacts(projectPath, source, destination)) {
       console.warn(
-        `Skipping legacy ${legacyPath} migration because it resolves outside this project.`
+        `跳过旧版 ${legacyPath} 的迁移，因为它解析到本项目之外。`
       );
       continue;
     }

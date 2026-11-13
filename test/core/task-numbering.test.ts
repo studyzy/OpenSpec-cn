@@ -19,7 +19,7 @@ describe('findTaskNumberingIssues', () => {
     expect(issues).toEqual([
       {
         line: 4,
-        message: 'Task ID "3.2.1" is duplicated; it was first declared on line 2.',
+        message: '任务 ID "3.2.1" 重复；它首次声明于 第 2 行。',
       },
     ]);
   });
@@ -36,12 +36,12 @@ describe('findTaskNumberingIssues', () => {
     expect(issues).toEqual([
       {
         line: 3,
-        message: 'Task ID "3.1" is duplicated; it was first declared on line 2.',
+        message: '任务 ID "3.1" 重复；它首次声明于 第 2 行。',
       },
       {
         line: 4,
         message:
-          'Task "4.1" is under group 3, but its leading number points to group 4. Move it to group 4 or renumber it.',
+          '任务 "4.1" 位于分组 3 下，但其开头编号指向分组 4。请将其移入分组 4 或重新编号。',
       },
     ]);
   });
@@ -106,7 +106,7 @@ describe('findTaskNumberingIssues', () => {
         path: 'frontend/tasks.md',
         line: 2,
         message:
-          'Task ID "2.1" is duplicated; it was first declared in backend/tasks.md on line 2.',
+          '任务 ID "2.1" 重复；它首次声明于 backend/tasks.md 第 2 行。',
       },
     ]);
   });

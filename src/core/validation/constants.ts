@@ -17,8 +17,8 @@ export const MAX_DELTAS_PER_CHANGE = 10;
 // placeholder through the same definition that produces it: a second, hand-copied
 // spelling would stop matching the day the wording changed, and a check that
 // matches nothing looks exactly like a check that found nothing.
-export const PURPOSE_PLACEHOLDER_PREFIX = 'TBD - created by archiving change ';
-export const PURPOSE_PLACEHOLDER_SUFFIX = '. Update Purpose after archive.';
+export const PURPOSE_PLACEHOLDER_PREFIX = 'TBD —— 本能力由归档变更 ';
+export const PURPOSE_PLACEHOLDER_SUFFIX = ' 时自动创建，归档后请手动更新其 Purpose。';
 
 // Validation messages
 export const VALIDATION_MESSAGES = {

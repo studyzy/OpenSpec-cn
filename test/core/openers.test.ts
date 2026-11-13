@@ -99,7 +99,7 @@ describe('openers core', () => {
     it('rejects a new tool that omits style', () => {
       expect(() =>
         mergeOpenerTable({ zed: { command: 'zed' } }, CONFIG_PATH)
-      ).toThrowError(/'zed' adds a new tool and must set style/);
+      ).toThrowError(/'zed' 新增了一个工具，必须设置 style/);
     });
 
     it('rejects malformed rows instead of ignoring them', () => {

@@ -1050,7 +1050,7 @@ Then expected result happens`;
       const updatedContent = await fs.readFile(mainSpecPath, 'utf-8');
       expect(updatedContent).toContain('# test-capability Specification');
       expect(updatedContent).toContain('## Purpose');
-      expect(updatedContent).toContain(`created by archiving change ${changeName}`);
+      expect(updatedContent).toContain(`本能力由归档变更 ${changeName} 时自动创建`);
       expect(updatedContent).toContain('## Requirements');
       expect(updatedContent).toContain('### Requirement: The system SHALL provide test capability');
       expect(updatedContent).toContain('#### Scenario: Basic test');
@@ -1528,7 +1528,7 @@ The system SHALL award loyalty points on each completed order.
       const mainSpecPath = path.join(tempDir, 'openspec', 'specs', 'loyalty', 'spec.md');
       const updatedContent = await fs.readFile(mainSpecPath, 'utf-8');
       expect(updatedContent).toContain('Tracks loyalty points earned and redeemed across the storefront.');
-      expect(updatedContent).not.toContain('TBD - created by archiving change');
+      expect(updatedContent).not.toContain('TBD —— 本能力由归档变更 ');
       expect(updatedContent).toContain('### Requirement: Earn Points');
     });
 
@@ -1557,7 +1557,7 @@ The system SHALL award loyalty points on each completed order.
       const mainSpecPath = path.join(tempDir, 'openspec', 'specs', 'loyalty', 'spec.md');
       const updatedContent = await fs.readFile(mainSpecPath, 'utf-8');
       expect(updatedContent).toContain('Tracks loyalty points earned and redeemed across the storefront.');
-      expect(updatedContent).not.toContain('TBD - created by archiving change');
+      expect(updatedContent).not.toContain('TBD —— 本能力由归档变更 ');
       expect(updatedContent).toContain('### Requirement: Earn Points');
     });
 
@@ -1593,7 +1593,7 @@ The system SHALL normalize config files on load.
       // The fenced example is part of the authored Purpose - masking fenced
       // lines out of the body would silently truncate it.
       expect(updatedContent).toContain('retries: 3');
-      expect(updatedContent).not.toContain('TBD - created by archiving change');
+      expect(updatedContent).not.toContain('TBD —— 本能力由归档变更 ');
     });
 
     it('should keep the TBD Purpose placeholder when the delta has no Purpose (issue #1413)', async () => {
@@ -1617,7 +1617,7 @@ The system SHALL send a referral invite.
       const mainSpecPath = path.join(tempDir, 'openspec', 'specs', 'referrals', 'spec.md');
       const updatedContent = await fs.readFile(mainSpecPath, 'utf-8');
       expect(updatedContent).toContain(
-        `TBD - created by archiving change ${changeName}. Update Purpose after archive.`
+        `TBD —— 本能力由归档变更 ${changeName} 时自动创建，归档后请手动更新其 Purpose。`
       );
     });
 
@@ -1647,7 +1647,7 @@ Illustration only - not this capability's purpose.
       const mainSpecPath = path.join(tempDir, 'openspec', 'specs', 'payouts', 'spec.md');
       const updatedContent = await fs.readFile(mainSpecPath, 'utf-8');
       expect(updatedContent).toContain(
-        `TBD - created by archiving change ${changeName}. Update Purpose after archive.`
+        `TBD —— 本能力由归档变更 ${changeName} 时自动创建，归档后请手动更新其 Purpose。`
       );
       expect(updatedContent).not.toContain("Illustration only - not this capability's purpose.\n## Requirements");
     });
@@ -1675,7 +1675,7 @@ The system SHALL send a notification.
       const mainSpecPath = path.join(tempDir, 'openspec', 'specs', 'notifications', 'spec.md');
       const updatedContent = await fs.readFile(mainSpecPath, 'utf-8');
       expect(updatedContent).toContain(
-        `TBD - created by archiving change ${changeName}. Update Purpose after archive.`
+        `TBD —— 本能力由归档变更 ${changeName} 时自动创建，归档后请手动更新其 Purpose。`
       );
     });
 
@@ -1709,12 +1709,12 @@ The system SHALL handle widgets.
       const mainSpecPath = path.join(tempDir, 'openspec', 'specs', 'widgets', 'spec.md');
       const updatedContent = await fs.readFile(mainSpecPath, 'utf-8');
       expect(updatedContent).toContain(
-        `TBD - created by archiving change ${changeName}. Update Purpose after archive.`
+        `TBD —— 本能力由归档变更 ${changeName} 时自动创建，归档后请手动更新其 Purpose。`
       );
       expect(updatedContent).not.toContain('### Requirement: Stray header');
       expect(updatedContent).toContain('### Requirement: Real Requirement');
       expect(console.log).toHaveBeenCalledWith(
-        expect.stringContaining('widgets - delta Purpose ignored (it would leave the new spec unreadable)')
+        expect.stringContaining('widgets - 已忽略 delta Purpose（会让新 spec 无法读取）')
       );
 
       // The archive still completed rather than aborting.
@@ -1752,11 +1752,11 @@ The system SHALL handle gadgets.
         'utf-8'
       );
       expect(updatedContent).toContain(
-        `TBD - created by archiving change ${changeName}. Update Purpose after archive.`
+        `TBD —— 本能力由归档变更 ${changeName} 时自动创建，归档后请手动更新其 Purpose。`
       );
       expect(updatedContent).not.toContain('# Not a spec title');
       expect(console.log).toHaveBeenCalledWith(
-        expect.stringContaining('gadgets - delta Purpose ignored')
+        expect.stringContaining('gadgets - 已忽略 delta Purpose')
       );
       // The rebuilt spec must still satisfy the validator archive itself runs.
       const report = await new Validator().validateSpecContent('gadgets', updatedContent);
@@ -1795,12 +1795,12 @@ retries: 3
         'utf-8'
       );
       expect(updatedContent).toContain(
-        `TBD - created by archiving change ${changeName}. Update Purpose after archive.`
+        `TBD —— 本能力由归档变更 ${changeName} 时自动创建，归档后请手动更新其 Purpose。`
       );
       // Exactly one Requirements section, and the requirement is still visible.
       expect(updatedContent.match(/^## Requirements$/gm)).toHaveLength(1);
       expect(console.log).toHaveBeenCalledWith(
-        expect.stringContaining('mesh-config - delta Purpose ignored')
+        expect.stringContaining('mesh-config - 已忽略 delta Purpose')
       );
       const report = await new Validator().validateSpecContent('mesh-config', updatedContent);
       expect(report.issues.filter(i => i.level === 'ERROR')).toHaveLength(0);
@@ -1917,11 +1917,11 @@ The system SHALL track widgets.
         // lands in the file, where it can hide the headers the parsers rely on
         // and blank the document out in a markdown renderer.
         expect(updatedContent).toContain(
-          `TBD - created by archiving change ${changeName}. Update Purpose after archive.`
+          `TBD —— 本能力由归档变更 ${changeName} 时自动创建，归档后请手动更新其 Purpose。`
         );
         expect(updatedContent).not.toContain('<!--');
         expect(console.log).toHaveBeenCalledWith(
-          expect.stringContaining(`${specFolder} - delta Purpose ignored`)
+          expect.stringContaining(`${specFolder} - 已忽略 delta Purpose`)
         );
         expect(updatedContent.match(/^## Requirements$/gm)).toHaveLength(1);
         const report = await new Validator().validateSpecContent(specFolder, updatedContent);
@@ -1968,7 +1968,7 @@ The system SHALL route events.
           'utf-8'
         );
         expect(updatedContent).toContain(
-          `TBD - created by archiving change ${changeName}. Update Purpose after archive.`
+          `TBD —— 本能力由归档变更 ${changeName} 时自动创建，归档后请手动更新其 Purpose。`
         );
         expect(updatedContent).not.toContain('Old abandoned purpose text');
         const report = await new Validator().validateSpecContent(`co-${label}`, updatedContent);
@@ -2005,7 +2005,7 @@ The system SHALL route events through the pipeline.
         'utf-8'
       );
       expect(updatedContent).toContain('ingest --> transform --> sink');
-      expect(updatedContent).not.toContain('TBD - created by archiving change');
+      expect(updatedContent).not.toContain('TBD —— 本能力由归档变更 ');
     });
 
     it('should keep the TBD placeholder when the delta Purpose is only a code fence (issue #1413)', async () => {
@@ -2039,7 +2039,7 @@ The system SHALL retry failed requests.
         'utf-8'
       );
       expect(updatedContent).toContain(
-        `TBD - created by archiving change ${changeName}. Update Purpose after archive.`
+        `TBD —— 本能力由归档变更 ${changeName} 时自动创建，归档后请手动更新其 Purpose。`
       );
       expect(updatedContent).not.toContain('retries: 3');
     });
@@ -2114,7 +2114,7 @@ The system SHALL do the thing.
         'utf-8'
       );
       expect(updatedContent).toContain(
-        `TBD - created by archiving change ${changeName}. Update Purpose after archive.`
+        `TBD —— 本能力由归档变更 ${changeName} 时自动创建，归档后请手动更新其 Purpose。`
       );
       expect(updatedContent).not.toContain('New capabilities only');
     });
@@ -2203,7 +2203,7 @@ The system SHALL refund the card on file.
       expect(updatedContent).toContain('### Requirement: Refund Card');
       // Dropping it silently would be indistinguishable from it having worked.
       expect(console.log).toHaveBeenCalledWith(
-        expect.stringContaining('billing - delta Purpose ignored; billing already has one')
+        expect.stringContaining('billing - 已忽略 delta Purpose；billing 已有该段落')
       );
     });
 
@@ -2986,7 +2986,7 @@ The system SHALL preserve legacy behavior.
       await expect(fs.access(changeDir)).resolves.not.toThrow();
       expect(process.exitCode).toBe(1);
       expect(console.log).toHaveBeenCalledWith(
-        expect.stringContaining("Spec inputs for 'legacy-layer' changed")
+        expect.stringContaining("'legacy-layer' 的规范输入发生了变化")
       );
     });
 
@@ -6450,7 +6450,7 @@ The system SHALL provide a replacement behavior.
 
       await expect(
         archiveCommand.execute(changeName, { yes: true })
-      ).rejects.toThrow(/changed before archive could write them/);
+      ).rejects.toThrow(/归档还未来得及写入/);
 
       expect(edited).toBe(true);
       await expect(fs.readFile(target, 'utf-8')).resolves.toBe(concurrent);
@@ -6491,7 +6491,7 @@ The system SHALL preserve a concurrent requirement.
 
       await expect(
         archiveCommand.execute(changeName, { yes: true })
-      ).rejects.toThrow(/changed before archive could retire them/);
+      ).rejects.toThrow(/归档还未来得及退役/);
 
       expect(edited).toBe(true);
       await expect(fs.readFile(target, 'utf-8')).resolves.toBe(concurrent);
@@ -6533,7 +6533,7 @@ The system SHALL preserve a concurrent requirement.
 
       await expect(
         archiveCommand.execute(changeName, { yes: true })
-      ).rejects.toThrow(/changed while archive was securing it for retirement/);
+      ).rejects.toThrow(/归档在为退役固定主规范 .* 期间，该规范发生了变化/);
 
       expect(edited).toBe(true);
       await expect(fs.readFile(target, 'utf-8')).resolves.toBe(concurrent);
@@ -6849,7 +6849,7 @@ The system SHALL provide a replacement behavior.
         });
 
         await expect(archiveCommand.execute(changeName, { yes: true })).rejects.toThrow(
-          /被移走的 spec 在退役校验后发生了变化.*The change was archived/s
+          /被移走的 spec 在退役校验后发生了变化.*变更为已归档/s
         );
 
         expect(edited).toBe(true);
@@ -6905,7 +6905,7 @@ The system SHALL provide a replacement behavior.
 
       await expect(
         archiveCommand.execute(changeName, { yes: true })
-      ).rejects.toThrow(/archived delta.*changed during the final move/);
+      ).rejects.toThrow(/已归档的增量规范发生了变化/);
 
       expect(edited).toBe(true);
       await expect(fs.readFile(target, 'utf-8')).resolves.toBe(original);
@@ -7679,12 +7679,12 @@ The system SHALL provide a new behavior.
         expect(payload.status).toEqual([{
           severity: 'error',
           code: 'archive_retirement_cleanup_failed',
-          message: expect.stringMatching(/change was archived.*Inspect all reported recovery paths/s),
+          message: expect.stringMatching(/变更为已归档.*请先检查所有报告的恢复路径/s),
           fix: '检查此诊断中已归档的变更和所有恢复路径；在清理前保留任何需要的内容。',
         }]);
       } else {
         await expect(archiveCommand.execute(changeName, { yes: true })).rejects.toThrow(
-          /change was archived.*Inspect all reported recovery paths/s
+          /变更为已归档.*请先检查所有报告的恢复路径/s
         );
       }
 
@@ -7799,7 +7799,7 @@ The system SHALL provide a new behavior.
       expect(payload.status).toEqual([{
         severity: 'error',
         code: 'archive_retirement_cleanup_failed',
-        message: expect.stringMatching(/被移走的 spec 在退役校验后发生了变化.*The change was archived/s),
+        message: expect.stringMatching(/被移走的 spec 在退役校验后发生了变化.*变更为已归档/s),
         fix: '检查此诊断中已归档的变更和所有恢复路径；在清理前保留任何需要的内容。',
       }]);
       expect(editedBackup).toBeDefined();
@@ -7945,7 +7945,7 @@ The system SHALL provide a new behavior.
         });
 
         await expect(archiveCommand.execute(changeName, { yes: true })).rejects.toThrow(
-/changed while archive was securing it for retirement/
+/归档在为退役固定主规范 .* 期间，该规范发生了变化/
         );
 
         expect((await fs.lstat(linkedSpec)).isSymbolicLink()).toBe(true);
@@ -7997,7 +7997,7 @@ The system SHALL provide a new behavior.
         });
 
         await expect(archiveCommand.execute(changeName, { yes: true })).rejects.toThrow(
-/A concurrent file appeared at/
+/归档退役 .* 时，该位置出现了并发创建的文件/
         );
 
         // The occupant that appeared at the link's path is left exactly as it
@@ -8157,7 +8157,7 @@ The system SHALL provide a new behavior.
         });
 
         await expect(archiveCommand.execute(changeName, { yes: true })).rejects.toThrow(
-          /rollback would overwrite a concurrent change/
+          /归档回滚会覆盖 .* 上并发产生的改动/
         );
 
         expect((await fs.stat(writtenTarget)).mode & 0o777).toBe(0o600);
@@ -8206,7 +8206,7 @@ The system SHALL provide a new behavior.
 
       await expect(
         archiveCommand.execute(changeName, { yes: true })
-      ).rejects.toThrow(/rollback would overwrite a concurrent change/);
+      ).rejects.toThrow(/归档回滚会覆盖 .* 上并发产生的改动/);
 
       await expect(fs.readFile(firstSpec, 'utf-8')).resolves.toBe(
         'concurrent regular occupant\n'
@@ -8286,7 +8286,7 @@ The system SHALL provide a new behavior.
 
       await expect(
         archiveCommand.execute(changeName, { yes: true })
-      ).rejects.toThrow(/rollback would overwrite a concurrent change/);
+      ).rejects.toThrow(/归档回滚会覆盖 .* 上并发产生的改动/);
 
       const aTarget = [...targets.keys()].find((target) =>
         target.includes(`${path.sep}a-layer${path.sep}`)

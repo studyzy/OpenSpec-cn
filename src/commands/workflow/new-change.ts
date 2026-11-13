@@ -105,11 +105,11 @@ function printImplicitRootNotice(root: ResolvedOpenSpecRoot): void {
 
   console.log();
   console.log(
-    chalk.dim(`Note: no OpenSpec root was found here, so one was created at ${location}/.`)
+    chalk.dim(`注意：此处未找到 OpenSpec 根目录，已在 ${location}/ 创建了一个。`)
   );
   console.log(
     chalk.dim(
-      'Run `openspec init` to finish setting this project up, or delete that directory if you meant a different project.'
+      '运行 `openspec-cn init` 完成此项目的设置，或在你本意是其他项目时删除该目录。'
     )
   );
 }

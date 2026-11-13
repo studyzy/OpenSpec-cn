@@ -53,7 +53,7 @@ describe('unrecognized keys in .openspec.yaml', () => {
     expect(warning).toBeDefined();
     expect(warning?.message).toContain('skip_design');
     expect(warning?.message).toContain('bogus_key');
-    expect(warning?.message).toMatch(/ignored/i);
+    expect(warning?.message).toMatch(/忽略/);
     expect(warning?.message).toContain('skip_specs');
     expect(report.valid).toBe(true);
   });

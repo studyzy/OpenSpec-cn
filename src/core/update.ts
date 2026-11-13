@@ -700,8 +700,8 @@ export class UpdateCommand {
       if (result.refreshedEdited.length > 0) {
         this.recorder?.addNote(
           'edited-skills',
-          `Update will replace your edits in ${result.refreshedEdited.join(', ')} and keep no copy. ` +
-            'OpenSpec refreshes the skills it installs on every update. Save your text first, and keep lasting changes in a skill of your own under another name.'
+          `更新将替换你在 ${result.refreshedEdited.join(', ')} 中的编辑且不保留副本。 ` +
+            'OpenSpec 每次更新都会刷新它安装的 skills。请先保存你的文本，并把持久的改动放在你自己另起名字的 skill 中。'
         );
       }
       return result;

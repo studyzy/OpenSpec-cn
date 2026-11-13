@@ -98,7 +98,7 @@ describe('openspec validate --archived checks archived task completion (#205)', 
     const result = await runCLI(['validate', '--archived'], { cwd: emptyDir });
 
     expect(result.exitCode).toBe(0);
-    expect(result.stdout).toContain('No archived changes found.');
+    expect(result.stdout).toContain('未找到已归档的变更。');
     await fs.rm(emptyDir, { recursive: true, force: true });
   });
 
@@ -115,7 +115,7 @@ describe('openspec validate --archived checks archived task completion (#205)', 
     const result = await runCLI(['validate', '--archived'], { cwd: dir });
 
     expect(result.exitCode).toBe(1);
-    expect(result.stdout).not.toContain('No archived changes found.');
+    expect(result.stdout).not.toContain('未找到已归档的变更。');
     await fs.rm(dir, { recursive: true, force: true });
   });
 

@@ -501,7 +501,7 @@ describe('InitCommand', () => {
       expect(await fs.readdir(outsideDir)).toEqual([]);
       expect((await fs.lstat(linkedSkillDir)).isSymbolicLink()).toBe(true);
       expect(vi.mocked(console.log).mock.calls.flat().join('\n')).toContain(
-        'Kept 1 skill folder that is yours'
+        '保留了 1 个属于你的 skill 文件夹'
       );
     });
 
@@ -1168,7 +1168,7 @@ describe('InitCommand', () => {
         .map(String);
       expect(logCalls.some((entry) => entry.includes('已创建：Codex'))).toBe(true);
       expect(logCalls.some((entry) => entry.includes('Zed Agent'))).toBe(true);
-      expect(logCalls.some((entry) => entry.includes('Other / Universal (shared .agents skills)'))).toBe(true);
+      expect(logCalls.some((entry) => entry.includes('其他 / 通用（共享 .agents skills）'))).toBe(true);
     });
 
     it.each(['antigravity,codex', 'codex,antigravity'])(
@@ -2100,7 +2100,7 @@ describe('InitCommand - profile and detection features', () => {
     const universal = config.choices.find((choice) => choice.value === 'agents');
 
     expect(universal).toBeDefined();
-    expect(universal?.name).toContain('Other / Universal');
+    expect(universal?.name).toContain('其他 / 通用');
     for (const term of ['universal', 'other', 'generic', 'unlisted']) {
       expect(universal?.searchAliases).toContain(term);
     }
@@ -2117,7 +2117,7 @@ describe('InitCommand - profile and detection features', () => {
     const [config] = searchableMultiSelectMock.mock.calls[0] as [{ emptyHint?: string }];
 
     expect(config.emptyHint).toContain('工具不在列表中？');
-    expect(config.emptyHint).toContain('Other / Universal (shared .agents skills)');
+    expect(config.emptyHint).toContain('其他 / 通用（共享 .agents skills）');
   });
 
   it('interactive init: confirming the cloud prompt writes files and persists the opt-in', async () => {

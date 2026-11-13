@@ -1186,7 +1186,7 @@ async function restoreSpecSnapshots(
             (await fs.readFile(snapshot.target)).equals(snapshot.content);
           if (unchangedSymlink || unchangedFile) continue;
           throw new Error(
-            `Archive rollback would overwrite a concurrent change at ${snapshot.target}.`
+            `归档回滚会覆盖 ${snapshot.target} 上并发产生的改动。`
           );
         } catch (error) {
           if ((error as NodeJS.ErrnoException).code !== 'ENOENT') throw error;
@@ -1213,7 +1213,7 @@ async function restoreSpecSnapshots(
               (snapshot.mode !== undefined && current.mode !== snapshot.mode)))
         ) {
           throw new Error(
-            `Archive rollback would overwrite a concurrent change at ${snapshot.target}.`
+            `归档回滚会覆盖 ${snapshot.target} 上并发产生的改动。`
           );
         }
         // Re-read at rollback: only restore when current content matches what
@@ -1235,7 +1235,7 @@ async function restoreSpecSnapshots(
           !currentContent.equals(snapshot.expectedContent)
         ) {
           throw new Error(
-            `Archive rollback would overwrite a concurrent change at ${snapshot.target}.`
+            `归档回滚会覆盖 ${snapshot.target} 上并发产生的改动。`
           );
         }
       }
@@ -1296,14 +1296,14 @@ async function finalizeRetirementBackups(
       snapshot.displacedPath = undefined;
     } catch (error) {
       errors.push(
-        `Could not finalize the retirement backup at ${displacedPath} ` +
-          `(${error instanceof Error ? error.message : String(error)}).`
+        `无法落定位于 ${displacedPath} 的退役备份 ` +
+          `（${error instanceof Error ? error.message : String(error)}）。`
       );
     }
   }
   if (errors.length > 0) {
     throw new RetirementCleanupError(
-      `${errors.join(' ')} The change was archived, but retirement cleanup did not complete. Inspect all reported recovery paths before recovery or cleanup.`
+      `${errors.join(' ')} 变更为已归档，但退役清理未完成。在执行恢复或清理之前，请先检查所有报告的恢复路径。`
     );
   }
 }
@@ -1452,8 +1452,8 @@ export class ArchiveCommand {
     if (nested) {
       throw new ArchiveBlockedError(
         'archive_change_is_namespace_folder',
-        `Cannot archive '${changeName}': ${describeNestedChange(nested)}`,
-        `Rename openspec/changes/${nested.nested[0]}/ to a flat change directory, then archive it.`
+        `无法归档 '${changeName}'：${describeNestedChange(nested)}`,
+        `请把 openspec/changes/${nested.nested[0]}/ 改名为扁平的变更目录，然后再归档。`
       );
     }
 
@@ -1746,7 +1746,7 @@ export class ArchiveCommand {
               targetBeforeBuild !== targetAfterBuild
             ) {
               throw new Error(
-                `Spec inputs for '${update.id}' changed while archive was preparing the preview.`
+                `归档在准备预览期间，'${update.id}' 的规范输入发生了变化。`
               );
             }
             prepared.push({
@@ -1830,7 +1830,7 @@ export class ArchiveCommand {
                 const current = currentById.get(proposed.update.id);
                 if (!current) {
                   throw new Error(
-                    `The delta for '${proposed.update.id}' changed while archive was awaiting confirmation.`
+                    `在归档等待确认期间，'${proposed.update.id}' 的增量规范发生了变化。`
                   );
                 }
                 if (
@@ -1838,8 +1838,8 @@ export class ArchiveCommand {
                   (await fingerprintPath(current.target)) !== proposed.targetFingerprint
                 ) {
                   throw new Error(
-                    `Spec inputs for '${proposed.update.id}' changed while archive was awaiting confirmation. ` +
-                      'No files were changed; review the new content and rerun.'
+                    `在归档等待确认期间，'${proposed.update.id}' 的规范输入发生了变化。 ` +
+                      '未改动任何文件；请检查新内容后重试。'
                   );
                 }
                 const rebuilt = await buildUpdatedSpec(current, changeName!, { silent: true });
@@ -1856,8 +1856,8 @@ export class ArchiveCommand {
                   outcome !== proposed.outcome
                 ) {
                   throw new Error(
-                    `Main spec '${proposed.update.id}' changed while archive was awaiting confirmation. ` +
-                      'No files were changed; review the new content and rerun.'
+                    `在归档等待确认期间，主规范 '${proposed.update.id}' 发生了变化。 ` +
+                      '未改动任何文件；请检查新内容后重试。'
                   );
                 }
               }
@@ -2008,8 +2008,8 @@ export class ArchiveCommand {
               (await fingerprintPath(proposed.update.target)) !== proposed.targetFingerprint
             ) {
               throw new Error(
-                `Spec inputs for '${proposed.update.id}' changed before archive could apply them. ` +
-                  'No files were changed; review the new content and rerun.'
+                `归档还未来得及应用，'${proposed.update.id}' 的规范输入就发生了变化。 ` +
+                  '未改动任何文件；请检查新内容后重试。'
               );
             }
           }
@@ -2040,7 +2040,7 @@ export class ArchiveCommand {
                   `${p.sourceFingerprint}\n${p.targetFingerprint}`
                 ) {
                   throw new Error(
-                    `Spec inputs for '${p.update.id}' changed before archive could write them.`
+                    `归档还未来得及写入，'${p.update.id}' 的规范输入就发生了变化。`
                   );
                 }
                 mutationAttempts.add(p.update.target);
@@ -2068,7 +2068,7 @@ export class ArchiveCommand {
                 beforeMutate: async () => {
                   if (retirementAuthorizationFingerprint === undefined) {
                     throw new Error(
-                      `The ${METADATA_FILENAME} retirement authorization is unavailable.`
+                      `${METADATA_FILENAME} 的退役授权不可用。`
                     );
                   }
                   await assertRetirementAuthorization(
@@ -2080,7 +2080,7 @@ export class ArchiveCommand {
                     `${p.sourceFingerprint}\n${p.targetFingerprint}`
                   ) {
                     throw new Error(
-                      `Spec inputs for '${p.update.id}' changed before archive could retire them.`
+                      `归档还未来得及退役，'${p.update.id}' 的规范输入就发生了变化。`
                     );
                   }
                   mutationAttempts.add(p.update.target);
@@ -2095,7 +2095,7 @@ export class ArchiveCommand {
                     p.targetMovableFingerprint
                   ) {
                     throw new Error(
-                      `Main spec '${p.update.id}' changed while archive was securing it for retirement.`
+                      `归档在为退役固定主规范 '${p.update.id}' 期间，该规范发生了变化。`
                     );
                   }
                 },
@@ -2106,7 +2106,7 @@ export class ArchiveCommand {
             const retirementSnapshot = specSnapshotsByTarget.get(p.update.target);
             if (retirementSnapshot === undefined || displacedPath === undefined) {
               throw new Error(
-                `Could not track the displaced main spec for '${p.update.id}' during retirement.`
+                `退役期间无法跟踪 '${p.update.id}' 被移走的主规范。`
               );
             }
             retirementSnapshot.displacedPath = displacedPath;
@@ -2202,7 +2202,7 @@ export class ArchiveCommand {
                 proposed.sourceFingerprint
               ) {
                 throw new Error(
-                  `The delta for '${proposed.update.id}' changed before the change could be archived.`
+                  `在变更被归档之前，'${proposed.update.id}' 的增量规范发生了变化。`
                 );
               }
             }
@@ -2245,7 +2245,7 @@ export class ArchiveCommand {
                   proposed.sourceContentFingerprint
                 ) {
                   throw new Error(
-                    `The archived delta for '${proposed.update.id}' changed during the final move.`
+                    `在最终移动期间，'${proposed.update.id}' 已归档的增量规范发生了变化。`
                   );
                 }
                 if (stagedSource) {
@@ -2313,7 +2313,7 @@ export class ArchiveCommand {
             if (rollbackErrors.length > 0) {
               const original = error instanceof Error ? error.message : String(error);
               throw new Error(
-                `${original} Rollback also failed: ${rollbackErrors.map(({ message }) => message).join(' ')}`
+                `${original} 回滚也失败了：${rollbackErrors.map(({ message }) => message).join(' ')}`
               );
             }
             throw error;
@@ -2422,7 +2422,7 @@ export class ArchiveCommand {
       if (isNonInteractivePromptError(error)) {
         throw new ArchiveBlockedError(
           'archive_change_name_required',
-          'A change name is required: no answer could be read from stdin.',
+          '必须提供变更名称：无法从 stdin 读取到回答。',
           withStoreFlag(root, `openspec-cn archive <change-name> ${rerunFlags(options).join(' ')}`)
         );
       }

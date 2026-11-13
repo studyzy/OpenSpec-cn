@@ -207,8 +207,8 @@ export function isConfigRootObject(parsed: unknown): boolean {
  */
 export function unreadableGlobalConfigMessage(configPath: string): string {
   return (
-    `Refusing to overwrite ${configPath}: it could not be parsed, so saving would replace every setting in it. ` +
-    'Fix it with "openspec config edit", or reset it with "openspec config reset --all".'
+    `拒绝覆盖 ${configPath}：它无法被解析，保存会替换其中的所有设置。 ` +
+    '请用 "openspec-cn config edit" 修复，或用 "openspec-cn config reset --all" 重置。'
   );
 }
 

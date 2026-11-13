@@ -132,8 +132,8 @@ export function inspectRelationships(input: InspectRelationshipsInput): Relation
           'info',
           'store_checkout_drift',
           drift.ahead > 0
-            ? `This store checkout has diverged from its upstream tracking branch (${drift.behind} behind, ${drift.ahead} ahead); teammates on newer commits may resolve different specs.`
-            : `This store checkout is ${behindCommits} behind its upstream tracking branch; teammates on newer commits may resolve different specs.`,
+            ? `此 store 检出已与其上游跟踪分支分叉（落后 ${drift.behind} 个提交，领先 ${drift.ahead} 个提交）；处于更新提交上的队友可能解析出不同的规范。`
+            : `此 store 检出落后其上游跟踪分支 ${behindCommits}；处于更新提交上的队友可能解析出不同的规范。`,
           { target: 'store.git' }
         )
       );

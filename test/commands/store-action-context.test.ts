@@ -61,7 +61,7 @@ describe('status actionContext for store-selected roots (#2013)', () => {
 
     expect(context.allowedEditRoots).toEqual([appRepo, storeRoot]);
     expect(context.constraints).toEqual([
-      `Change artifacts live in store 'plans' (${storeRoot}). Implementation edits go in ${appRepo}, the project on the current path that declares this store; ask the user before editing any other repository.`,
+      `变更制品存放在 store 'plans'（${storeRoot}）中。实现改动应落在 ${appRepo}，即当前路径上声明此 store 的项目；在编辑任何其他仓库之前，先询问用户。`,
     ]);
   });
 
@@ -99,7 +99,7 @@ describe('status actionContext for store-selected roots (#2013)', () => {
 
     expect(context.allowedEditRoots).toEqual([storeRoot]);
     expect(context.constraints).toEqual([
-      `Change artifacts live in store 'plans' (${storeRoot}). OpenSpec could not determine which repository implements this change; ask the user which repository to edit, and make implementation edits there.`,
+      `变更制品存放在 store 'plans'（${storeRoot}）中。OpenSpec 无法确定由哪个仓库实现此变更；请询问用户要编辑哪个仓库，并在那里进行实现改动。`,
     ]);
   });
 
@@ -149,7 +149,7 @@ describe('status actionContext for store-selected roots (#2013)', () => {
       linkedContext: [],
       allowedEditRoots: [repo],
       requiresAffectedAreaSelection: false,
-      constraints: ['Repo-local change artifacts and implementation edits are scoped to this project.'],
+      constraints: ['仓库本地的变更制品与实现改动都限定在本项目范围内。'],
     }));
   });
 });

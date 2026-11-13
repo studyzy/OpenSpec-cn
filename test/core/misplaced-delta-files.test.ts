@@ -333,7 +333,7 @@ describe('instructions apply with an unread delta file', () => {
     expect(instructions.warnings).toHaveLength(1);
     expect(instructions.warnings?.[0]).toContain('specs/user-auth.md');
     expect(instructions.warnings?.[0]).toContain('specs/user-auth/spec.md');
-    expect(instructions.warnings?.[0]).toContain('openspec validate my-change');
+    expect(instructions.warnings?.[0]).toContain('openspec-cn validate my-change');
     expect(report.valid).toBe(false);
   });
 

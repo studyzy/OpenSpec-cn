@@ -499,8 +499,8 @@ async function collectApplyWarnings(input: {
   if (specArtifacts.some((artifact) => skippedArtifacts?.has(artifact.id))) return [];
   const warnings = (await findUnreadDeltaFiles(path.join(changeDir, 'specs'))).map(
     (file) =>
-      `specs/${file.path} is not a capability's spec.md, so \`openspec validate ${changeName}\` rejects it and archive never merges it. ` +
-      `Move its requirements into specs/${file.expected}.`
+      `specs/${file.path} 不是任何能力的 spec.md，因此 \`openspec-cn validate ${changeName}\` 会拒绝它，归档时也永远不会合并它。 ` +
+      `请把其中的需求移入 specs/${file.expected}。`
   );
   const hasDeltas = specArtifacts.some(
     (artifact) => resolveArtifactOutputs(changeDir, artifact.generates).length > 0

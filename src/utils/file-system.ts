@@ -271,7 +271,7 @@ export class FileSystemUtils {
           return currentDir;
         }
         // Path component exists but is not a directory (edge case)
-        console.debug(`Path component ${currentDir} exists but is not a directory`);
+        console.debug(`路径组成部分 ${currentDir} 存在但不是目录`);
         return null;
       } catch (error: any) {
         if (error.code === 'ENOENT') {
@@ -371,7 +371,7 @@ export class FileSystemUtils {
       if (startIndex !== -1 && endIndex !== -1) {
         if (endIndex < startIndex) {
           throw new Error(
-            `Invalid marker state in ${filePath}. End marker appears before start marker.`
+            `${filePath} 中的标记状态无效：结束标记出现在起始标记之前。`
           );
         }
 

@@ -140,7 +140,7 @@ describe('openspec validate checks task numbering (#1520)', () => {
       expect.objectContaining({
         level: 'WARNING',
         line: 11,
-        message: expect.stringMatching(/11\.1.*duplicate/i),
+        message: expect.stringMatching(/11\.1.*重复/),
       }),
     ]);
   });
@@ -205,7 +205,7 @@ describe('openspec validate checks task numbering (#1520)', () => {
     );
 
     expect(result.exitCode).toBe(1);
-    expect(result.stderr).toContain('Task "10.7" is under group 11');
-    expect(result.stderr).toContain('Task ID "11.1" is duplicated');
+    expect(result.stderr).toContain('任务 "10.7" 位于分组 11 下');
+    expect(result.stderr).toContain('任务 ID "11.1" 重复');
   });
 });

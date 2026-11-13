@@ -219,7 +219,7 @@ export class CompletionCommand {
       // Get shell-specific config file path
       const configPaths: Record<string, string> = {
         // Uninstall also clears a block an older install left in ~/.zshrc.
-        zsh: zshrcDisplayPath() === '~/.zshrc' ? '~/.zshrc' : `${zshrcDisplayPath()} (and ~/.zshrc if an older install wrote there)`,
+        zsh: zshrcDisplayPath() === '~/.zshrc' ? '~/.zshrc' : `${zshrcDisplayPath()}（以及 ~/.zshrc，若旧版安装写入过那里）`,
         bash: '~/.bashrc',
         fish: 'Fish 配置',  // Fish doesn't modify profile, just removes script file
         powershell: '$PROFILE',
@@ -227,7 +227,7 @@ export class CompletionCommand {
       const configPath = configPaths[shell] || `${shell} 配置`;
 
       const confirmed = await confirm({
-        message: `是否从 ${configPath} 中移除 OpenSpec-cn 配置？`,
+        message: `是否从 ${configPath} 中移除 OpenSpec 配置？`,
         default: false,
       });
 

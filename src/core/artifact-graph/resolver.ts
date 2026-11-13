@@ -207,7 +207,7 @@ export function resolveSchema(name: string, projectRoot?: string): SchemaYaml {
   if (!schemaDir) {
     const availableSchemas = listSchemas(projectRoot);
     throw new Error(
-      `Schema '${normalizedName}' not found. Available schemas: ${availableSchemas.join(', ')}`
+      `未找到 Schema '${normalizedName}'。可用的 Schema：${availableSchemas.join(', ')}`
     );
   }
 

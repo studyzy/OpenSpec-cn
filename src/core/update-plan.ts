@@ -512,7 +512,7 @@ function listFilesRecursively(dirPath: string): string[] {
 export function formatUpdatePlan(plan: UpdatePlan): string {
   const lines: string[] = [];
   if (plan.changes.length === 0) {
-    lines.push('No changes: skills are up to date.');
+    lines.push('无变更：skills 已是最新。');
   } else {
     lines.push(`将变更 ${plan.changes.length} 个文件：`);
     const width = Math.max(...plan.changes.map((change) => change.action.length));

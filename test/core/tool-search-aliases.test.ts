@@ -23,7 +23,7 @@ describe('tool search aliases', () => {
   });
 
   it('names the entry so it reads as the escape hatch in the picker', () => {
-    expect(universal?.name).toMatch(/Other \/ Universal/);
+    expect(universal?.name).toMatch(/其他 \/ 通用/);
   });
 
   it('keeps every alias to a single word', () => {

@@ -222,7 +222,7 @@ artifacts:
     template: ${field === 'template' ? JSON.stringify(unsafePath) : 'proposal.md'}
 `;
 
-      expect(() => parseSchema(yaml)).toThrow(/relative path inside/u);
+      expect(() => parseSchema(yaml)).toThrow(/相对路径/u);
     });
 
     it('should reject an apply tracking path outside the change', () => {
@@ -239,7 +239,7 @@ apply:
   tracks: ../../outside.md
 `;
 
-      expect(() => parseSchema(yaml)).toThrow(/relative path inside/u);
+      expect(() => parseSchema(yaml)).toThrow(/相对路径/u);
     });
   });
 

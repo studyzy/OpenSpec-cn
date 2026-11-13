@@ -111,10 +111,10 @@ export function splitEditorCommand(value: string, platform: NodeJS.Platform = pr
 function spawnEditor(editor: string, filePath: string): ChildProcess {
   const words = path.isAbsolute(editor) && fs.existsSync(editor) ? [editor] : splitEditorCommand(editor);
   if (words === null) {
-    throw new Error('the value has an unterminated quote');
+    throw new Error('该值存在未闭合的引号');
   }
   if (words.length === 0) {
-    throw new Error('the value is blank');
+    throw new Error('该值为空白');
   }
   const [program, ...args] = words;
   return loadSpawn()(program, [...args, filePath], { stdio: 'inherit', shell: false });

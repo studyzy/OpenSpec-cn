@@ -316,7 +316,7 @@ function renderEntryLines(entry: ReferenceIndexEntry): string[] {
   const lines: string[] = [];
 
   if (entry.root !== undefined) {
-    lines.push(`Store ${entry.store_id} (${entry.root}):`);
+    lines.push(`Store ${entry.store_id}（${entry.root}）：`);
     for (const spec of entry.specs ?? []) {
       lines.push(specLine(spec));
     }
@@ -333,7 +333,7 @@ function renderEntryLines(entry: ReferenceIndexEntry): string[] {
     }
   } else {
     for (const diagnostic of entry.status) {
-      lines.push(`Store ${entry.store_id}: ${diagnostic.message}`);
+      lines.push(`Store ${entry.store_id}：${diagnostic.message}`);
       if (diagnostic.fix) {
         lines.push(`  Fix: ${diagnostic.fix}`);
       }

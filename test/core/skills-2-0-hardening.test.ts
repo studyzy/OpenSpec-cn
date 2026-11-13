@@ -627,7 +627,7 @@ describe('OpenSpec 2.0 skills: hardening', () => {
     );
     try {
       await expect(new InitCommand({ tools: 'cursor', force: true }).execute(project)).rejects.toThrow(
-        'Claude Code (already set up here)'
+        'Claude Code（此处已配置）'
       );
       expect(await exists('.agents/skills/openspec-propose/SKILL.md')).toBe(true);
       expect(await exists('.claude/commands/opsx/explore.md')).toBe(true);

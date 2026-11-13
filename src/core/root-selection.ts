@@ -379,7 +379,7 @@ async function resolveDefaultStoreRoot(
           ? `请注册该存储（openspec-cn store register <path> --id ${id}），或清除过时的全局默认值（openspec-cn config unset defaultStore）。`
           : error.diagnostic.fix;
       throw new RootSelectionError(
-        `Global defaultStore '${id}': ${error.message}`,
+        `全局 defaultStore '${id}'：${error.message}`,
         error.diagnostic.code,
         {
           ...(error.diagnostic.target ? { target: error.diagnostic.target } : {}),

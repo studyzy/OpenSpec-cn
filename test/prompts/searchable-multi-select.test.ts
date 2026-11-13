@@ -142,7 +142,7 @@ const searchChoices = [
   { name: 'Claude Code', value: 'claude' },
   { name: 'Amazon Q Developer', value: 'amazon-q' },
   {
-    name: 'Other / Universal',
+    name: '其他 / 通用',
     value: 'agents',
     searchAliases: ['unlisted', 'generic', '.agents'],
   },
@@ -293,26 +293,26 @@ describe('searchable-multi-select keybindings', () => {
       await setup(searchChoices);
       typeSearch('unlisted');
       expect(getSearchText()).toBe('unlisted');
-      expect(visibleNames()).toEqual(['Other / Universal']);
+      expect(visibleNames()).toEqual(['其他 / 通用']);
     });
 
     it('should match a second alias for the same choice', async () => {
       await setup(searchChoices);
       typeSearch('generic');
-      expect(visibleNames()).toEqual(['Other / Universal']);
+      expect(visibleNames()).toEqual(['其他 / 通用']);
     });
 
     it('should match an alias on a prefix, as it does for names', async () => {
       await setup(searchChoices);
       typeSearch('unlis');
-      expect(visibleNames()).toEqual(['Other / Universal']);
+      expect(visibleNames()).toEqual(['其他 / 通用']);
     });
 
     it('should match an alias regardless of case', async () => {
       await setup(searchChoices);
       if (!keypressHandler) throw new Error('No keypress handler registered');
       keypressHandler({ sequence: 'UNLISTED' });
-      expect(visibleNames()).toEqual(['Other / Universal']);
+      expect(visibleNames()).toEqual(['其他 / 通用']);
     });
 
     it('should never render an alias as part of a choice', async () => {
@@ -342,13 +342,13 @@ describe('searchable-multi-select keybindings', () => {
     });
 
     it('should point at the fallback choice when a search matches nothing', async () => {
-      await setup(searchChoices, undefined, 'Tool not listed? Pick "Other / Universal".');
+      await setup(searchChoices, undefined, 'Tool not listed? Pick "其他 / 通用".');
       typeSearch('nonesuch');
       expect(renderOutput).toContain('Tool not listed?');
     });
 
     it('should not show the fallback hint while matches remain', async () => {
-      await setup(searchChoices, undefined, 'Tool not listed? Pick "Other / Universal".');
+      await setup(searchChoices, undefined, 'Tool not listed? Pick "其他 / 通用".');
       typeSearch('claude');
       expect(renderOutput).not.toContain('Tool not listed?');
     });
@@ -366,7 +366,7 @@ describe('searchable-multi-select keybindings', () => {
       await setup(searchChoices);
       typeSearch('.agents');
       expect(getSearchText()).toBe('.agents');
-      expect(visibleNames()).toEqual(['Other / Universal']);
+      expect(visibleNames()).toEqual(['其他 / 通用']);
     });
 
     it('should ignore control chords rather than typing them', async () => {

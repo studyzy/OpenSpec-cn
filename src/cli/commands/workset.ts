@@ -38,7 +38,7 @@ export function registerWorksetCommand(program: Command): void {
       [] as string[]
     )
     .option('--tool <id>', '打开此 workset 的首选工具')
-    .option('--json', 'Output as JSON')
+    .option('--json', '以 JSON 格式输出')
     .action(async (name: string | undefined, _options: WorksetCreateOptions, command: Command) => {
       const worksetCommand = await loadWorksetCommand();
       await worksetCommand.create(name, command.optsWithGlobals());
@@ -48,7 +48,7 @@ export function registerWorksetCommand(program: Command): void {
     .command('list')
     .alias('ls')
     .description('显示已保存的 worksets 及其成员')
-    .option('--json', 'Output as JSON')
+    .option('--json', '以 JSON 格式输出')
     .action(async (_options: { json?: boolean }, command: Command) => {
       const worksetCommand = await loadWorksetCommand();
       await worksetCommand.list(command.optsWithGlobals());
@@ -73,7 +73,7 @@ export function registerWorksetCommand(program: Command): void {
     .command('remove <name>')
     .description('删除已保存的 workset（成员文件夹不会被触及）')
     .option('--yes', '非交互式确认删除')
-    .option('--json', 'Output as JSON')
+    .option('--json', '以 JSON 格式输出')
     .action(async (name: string, _options: WorksetRemoveOptions, command: Command) => {
       const worksetCommand = await loadWorksetCommand();
       await worksetCommand.remove(name, command.optsWithGlobals());

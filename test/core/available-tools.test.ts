@@ -123,7 +123,7 @@ describe('available-tools', () => {
 
       const devinTool = tools.find((t) => t.value === 'devin');
       expect(devinTool).toBeDefined();
-      expect(devinTool?.name).toBe('Devin Desktop (formerly Windsurf)');
+      expect(devinTool?.name).toBe('Devin Desktop（原 Windsurf）');
       expect(devinTool?.skillsDir).toBe('.devin');
     });
 

@@ -659,7 +659,7 @@ describe('store command', () => {
     await runStoreCommand(['register', storeRoot]);
 
     expect(confirm).toHaveBeenCalledWith({
-      message: "Turn this OpenSpec root into store 'team-context'?",
+      message: "将此 OpenSpec 根目录变为 store 'team-context' 吗？",
       default: false,
     });
     expect(fs.existsSync(getStoreMetadataPath(storeRoot))).toBe(false);

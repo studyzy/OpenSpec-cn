@@ -223,7 +223,7 @@ Delta 操作（使用 ## 标题）：
 用一到两句话（50 个字符以上，否则 `openspec-cn validate --strict`
 会报告其过于简略）描述该能力的用途。归档时会将其
 复制到所创建的主 spec 中；缺少它时，新的主 spec 会留下
-`TBD - created by archiving change <name>. Update Purpose after archive.`
+`TBD —— 本能力由归档变更 <name> 时自动创建，归档后请手动更新其 Purpose。`
 占位符，需要手工填写。
 不要为既有能力的 delta 添加 `## Purpose` ——
 该 spec 已经有一个，delta 中的会被忽略。要修改

@@ -57,13 +57,13 @@ jobs:
       contents: read
 
     steps:
-      - name: Checkout code
+      - name: 检出代码
         uses: actions/checkout@v4
 
-      - name: Install OpenSpec CLI
+      - name: 安装 OpenSpec CLI
         run: npm install -g @studyzy/openspec-cn
 
-      - name: Verify OpenSpec CLI
+      - name: 验证 OpenSpec CLI
         run: openspec-cn --version
 `;
 }

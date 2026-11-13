@@ -535,27 +535,27 @@ export async function schemaWhichCommand(name?: string, options?: { json?: boole
         };
 
         if (bySource.project.length > 0) {
-          console.log('\nProject schemas:');
+          console.log('\n项目 Schema：');
           for (const schema of bySource.project) {
             const shadowInfo = schema.shadows.length > 0
-              ? ` (shadows: ${schema.shadows.map((s) => s.source).join(', ')})`
+              ? ` （遮蔽：${schema.shadows.map((s) => s.source).join(', ')}）`
               : '';
             console.log(`  ${schema.name}${shadowInfo}`);
           }
         }
 
         if (bySource.user.length > 0) {
-          console.log('\nUser schemas:');
+          console.log('\n用户级 Schema：');
           for (const schema of bySource.user) {
             const shadowInfo = schema.shadows.length > 0
-              ? ` (shadows: ${schema.shadows.map((s) => s.source).join(', ')})`
+              ? ` （遮蔽：${schema.shadows.map((s) => s.source).join(', ')}）`
               : '';
             console.log(`  ${schema.name}${shadowInfo}`);
           }
         }
 
         if (bySource.package.length > 0) {
-          console.log('\nPackage schemas:');
+          console.log('\n包 Schema：');
           for (const schema of bySource.package) {
             console.log(`  ${schema.name}`);
           }
@@ -674,7 +674,7 @@ export async function schemaValidateCommand(name?: string, options?: { json?: bo
           return;
         }
 
-        console.log('\nValidation Results:');
+        console.log('\n校验结果：');
         for (const result of schemaResults) {
           const status = result.valid ? '✓' : '✗';
           console.log(`  ${status} ${result.name}`);
@@ -861,7 +861,7 @@ export async function schemaForkCommand(source: string, name?: string, options?:
     // name-updated, and (via the up-front parseSchema above) validated. Any
     // failure while staging leaves both the source and the existing
     // destination exactly as they were.
-    if (spinner) spinner.start(`Forking '${source}' to '${destinationName}'...`);
+    if (spinner) spinner.start(`正在将 '${source}' fork 为 '${destinationName}'...`);
     fs.mkdirSync(schemasDir, { recursive: true });
     const stagingDir = fs.mkdtempSync(path.join(schemasDir, '.fork-staging-'));
     try {
@@ -886,8 +886,8 @@ export async function schemaForkCommand(source: string, name?: string, options?:
         parseSchema(fs.readFileSync(stagedSchemaPath, 'utf-8'));
       } catch (validationError) {
         throw new Error(
-          `The staged fork of '${source}' is not a valid schema (the source may have changed during copy); ` +
-            `aborted, '${destinationName}' was not modified.`,
+          `'${source}' 的暂存 fork 不是有效的 Schema（源可能在复制期间发生了变化）；` +
+            `已中止，'${destinationName}' 未被修改。`,
           { cause: validationError }
         );
       }
@@ -898,7 +898,7 @@ export async function schemaForkCommand(source: string, name?: string, options?:
       // install rename itself fails (e.g. a Windows lock), the backup is
       // moved back so the user's original destination is never lost.
       if (destinationExists) {
-        if (spinner) spinner.text = `Replacing existing schema '${destinationName}'...`;
+        if (spinner) spinner.text = `正在替换已有的 Schema '${destinationName}'...`;
 
         // Revalidate immediately before the destructive move: if the
         // destination changed on disk while we were staging (or was removed),
@@ -929,9 +929,9 @@ export async function schemaForkCommand(source: string, name?: string, options?:
             fs.renameSync(backupDir, destinationDir);
           } catch (restoreError) {
             throw new Error(
-              `Failed to install the forked schema and could not restore the previous '${destinationName}'. ` +
-                `Your previous schema is preserved at ${backupDir}; move it back to ${destinationDir} to restore. ` +
-                `Restore error: ${(restoreError as Error).message}`,
+              `无法安装 fork 出的 Schema，也未能恢复原有的 '${destinationName}'。 ` +
+                `原 Schema 保留在 ${backupDir}；将其移回 ${destinationDir} 即可恢复。 ` +
+                `恢复错误：${(restoreError as Error).message}`,
               { cause: installError }
             );
           }
@@ -947,8 +947,8 @@ export async function schemaForkCommand(source: string, name?: string, options?:
           fs.rmSync(backupDir, { recursive: true, force: true });
         } else {
           console.error(
-            `Warning: the previous '${destinationName}' changed during the fork and was NOT deleted; ` +
-              `its pre-fork copy is preserved at ${backupDir}.`
+            `警告：原有的 '${destinationName}' 在 fork 期间发生变化，因此未删除；` +
+              `其 fork 前的副本保留在 ${backupDir}。`
           );
         }
       } else {
@@ -968,7 +968,7 @@ export async function schemaForkCommand(source: string, name?: string, options?:
       throw error;
     }
 
-    if (spinner) spinner.succeed(`Forked '${source}' to '${destinationName}'`);
+    if (spinner) spinner.succeed(`已将 '${source}' fork 为 '${destinationName}'`);
 
     if (options?.json) {
       console.log(JSON.stringify({
@@ -980,9 +980,9 @@ export async function schemaForkCommand(source: string, name?: string, options?:
         destinationPath: destinationDir,
       }, null, 2));
     } else {
-      console.log(`\nSource: ${sourceDir} (${sourceLocation})`);
-      console.log(`Destination: ${destinationDir}`);
-      console.log(`\nYou can now customize the schema at:`);
+      console.log(`\n来源：${sourceDir}（${sourceLocation}）`);
+      console.log(`目标：${destinationDir}`);
+      console.log(`\n现在可以在以下位置自定义该 Schema：`);
       console.log(`  ${destinationDir}/schema.yaml`);
     }
   } catch (error) {
@@ -1190,7 +1190,7 @@ export async function schemaInitCommand(
       ? fingerprintDir(schemaDir)
       : null;
 
-    if (spinner) spinner.start(`Creating schema '${name}'...`);
+    if (spinner) spinner.start(`正在创建 Schema '${name}'...`);
     fs.mkdirSync(schemasDir, { recursive: true });
     const schemaStagingDir = fs.mkdtempSync(
       path.join(schemasDir, '.init-staging-')
@@ -1214,9 +1214,9 @@ export async function schemaInitCommand(
       const validation = validateSchema(schemaStagingDir);
       if (!validation.valid) {
         throw new Error(
-          `Generated schema failed validation: ${validation.issues
+          `生成的 Schema 未通过校验：${validation.issues
             .map((issue) => issue.message)
-            .join('; ')}`
+            .join('；')}`
         );
       }
 
@@ -1294,7 +1294,7 @@ export async function schemaInitCommand(
             schemaInitFileOperations.renameSync(configBackup, preparedConfig.path);
           }
         } catch (rollbackError) {
-          rollbackErrors.push(`config: ${(rollbackError as Error).message}`);
+          rollbackErrors.push(`配置：${(rollbackError as Error).message}`);
         }
         try {
           if (schemaInstalled) {
@@ -1304,7 +1304,7 @@ export async function schemaInitCommand(
             schemaInitFileOperations.renameSync(schemaBackup, schemaDir);
           }
         } catch (rollbackError) {
-          rollbackErrors.push(`schema: ${(rollbackError as Error).message}`);
+          rollbackErrors.push(`Schema：${(rollbackError as Error).message}`);
         }
 
         if (rollbackErrors.length > 0) {
@@ -1329,7 +1329,7 @@ export async function schemaInitCommand(
           fs.rmSync(backup, { recursive: true, force: true });
         } catch (cleanupError) {
           console.error(
-            `Warning: initialization succeeded, but the backup at ${backup} could not be removed: ${(cleanupError as Error).message}`
+            `警告：初始化已成功，但无法删除位于 ${backup} 的备份：${(cleanupError as Error).message}`
           );
         }
       }
@@ -1361,12 +1361,12 @@ export async function schemaInitCommand(
         setAsDefault: options?.default || false,
       }, null, 2));
     } else {
-      console.log(`\nSchema created at: ${schemaDir}`);
-      console.log(`\nArtifacts: ${selectedArtifactIds.join(', ')}`);
+      console.log(`\nSchema 创建于：${schemaDir}`);
+      console.log(`\n制品：${selectedArtifactIds.join(', ')}`);
       if (options?.default) {
-        console.log(`\nSet as project default schema.`);
+        console.log(`\n已设为项目默认 Schema。`);
       }
-      console.log(`\nNext steps:`);
+      console.log(`\n后续步骤：`);
       console.log(`  1. 编辑 ${schemaDir}/schema.yaml 以自定义 Artifact`);
       console.log(`  2. 修改 Schema 目录中的模板`);
       console.log(`  3. 使用命令: openspec-cn new --schema ${name}`);

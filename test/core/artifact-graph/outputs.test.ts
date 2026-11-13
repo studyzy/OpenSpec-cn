@@ -323,16 +323,16 @@ describe('artifact-graph/outputs', () => {
     expect(resolveArtifactOutputs(tempDir, nested(16))).toEqual([canonical(fileA)]);
     globSpy.mockClear();
     expect(() => resolveArtifactOutputs(tempDir, nested(17))).toThrow(
-      'Artifact output pattern nests braces more than 16 levels deep'
+      '制品输出模式的括号嵌套超过 16 层'
     );
     // A pattern deep enough to crash braces is also too long for the filesystem;
     // the guard must still be the error the user sees.
     expect(() => resolveArtifactOutputs(tempDir, nested(4000))).toThrow(
-      'Artifact output pattern nests braces more than 16 levels deep'
+      '制品输出模式的括号嵌套超过 16 层'
     );
     // The error quotes only the start of a pattern that long.
     expect(() => resolveArtifactOutputs(tempDir, nested(4000))).toThrow(
-      `16 levels deep: ${nested(4000).slice(0, 80)}...`
+      `16 层：${nested(4000).slice(0, 80)}...`
     );
     expect(() => resolveArtifactOutputs(tempDir, nested(4000))).not.toThrow(nested(4000));
     expect(() => resolveArtifactOutputs(tempDir, nested(4000))).not.toThrow(
@@ -350,21 +350,21 @@ describe('artifact-graph/outputs', () => {
     const globSpy = vi.mocked(globby.globSync);
 
     expect(() => resolveArtifactOutputs(tempDir, wide(20))).toThrow(
-      'Artifact output pattern expands to more than 1024 patterns'
+      '制品输出模式展开后超过 1024 个模式'
     );
     // The error quotes only the start of a pattern that long.
     expect(() => resolveArtifactOutputs(tempDir, wide(20))).toThrow(
-      `1024 patterns: ${wide(20).slice(0, 80)}...`
+      `1024 个模式：${wide(20).slice(0, 80)}...`
     );
     // A range is bounded by the same budget. brace-expansion caps itself at
     // 100,000 results, so the budget is passed down as its `max` and the
     // allocation stops just past 1024 instead.
     expect(() => resolveArtifactOutputs(tempDir, 'file-{1..200000}.md')).toThrow(
-      'Artifact output pattern expands to more than 1024 patterns'
+      '制品输出模式展开后超过 1024 个模式'
     );
     // Far past brace-expansion's own cap, so only our `max` can stop it early.
     expect(() => resolveArtifactOutputs(tempDir, 'file-{1..1000000000}.md')).toThrow(
-      'Artifact output pattern expands to more than 1024 patterns'
+      '制品输出模式展开后超过 1024 个模式'
     );
     expect(globSpy).not.toHaveBeenCalled();
     globSpy.mockRestore();
@@ -421,7 +421,7 @@ describe('artifact-graph/outputs', () => {
     const globSpy = vi.mocked(globby.globSync);
 
     expect(() => resolveArtifactOutputs(tempDir, nested(17))).toThrow(
-      'Artifact output pattern nests braces more than 16 levels deep'
+      '制品输出模式的括号嵌套超过 16 层'
     );
     expect(globSpy).not.toHaveBeenCalled();
     globSpy.mockRestore();

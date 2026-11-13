@@ -668,12 +668,12 @@ operations:
       });
       expect(created.exitCode).toBe(0);
       const firstOutput = created.stdout + created.stderr;
-      expect(firstOutput).toContain('no OpenSpec root was found here');
+      expect(firstOutput).toContain('此处未找到 OpenSpec 根目录');
       // Naming the directory it created is the point: the reader has to know
       // what to delete if this was not the project they meant. The path is
       // relative to where the command ran, so it reads the same on Windows.
-      expect(firstOutput).toContain('created at openspec/.');
-      expect(firstOutput).toContain('openspec init');
+      expect(firstOutput).toContain('已在 openspec/ 创建');
+      expect(firstOutput).toContain('openspec-cn init');
       expect(fs.existsSync(path.join(appRepo, 'openspec', 'changes', 'adopt-me'))).toBe(true);
 
       // The root exists now, so the notice must not repeat on every change.
@@ -682,7 +682,7 @@ operations:
         env: isolatedEnv,
       });
       expect(second.exitCode).toBe(0);
-      expect(second.stdout + second.stderr).not.toContain('no OpenSpec root was found here');
+      expect(second.stdout + second.stderr).not.toContain('此处未找到 OpenSpec 根目录');
     });
 
     // Run from a subdirectory and the subdirectory is what gets adopted - the
@@ -700,7 +700,7 @@ operations:
         env: isolatedEnv,
       });
       expect(created.exitCode).toBe(0);
-      expect(created.stdout + created.stderr).toContain('created at openspec/.');
+      expect(created.stdout + created.stderr).toContain('已在 openspec/ 创建');
 
       expect(fs.existsSync(path.join(nested, 'openspec', 'changes', 'adopt-the-subdir'))).toBe(
         true
@@ -719,7 +719,7 @@ operations:
         env: isolatedEnv,
       });
       expect(result.exitCode).toBe(0);
-      expect(result.stdout).not.toContain('no OpenSpec root was found here');
+      expect(result.stdout).not.toContain('此处未找到 OpenSpec 根目录');
 
       // `root.source` is how a caller in JSON mode learns the same fact.
       const json = parseJson(result);

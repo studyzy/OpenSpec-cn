@@ -375,7 +375,7 @@ describe('reference index assembly', () => {
     expect(block).toContain('  - bare');
     expect(block).not.toContain('  - bare:');
     expect(block).toContain('Fetch: openspec-cn show <spec-id> --type spec --store team-context');
-    expect(block).toContain("Store missing-context: 被引用的 store 'missing-context' 未在本机注册。");
+    expect(block).toContain("Store missing-context：被引用的 store 'missing-context' 未在本机注册。");
     expect(block).toContain('Fix: 从队友处获取一个 checkout 并运行：openspec-cn store register <path> --id missing-context');
 
     expect(section).toContain('### 被引用的 Stores');

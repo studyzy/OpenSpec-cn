@@ -245,7 +245,7 @@ export class Validator {
             level: 'ERROR',
             path: entryPath,
             line: unpaired.line,
-            message: `RENAMED ${unpaired.side}: "${unpaired.name}" has no matching ${missing}: line. Write each rename as a FROM: line followed immediately by its TO: line.`,
+            message: `RENAMED ${unpaired.side}: "${unpaired.name}" 缺少配对的 ${missing}: 行。请把每个重命名写成 FROM: 行，紧跟其 TO: 行。`,
           });
         }
 

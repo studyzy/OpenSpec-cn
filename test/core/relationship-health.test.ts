@@ -107,7 +107,7 @@ describe('relationship health composition (3.6)', () => {
     expect(behind.store?.status[0]).toEqual(
       expect.objectContaining({ severity: 'info', code: 'store_checkout_drift' })
     );
-    expect(behind.store?.status[0].message).toContain('3 个提交 behind');
+    expect(behind.store?.status[0].message).toContain('落后其上游跟踪分支 3 个提交');
     expect(behind.store?.drift).toEqual({ ahead: 0, behind: 3 });
 
     // Singular when exactly one commit behind.
@@ -115,15 +115,15 @@ describe('relationship health composition (3.6)', () => {
       ...baseInput(),
       storeFacts: { ...facts, drift: { ahead: 0, behind: 1 } },
     });
-    expect(one.store?.status[0].message).toContain('1 个提交 behind');
+    expect(one.store?.status[0].message).toContain('落后其上游跟踪分支 1 个提交');
     expect(one.store?.status[0].message).not.toContain('1 commits');
 
     const diverged = inspectRelationships({
       ...baseInput(),
       storeFacts: { ...facts, drift: { ahead: 2, behind: 3 } },
     });
-    expect(diverged.store?.status[0].message).toContain('diverged');
-    expect(diverged.store?.status[0].message).toContain('3 behind, 2 ahead');
+    expect(diverged.store?.status[0].message).toContain('分叉');
+    expect(diverged.store?.status[0].message).toContain('落后 3 个提交，领先 2 个提交');
 
     // Ahead-only is the normal steady state for a never-pushed store.
     const ahead = inspectRelationships({

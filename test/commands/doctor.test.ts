@@ -265,10 +265,10 @@ describe('openspec doctor (3.6)', () => {
     expect(store.status[0]).toEqual(
       expect.objectContaining({ severity: 'info', code: 'store_checkout_drift' })
     );
-    expect(store.status[0].message).toContain('1 个提交 behind its upstream tracking branch');
+    expect(store.status[0].message).toContain('落后其上游跟踪分支 1 个提交');
 
     const human = await runCLI(['doctor', '--store', 'team-context'], { cwd: tempDir, env });
-    expect(human.stdout).toContain('behind its upstream tracking branch');
+    expect(human.stdout).toContain('落后其上游跟踪分支');
   });
 
   it('reports diverged drift when the checkout is both ahead and behind', async () => {
@@ -297,8 +297,8 @@ describe('openspec doctor (3.6)', () => {
     expect(store.status[0]).toEqual(
       expect.objectContaining({ severity: 'info', code: 'store_checkout_drift' })
     );
-    expect(store.status[0].message).toContain('diverged');
-    expect(store.status[0].message).toContain('1 behind, 1 ahead');
+    expect(store.status[0].message).toContain('分叉');
+    expect(store.status[0].message).toContain('落后 1 个提交，领先 1 个提交');
   });
 
   it('reports no drift for a store checkout with no upstream tracking branch', async () => {

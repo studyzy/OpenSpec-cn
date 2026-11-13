@@ -108,7 +108,7 @@ export const AI_TOOLS: AIToolOption[] = [
   // alone says nothing about Antigravity.
   { name: 'Antigravity', value: 'antigravity', available: true, successLabel: 'Antigravity', skillsDir: '.agents', legacySkillsDirs: ['.agent'], detectionPaths: ['.agent', '.agents/workflows'], requiresIdeRestart: true },
   { name: 'AtomCode', value: 'atomcode', available: true, successLabel: 'AtomCode', skillsDir: '.atomcode' },
-  { name: 'Auggie (Augment CLI)', value: 'auggie', available: true, successLabel: 'Auggie', skillsDir: '.augment' },
+  { name: 'Auggie（Augment CLI）', value: 'auggie', available: true, successLabel: 'Auggie', skillsDir: '.augment' },
   { name: 'IBM Bob', value: 'bob', available: true, successLabel: 'IBM Bob', skillsDir: '.bob' },
   { name: 'Claude Code', value: 'claude', available: true, successLabel: 'Claude Code', skillsDir: '.claude' },
   { name: 'Cline', value: 'cline', available: true, successLabel: 'Cline', skillsDir: '.cline', requiresIdeRestart: true },
@@ -116,11 +116,11 @@ export const AI_TOOLS: AIToolOption[] = [
   { name: 'CodeArts', value: 'codeartsagent', available: true, successLabel: 'CodeArts', skillsDir: '.codeartsdoer' },
   { name: 'Codex', value: 'codex', available: true, successLabel: 'Codex', skillsDir: '.agents', legacySkillsDirs: ['.codex'], detectionPaths: ['.agents/skills', '.codex/skills'] },
   { name: 'DeepSeek Harness', value: 'dsh', available: true, successLabel: 'DeepSeek Harness', skillsDir: '.dsh' },
-  { name: 'Devin Desktop (formerly Windsurf)', value: 'devin', available: true, successLabel: 'Devin Desktop', skillsDir: '.devin', detectionPaths: ['.devin', '.windsurf'], requiresIdeRestart: true },
+  { name: 'Devin Desktop（原 Windsurf）', value: 'devin', available: true, successLabel: 'Devin Desktop', skillsDir: '.devin', detectionPaths: ['.devin', '.windsurf'], requiresIdeRestart: true },
   { name: 'ForgeCode', value: 'forgecode', available: true, successLabel: 'ForgeCode', skillsDir: '.forge' },
-  { name: 'CodeBuddy Code (CLI)', value: 'codebuddy', available: true, successLabel: 'CodeBuddy Code', skillsDir: '.codebuddy' },
+  { name: 'CodeBuddy Code（CLI）', value: 'codebuddy', available: true, successLabel: 'CodeBuddy Code', skillsDir: '.codebuddy' },
   { name: 'Code Studio', value: 'codestudio', available: true, successLabel: 'Code Studio', skillsDir: '.codestudio', requiresIdeRestart: true },
-  { name: 'Continue', value: 'continue', available: true, successLabel: 'Continue (VS Code / JetBrains / Cli)', skillsDir: '.continue', requiresIdeRestart: true },
+  { name: 'Continue', value: 'continue', available: true, successLabel: 'Continue（VS Code / JetBrains / CLI）', skillsDir: '.continue', requiresIdeRestart: true },
   { name: 'CoStrict', value: 'costrict', available: true, successLabel: 'CoStrict', skillsDir: '.cospec', requiresIdeRestart: true },
   { name: 'Crush', value: 'crush', available: true, successLabel: 'Crush', skillsDir: '.crush' },
   { name: 'Cursor', value: 'cursor', available: true, successLabel: 'Cursor', skillsDir: '.cursor', requiresIdeRestart: true },
@@ -163,7 +163,7 @@ export const AI_TOOLS: AIToolOption[] = [
   // whose assistant is not on the list actually types (#653) — it is named for
   // a directory, which none of them would guess. Aliases are single words: the
   // space bar toggles a selection rather than typing into the search box.
-  { name: 'Other / Universal (shared .agents skills)', value: 'agents', available: true, successLabel: 'shared .agents skills', skillsDir: '.agents', detectionPaths: ['.agents/skills'], searchAliases: ['universal', 'other', 'generic', 'custom', 'proprietary', 'unlisted', 'unsupported', 'vendor-neutral', 'agents.md'] }
+  { name: '其他 / 通用（共享 .agents skills）', value: 'agents', available: true, successLabel: 'shared .agents skills', skillsDir: '.agents', detectionPaths: ['.agents/skills'], searchAliases: ['universal', 'other', 'generic', 'custom', 'proprietary', 'unlisted', 'unsupported', 'vendor-neutral', 'agents.md'] }
 ];
 
 /**

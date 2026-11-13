@@ -48,7 +48,7 @@ function assertBraceNesting(pattern: string): void {
         // A pattern this deep can run to thousands of characters; quote only its start.
         const shown = pattern.length > 80 ? `${pattern.slice(0, 80)}...` : pattern;
         throw new Error(
-          `Artifact output pattern nests braces more than ${MAX_BRACE_NESTING} levels deep: ${shown}`
+          `制品输出模式的括号嵌套超过 ${MAX_BRACE_NESTING} 层：${shown}`
         );
       }
     } else if ((char === '}' && open.at(-1) === '{') || (char === ')' && open.at(-1) === '(')) {
@@ -142,13 +142,13 @@ function assertExpansionBudget(pattern: string, count: number): void {
   // A pattern this wide can run to thousands of characters; quote only its start.
   const shown = pattern.length > 80 ? `${pattern.slice(0, 80)}...` : pattern;
   throw new Error(
-    `Artifact output pattern expands to more than ${MAX_BRACE_EXPANSIONS} patterns: ${shown}`
+    `制品输出模式展开后超过 ${MAX_BRACE_EXPANSIONS} 个模式：${shown}`
   );
 }
 
 function expandArtifactBraces(pattern: string): string[] {
   if (pattern.includes('\u0000')) {
-    throw new Error('Artifact output pattern contains a NUL byte');
+    throw new Error('制品输出模式包含 NUL 字节');
   }
   const pending = [pattern];
   const finished: string[] = [];

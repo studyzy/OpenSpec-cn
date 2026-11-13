@@ -1202,7 +1202,7 @@ metadata:
         );
         expect(
           warningSpy.mock.calls.flat().map(String).some((entry) =>
-            entry.includes('resolves outside this project')
+            entry.includes('解析到本项目之外')
           )
         ).toBe(true);
       } finally {
@@ -1237,7 +1237,7 @@ metadata:
         );
         expect(
           warningSpy.mock.calls.flat().map(String).some((entry) =>
-            entry.includes('resolves outside this project')
+            entry.includes('解析到本项目之外')
           )
         ).toBe(true);
       } finally {

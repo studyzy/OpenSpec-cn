@@ -112,23 +112,23 @@ openspec init --tools claude
 
 **输出**
 
-OpenSpec writes its skills once, to `.agents/skills/`. Tools that need them get links in their own folder. MiniMax Code instead gets its own copy in `~/.minimax/skills/`:
+OpenSpec 只把 skills 写一份到 `.agents/skills/`；需要它们的工具会在自己的文件夹中得到链接。MiniMax Code 例外，它会在 `~/.minimax/skills/` 中拥有自己的副本：
 
 ```
-▌ OpenSpec structure created
-✔ Setup complete for Claude Code
+▌ OpenSpec 结构已创建
+✔ Claude Code 安装完成
 
-OpenSpec Setup Complete
+OpenSpec 设置完成
 
-Created: Claude Code
-6 skills in .agents/skills/ (linked from .claude/skills/)
-Config: openspec/config.yaml (schema: spec-driven)
+已创建：Claude Code
+.agents/skills/ 中共有 6 个 skills（链接自 .claude/skills/）
+配置：openspec/config.yaml（schema: spec-driven）
 
-Getting started:
-  Start your first change: /openspec-propose "your idea"
+开始使用：
+  发起第一个变更：/openspec-propose "你的想法"
 ```
 
-`--tools none` 只创建 `openspec/config.yaml`。在已初始化的项目上，init 会在原地重写已安装的文件，摘要显示 `Refreshed: Claude Code`，并有 `Config: openspec/config.yaml (exists)`。
+`--tools none` 只创建 `openspec/config.yaml`。在已初始化的项目上，init 会在原地重写已安装的文件，摘要显示 `已刷新：Claude Code`，并有 `配置：openspec/config.yaml（已存在）`。
 
 **退出码**
 

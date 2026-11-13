@@ -94,7 +94,7 @@ describe('an unparseable global config', () => {
     fs.writeFileSync(configPath, content);
 
     expect(isGlobalConfigUnreadable()).toBe(true);
-    expect(() => saveGlobalConfig({ profile: 'core' })).toThrow(/Refusing to overwrite/);
+    expect(() => saveGlobalConfig({ profile: 'core' })).toThrow(/拒绝覆盖/);
     expect(read()).toBe(content);
   });
 
@@ -123,7 +123,7 @@ describe('an unparseable global config', () => {
       }
 
       expect(message).toContain(configPath);
-      expect(message).toContain('openspec config edit');
+      expect(message).toContain('openspec-cn config edit');
       expect(read()).toBe(TYPO);
     });
 
@@ -213,7 +213,7 @@ describe('an unparseable global config', () => {
       fs.writeFileSync(configPath, TYPO);
       const { updateTelemetryConfig } = await import('../../src/telemetry/config.js');
 
-      await expect(updateTelemetryConfig({ noticeSeen: true })).rejects.toThrow(/could not be parsed/);
+      await expect(updateTelemetryConfig({ noticeSeen: true })).rejects.toThrow(/无法被解析/);
       expect(read()).toBe(TYPO);
     });
 
@@ -247,8 +247,8 @@ describe('an unparseable global config', () => {
 
         // Not a TypeError: the same actionable one-liner every writer reports.
         expect(message).toContain(configPath);
-        expect(message).toContain('openspec config edit');
-        expect(message).toContain('openspec config reset --all');
+        expect(message).toContain('openspec-cn config edit');
+        expect(message).toContain('openspec-cn config reset --all');
         expect(read()).toBe(content);
         expect(fetchSpy).not.toHaveBeenCalled();
       },
@@ -281,7 +281,7 @@ describe('an unparseable global config', () => {
       const { getOrCreateAnonymousId } = await import('../../src/telemetry/index.js');
 
       // The refusal must not be silently swallowed into a corrupt write.
-      await expect(getOrCreateAnonymousId()).rejects.toThrow(/could not be parsed/);
+      await expect(getOrCreateAnonymousId()).rejects.toThrow(/无法被解析/);
       expect(read()).toBe('[]\n');
 
       fs.writeFileSync(configPath, '{}\n');

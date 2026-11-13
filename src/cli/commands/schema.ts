@@ -17,7 +17,7 @@ export function registerSchemaCommand(program: Command): void {
   schemaCmd
     .command('which [name]')
     .description('显示 Schema 的解析来源')
-    .option('--json', 'Output as JSON')
+    .option('--json', '以 JSON 格式输出')
     .option('--all', '列出所有 Schema 及其解析来源')
     .action(async (name?: string, options?: { json?: boolean; all?: boolean }) => {
       const { schemaWhichCommand } = await import('../../commands/schema.js');
@@ -28,7 +28,7 @@ export function registerSchemaCommand(program: Command): void {
   schemaCmd
     .command('validate [name]')
     .description('验证 Schema 结构和模板')
-    .option('--json', 'Output as JSON')
+    .option('--json', '以 JSON 格式输出')
     .option('--verbose', '显示详细验证步骤')
     .action(async (name?: string, options?: { json?: boolean; verbose?: boolean }) => {
       const { schemaValidateCommand } = await import('../../commands/schema.js');
@@ -39,7 +39,7 @@ export function registerSchemaCommand(program: Command): void {
   schemaCmd
     .command('fork <source> [name]')
     .description('复制现有 Schema 到项目中以进行自定义')
-    .option('--json', 'Output as JSON')
+    .option('--json', '以 JSON 格式输出')
     .option('--force', '覆盖现有目标')
     .action(async (source: string, name?: string, options?: { json?: boolean; force?: boolean }) => {
       const { schemaForkCommand } = await import('../../commands/schema.js');
@@ -50,7 +50,7 @@ export function registerSchemaCommand(program: Command): void {
   schemaCmd
     .command('init <name>')
     .description('创建一个新的项目本地 Schema')
-    .option('--json', 'Output as JSON')
+    .option('--json', '以 JSON 格式输出')
     .option('--description <text>', 'Schema 描述')
     .option('--artifacts <list>', '逗号分隔的 Artifact ID (proposal,specs,design,tasks)')
     .option('--default', '设为项目默认 Schema')

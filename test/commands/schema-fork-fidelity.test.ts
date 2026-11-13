@@ -468,8 +468,8 @@ describe('schema fork fidelity (PR #1130)', () => {
     // The destination loss is surfaced, not silent: the error names a
     // `.fork-backup-` directory and how to restore it.
     expect(output).toMatch(/\.fork-backup-/);
-    expect(output).toMatch(/preserved at/i);
-    expect(output).toMatch(/could not restore/i);
+    expect(output).toMatch(/保留在/u);
+    expect(output).toMatch(/无法.*恢复/u);
 
     // The original content really is still on disk in the backup dir the error
     // points at (recovery is genuinely possible).
@@ -589,7 +589,7 @@ describe('schema fork fidelity (PR #1130)', () => {
     expect(fs.readFileSync(existing, 'utf-8')).toMatch(/^name: keep-me$/m);
 
     // The changed backup was NOT deleted, and its location is surfaced.
-    expect(errOutput).toMatch(/was NOT deleted/i);
+    expect(errOutput).toMatch(/未删除/u);
     expect(errOutput).toMatch(/\.fork-backup-/);
     const backupDir = fs
       .readdirSync(path.join(tempDir, 'openspec', 'schemas'))
@@ -644,7 +644,7 @@ describe('schema fork fidelity (PR #1130)', () => {
     const output = consoleLogSpy.mock.calls.map((c) => String(c[0])).join('\n');
     expect(process.exitCode).toBeTruthy();
     expect(output).toContain('"forked": false');
-    expect(output).toMatch(/not a valid schema|aborted/i);
+    expect(output).toMatch(/不是有效的 Schema|已中止/u);
 
     // The valid destination is preserved byte-identical — never overwritten by
     // the invalid staged fork nor deleted for it.

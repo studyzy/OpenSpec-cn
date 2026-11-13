@@ -29,7 +29,7 @@ export function registerStoreCommand(program: Command): void {
     .option('--init-git', '初始化 Git 仓库并创建初始提交（默认）')
     .option('--no-init-git', '跳过所有 Git 操作：不初始化，不创建初始提交')
     .option('--remote <url>', '记录在 store.yaml 中的规范克隆源')
-    .option('--json', 'Output as JSON')
+    .option('--json', '以 JSON 格式输出')
     .action(async (id: string | undefined, options: StoreSetupOptions) => {
       const storeCommand = await loadStoreCommand();
       await storeCommand.setup(id, options);
@@ -40,7 +40,7 @@ export function registerStoreCommand(program: Command): void {
     .description('注册现有的本地 store')
     .option('--id <id>', 'Store id；默认使用元数据或文件夹名称')
     .option('--yes', '确认为健康的 OpenSpec 根目录创建 store 身份元数据')
-    .option('--json', 'Output as JSON')
+    .option('--json', '以 JSON 格式输出')
     .action(async (inputPath: string | undefined, options: StoreRegisterOptions) => {
       const storeCommand = await loadStoreCommand();
       await storeCommand.register(inputPath, options);
@@ -49,7 +49,7 @@ export function registerStoreCommand(program: Command): void {
   store
     .command('unregister <id>')
     .description('清除本地 store 注册记录而不删除文件')
-    .option('--json', 'Output as JSON')
+    .option('--json', '以 JSON 格式输出')
     .action(async (id: string, options: StoreJsonOptions) => {
       const storeCommand = await loadStoreCommand();
       await storeCommand.unregister(id, options);
@@ -59,7 +59,7 @@ export function registerStoreCommand(program: Command): void {
     .command('remove <id>')
     .description('清除本地 store 注册记录并删除其本地文件夹')
     .option('--yes', '确认删除本地 store 文件夹')
-    .option('--json', 'Output as JSON')
+    .option('--json', '以 JSON 格式输出')
     .action(async (id: string, options: StoreRemoveOptions) => {
       const storeCommand = await loadStoreCommand();
       await storeCommand.remove(id, options);
@@ -69,7 +69,7 @@ export function registerStoreCommand(program: Command): void {
     .command('list')
     .alias('ls')
     .description('列出本地已注册的 stores')
-    .option('--json', 'Output as JSON')
+    .option('--json', '以 JSON 格式输出')
     .action(async (options: StoreJsonOptions) => {
       const storeCommand = await loadStoreCommand();
       await storeCommand.list(options);
@@ -78,7 +78,7 @@ export function registerStoreCommand(program: Command): void {
   store
     .command('doctor [id]')
     .description('检查本地 store 注册和元数据')
-    .option('--json', 'Output as JSON')
+    .option('--json', '以 JSON 格式输出')
     .action(async (id: string | undefined, options: StoreJsonOptions) => {
       const storeCommand = await loadStoreCommand();
       await storeCommand.doctor(id, options);

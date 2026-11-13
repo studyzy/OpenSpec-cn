@@ -157,7 +157,7 @@ artifacts:
       );
 
       expect(getSchemaDir('../escape', tempDir)).toBeNull();
-      expect(() => resolveSchema('../escape', tempDir)).toThrow(/not found/u);
+      expect(() => resolveSchema('../escape', tempDir)).toThrow(/未找到/u);
     });
 
     it('should reject a schema file symlink that escapes its schema directory', () => {
@@ -170,7 +170,7 @@ artifacts:
       fs.symlinkSync(outsideSchema, path.join(schemaDir, 'schema.yaml'));
 
       expect(getSchemaDir('linked-file', tempDir)).toBeNull();
-      expect(() => resolveSchema('linked-file', tempDir)).toThrow(/not found/u);
+      expect(() => resolveSchema('linked-file', tempDir)).toThrow(/未找到/u);
     });
 
     it('should validate user override and throw on invalid schema', () => {
@@ -298,7 +298,7 @@ version: [[[invalid yaml
     });
 
     it('should throw when schema not found', () => {
-      expect(() => resolveSchema('nonexistent-schema')).toThrow(/not found/);
+      expect(() => resolveSchema('nonexistent-schema')).toThrow(/未找到/);
     });
 
     it('should list available schemas in error message', () => {

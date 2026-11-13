@@ -85,16 +85,16 @@ export class ValidateCommand {
     let findingsScope: BulkScope | undefined;
     if (options.report !== undefined) {
       const message = options.report !== 'full' && options.report !== 'findings'
-        ? `Unknown validation report '${options.report}'.`
+        ? `未知的校验报告类型 '${options.report}'。`
         : itemName !== undefined
-          ? 'A validation report cannot be combined with an item name.'
+          ? '校验报告不能与项目名称同时使用。'
           : options.archived && bulk
-            ? 'A validation report cannot combine archived and active scopes.'
+            ? '校验报告不能同时覆盖已归档和活跃范围。'
             : !options.archived && !bulk
-              ? 'A validation report requires an explicit bulk scope.'
+              ? '校验报告需要显式的批量范围。'
               : undefined;
       if (message) {
-        const fix = 'Use --report full|findings with --all, --changes, --specs, or --archived, without an item name. Do not combine archived and active scopes.';
+        const fix = '请将 --report full|findings 与 --all、--changes、--specs 或 --archived 一起使用，且不要指定项目名称。不要同时覆盖已归档和活跃范围。';
         if (options.json) {
           console.log(JSON.stringify({ status: [{ severity: 'error', code: 'invalid_validation_report_request', message, fix }] }, null, 2));
         } else {
@@ -330,7 +330,7 @@ export class ValidateCommand {
     // whole-value check.
     const nameProblem =
       type === 'change'
-        ? folderStyleNameProblem(id, 'Change name')
+        ? folderStyleNameProblem(id, '变更名称')
         : (id.split('/').map((segment) => folderStyleNameProblem(segment, 'Spec id')).find(Boolean) ?? null);
     if (nameProblem) {
       if (opts.json) {
@@ -686,7 +686,7 @@ export class ValidateCommand {
           });
         }
       } catch (error: any) {
-        issues.push({ level: 'ERROR', path: 'tasks.md', message: error?.message || 'Unknown error' });
+        issues.push({ level: 'ERROR', path: 'tasks.md', message: error?.message || '未知错误' });
       }
       const valid = issues.length === 0;
       if (valid) passed++; else failed++;
@@ -714,7 +714,7 @@ export class ValidateCommand {
     }
 
     if (results.length === 0) {
-      console.log('No archived changes found.');
+      console.log('未找到已归档的变更。');
       process.exitCode = 0;
       return;
     }
@@ -732,7 +732,7 @@ export class ValidateCommand {
         }
       }
     }
-    console.log(`Totals: ${summary.totals.passed} passed, ${summary.totals.failed} failed (${summary.totals.items} items)`);
+    console.log(`合计：${summary.totals.passed} 通过，${summary.totals.failed} 失败（共 ${summary.totals.items} 项）`);
     process.exitCode = failed > 0 ? 1 : 0;
   }
 }

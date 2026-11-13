@@ -13,9 +13,9 @@ export function registerDoctorCommand(program: Command): void {
     .description(description)
     .option('--store <id>', COMMON_FLAGS.store.description)
     .addOption(
-      new Option('--store-path <path>', 'Removed; register the store and use --store').hideHelp()
+      new Option('--store-path <path>', '已移除；请注册该 store 并使用 --store').hideHelp()
     )
-    .option('--json', 'Output as JSON')
+    .option('--json', '以 JSON 格式输出')
     .action(async (options: DoctorOptions) => {
       const { doctorCommand } = await import('../../commands/doctor.js');
       await doctorCommand(options);

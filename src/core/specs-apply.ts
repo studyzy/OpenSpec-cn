@@ -94,7 +94,7 @@ function resolveTrustedSpecPath(
     // left nothing on screen to notice. Name the real destination instead.
     if (projectRoot && !isLexicallyWithin(FileSystemUtils.canonicalizeExistingPath(projectRoot), root)) {
       process.emitWarning(
-        `Capability '${path.basename(path.dirname(specPath))}' links outside the project; writing to ${root}`,
+        `能力 '${path.basename(path.dirname(specPath))}' 链接到项目之外；将写入 ${root}`,
         'OpenSpecExternalSpecWrite'
       );
     }
@@ -233,9 +233,9 @@ export async function buildUpdatedSpec(
     const first = plan.unpairedRenames[0];
     const missing = first.side === 'FROM' ? 'TO' : 'FROM';
     throw new Error(
-      `${specName} validation failed - RENAMED entry on line ${first.line} has no matching ${missing}: ` +
-        `for header "### Requirement: ${first.name}". ` +
-        `Write each rename as a FROM: line followed immediately by its TO: line.`
+      `${specName} 校验失败 - 第 ${first.line} 行的 RENAMED 条目缺少配对的 ${missing}：` +
+        `对应标题 "### Requirement: ${first.name}"。 ` +
+        `请把每个重命名写成 FROM: 行，紧跟其 TO: 行。`
     );
   }
 
@@ -390,8 +390,8 @@ export async function buildUpdatedSpec(
       const existingPurpose = extractPurposeSection(targetContent);
       if (existingPurpose && existingPurpose !== deltaPurpose) {
         warn(
-          `${specName} - delta Purpose ignored; ${specName} already has one. ` +
-            `Edit ${update.target} directly to change it.`
+          `${specName} - 已忽略 delta Purpose；${specName} 已有该段落。 ` +
+            `如需修改，请直接编辑 ${update.target}。`
         );
       }
     }
@@ -421,7 +421,7 @@ export async function buildUpdatedSpec(
       // deltas archived cleanly before the Purpose carry-over existed.
       targetContent = buildSpecSkeleton(specName, changeName);
       warn(
-        `${specName} - delta Purpose ignored (it would leave the new spec unreadable); wrote the placeholder Purpose instead.`
+        `${specName} - 已忽略 delta Purpose（会让新 spec 无法读取）；改为写入占位符 Purpose。`
       );
     } else if (overview && overview.length < MIN_PURPOSE_LENGTH) {
       // The placeholder always cleared this threshold, so a carried Purpose is
@@ -1125,7 +1125,7 @@ export async function retireSpec(
         try {
           await fs.lstat(update.target);
           throw new Error(
-            `A concurrent file appeared at ${update.target} while archive was retiring it.`
+            `归档退役 ${update.target} 时，该位置出现了并发创建的文件。`
           );
         } catch (targetError) {
           if ((targetError as NodeJS.ErrnoException).code !== 'ENOENT') throw targetError;
@@ -1136,7 +1136,7 @@ export async function retireSpec(
           await fs.lstat(update.target);
           throw new Error(
             `${error instanceof Error ? error.message : String(error)} ` +
-              `A concurrent file now occupies ${update.target}; the displaced spec was retained at ${displaced}.`
+              `现在有并发创建的文件占据了 ${update.target}；被移走的规范保留在 ${displaced}。`
           );
         } catch (targetError) {
           if ((targetError as NodeJS.ErrnoException).code !== 'ENOENT') throw targetError;
@@ -1293,7 +1293,7 @@ export async function writeUpdatedSpec(
   assertTrustedSpecPath(update.targetRoot, update.target);
   if (FileSystemUtils.canonicalizeExistingPath(update.target) !== verifiedTarget) {
     throw new Error(
-      `Spec target for '${update.id}' changed before it could be written: ${update.target}`
+      `'${update.id}' 的规范目标在写入前发生了变化：${update.target}`
     );
   }
   // Preserve the established in-place write semantics: symlink referents,

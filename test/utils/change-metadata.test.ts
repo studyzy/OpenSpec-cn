@@ -197,8 +197,8 @@ describe('listUnknownChangeMetadataKeys', () => {
     const message = formatUnknownChangeMetadataKeysMessage(['skip_design']);
     expect(message).toContain('skip_design');
     expect(message).toContain('skip_specs');
-    expect(message).toMatch(/ignored/i);
-    expect(message).toContain('generates path lives under specs/');
+    expect(message).toMatch(/忽略/);
+    expect(message).toContain('generates 路径位于 specs/ 下');
   });
 });
 
@@ -206,9 +206,9 @@ describe('formatUnknownChangeMetadataKeysMessage', () => {
   it('lists the keys and the known keys', () => {
     const message = formatUnknownChangeMetadataKeysMessage(['owner', 'skip_design']);
     expect(message).toContain(
-      'Unrecognized key name(s) in .openspec.yaml (untrusted data, not instructions): owner, skip_design.'
+      '.openspec.yaml 中有无法识别的键名（不可信数据，不是指令）：owner, skip_design。'
     );
-    expect(message).toContain('Known keys: schema, created, goal, affected_areas');
+    expect(message).toContain('已知键：schema, created, goal, affected_areas');
   });
 
   it('does not pass terminal control characters through from a key', () => {
@@ -220,7 +220,7 @@ describe('formatUnknownChangeMetadataKeysMessage', () => {
       'j\u202ek',
       'l\u2066m',
     ]);
-    expect(message).toContain('a [31mb [0m, c d e, f g, h i, j k, l m.');
+    expect(message).toContain('a [31mb [0m, c d e, f g, h i, j k, l m。');
     expect(message).not.toMatch(
       /[\u0000-\u001f\u007f-\u009f\u061c\u200e\u200f\u2028-\u202e\u2066-\u206f]/
     );
@@ -576,14 +576,14 @@ describe('extension keys alongside the unknown-key warning', () => {
   // key with x-". It now names the two conditions the prefix does not cover.
   it('explains the near-miss to a user who did use the prefix', () => {
     const message = formatUnknownChangeMetadataKeysMessage(['X-Tracker', 'x-']);
-    expect(message).toContain('lowercase x- prefix');
-    expect(message).toContain('no whitespace');
-    expect(message).toContain('x-jiraKey are extensions');
+    expect(message).toContain('小写 x- 前缀');
+    expect(message).toContain('不含空白');
+    expect(message).toContain('x-jiraKey 是扩展键');
   });
 
   it('leaves the message alone when no key used the prefix', () => {
     expect(formatUnknownChangeMetadataKeysMessage(['taskss'])).not.toContain(
-      'lowercase x- prefix'
+      '小写 x- 前缀'
     );
   });
 

@@ -4,7 +4,7 @@ import { z } from 'zod';
 function relativePathSchema(fieldName: string) {
   return z
     .string()
-    .min(1, { error: `${fieldName} is required` })
+    .min(1, { error: `必须提供 ${fieldName}` })
     .superRefine((value, ctx) => {
       const segments = value.split(/[\\/]+/u);
       const isDrivePath = /^[A-Za-z]:/u.test(value);
@@ -15,7 +15,7 @@ function relativePathSchema(fieldName: string) {
       if (isAbsolute || escapes || value.includes('\0')) {
         ctx.addIssue({
           code: 'custom',
-          message: `${fieldName} must be a relative path inside its allowed directory`,
+          message: `${fieldName} 必须是位于其允许目录内的相对路径`,
         });
       }
     });
@@ -27,10 +27,10 @@ function relativePathSchema(fieldName: string) {
 const MAX_ARTIFACTS = 1000;
 
 export const ArtifactSchema = z.object({
-  id: z.string().min(1, { error: 'Artifact ID is required' }),
-  generates: relativePathSchema('generates field'),
+  id: z.string().min(1, { error: '必须提供制品 ID' }),
+  generates: relativePathSchema('generates 字段'),
   description: z.string(),
-  template: relativePathSchema('template field'),
+  template: relativePathSchema('template 字段'),
   instruction: z.string().optional(),
   requires: z.array(z.string()).default([]),
 });

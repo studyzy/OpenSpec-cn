@@ -15,7 +15,7 @@ export const COMMAND_REGISTRY: CommandDefinition[] = [
       },
       {
         name: 'language',
-        description: 'Write new OpenSpec artifacts in this language',
+        description: '用此语言编写新的 OpenSpec 制品',
         takesValue: true,
       },
       {
@@ -55,17 +55,17 @@ export const COMMAND_REGISTRY: CommandDefinition[] = [
       },
       {
         name: 'dry-run',
-        description: 'Report what the update would change without writing anything',
+        description: '报告更新将改动什么而不写入任何内容',
       },
       {
         name: 'json',
-        description: 'With --dry-run, print the planned changes as JSON',
+        description: '与 --dry-run 一起使用时，以 JSON 打印计划中的变更',
       },
     ],
   },
   {
     name: 'install',
-    description: 'Install the standalone openspec, which runs without Node.js (latest release unless [version] is given)',
+    description: '安装独立版 openspec-cn，无需 Node.js 即可运行（默认最新版本，除非指定 [version]）',
     acceptsPositional: true,
     positionals: [{ name: 'version', optional: true }],
     flags: [],

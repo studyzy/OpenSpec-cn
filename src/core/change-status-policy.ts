@@ -78,17 +78,17 @@ function editScope(input: ActionContextInput): Pick<ActionContext, 'allowedEditR
   if (!input.store) {
     return {
       allowedEditRoots: [input.projectRoot],
-      constraints: ['Repo-local change artifacts and implementation edits are scoped to this project.'],
+      constraints: ['仓库本地的变更制品与实现改动都限定在本项目范围内。'],
     };
   }
 
-  const planning = `Change artifacts live in store '${input.store.id}' (${input.projectRoot}).`;
+  const planning = `变更制品存放在 store '${input.store.id}'（${input.projectRoot}）中`;
   const { implementationRoot } = input.store;
   if (implementationRoot) {
     return {
       allowedEditRoots: [implementationRoot, input.projectRoot],
       constraints: [
-        `${planning} Implementation edits go in ${implementationRoot}, the project on the current path that declares this store; ask the user before editing any other repository.`,
+        `${planning}。实现改动应落在 ${implementationRoot}，即当前路径上声明此 store 的项目；在编辑任何其他仓库之前，先询问用户。`,
       ],
     };
   }
@@ -96,7 +96,7 @@ function editScope(input: ActionContextInput): Pick<ActionContext, 'allowedEditR
   return {
     allowedEditRoots: [input.projectRoot],
     constraints: [
-      `${planning} OpenSpec could not determine which repository implements this change; ask the user which repository to edit, and make implementation edits there.`,
+      `${planning}。OpenSpec 无法确定由哪个仓库实现此变更；请询问用户要编辑哪个仓库，并在那里进行实现改动。`,
     ],
   };
 }

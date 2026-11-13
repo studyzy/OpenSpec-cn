@@ -72,7 +72,7 @@ describe('a linked capability directory outside the project', () => {
     // But it is announced, with the path actually being written.
     expect(warnings.some((message) => message.includes(realOutside))).toBe(true);
     // Named by its capability directory, not the spec.md every capability shares.
-    expect(warnings.some((message) => message.startsWith("Capability 'widgets' "))).toBe(true);
+    expect(warnings.some((message) => message.startsWith("能力 'widgets' "))).toBe(true);
   });
 
   itWithSymlinks('still allows a capability directory linked within the project', async () => {

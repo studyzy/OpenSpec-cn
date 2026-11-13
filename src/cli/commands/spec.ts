@@ -14,7 +14,7 @@ export function registerSpecCommand(rootProgram: Command) {
   specCommand
     .command('show [spec-id]')
     .description('显示特定规范')
-    .option('--json', 'Output as JSON')
+    .option('--json', '以 JSON 格式输出')
     .option('--requirements', '仅 JSON：仅显示需求（排除场景）')
     .option('--no-scenarios', '仅 JSON：排除场景内容')
     .option('-r, --requirement <id>', '仅 JSON：按 ID 显示特定需求（从 1 开始）')
@@ -27,7 +27,7 @@ export function registerSpecCommand(rootProgram: Command) {
   specCommand
     .command('list')
     .description('列出所有可用的规范')
-    .option('--json', 'Output as JSON')
+    .option('--json', '以 JSON 格式输出')
     .option('--long', '显示 id 和 title 及计数')
     .action(async (options: { json?: boolean; long?: boolean }) => {
       const { specListCommand } = await import('../../commands/spec.js');

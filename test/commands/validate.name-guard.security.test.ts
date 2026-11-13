@@ -76,7 +76,7 @@ describe('validate --type name guard', () => {
   it('refuses a traversing change name', async () => {
     const result = await runCLI(['validate', '..', '--type', 'change'], { cwd: testDir });
     expect(result.exitCode).toBe(1);
-    expect(result.stderr).toContain("Change name不能是 '..'");
+    expect(result.stderr).toContain("变更名称不能是 '..'");
   });
 
   it('reports the refusal as JSON for a JSON run', async () => {

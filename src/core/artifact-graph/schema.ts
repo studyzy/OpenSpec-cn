@@ -100,7 +100,7 @@ function validateApplyReferences(schema: SchemaYaml): void {
   for (const req of apply.requires) {
     if (!validIds.includes(req)) {
       throw new SchemaValidationError(
-        `Invalid apply.requires reference: '${req}' does not exist (artifacts: ${validIds.join(', ')})`
+        `无效的 apply.requires 引用：'${req}' 不存在（制品：${validIds.join(', ')}）`
       );
     }
   }
@@ -123,12 +123,12 @@ export function findApplyTracksWarning(schema: SchemaYaml): string | undefined {
   const tracks = schema.apply?.tracks;
   if (tracks == null || schema.artifacts.some(a => a.generates === tracks)) return undefined;
   return (
-    `apply.tracks '${tracks}' does not exactly match any artifact's generates value ` +
-    `(generates: ${schema.artifacts.map(a => a.generates).join(', ')}), ` +
-    `so OpenSpec cannot tell which artifact's progress it tracks. ` +
-    `Apply still reads that file as written, but list and status count tasks.md instead. ` +
-    `Make apply.tracks exactly equal one of those generates values, ` +
-    `or confirm that file is maintained outside the artifact graph.`
+    `apply.tracks '${tracks}' 与任何制品的 generates 值都不完全一致 ` +
+    `（generates：${schema.artifacts.map(a => a.generates).join(', ')}），` +
+    `因此 OpenSpec 无法判断它跟踪的是哪个制品的进度。 ` +
+    `apply 仍会按原样读取该文件，但 list 和 status 改为统计 tasks.md。 ` +
+    `请让 apply.tracks 完全等于上述某个 generates 值，` +
+    `或确认该文件是在制品图之外维护的。`
   );
 }
 
