@@ -42,9 +42,9 @@ profile values are core and custom, so "expanded" reads as a third profile). -->
 每个 skill 都期望项目已经使用了 OpenSpec。在它第一个会写入任何东西的步骤之前，skill 会检查根目录是否可解析。当根目录不存在时会发生什么，取决于该 skill 是如何被触达的：
 
 - **自动选中**：你的 Agent 自行挑选了这个 skill，你并未点名 OpenSpec。它会放弃 OpenSpec，像没装 OpenSpec 那样正常回答你的请求。
-- **显式发起 OpenSpec 请求**：你点名了 OpenSpec、点名了该 skill，或运行了它的命令。它会在写入前停下，并询问如何进行：在这里运行 `openspec init`、用 `--store <id>` 指向某个 store，或不用 OpenSpec 继续。它会等待你的回答。
+- **显式发起 OpenSpec 请求**：你点名了 OpenSpec，或按名字调用了该 skill。它会在写入前停下，并询问如何进行：在这里运行 `openspec-cn init`、用 `--store <id>` 指向某个 store，或不用 OpenSpec 继续。它会等待你的回答。
 
-命令永远属于第二种情况。如果某项目的 `openspec/config.yaml` 指向了一个本机无法解析的 store（未注册，或 `store:` 行格式错误），该项目不会被当作未初始化：skill 会停下并显示 store 错误及其修复方式。无论哪种情况，任何 skill 都不会自行创建 `openspec/` 目录。下面的条目描述的是根目录就位后每个 skill 的职责。
+按名字调用 skill 永远属于第二种情况。如果某项目的 `openspec/config.yaml` 指向了一个本机无法解析的 store（未注册，或 `store:` 行格式错误），该项目不会被当作未初始化：skill 会停下并显示 store 错误及其修复方式。无论哪种情况，任何 skill 都不会自行创建 `openspec/` 目录。下面的条目描述的是根目录就位后每个 skill 的职责。
 
 | Skill | 职责 | 类型 |
 |---|---|---|

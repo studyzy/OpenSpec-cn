@@ -3,7 +3,8 @@ import * as fs from 'node:fs';
 import * as path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { claudeAdapter } from '../src/core/command-generation/adapters/claude.js';
-import { AI_TOOLS } from '../src/core/config.js';
+import { AI_TOOLS, SKILL_LINKED_TOOL_IDS } from '../src/core/config.js';
+import { SHARED_SKILLS_ROOT } from '../src/core/shared/skill-paths.js';
 import { formatProjectMdMigrationHint } from '../src/core/legacy-cleanup.js';
 import { CORE_WORKFLOWS } from '../src/core/profiles.js';
 
@@ -64,9 +65,12 @@ describe('setup documentation', () => {
     const claudeCommandPath = claudeAdapter.getFilePath('<id>').split(path.sep).join('/');
 
     expect(claude?.skillsDir).toBeDefined();
-    expect(SETUP).toContain(`\`${claude?.skillsDir}/skills/openspec-*/SKILL.md\``);
-    expect(SETUP).toContain(`\`${claudeCommandPath}\``);
-    expect(SETUP).toContain('openspec-cn config set delivery both');
+    // Claude 的 skills 是指向唯一共享副本的链接，位于它自己的文件夹中。
+    expect(SKILL_LINKED_TOOL_IDS.has('claude')).toBe(true);
+    expect(SETUP).toContain(`\`${claude?.skillsDir}/skills/openspec-*\`、这些路径链接到 \`${SHARED_SKILLS_ROOT}/skills/openspec-*\``);
+    // OpenSpec 2.0 只安装 skills：恢复方式就是普通的 update，绝不涉及命令路径或 delivery 开关。
+    expect(SETUP).not.toContain(`\`${claudeCommandPath}\``);
+    expect(SETUP).not.toContain('openspec config set delivery');
     expect(SETUP).toContain('openspec-cn update');
     expect(SETUP).toContain('`/openspec-propose`');
   });

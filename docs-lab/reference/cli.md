@@ -112,7 +112,7 @@ openspec init --tools claude
 
 **输出**
 
-每个选中的工具都会在自己的目录中获得 OpenSpec 的 skills 和 commands：
+OpenSpec writes its skills once, to `.agents/skills/`. Tools that need them get links in their own folder. MiniMax Code instead gets its own copy in `~/.minimax/skills/`:
 
 ```
 ▌ OpenSpec structure created
@@ -121,13 +121,11 @@ openspec init --tools claude
 OpenSpec Setup Complete
 
 Created: Claude Code
-6 skills and 6 commands in .claude/
+6 skills in .agents/skills/ (linked from .claude/skills/)
 Config: openspec/config.yaml (schema: spec-driven)
 
 Getting started:
-  Start your first change: /opsx:propose "your idea"
-
-Restart your IDE for the new commands to take effect.
+  Start your first change: /openspec-propose "your idea"
 ```
 
 `--tools none` 只创建 `openspec/config.yaml`。在已初始化的项目上，init 会在原地重写已安装的文件，摘要显示 `Refreshed: Claude Code`，并有 `Config: openspec/config.yaml (exists)`。
@@ -180,7 +178,7 @@ openspec-cn update --dry-run
 
 ```
 2 file(s) would change:
-  update  .claude/skills/openspec-propose/SKILL.md  (claude)
+  update  .agents/skills/openspec-propose/SKILL.md  (openspec)
   add     ~/.config/openspec/config.json  (openspec)
 ```
 
@@ -189,7 +187,7 @@ openspec-cn update --dry-run
 ```json
 {
   "changes": [
-    { "path": ".claude/skills/openspec-propose/SKILL.md", "action": "update", "tool": "claude" },
+    { "path": ".agents/skills/openspec-propose/SKILL.md", "action": "update", "tool": "openspec" },
     { "path": "~/.config/openspec/config.json", "action": "add", "tool": "openspec" }
   ],
   "notes": [],
@@ -201,9 +199,9 @@ openspec-cn update --dry-run
 |---|---|
 | `changes[].path` | 相对于项目的路径。项目之外的文件（如全局 skill 或全局配置）会从你的主目录开始以 `~/...` 显示；若同样在主目录之外，则显示为绝对路径。 |
 | `changes[].action` | `add`、`update` 或 `delete`。新内容与旧内容完全相同的文件不会被列出。 |
-| `changes[].tool` | 文件所属的已配置工具，例如 `claude`。属于 OpenSpec 自身而非某个工具的文件（全局配置与旧版产物清理）为 `openspec`。 |
-| `notes[]` | 终端用户会被询问的步骤的 `{ code, message }`。`legacy-tool-directories`：交互式运行会先询问的移动；`changes` 会把它列为已执行。`legacy-artifacts`：发现了 OpenSpec 旧布局的文件，例如 `openspec-proposal.md` 斜杠命令或 `AGENTS.md` 中的 OpenSpec 标记块。没有 `--force` 时，非交互式更新会保留它们，因此 `changes` 也不会列出；`--dry-run --force` 会列出它们的清理。普通刷新时为空。 |
-| `failures[]` | 真实更新会失败的每个工具的 `{ tool, error }`，包括它无法完成的写入：文件该在的位置被目录占用、目录该在的位置被文件占用，或者文件/文件夹没有写权限。对该工具，`changes` 会在真实更新停下的地方停下；其他工具仍会被规划。磁盘只在写入过程中才报告的错误（如空间不足）无法预知。 |
+| `changes[].tool` | 文件所属的已配置工具，例如 `claude`。不属于任何单一工具的文件为 `openspec`：`.agents/skills/` 中的共享 skills、全局配置，以及旧版产物清理。 |
+| `notes[]` | `{ code, message }`，表示终端用户会被询问或提醒的某个步骤。`legacy-tool-directories`：交互式运行会先询问的移动；`changes` 将其列为已执行。`legacy-artifacts`：发现了 OpenSpec 旧布局的文件，例如 `openspec-proposal.md` 斜杠命令或 `AGENTS.md` 中的 OpenSpec 标记块。没有 `--force` 时，非交互式 update 不会改动它们，因此 `changes` 也不会；`--dry-run --force` 会列出它们的清理。`edited-skills`：update 将替换你在它安装的 skill 中所做的修改，消息中会点名相关文件。普通刷新时为空的。 |
+| `failures[]` | `{ tool, error }`，对应真实 update 会失败的每个工具，包括它无法完成的写入：本该是文件的位置却是目录、本该是目录的位置却是文件，或文件/文件夹没有写权限。对这些工具，`changes` 停在真实 update 停止的位置；其他工具仍会被规划。仅在写入时才会由磁盘报告的错误（例如磁盘空间不足）无法预知。 |
 
 规划开始前的失败（例如没有 OpenSpec 目录）仍然只打印一个 JSON 文档：空计划加上一个 `status` 数组，其中包含 `severity`、`code`（`update_error`）和 `message`。退出码为 1。
 
@@ -227,9 +225,9 @@ Updating 1 tool(s): claude (1.6.0 → 1.7.0)
 
 ✓ Updated: Claude Code (v1.7.0)
 Tools: Claude Code
-
-Restart your IDE for changes to take effect.
 ```
+
+触及基于 IDE 的工具（如 Cursor 或 Kiro）的 update 会以 `Restart your IDE to refresh skills.` 结束。
 
 在没有 OpenSpec 的目录中，update 会拒绝执行：
 
@@ -248,7 +246,7 @@ Restart your IDE for changes to take effect.
 
 ```bash
 openspec-cn config list                  # 查看当前设置
-openspec-cn config set delivery skills   # 修改一个值
+openspec-cn config set profile core      # 修改一个值
 openspec-cn config profile               # 交互式工作流选择器
 ```
 
@@ -261,7 +259,7 @@ openspec-cn config profile               # 交互式工作流选择器
 | `unset <key>` | 移除某个键，让默认值生效。 |
 | `reset` | 将所有配置重置为默认值。 |
 | `edit` | 在 `$EDITOR` 中打开配置文件。 |
-| `profile [preset]` | 配置交付模式和工作流。 |
+| `profile [preset]` | 配置安装哪些工作流。 |
 
 配置对你的机器是全局的，以 JSON 存储在 `config path` 指向的位置：设置 `$XDG_CONFIG_HOME` 时为 `$XDG_CONFIG_HOME/openspec/config.json`，否则为 `~/.config/openspec/config.json`（macOS、Linux）或 `%APPDATA%\openspec\config.json`（Windows）。每个子命令都接受 `--scope <scope>`，但目前只有 `global` 可用。任何其他 scope 都会以 `Error: Project-local config is not yet implemented` 退出 1。
 
@@ -290,23 +288,23 @@ openspec-cn config list --json   # 原始配置，JSON 形式
 
 **输出**
 
-每个设置，然后是标记值为显式或默认的 profile 摘要：
+每个设置，然后是 profile 摘要。它会将 profile 标记为显式或默认，并把 `delivery` 标记为已弃用：
 
 ```
 featureFlags: {}
 profile: core
-delivery: both
+delivery: skills
 
 Profile settings:
   profile: core (default)
-  delivery: both (default)
+  delivery: skills (retired in 2.0, ignored)
   workflows: propose, explore, apply, update, sync, archive (from core profile)
 ```
 
 ### openspec-cn config get
 
 ```bash
-openspec-cn config get delivery
+openspec-cn config get profile
 ```
 
 **参数**
@@ -320,7 +318,7 @@ openspec-cn config get delivery
 裸值，可供脚本使用。对象以紧凑 JSON 打印：
 
 ```
-both
+core
 ```
 
 **退出码**
@@ -331,7 +329,7 @@ both
 ### openspec-cn config set
 
 ```bash
-openspec-cn config set delivery skills
+openspec-cn config set profile core
 openspec-cn config set featureFlags.workspaces true
 ```
 
@@ -352,7 +350,14 @@ openspec-cn config set featureFlags.workspaces true
 **输出**
 
 ```
-Set featureFlags.workspaces = true
+已设置 featureFlags.workspaces = true
+```
+
+`delivery` 仍会被接受，因此旧脚本依然可用，但它不再影响任何行为（[升级到 2.0](../help/upgrade-to-2.md)）：
+
+```
+已设置 delivery = "skills"
+注意：delivery 不再产生任何影响；OpenSpec 2.0 只安装 skills。
 ```
 
 未知键和无效值会在保存任何内容前以退出码 1 失败：
@@ -364,10 +369,10 @@ Pass --allow-unknown to bypass this check.
 ```
 
 ```
-Error: Invalid configuration - delivery: Invalid option: expected one of "both"|"skills"|"commands"
+Error: Invalid configuration - profile: Invalid option: expected one of "core"|"custom"
 ```
 
-如果配置文件存在但其内容不是 JSON 对象——无论是完全不是有效 JSON，还是其根是 `null`、数组之类的东西——`config set`、`config unset` 和 `config profile` 都会退出 1 并保持文件不变。用 `openspec config edit` 修复它，或用 `openspec config reset --all` 替换它：
+如果配置文件存在但其内容不是 JSON 对象——无论是完全不是有效 JSON，还是其根是 `null`、数组之类的东西——`config set`、`config unset` 和 `config profile` 都会退出 1 并保持文件不变。用 `openspec-cn config edit` 修复它，或用 `openspec-cn config reset --all` 替换它：
 
 ```
 Error: /home/you/.config/openspec/config.json could not be parsed, so it was left unchanged.
@@ -379,13 +384,13 @@ Fix it with "openspec config edit", or reset it with "openspec config reset --al
 ### openspec-cn config unset
 
 ```bash
-openspec-cn config unset delivery
+openspec-cn config unset profile
 ```
 
 移除该键，让默认值再次生效。带内置默认值的键始终算作已设置，因此即使你从未设置过，它也会报告成功：
 
 ```
-Unset delivery (reverted to default)
+Unset profile (reverted to default)
 ```
 
 完全没有任何值的键会打印 `Key "featureFlags.nothere" was not set`。两种情况都退出 0。无法解析的配置文件则退出 1，与 `config set` 相同。
@@ -447,9 +452,9 @@ openspec-cn config profile core   # 直接应用 core 预设
 
 | 参数 | 说明 |
 |---|---|
-| `preset` | 可选的预设名称。目前只有 `core`。它选择 core 工作流并保留你的 delivery 设置。 |
+| `preset` | 可选的预设名称。目前只有 `core`。它选择 core 工作流。 |
 
-没有预设时，交互式选择器会显示你当前的 delivery 和工作流，让你修改其中之一或全部（delivery：both、仅 skills 或仅 commands；workflows：复选框列表），打印差异，并在 OpenSpec 项目内提议为你运行 `openspec-cn update`。在非终端环境中它退出 1：
+没有预设时，交互式选择器会显示你当前的工作流，让你修改（复选框列表），打印差异，并在 OpenSpec 项目内提议为你运行 `openspec-cn update`。在非终端环境中它退出 1：
 
 ```
 Interactive mode required. Use `openspec-cn config profile core` or set config via environment/flags.
@@ -1392,7 +1397,7 @@ No project context or operation guidance configured.
 
 开头，并继续包含 `outputPath`、`existingOutputPaths`、完整的 `instruction` 和 `template` 字符串、`dependencies`、`unlocks` 和 `root`。`apply` 形式携带 `contextFiles`、`progress`、`tasks`、`taskTrackingConfigured`、`state`（`blocked`、`ready`、`all_done`）和 `instruction`。
 
-每条 `tasks` 条目带有 `id`、`description`、`done`、`sourcePath` 和 `line`。`sourcePath` 是提供该任务的被追踪文件的绝对路径。`line` 是该任务复选框在文件中从 1 开始的行号。
+每条 `tasks` 条目带有 `id`、`description`、`done`、`sourcePath` 和 `line`。`sourcePath` 是提供该任务的被追踪文件的绝对路径。`line` 是该任务复选框在文件中从 1 开始的行号。`description` 是任务的完整文本：换行到多行的任务会返回为一行，末尾的 `\` 换行符会被移除。
 
 `taskTrackingConfigured` 始终是布尔值：当 schema 设置了非空的 [`apply.tracks`](schemas/schema-yaml.md#tracks) 时为 `true`（即使没有文件匹配），否则为 `false`。若某个匹配的追踪文件无法读取，`unavailableTrackingFiles` 会包含其绝对 `path` 和错误 `reason`。当所有匹配的文件都可读取时，省略该字段。可读取的文件仍会贡献到 `tasks` 和 `progress`，但在每个匹配的文件都被读取之前，`state` 不能为 `all_done`。
 

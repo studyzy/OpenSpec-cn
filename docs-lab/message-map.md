@@ -9,7 +9,7 @@
 | 用户应如何安装 CLI、更新、卸载？ | [Start › Installation](start/installation.md) | Answered |
 | 用户如何为他们的 AI 助手手动安装与设置？ | [Start › Installation](start/installation.md)，install.md 提示词 | Answered |
 | 用户应如何将 OpenSpec 添加到他们的仓库？ | [Start › Set up your project](start/setup.md) | Answered |
-| 工作流如何进入用户的工具，为什么同时有 skills 和 commands？ | [Start › Set up your project](start/setup.md) | Answered |
+| 工作流如何进入用户的工具？ | [Start › Set up your project](start/setup.md) | Answered |
 | 我们如何教授这个循环：propose、review、apply、archive？ | [Start › Quickstart](start/quickstart.md) | Answered |
 | 用户应如何端到端跑完第一个变更？ | [Start › Quickstart](start/quickstart.md) | Answered |
 | 用户如何知道哪些提示词放在 AI 聊天中、哪些命令放在终端里？ | [Start › Quickstart](start/quickstart.md) 各步骤行内说明，然后 [Help › FAQ](help/faq.md) | Answered |
@@ -30,7 +30,7 @@
 | 我们如何解释 OpenSpec 中哪些可以自定义？ | [Customize › Overview](customize/overview.md) | Answered |
 | 用户如何选择正确的自定义层级，何时应从配置升级到 schemas？ | [Customize › Overview](customize/overview.md) 的"Not sure which to use?"章节 | Answered |
 | 用户应如何选择安装哪些工作流？ | [Customize › Profiles](customize/profiles.md) | Answered |
-| 用户如何切换为仅 skills 或仅 commands？ | [Customize › Profiles](customize/profiles.md) 的 Delivery 章节；[Start › Set up your project](start/setup.md) 负责两种形式为何存在 | Answered |
+| `delivery` 设置怎么了？ | [Customize › Profiles](customize/profiles.md) 的 Delivery 章节；[Help › Upgrade to 2.0](help/upgrade-to-2.md) | Answered |
 | 用户如何让工作流按自己的方式规划变更：context、rules 和 guidance？ | [Customize › Project configuration](customize/project-config.md) | Answered |
 | 用户如何让制品用英语以外的语言书写？ | [Customize › Project configuration](customize/project-config.md) 的 context 章节中"另一种语言"说明 | Answered |
 | 用户应如何改变 OpenSpec 产出的内容？ | [Customize › Schemas](customize/schemas.md)，其中 fork 演练在"Creating your own custom schema" | Answered |

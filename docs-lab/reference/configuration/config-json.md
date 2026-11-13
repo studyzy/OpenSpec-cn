@@ -10,13 +10,9 @@ CLI 将机器级设置存放在 macOS 与 Linux 的 `~/.config/openspec/config.j
 
 | 键 | 类型 | 必填 | 作用 |
 | --- | --- | --- | --- |
-| `profile` | string: `core` or `custom` | No | 选择 `openspec-cn init` 安装的工作流集合 |
-| `delivery` | string: `both`, `skills`, or `commands` | No | init 安装 skills、斜杠命令，还是两者都装 |
+| `profile` | string: `core` 或 `custom` | No | 选择 `openspec-cn init` 安装的工作流集合 |
+| `delivery` | string: `both`、`skills` 或 `commands` | No | 2.0 中已弃用：仍会被读取，但不再影响任何行为 |
 | `workflows` | list of strings | No | `custom` profile 安装的工作流列表 |
-| `featureFlags` | map: flag → boolean | No | 布尔功能开关 |
-| `defaultStore` | string | No | 根目录解析的机器级回退 store |
-| `openers` | map: 工具 id → 设置 | No | workset 在哪些工具中打开，以及各自如何启动 |
-| `telemetry` | map | No | 遥测退出开关、匿名 id 和提示已展示状态 |
 
 ### profile
 
@@ -24,7 +20,7 @@ CLI 将机器级设置存放在 macOS 与 Linux 的 `~/.config/openspec/config.j
 
 ### delivery
 
-init 将工作流作为 skills、斜杠命令还是两者安装。默认为 `both`。命令已弃用，将在 OpenSpec 2.0 中移除，届时只安装 skills（[#2022](https://github.com/Fission-AI/OpenSpec/issues/2022)）。
+在 OpenSpec 2.0 中已弃用，2.0 只安装 skills。该值仍会被接受和读取，因此旧配置依然有效，但它不再改变 `init` 和 `update` 安装的内容。默认值为 `skills`。在 1.x 中它决定安装 skills、斜杠命令还是两者（[升级到 2.0](../../help/upgrade-to-2.md)）。
 
 ### workflows
 
@@ -87,7 +83,6 @@ CLI 存储你的匿名 id，以及首次运行提示是否已展示。将 `telem
 ```json
 {
   "profile": "core",
-  "delivery": "both",
   "featureFlags": {},
   "telemetry": {
     "anonymousId": "5f8a2c1e-4b6d-4f9a-9c3d-7e1b2a8d4c6f",

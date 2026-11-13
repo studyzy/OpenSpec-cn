@@ -45,12 +45,11 @@
   关注 <a href="https://x.com/0xTab">X 上的 @0xTab</a> 获取更新 · 加入 <a href="https://discord.gg/YctCnvvshC">OpenSpec Discord</a> 获取帮助与答疑。
 </p>
 
-<!-- TODO: 添加 /opsx:propose → /opsx:archive 工作流的 GIF 演示 -->
-
+<!-- TODO: 添加 openspec-propose → openspec-archive-change 工作流的 GIF 演示 -->
 ## 看看效果
 
 ```text
-你：/opsx:explore
+你：/openspec-explore
 AI：  你想探索什么？
 你：我想做深色模式，但不确定怎么搞才干净。
 AI：  让我看看你的样式方案...
@@ -58,7 +57,7 @@ AI：  让我看看你的样式方案...
      加上系统偏好检测。不需要新依赖。要划定范围吗？
 你：好，开始吧。
 
-你：/opsx:propose add-dark-mode
+你：/openspec-propose add-dark-mode
 AI：已创建 openspec/changes/add-dark-mode/
      ✓ proposal.md — 为什么要做这个，什么在变
      ✓ specs/       — 需求和场景
@@ -66,7 +65,7 @@ AI：已创建 openspec/changes/add-dark-mode/
      ✓ tasks.md     — 实现清单
      准备好开始实现了！
 
-你：/opsx:apply
+你：/openspec-apply-change
 AI：开始实现任务...
     ✓ 1.1 添加主题上下文 Provider
     ✓ 1.2 创建切换组件
@@ -74,10 +73,9 @@ AI：开始实现任务...
     ✓ 2.2 接入 localStorage
     所有任务已完成！
 
-你：/opsx:archive
+你：/openspec-archive-change
 AI：已归档至 openspec/changes/archive/2025-01-23-add-dark-mode/
-    Specs 已更新。可以开始下一个功能了。
-```
+    Specs 已更新。可以开始下一个功能了。```
 
 <details>
 <summary><strong>What do the specs actually look like?</strong></summary>
@@ -150,13 +148,12 @@ openspec-cn init
 
 现在与你的 AI 对话：
 
-- **还不确定要构建什么？** 先用 `/opsx:explore`，一个无风险的思考伙伴，它会阅读你的代码、权衡方案、在写任何代码之前帮你理清思路。（[快速入门](https://openspec.dev/docs/quickstart)）
-- **已经知道自己想要什么？** 直接用 `/opsx:propose <你想要构建的内容>`。
+- **还不确定要构建什么？** 先用 `/openspec-explore`，一个无风险的思考伙伴，它会阅读你的代码、权衡方案、在写任何代码之前帮你理清思路。（[快速入门](https://openspec.dev/docs/quickstart)）
+- **已经知道自己想要什么？** 直接用 `/openspec-propose <你想要构建的内容>`。
 
-这两者都在默认 profile 中。如果你想要扩展工作流（`/opsx:new`、`/opsx:continue`、`/opsx:ff`、`/opsx:verify`、`/opsx:bulk-archive`、`/opsx:onboard`），请通过 `openspec-cn config profile` 选择，然后运行 `openspec-cn update` 应用。
+这两者都在默认 profile 中。如果你想要扩展工作流（`openspec-new-change`、`openspec-continue-change`、`openspec-ff-change`、`openspec-verify-change`、`openspec-bulk-archive-change`、`openspec-onboard`），请通过 `openspec-cn config profile` 选择，然后运行 `openspec-cn update` 应用。
 
-`/opsx:propose` 是规范名称；你的工具可能拼作 `/opsx-propose`（Cursor、GitHub Copilot）、`@opsx-propose`（Amazon Q）或 `$openspec-propose`（Codex）。`openspec init` 会为你选择的工具打印正确的形式 —— 见[支持的工具](https://openspec.dev/docs/supported-tools)。
-
+这些都是 skills。大多数工具以 `/openspec-propose` 调用，Codex 以 `$openspec-propose` 调用，你也可以直接用大白话说明要做的事。`openspec-cn init` 会为你选择的工具打印正确的形式 —— 见[支持的工具](https://openspec.dev/docs/supported-tools)。从 1.x 及其 `/opsx:*` 命令升级过来？见[升级到 2.0](https://openspec.dev/docs/upgrade-to-2)。
 > [!NOTE]
 > 不确定你的工具是否受支持？[查看完整列表](https://openspec.dev/docs/supported-tools) —— 我们支持 30+ 种工具且持续增长。
 >
@@ -181,7 +178,6 @@ openspec-cn init
 
 → **[浏览目录](docs/customization.md#community-schemas)**，详见自定义文档。
 
-
 ## 为什么选择 OpenSpec？
 
 AI 编程助手很强大，但当需求只存在于聊天记录里时，结果往往难以预测。OpenSpec 增加了一层轻量的规范（spec）机制，让你在写任何代码前先对齐要做什么。
@@ -189,7 +185,7 @@ AI 编程助手很强大，但当需求只存在于聊天记录里时，结果�
 - **构建前先达成共识** —— 在写代码前，人类和 AI 先在 specs 上对齐
 - **保持有序** —— 每个变更都有自己的文件夹，内含 proposal、specs、design 和 tasks
 - **流畅协作** —— 随时更新任意制品，没有僵化的阶段门槛
-- **使用你的工具** —— 通过斜杠命令与 30+ 种 AI 助手协作
+- **使用你的工具** —— 通过 skills 与 30+ 种 AI 助手协作
 
 ### 我们如何对比
 
@@ -211,7 +207,7 @@ npm install -g @studyzy/openspec-cn@latest
 
 **刷新代理指令（agent instructions）**
 
-在每个项目里运行一次，用于重新生成 AI 指引，并确保最新斜杠命令可用：
+在每个项目里运行一次，用于重新生成 AI 指引并刷新已安装的 skills：
 
 ```bash
 openspec-cn update
@@ -220,7 +216,6 @@ openspec-cn update
 ## 使用注意事项
 
 **模型选择**：OpenSpec 更适合高推理模型。我们推荐在规划与实现阶段都使用 Codex 5.5 和 Opus 4.7。
-
 **上下文卫生**：OpenSpec 受益于更干净的上下文窗口。在开始实现前清理上下文，并在整个会话中保持良好的上下文卫生。
 
 ## 参与贡献

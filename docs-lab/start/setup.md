@@ -22,11 +22,11 @@ init 会询问你使用哪些 AI 工具，为你选中的工具写入工作流�
 OpenSpec Setup Complete
 
 Created: Claude Code
-6 skills and 6 commands in .claude/
+6 skills in .agents/skills/ (linked from .claude/skills/)
 Config: openspec/config.yaml (schema: spec-driven)
 ```
 
-重启你的 IDE，让新命令生效。
+如果你的工具运行在 IDE 中，请重启它，以便加载新的 skills。
 
 重复运行 init 是安全的：
 
@@ -55,9 +55,11 @@ Leave out generic, outdated, or verbose material. Do not delete project.md.
 运行 init 会在你的项目中创建两样东西：
 
 - 仓库根目录下的 `openspec/` 文件夹
-- 添加到你的 AI 工具文件夹（`.agents/`、`.claude/` 等）的工作流文件（skills 和 commands）
+- 工作流文件：共享 `.agents/skills/` 文件夹中的 skills，必要时从工具自己的文件夹（例如 `.claude/skills/`）链接过去
 
-把所有这些像源代码一样提交（[FAQ](../help/faq.md) 说明了为什么）。init 不会改动你仓库中的任何其他东西（如果它发现旧版 OpenSpec 的遗留物，会在清理前先询问）。
+把所有这些像源代码一样提交。
+
+Init 还会删除早期版本生成的命令文件，并保留你编辑过的那些。在 1.0 之前配置的项目还有更早的遗留物：`.claude/commands/openspec/` 之类的文件夹，以及 `CLAUDE.md` 和 `AGENTS.md` 等文件中的 OpenSpec 标记块。交互式 init 会在删除前询问。使用 `--force`、使用 `--tools`，或在非交互式运行中，init 会不经询问直接删除，包括这些块中的任何编辑内容，请先备份。
 
 ### `openspec/` 文件夹
 
@@ -73,11 +75,9 @@ openspec/
 
 [项目配置](../customize/project-config.md) 覆盖了 `config.yaml`。
 
-<a id="the-workflow-files-skills-and-commands"></a>
+### 工作流文件（skills）
 
-### 工作流文件（skills 和 commands）
-
-这些就是 OpenSpec 工作流，也就是你在工作中会用到的操作。下面是它们以已安装 skill 的形式、放在多数工具共用的 `.agents/` 文件夹里的样子：
+这些就是 OpenSpec 工作流，也就是你在工作中会用到的操作。下面是它们以已安装 skill 的形式、放在共享 `.agents/skills/` 文件夹里的样子：
 
 ```
 .agents/skills/
@@ -93,60 +93,27 @@ openspec/
 
 这是默认集合加上两个可选工作流。[Profiles](../customize/profiles.md) 列出了全部十二个。
 
-默认情况下，每个工作流以两种形式安装：
+无论你配置了多少个工具，每个 skill 只在这里写一次。不读取 `.agents/skills/` 的工具（Claude Code、Kiro 等）会在自己的文件夹中获得指向每个 skill 的链接，例如 `.claude/skills/openspec-propose`。MiniMax Code 是唯一的例外：它的 skills 放在你主目录下的 `~/.minimax/skills/`。[支持的工具](../reference/supported-tools.md#where-skills-go) 展示了目录布局以及哪些工具会获得链接。
 
-- **Skill**（`openspec-apply-change`）：当你请求某项工作时，你的 Agent 会自动捡起的指令。
-- **Command**（Claude Code 中的 `/opsx:apply`）：同一个工作流的键入式入口，名字更短。
+每个工作流都是一个 **skill**：当你请求某项工作时，你的 Agent 会自动捡起的指令；你也可以按名字调用它（Claude Code 中是 `/openspec-apply-change`，Codex 中是 `$openspec-apply-change`）。[支持的工具](../reference/supported-tools.md#support-matrix) 展示了每种工具的拼写。
 
-两者在功能上完全一致。一个工作流的 skill 和它的 command 携带相同的指令。
-
-为什么是两种：command 先出现，而且每个工具对它都有自己的拼写。skill 是跨工具共享的较新标准，但不是每个工具都能直接调用 skill，所以 command 仍是那些工具的入口。
-
-有些工具只以 skill 形式安装。当工具能直接运行 skill 时，init 会跳过 commands 并说明（`Commands skipped for: codex (uses skills)`）。
-
-命令已弃用，将在 OpenSpec 2.0 中移除；skills 会保留。[Profiles](../customize/profiles.md#delivery-skills-commands-or-both) 说明了如何立即切换。
+OpenSpec 1.x 还会为每个工作流写入一个命令文件（`/opsx:apply`）。OpenSpec 2.0 只安装 skills。[升级到 2.0](../help/upgrade-to-2.md) 说明了有哪些变化。
 
 #### 更改安装内容
 
-交互式选择器可以改变交付形式和工作流集合（[Profiles](../customize/profiles.md)）。在终端中执行：
+交互式选择器可以改变工作流集合（[Profiles](../customize/profiles.md)）。在终端中执行：
 
 ```bash
 openspec-cn config profile
 ```
 
-下面是从 both 切换为仅 skills 的样子：
-
-```
-Current profile settings
-  Delivery: both
-
-? What do you want to configure? Delivery only
-? Delivery mode (how workflows are installed): Skills only
-
-Config changes:
-  delivery: both -> skills
-? Apply changes to this project now? (Y/n) y
-```
-
-回答 yes 会立即应用到当前项目。其他项目在下次 `openspec-cn update` 时才会生效。该设置是全局的，按机器保存。
+对 "Apply changes to this project now?" 回答 yes 会立即应用。其他项目会在下次 `openspec-cn update` 时采纳。该设置是全局的、按机器生效的。
 
 #### Claude Code 不显示工作流
 
-Claude Code 根据你的 delivery 设置，从以下一个或两个项目路径加载 OpenSpec 工作流：
-
-- **Skills**：`.claude/skills/openspec-*/SKILL.md`
-- **Commands**：`.claude/commands/opsx/<id>.md`
-
-若文件缺失，刷新项目。在终端中：
+Claude Code 从 `.claude/skills/openspec-*`、这些路径链接到 `.agents/skills/openspec-*` 加载 OpenSpec skills。若文件缺失，请刷新项目。在终端中：
 
 ```bash
-openspec-cn update
-```
-
-若命令文件存在但 `/opsx:` 没有显示 OpenSpec 命令，更新 Claude Code 并重启它。若命令仍未加载，同时启用 skills。在终端中：
-
-```bash
-openspec-cn config set delivery both
 openspec-cn update
 ```
 

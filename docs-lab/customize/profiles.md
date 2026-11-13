@@ -1,8 +1,8 @@
 # Profiles
 
-> 选择安装哪些工作流，以及它们以 skills、commands 还是两者形式安装。
+> 选择安装哪些工作流。
 
-profile 是你的偏好：在你机器上安装哪些 OpenSpec 工作流（AI 工具中的 [skills 和 commands](../start/setup.md#the-workflow-files-skills-and-commands)）。默认 profile 是 `core`。包含或排除工作流后，你的选择会保存为 `custom` profile。
+profile 是你的偏好：在你机器上安装哪些 OpenSpec 工作流（AI 工具中的 [skills](../start/setup.md#the-workflow-files-skills)）。默认 profile 是 `core`。包含或排除工作流后，你的选择会保存为 `custom` profile。
 
 ## 核心集合
 
@@ -38,42 +38,13 @@ profile 是你的偏好：在你机器上安装哪些 OpenSpec 工作流（AI �
 openspec-cn config profile
 ```
 
-选择器会询问要配置什么（[交付方式](#delivery-skills-commands-or-both)、工作流，还是两者），然后把全部十二个工作流列成复选框，已安装的处于勾选状态。任何不是正好核心六个的选择都会保存为 `custom` profile，所以你也可以取消勾选不用的核心工作流。
+选择器会把全部十二个工作流列成复选框，已安装的处于勾选状态。任何不是正好核心六个的选择都会保存为 `custom` profile，所以你也可以取消勾选不用的核心工作流。
 
-<a id="delivery-skills-commands-or-both"></a>
+## 交付方式（2.0 中已弃用）
 
-## 交付方式：skills、commands 或两者
+OpenSpec 2.0 只安装 skills，因此 `delivery` 设置不再影响任何行为。已有的值会被保留。`openspec config set delivery <value>` 仍会保存该值，并打印一条说明它不起作用的提示。
 
-> [!IMPORTANT]
-> 命令文件已弃用，无论交付方式如何设置，都将在 OpenSpec 2.0 中移除。你的 OpenSpec skills 会保留并完成同样的工作：直接说明要做的任务，或按名称调用 skill（在 Claude Code 中用 `/openspec-propose` 代替 `/opsx:propose`）。在此之前，只要某个已配置的工具会获得命令文件，`openspec-cn update` 每次运行都会提醒你。
->
-> 现在就想切换的话，把 `delivery` 设为 `skills` 并运行 `openspec-cn update`。它只删除 OpenSpec 生成的命令文件；你编辑过的会保留并列出，这样你可以把需要的内容移入 skill。该设置对你的机器上所有项目生效，所以要在每个项目中都运行一次 `openspec-cn update`。计划进展见 [#2022](https://github.com/Fission-AI/OpenSpec/issues/2022)。
-
-交付方式是 profile 的一个设置，让你选择只安装 skills、只安装 commands，还是两者都装。默认是 `both`。[设置你的项目](../start/setup.md#the-workflow-files-skills-and-commands) 解释了这两种形式以及为什么两者都存在。该字段的精确契约在 [CLI settings (config.json)](../reference/configuration/config-json.md#delivery)。
-
-两种修改方式：
-
-**交互式**：运行 `openspec-cn config profile` 并选择 "Delivery only"。下面是从 both 切换为仅 skills 的样子：
-
-```
-Current profile settings
-  Delivery: both
-
-? What do you want to configure? Delivery only
-? Delivery mode (how workflows are installed): Skills only
-
-Config changes:
-  delivery: both -> skills
-? Apply changes to this project now? (Y/n) y
-```
-
-**直接式**：一条命令，没有提示：
-
-```bash
-openspec-cn config set delivery skills   # or: both, commands
-```
-
-交付方式绝不会改变 profile 名称。`core` 和 `custom` 只描述工作流集合，切回 `core` 会保留你的交付方式设置。
+在 1.x 中，delivery 决定安装 skills、commands 还是两者。[升级到 2.0](../help/upgrade-to-2.md) 说明了命令文件会怎样。
 
 ## 切换 profiles
 
@@ -82,8 +53,8 @@ openspec-cn config set delivery skills   # or: both, commands
 1. 更改 profile：
 
    ```bash
-   openspec-cn config profile        # interactive
-   openspec-cn config profile core   # reset to the core six (keeps delivery)
+   openspec-cn config profile        # 交互式
+   openspec-cn config profile core   # 重置为核心六个
    ```
 
 2. 在你工作的每个项目中运行更新：

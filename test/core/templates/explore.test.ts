@@ -439,7 +439,7 @@ describe('explore templates', () => {
       );
       expect(transition, label).toMatch(/捕获用户请求的制品/);
       expect(transition, label).toContain(
-        '无需让他们调用另一个工作流命令'
+        '无需让他们调用另一个工作流'
       );
       expect(transition, label).toMatch(/按依赖顺序处理/i);
       expect(transition, label).toMatch(
@@ -623,7 +623,7 @@ describe('explore handoff to the propose workflow (#869)', () => {
   it('names the propose workflow where discovery ends', () => {
     for (const [label, body] of bodies) {
       expect(body, label).toContain(
-        '**流入提案**："准备开始了吗？运行 `/opsx:propose`，它就会变成一个变更。"'
+        '**流入提案**："准备开始了吗？使用 `/opsx:propose` skill，它就会变成一个变更。"'
       );
       expect(body, label).not.toContain('I can create a change proposal');
     }

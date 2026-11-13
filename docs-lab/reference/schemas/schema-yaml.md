@@ -159,7 +159,7 @@ openspec/changes/add-auth/tasks.md
 2) [x] Completed task
 ```
 
-任何 Markdown 列表标记都可以：`-`、`*`、`+`，或最多九位数字后跟 `.` 或 `)`。允许前导空格。spec-driven 页面中的 [tasks.md 一节](spec-driven/index.md#tasksmd) 定义了默认 schema 生成的更严格格式。
+任何 Markdown 列表标记都可以：`-`、`*`、`+`，或最多九位数字后跟 `.` 或 `)`。允许前导空格。任务文本可以换行到下面的行。OpenSpec 会把换行续写的行视为任务文本的一部分，直到遇到空行、标题、代码围栏或另一个列表项。spec-driven 页面中的 [tasks.md 一节](spec-driven/index.md#tasksmd) 定义了默认 schema 生成的更严格格式。
 
 被跟踪的文件驱动 apply 状态：
 

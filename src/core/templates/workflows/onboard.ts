@@ -22,9 +22,9 @@ const EXPLORE_MODE_NOTE = optionalWorkflow(
 );
 
 /**
- * The command-reference tables. Every row is dropped along with its line when
+ * The skill-reference tables. Every row is dropped along with its line when
  * the profile does not install that workflow, so the table lists exactly the
- * commands the reader can run — and stays a valid table either way.
+ * skills the reader can use — and stays a valid table either way.
  */
 const COMMAND_REFERENCE_ROWS = [
   onlyWithWorkflow('propose', ' | `/opsx:propose` | 创建一个变更并生成全部制品 |'),
@@ -38,7 +38,7 @@ const COMMAND_REFERENCE_ROWS = [
 ].join('\n');
 
 const QUICK_REFERENCE_ROWS = [
-  onlyWithWorkflow('propose', ' | `/opsx:propose <name>`  | 创建一个变更并生成全部制品 |'),
+  onlyWithWorkflow('propose', ' | `/opsx:propose <idea>`  | 创建一个变更并生成全部制品 |'),
   onlyWithWorkflow('explore', ' | `/opsx:explore`         | 想清楚问题（不改动代码）   |'),
   onlyWithWorkflow('apply', ' | `/opsx:apply <name>`    | 实现任务                            |'),
   onlyWithWorkflow('archive', ' | `/opsx:archive <name>`  | 完成后归档                          |'),
@@ -555,11 +555,11 @@ openspec-cn archive "<name>" --yes
 
 ---
 
-## 命令参考
+## Skill 参考
 
-**你已安装的命令：**
+**你已安装的 skills：**
 
- | 命令              | 作用                               |
+ | Skill             | 作用                               |
  |-------------------|--------------------------------------------|
 ${COMMAND_REFERENCE_ROWS}
 
@@ -589,16 +589,16 @@ ${RESUME_HINTS}
 
 优雅退出，不要施压。
 
-### 用户只想看命令参考
+### 用户只想看 skill 参考
 
-若用户说只想看命令或跳过教程：
+若用户说只想看 skills 或跳过教程：
 
 \`\`\`
 ## OpenSpec 快速参考
 
-**你已安装的命令：**
+**你已安装的 skills：**
 
- | 命令                     | 作用                               |
+ | Skill                    | 作用                               |
  |--------------------------|--------------------------------------------|
 ${QUICK_REFERENCE_ROWS}
 

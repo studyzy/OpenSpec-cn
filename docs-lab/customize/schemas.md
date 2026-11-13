@@ -158,7 +158,7 @@ Artifacts: proposal, tasks
 
 ## fork 是一份快照
 
-`openspec-cn update` 会刷新已安装的 skills 和 commands，但它从不触碰 `openspec/schemas/`。你的 fork 会精确地按你留下的样子继续工作，这也意味着当内置 schema 演进时，它不再接收改进。要在之后接收这些改进，就再以新名字 fork 一次内置 schema，并把差异迁移过去。
+`openspec-cn update` 会刷新已安装的 skills，但它从不触碰 `openspec/schemas/`。你的 fork 会精确地按你留下的样子继续工作，这也意味着当内置 schema 演进时，它不再接收改进。要在之后接收这些改进，就再以新名字 fork 一次内置 schema，并把差异迁移过去。
 
 ## 分享 schemas
 

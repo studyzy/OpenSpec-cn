@@ -8,7 +8,7 @@ OpenSpec 支持多种定制选项。本页说明每一项改变什么，以及�
 
 | 选项 | 改变什么 | 何时使用 |
 |---|---|---|
-| [Profiles](profiles.md) | 安装哪些工作流，以及以 skills、commands 还是两者形式安装 | 你想要额外的工作流和工作模式，或移除不需要的工作流 |
+| [Profiles](profiles.md) | 安装哪些工作流 | 你想要额外的工作流和工作模式，或移除不需要的工作流 |
 | [项目配置](project-config.md) | 注入到每次工作流运行的指令：context、rules 和操作指引（`config.yaml`） | 你想按自己的方式规划变更，比如任务总是包含 Playwright 测试 |
 | [Schemas](schemas.md) | OpenSpec 产出什么：制品、它们的顺序和模板 | 变更应该产出不同的规划文件、章节或格式 |
 

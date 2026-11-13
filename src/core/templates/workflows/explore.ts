@@ -57,7 +57,7 @@ const CAPTURE_APPLY_HANDOFF = optionalWorkflow(
 
 const DISCOVERY_END_HANDOFF = optionalWorkflow(
   'propose',
-  '准备开始了吗？运行 `/opsx:propose`，它就会变成一个变更。',
+  '准备开始了吗？使用 `/opsx:propose` skill，它就会变成一个变更。',
   '准备开始了吗？我可以把它捕获为一个变更。'
 );
 

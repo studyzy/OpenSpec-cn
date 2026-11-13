@@ -147,7 +147,7 @@ function reportEditorFailure(editor: string, outcome: EditorOutcome): void {
   }
 }
 
-type ProfileAction = 'both' | 'delivery' | 'workflows' | 'keep';
+type ProfileAction = 'workflows' | 'keep';
 
 /**
  * A config file that exists but cannot be parsed is still the user's file:
@@ -375,10 +375,9 @@ export function configListCommand(options: { json?: boolean }): void {
 
     // Annotate profile settings
     const profileSource = rawConfig.profile !== undefined ? '(显式设置)' : '(默认值)';
-    const deliverySource = rawConfig.delivery !== undefined ? '(显式设置)' : '(默认值)';
-    console.log(`\n档案设置：`);
+    console.log(`\n配置文件设置：`);
     console.log(`  profile: ${config.profile} ${profileSource}`);
-    console.log(`  delivery: ${config.delivery} ${deliverySource}`);
+    console.log(`  delivery: ${config.delivery} （2.0 中已弃用，会被忽略）`);
     if (config.profile === 'core') {
       console.log(`  workflows: ${CORE_WORKFLOWS.join(', ')} (来自 core 档案)`);
     } else if (config.workflows && config.workflows.length > 0) {
@@ -447,7 +446,16 @@ export function configSetCommand(key: string, value: string, options: { string?:
   const displayValue =
     typeof coercedValue === 'string' ? `"${coercedValue}"` : String(coercedValue);
   console.log(`已设置 ${key} = ${displayValue}`);
+  if (key === 'delivery') {
+    // Still accepted, so `config set delivery skills && openspec update` from
+    // the 1.x notice keeps working.
+    console.log(DELIVERY_RETIRED_NOTE);
+  }
 }
+
+/** What `delivery` means now that every tool gets skills only. */
+export const DELIVERY_RETIRED_NOTE =
+  '注意：delivery 不再产生任何影响；OpenSpec 2.0 只安装 skills。';
 
 export function configUnsetCommand(key: string): void {
   if (refuseUnreadableConfig()) {
@@ -586,26 +594,14 @@ export async function configProfileCommand(preset?: string): Promise<void> {
     const config = getGlobalConfig();
     const currentState = resolveCurrentProfileState(config);
 
-    console.log(chalk.bold('\n当前档案设置'));
-    console.log(`  交付方式: ${currentState.delivery}`);
+    console.log(chalk.bold('\n当前配置文件设置'));
     console.log(`  工作流: ${formatWorkflowSummary(currentState.workflows, currentState.profile)}`);
-    console.log(chalk.dim('  交付方式 = 工作流的安装位置（skills、命令或两者）'));
     console.log(chalk.dim('  工作流 = 可用的工作流动作（propose、explore、apply 等）'));
     console.log();
 
     const action = await select<ProfileAction>({
       message: '您想配置什么？',
       choices: [
-        {
-          value: 'both',
-          name: '交付方式和工作流',
-          description: '同时更新安装模式和可用动作',
-        },
-        {
-          value: 'delivery',
-          name: '仅交付方式',
-          description: '更改工作流的安装位置',
-        },
         {
           value: 'workflows',
           name: '仅工作流',
@@ -632,38 +628,7 @@ export async function configProfileCommand(preset?: string): Promise<void> {
     };
     let workflowSelectionChanged = false;
 
-    if (action === 'both' || action === 'delivery') {
-      const deliveryChoices: { value: Delivery; name: string; description: string }[] = [
-        {
-          value: 'both' as Delivery,
-          name: '两者都安装（Skills + 命令）',
-          description: '同时将工作流作为技能和斜杠命令安装',
-        },
-        {
-          value: 'skills' as Delivery,
-          name: '仅 Skills',
-          description: '仅将工作流作为技能安装',
-        },
-        {
-          value: 'commands' as Delivery,
-          name: '仅命令',
-          description: '仅将工作流作为斜杠命令安装',
-        },
-      ];
-      for (const choice of deliveryChoices) {
-        if (choice.value === currentState.delivery) {
-          choice.name += ' [当前]';
-        }
-      }
-
-      nextState.delivery = await select<Delivery>({
-        message: '交付方式（工作流的安装方式）：',
-        choices: deliveryChoices,
-        default: currentState.delivery,
-      });
-    }
-
-    if (action === 'both' || action === 'workflows') {
+    if (action === 'workflows') {
       const formatWorkflowChoice = (workflow: string) => {
         const metadata = WORKFLOW_PROMPT_META[workflow] ?? {
           name: workflow,

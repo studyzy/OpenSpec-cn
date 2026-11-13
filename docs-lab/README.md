@@ -57,7 +57,7 @@ docs-lab 中的每个页面都从头手工编写。旧的 `docs/` 目录树只�
 | 页面 | 目标 |
 |---|---|
 | [Overview](customize/overview.md) | 自定义 OpenSpec 的选项。 |
-| [Profiles](customize/profiles.md) | 选择安装哪些工作流，以及它们是安装为 skills、commands 还是两者。 |
+| [Profiles](customize/profiles.md) | 选择安装哪些工作流。 |
 | [Project configuration](customize/project-config.md) | 用 config.yaml 中的几行配置让工作流按你想要的方式规划变更。 |
 | [Schemas](customize/schemas.md) | 改变 OpenSpec 产出的内容：制品、它们的顺序，以及它们的模板。 |
 
@@ -95,6 +95,7 @@ docs-lab 中的每个页面都从头手工编写。旧的 `docs/` 目录树只�
 |---|---|
 | [FAQ](help/faq.md) | 对不需要一个页面的问题给出简短回答。 |
 | [Troubleshooting](help/troubleshooting.md) | 当 OpenSpec 没有按你预期工作时：症状及其修复。 |
+| [Upgrade to 2.0](help/upgrade-to-2.md)（现已发布，位于 Start 下，排在 Help 其余页面之前） | 2.0 有哪些变化，以及如何迁移项目。 |
 
 ### Legacy：安全落地旧工作流（起草完成前从站点撤下，见 Open TODOs）
 

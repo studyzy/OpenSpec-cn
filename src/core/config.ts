@@ -38,8 +38,68 @@ export interface AIToolOption {
   requiresIdeRestart?: boolean; // True when slash commands are loaded by an IDE/editor process (a CLI picks them up immediately, so no restart hint — see #1067)
 }
 
+/**
+ * Every tool's project skills live once, in `.agents/skills/`. These tools
+ * don't (or may not) read that folder, so each skill is also linked into the
+ * tool's own `skills/` folder, the way `npx skills` does it. Confirmed by
+ * installing each tool: claude, continue, forgecode (user folder only), kiro,
+ * codebuddy, easycode, iflow, codeartsagent. Unconfirmed without an account:
+ * lingma, gigacode, veai, rovodev, codestudio. Hermes reads only its own and
+ * configured folders.
+ */
+export const SKILL_LINKED_TOOL_IDS: ReadonlySet<string> = new Set([
+  'claude',
+  'continue',
+  'forgecode',
+  'kiro',
+  'codebuddy',
+  'easycode',
+  'iflow',
+  'codeartsagent',
+  'lingma',
+  'gigacode',
+  'veai',
+  'rovodev',
+  'codestudio',
+  'hermes',
+]);
+
+/** A tool OpenSpec no longer supports (src/core/retired-tools.ts cleans up after it). */
+export interface RetiredTool {
+  /** The id earlier releases accepted in `--tools`. */
+  id: string;
+  name: string;
+  /** The project folder earlier releases wrote into. */
+  folder: string;
+  /** Why it is retired, completing "… is no longer supported: <reason>". */
+  reason: string;
+  /** The `--tools` id to use instead. */
+  successor: string;
+  /** That tool's name. */
+  successorName: string;
+}
+
+export const RETIRED_TOOLS: readonly RetiredTool[] = [
+  {
+    id: 'amazon-q',
+    name: 'Amazon Q Developer',
+    folder: '.amazonq',
+    reason: '它无法加载 skills，且 AWS 正逐渐用 Kiro 取代它',
+    successor: 'kiro',
+    successorName: 'Kiro',
+  },
+];
+
+export function findRetiredTool(toolId: string): RetiredTool | undefined {
+  return RETIRED_TOOLS.find((tool) => tool.id === toolId);
+}
+
+/** The line `init --tools <retired id>` fails with. */
+export function formatRetiredToolError(tool: RetiredTool): string {
+  return `${tool.name} 已不再支持：${tool.reason}。请改用 ${tool.successorName}：openspec-cn init --tools ${tool.successor}`;
+}
+
 export const AI_TOOLS: AIToolOption[] = [
-  { name: 'Amazon Q Developer', value: 'amazon-q', available: true, successLabel: 'Amazon Q Developer', skillsDir: '.amazonq', requiresIdeRestart: true },
   { name: 'Amp', value: 'amp', available: true, successLabel: 'Amp', skillsDir: '.agents', detectionPaths: ['.amp', '.agents/skills'] },
   // Antigravity moved workspace skills and workflows from `.agent` to the
   // shared `.agents` root in v1.20.5. Detection keys off `.agent` and
@@ -71,7 +131,7 @@ export const AI_TOOLS: AIToolOption[] = [
   { name: 'GigaCode', value: 'gigacode', available: true, successLabel: 'GigaCode', skillsDir: '.gigacode' },
   { name: 'Grok Build', value: 'grok', available: true, successLabel: 'Grok Build', skillsDir: '.grok' },
   { name: 'GSD', value: 'gsd', available: true, successLabel: 'GSD', skillsDir: '.agents', detectionPaths: ['.gsd'] },
-  { name: 'Hermes Agent', value: 'hermes', available: true, successLabel: 'Hermes Agent', skillsDir: '.hermes', detectionPaths: ['.hermes', 'HERMES.md', '.hermes.md'], setupNote: "Hermes 默认只从 ~/.hermes/skills 加载 skills。请将本项目的 .hermes/skills 目录添加到 ~/.hermes/config.yaml 中的 skills.external_dirs，以便 Hermes 加载生成的 OpenSpec skills。" },
+  { name: 'Hermes Agent', value: 'hermes', available: true, successLabel: 'Hermes Agent', skillsDir: '.hermes', detectionPaths: ['.hermes', 'HERMES.md', '.hermes.md'], setupNote: "Hermes 只有在信任本仓库后才会加载本项目的 .hermes/skills：在本项目运行 `hermes skills trust`（Hermes v2026.6.5 或更高版本）。旧版本请改为将本项目的 .hermes/skills 目录添加到 ~/.hermes/config.yaml 中的 skills.external_dirs。" },
   { name: 'iFlow', value: 'iflow', available: true, successLabel: 'iFlow', skillsDir: '.iflow' },
   { name: 'Junie', value: 'junie', available: true, successLabel: 'Junie', skillsDir: '.junie', requiresIdeRestart: true },
   { name: 'Kilo Code', value: 'kilocode', available: true, successLabel: 'Kilo Code', skillsDir: '.kilocode', requiresIdeRestart: true },

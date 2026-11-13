@@ -14,7 +14,10 @@ import { ALL_WORKFLOWS, type WorkflowId } from './profiles.js';
 
 export type OnboardingCommand = {
   workflow: WorkflowId;
+  /** The 1.x command spelling, which update.ts maps to each tool's skill form. */
   command: string;
+  /** The skill's name, shown before tools are picked. */
+  skill: string;
   description: string;
 };
 
@@ -32,10 +35,10 @@ export const DESCRIPTION_BUDGET = 8;
  * then implement.
  */
 const ONBOARDING_COMMANDS: readonly OnboardingCommand[] = [
-  { workflow: 'propose', command: '/opsx:propose', description: '发起变更' },
-  { workflow: 'new', command: '/opsx:new', description: '脚手架变更' },
-  { workflow: 'continue', command: '/opsx:continue', description: '下一制品' },
-  { workflow: 'apply', command: '/opsx:apply', description: '实现任务' },
+  { workflow: 'propose', command: '/opsx:propose', skill: 'openspec-propose', description: '发起变更' },
+  { workflow: 'new', command: '/opsx:new', skill: 'openspec-new-change', description: '脚手架变更' },
+  { workflow: 'continue', command: '/opsx:continue', skill: 'openspec-continue-change', description: '下一制品' },
+  { workflow: 'apply', command: '/opsx:apply', skill: 'openspec-apply-change', description: '实现任务' },
 ];
 
 /**

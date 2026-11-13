@@ -19,8 +19,8 @@ metadata:
 
 否则，在没有根目录的情况下，接下来怎么做取决于这个工作流是如何被触发的：
 
-- **自动选用**：这个工作流是你自己选的，用户没有提到 OpenSpec、没有点名这个 skill，也没有运行它的斜杠命令。停止使用 OpenSpec，按平常方式回答请求，就像没安装 OpenSpec 一样。不要要求他们做任何配置，也不要提及 OpenSpec 配置。
-- **明确要求 OpenSpec**：用户提到了 OpenSpec、点名了这个 skill，或运行了它的斜杠命令。在写入前停下并询问如何继续：为本项目做配置（`openspec-cn init`）、指向他们已有的某个 store（`--store <id>`），还是本次请求不使用 OpenSpec 继续。等待他们的答复。
+- **自动选用**：这个工作流是你自己选的，用户没有提到 OpenSpec、没有点名这个 skill，也没有按名字调用这个 skill。停止使用 OpenSpec，按平常方式回答请求，就像没安装 OpenSpec 一样。不要要求他们做任何配置，也不要提及 OpenSpec 配置。
+- **明确要求 OpenSpec**：用户提到了 OpenSpec、点名了这个 skill，或按名字调用了这个 skill。在写入前停下并询问如何继续：为本项目做配置（`openspec-cn init`）、指向他们已有的某个 store（`--store <id>`），还是本次请求不使用 OpenSpec 继续。等待他们的答复。
 
 无论走哪个分支，都绝不能把创建根目录当作副作用：在用户要求之前不要运行 `openspec-cn init`，不要手工创建 `openspec/` 文件，也不要让任何命令创建它。
 
@@ -97,7 +97,7 @@ metadata:
 - 修订了哪些制品（以及哪些提议的修订被拒绝）
 - 在已部分填充的 glob 制品下创建的任何文件
 - 推迟到 `/openspec-continue-change` 的任何内容（尚无文件的制品且状态为 `ready` 或 `blocked`，绝不包括 `skipped` 制品）
-- 变更的状态及推荐的下一步命令
+- 变更的当前状态及推荐的下一步 skill
 
 **护栏**
 - 仅规划制品 — 绝不要编辑实现代码。若修订后的计划暗示代码更改，停止并指向 `/openspec-apply-change`。

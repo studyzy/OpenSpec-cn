@@ -223,7 +223,7 @@ openspec-cn version
 openspec-cn update
 ```
 
-当有更新的 CLI 发布时，[`openspec-cn update`](../reference/cli.md#openspec-update) 会提示你，并且可以替你安装；那次升级每台机器只发生一次。每次运行都会刷新项目生成的 skills 和 commands，它们不会自行更新。一个最新的项目会打印 `✓ All 2 tool(s) up to date (v1.7.0)`。
+当有更新的 CLI 发布时，[`openspec-cn update`](../reference/cli.md#openspec-update) 会提示你，并且可以替你安装；那次升级每台机器只发生一次。每次运行都会刷新项目生成的 skills，它们不会自行更新。一个最新的项目会打印 `✓ All 2 tool(s) up to date (v1.7.0)`。
 
 
 > [!WARNING]
@@ -252,7 +252,7 @@ npm uninstall -g @studyzy/openspec-cn
 
 **3. 删除剩下的部分，或者保留。**
 
-- 生成的 Agent 文件：目录下的 `openspec-*` skills 和 `opsx` commands，位于 `.claude/` 或 `.agents/` 之类的目录下，按项目区分。[支持的工具](../reference/supported-tools.md) 列出了每种工具的路径；MiniMax Code 把 skills 放在 `~/.minimax/skills`。
+- 生成的项目内 Agent 文件：`.agents/skills/` 中的 `openspec-*` skills 和 `.openspec-target`，以及 `.claude/skills/` 之类的工具文件夹中的 `openspec-*` 链接。[支持的工具](../reference/supported-tools.md) 列出了哪些工具会获得链接；MiniMax Code 把 skills 放在 `~/.minimax/skills`。
 - 旧版本的遗留物：`CLAUDE.md` 或 `AGENTS.md` 中的标记块（删除该块，保留文件）以及 `~/.codex/prompts` 下的 `opsx-*.md` 提示词。
 - `openspec/` 文件夹：先停一下。`specs/` 和 `changes/archive/` 是系统的记录，是即使没有 OpenSpec 也能正常阅读的纯 Markdown。
-- 每台机器的状态：`~/.config/openspec/` 下的设置和遥测 id；`~/.local/share/openspec/` 下的 schema 覆盖、store 注册，以及独立安装的内置 schema（`binary-schemas/`）（Windows：`%APPDATA%\openspec`、`%LOCALAPPDATA%\openspec`）。注册信息是指针；它们指向的 store 仓库不会被动到。
+- 每台机器的状态：`~/.config/openspec/` 下的设置和遥测 id；`~/.local/share/openspec/` 下的 schema 覆盖、store 注册，以及独立安装的内置 schema（`binary-schemas/`）（Windows 下为 `%APPDATA%\openspec`、`%LOCALAPPDATA%\openspec`）。注册项只是指针，它们指向的 store 仓库不会被改动。
