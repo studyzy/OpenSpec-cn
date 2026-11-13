@@ -8,7 +8,7 @@ npx skills add studyzy/OpenSpec-cn
 
 此处的每个 `openspec-*/SKILL.md` 与 `openspec-cn init` 写入项目的 skill 完全相同。
 这些 skills 驱动 `openspec-cn` CLI，因此若需完整安装（CLI + `openspec/` 项目脚手架 +
-斜杠命令），请运行：
+共享 skills），请运行：
 
 ```bash
 npx @studyzy/openspec-cn@latest init

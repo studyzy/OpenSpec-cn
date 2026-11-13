@@ -153,7 +153,7 @@ openspec-cn init
 
 这两者都在默认 profile 中。如果你想要扩展工作流（`openspec-new-change`、`openspec-continue-change`、`openspec-ff-change`、`openspec-verify-change`、`openspec-bulk-archive-change`、`openspec-onboard`），请通过 `openspec-cn config profile` 选择，然后运行 `openspec-cn update` 应用。
 
-这些都是 skills。大多数工具以 `/openspec-propose` 调用，Codex 以 `$openspec-propose` 调用，你也可以直接用大白话说明要做的事。`openspec-cn init` 会为你选择的工具打印正确的形式 —— 见[支持的工具](https://openspec.dev/docs/supported-tools)。从 1.x 及其 `/opsx:*` 命令升级过来？见[升级到 2.0](https://openspec.dev/docs/upgrade-to-2)。
+这些都是 skills。大多数工具以 `/openspec-propose` 调用，Codex 以 `$openspec-propose` 调用，你也可以直接用大白话说明要做的事。`openspec-cn init` 会为你选择的工具打印正确的形式 —— 见[支持的工具](https://openspec.dev/docs/supported-tools)。从 1.x 及其 `/opsx:*` 命令升级过来？请先提交工作区，然后运行 `openspec-cn update`；详细步骤见[升级到 2.0](docs-lab/help/upgrade-to-2.md)。
 > [!NOTE]
 > 不确定你的工具是否受支持？[查看完整列表](https://openspec.dev/docs/supported-tools) —— 我们支持 30+ 种工具且持续增长。
 >

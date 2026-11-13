@@ -103,8 +103,15 @@
 | cloud coding agent | 云端编程 Agent | GitHub Copilot 相关 |
 | opt-in | 主动选择启用 | — |
 | vendor-neutral | 与厂商无关 | 共享 `.agents` 目标 |
-| delivery mode | 交付模式 | skills / commands |
-| skills-only | 仅 skills | 某些工具不生成命令文件 |
+| delivery mode | 交付模式 | 2.0 起已退役，文案中保留原文 `delivery` |
+| skills-only | 仅 skills | 2.0 起唯一的安装方式 |
+| shared skills | 共享 skills | 指 `.agents/skills/` 中的唯一副本 |
+| skill link | skill 链接 | 工具自身文件夹中指向共享副本的符号链接/junction |
+| `.openspec-target` | （不译） | 记录项目中 OpenSpec 管理内容的清单文件 |
+| retired tool | 退役工具 | 如 Amazon Q Developer，不再支持并清理其文件 |
+| keep / kept | 保留 | 用户编辑过、OpenSpec 不会覆盖的文件 |
+| own-files | own-files | `.openspec-target` 中的标记，保持原文 |
+| upgrade to 2.0 | 升级到 2.0 | 文档标题 |
 | Not generated | 不生成 | 工具表格中的命令路径单元格 |
 | shadowing (on PATH) | 遮蔽 | PATH 上存在更早的副本 |
 | version manager | 版本管理器 | nvm / fnm / asdf / volta |

@@ -15,7 +15,7 @@
 ## 技术栈
 
 - TypeScript, ESM 模块 (`"type": "module"`)
-- Node.js ≥ 20.19.0
+- Node.js ≥ 22.12.0
 - pnpm 包管理
 - CLI 框架: Commander.js
 - 测试: Vitest
@@ -63,12 +63,16 @@ src/
 │   │   ├── graph.ts     # 制品依赖图
 │   │   ├── state.ts     # 运行时状态追踪
 │   │   └── resolver.ts  # 依赖解析
-│   ├── command-generation/  # 为 30+ 种 AI 工具生成斜杠命令
+│   ├── command-generation/  # 命令适配器（2.0 只用于识别/清理旧版命令文件，不再生成）
 │   │   └── adapters/        # 每种工具一个适配器（claude, cursor, codebuddy, copilot 等）
 │   ├── store/            # Store 系统（注册、注销、Git 操作、诊断）
 │   │   └── operations.ts # ~1200行，Store 完整生命周期管理
 │   ├── shared/           # 共享工具：Agent Skills 模板生成、工具检测
-│   ├── config.ts         # AI_TOOLS 常量（31种工具），OpenSpec 可用性检测
+│   │   ├── shared-skill-install.ts # 2.0 唯一入口：向 .agents/skills/ 安装共享 skills 并建链接
+│   │   ├── skill-links.ts          # 链接的创建/识别/分类
+│   │   └── own-skill-texts.ts      # 判断 .agents/skills/ 中哪些是用户自有 skill
+│   ├── config.ts         # AI_TOOLS 常量（30+ 种工具）、RETIRED_TOOLS、OpenSpec 可用性检测
+│   ├── retired-tools.ts  # 已退役工具（Amazon Q）的清理与提示
 │   ├── config-prompts.ts # 交互式配置提示
 │   ├── init.ts           # 项目初始化（动态导入 @inquirer，ESLint 豁免静态导入限制）
 │   ├── profiles.ts       # Profile 定义（core, custom）
@@ -101,6 +105,8 @@ src/
 
 6. **汉化范围**: 界面文字、文档、模板已汉化。代码标识符、CLI 参数名保持英文。`src/` 中中文字符串用 `// 中文注释` 标注。
 
+7. **2.0 只安装 skills**: 项目 skills 只写一份到 `.agents/skills/`；不读该目录的工具（Claude Code、Kiro、CodeBuddy 等，见 `SKILL_LINKED_TOOL_IDS`）从其自身文件夹建立链接。MiniMax Code 例外，写全局 `~/.minimax/skills/`。原本由 `delivery` 设置的 skills/commands 二选一已退役：值仍会被读取，但不再影响安装内容；`command-generation/adapters` 仅保留用于识别并清理旧版生成的文件。
+
 ## OpenSpec 开发工作流
 
 本仓库自身使用 OpenSpec 管理开发。`openspec/` 目录结构：
@@ -114,7 +120,7 @@ openspec/
 └── explorations/    # 设计探索文档
 ```
 
-工作流：`/opsx:explore` → `/opsx:propose` → `/opsx:apply` → `/opsx:archive`
+工作流：`/openspec-explore` → `/openspec-propose` → `/openspec-apply-change` → `/openspec-archive-change`（Codex 中写作 `$openspec-propose`）。
 
 ## 测试结构
 
@@ -122,16 +128,19 @@ openspec/
 test/
 ├── AGENTS.md          # 测试编写指引
 ├── vocabulary-sweep.test.ts  # 确保退役术语不会重新出现
+├── *-docs-claims.test.ts     # 校验文档（docs-lab/）与 CLI 实际行为/文案一致
 ├── cli-e2e/           # CLI 端到端测试
 │   ├── basic.test.ts  # help/version/init/validate
 │   └── commands/      # 各命令测试（~17+ 文件）
 ├── core/              # 核心模块单元测试（~35 文件）
 ├── helpers/
 │   └── run-cli.ts     # runCLI() 辅助函数，spawn dist/cli/index.js
-└── fixtures/          # 测试固件（示例 openspec 项目）
+└── fixtures/          # 测试固件（含 released-output/ 各历史版本产物快照）
 ```
 
 CLI E2E 测试通过 `runCLI()` spawn 已构建的 `dist/cli/index.js`，创建临时目录，设置 `OPEN_SPEC_INTERACTIVE=0` 禁用交互提示，使用 `--json` 标志获取机器可解析输出。`vitest.setup.ts` 确保测试前 CLI 已构建。
+
+`*-docs-claims.test.ts` 会读取 `docs-lab/` 中的页面并断言其中引用的命令、文案、安装地址与源码一致；改动 CLI 输出的用户可见文案时，通常要同步这些测试与文档。
 
 ## 发布
 
@@ -142,7 +151,20 @@ pnpm changeset     # 交互式创建 changeset
 pnpm release       # 发布流程
 ```
 
-Nix 支持通过 `flake.nix` 提供（`pnpm_9`, `nodejs_20`），支持 x86_64-linux, aarch64-linux, x86_64-darwin, aarch64-darwin。
+Nix 支持通过 `flake.nix` 提供（`pnpm_9`, `nodejs_22`），支持 x86_64-linux, aarch64-linux, x86_64-darwin, aarch64-darwin。
 
 ## 注意
-EXPECTED_FUNCTION_HASHES 和 EXPECTED_GENERATED_SKILL_CONTENT_HASHES 会因为汉化而改变，导致相关的UT不通过，这些UT需要在最后所有项目都完成汉化后再重新计算Hash进行修复。
+EXPECTED_FUNCTION_HASHES 和 EXPECTED_GENERATED_SKILL_CONTENT_HASHES 会因为汉化而改变，导致相关的UT不通过。应当在所有汉化完成后用脚本重新计算哈希，不要手工改单个值：
+1. `pnpm build`
+2. `pnpm generate:skills` — 由 `src/core/templates/` 重新生成 `skills/*/SKILL.md`
+3. `pnpm regen:parity-hashes` — 重算 parity 测试中的哈希表
+
+## 合入上游版本
+
+1. `git fetch offical --tags`，确认 `git merge-base HEAD v<版本>` 是上次合入的上游 tag。
+2. `git merge --no-commit v<版本>`，逐个解决冲突。
+3. 身份适配：npm 包 `@studyzy/openspec-cn`、命令 `openspec-cn`、独立二进制 `openspec-cn`/`openspec-cn.exe`、仓库与下载源 `studyzy/OpenSpec-cn`。目录 `openspec/`、schema 名、env 变量名（`OPENSPEC_*`）、skill 名（`openspec-*`）保持不变。
+4. 新增或改动的用户可见文案按 `TRANSLATION_GLOSSARY.md` 汉化；`docs-lab/` 是当前文档来源，需一并汉化（`docs/` 为遗留目录，可不动）。
+5. 更新 `CODEBUDDY.md`、`README.md`、`TRANSLATION_GLOSSARY.md` 中受影响的事实。
+6. 重算模板哈希（见上），跑 `pnpm build && pnpm lint && pnpm test`。
+7. 补一条对应版本级别的 changeset。
