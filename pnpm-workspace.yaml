@@ -45,3 +45,14 @@ overrides:
   # all pin ^10.x); never in the published CLI. Remove once those ranges allow
   # >=11.0.1 (check: pnpm why minimatch).
   minimatch@<11.0.1: '>=11.0.1'
+
+auditConfig:
+  ignoreGhsas:
+    # GHSA-fc5q-39xc-vjpf — picomatch <=4.0.7 ReDoS through single-branch
+    # repeated extglobs. No patched release exists, so no override can fix it.
+    # Runtime direct dependency: src/core/artifact-graph/outputs.ts uses it to
+    # match one path segment of a schema artifact's glob output path; patterns
+    # come from the project's own schema. Accepted residual risk: a crafted
+    # schema glob can reach picomatch. Remove this exception once picomatch
+    # ships a patched release (check: pnpm why picomatch; pnpm audit --prod).
+    - GHSA-fc5q-39xc-vjpf

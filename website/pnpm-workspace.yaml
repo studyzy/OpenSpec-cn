@@ -16,3 +16,11 @@ overrides:
   # only (transitive via postcss); this is a statically exported site with no server
   # runtime. Remove once transitive nanoid is >=3.3.17 (check: pnpm why nanoid).
   nanoid@<3.3.17: '>=3.3.17 <4'
+
+auditConfig:
+  ignoreGhsas:
+    # GHSA-fc5q-39xc-vjpf — picomatch <=4.0.7 ReDoS. No patched release exists.
+    # Build-time only here (fumadocs-core > tinyglobby > picomatch) for a
+    # statically exported site with no server runtime. Remove this exception
+    # once picomatch ships a patched release (check: pnpm audit --dir website).
+    - GHSA-fc5q-39xc-vjpf
