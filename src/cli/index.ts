@@ -3,7 +3,6 @@ import { createRequire } from 'module';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { existsSync, promises as fs } from 'fs';
-import { AI_TOOLS, TOOL_ID_ALIASES } from '../core/config.js';
 import type { ArchiveOptions } from '../core/archive.js';
 import { registerSpecCommand } from './commands/spec.js';
 import { registerConfigCommand } from './commands/config.js';
@@ -253,25 +252,27 @@ program.hook('postAction', async (_thisCommand, actionCommand) => {
   }
 });
 
-const availableToolIds = AI_TOOLS
-  .filter((tool) => tool.skillsDir || tool.globalSkillsDir)
-  .map((tool) => tool.value);
-const toolAliasNote = Object.entries(TOOL_ID_ALIASES)
-  .map(([retired, current]) => `${retired} (now ${current})`)
-  .join(', ');
-const toolsOptionDescription = `非交互式配置AI工具。使用 "all"、"none" 或逗号分隔的列表：${availableToolIds.join(', ')}。同时接受：${toolAliasNote}`;
+function initToolsHelp(): string {
+  const require = createRequire(import.meta.url);
+  const { AI_TOOLS, TOOL_ID_ALIASES } = require('../core/config.js') as typeof import('../core/config.js');
+  const ids = AI_TOOLS.map(tool => tool.value).join(', ');
+  const aliases = Object.entries(TOOL_ID_ALIASES).map(([old, id]) => `${old} (now ${id})`);
+  return `\n使用 "all"、"none" 或逗号分隔的列表：${ids}。同时接受：${aliases.join(', ')}。`;
+}
 
 program
   .command('init [path]')
   .description('在您的项目中初始化OpenSpec')
-  .option('--tools <tools>', toolsOptionDescription)
+  .option('--tools <tools>', '非交互式配置 AI 工具（"all"、"none" 或逗号分隔的工具 ID 列表）')
+  .addHelpText('after', initToolsHelp)
   .option('--language <language>', '用此语言编写新的 OpenSpec 制品')
   .option('--force', '自动清理旧文件而不提示')
   .option('--profile <profile>', '覆盖全局配置档案（core 或 custom）')
   .option('--no-animation', '显示静态欢迎屏而非动画版')
   .option('--copilot-cloud', '无需提示直接配置 GitHub Copilot 云端 coding-agent 文件')
   .option('--no-copilot-cloud', '无需提示跳过 GitHub Copilot 云端 coding-agent 文件')
-  .action(async (targetPath = '.', options?: { tools?: string; language?: string; force?: boolean; profile?: string; animation?: boolean; copilotCloud?: boolean }) => {
+  .option('--scope <scope>', 'skills 安装位置：global（本机，所有项目共用）或 project')
+  .action(async (targetPath = '.', options?: { tools?: string; language?: string; force?: boolean; profile?: string; animation?: boolean; copilotCloud?: boolean; scope?: string }) => {
     try {
       // Validate that the path is a valid directory
       const resolvedPath = path.resolve(targetPath);
@@ -300,6 +301,7 @@ program
         profile: options?.profile,
         animation: options?.animation,
         copilotCloud: options?.copilotCloud,
+        scope: options?.scope,
       });
       await initCommand.execute(targetPath);
     } catch (error) {

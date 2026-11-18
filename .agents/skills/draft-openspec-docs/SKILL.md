@@ -2,6 +2,8 @@
 name: draft-openspec-docs
 description: OpenSpec 文档的协作式页面起草模式。在目标页面内部构建一份草稿计划（目的、结构、编号起草步骤），与用户一起迭代，然后按已批准的步骤逐章节起草，并在完成后清理自身。在页面需要从头重写，或一个新区块需要用户参与塑形时使用。
 argument-hint: target page
+metadata:
+  internal: true
 ---
 
 # 起草 OpenSpec 文档（草稿计划工作流）

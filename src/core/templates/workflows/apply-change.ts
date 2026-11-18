@@ -5,27 +5,15 @@
  * templates file into workflow-focused modules.
  */
 import type { SkillTemplate, CommandTemplate } from '../types.js';
-import { optionalWorkflow } from '../optional-workflow.js';
 import { STORE_SELECTION_GUIDANCE } from './store-selection.js';
 import { PROJECT_ROOT_GUARD } from './project-root.js';
 
-/**
- * `/opsx:continue` is not in the `core` profile, so the blocked-state handoff
- * is authored with a CLI fallback and resolved at generation time (see
- * optional-workflow.ts).
- */
-const BLOCKED_STATE_HANDOFF = optionalWorkflow(
-  'continue',
-  '建议使用 `/opsx:continue` 来创建它们。',
-  '建议补全缺失的制品。运行 `openspec-cn status --change "<name>" --json`，选择下一个 `ready` 制品（而非 `skipped` 或 `blocked`），并使用 `openspec-cn instructions "<artifact-id>" --change "<name>" --json` 获取其规则和模板。两条命令都要保留已选中的 `--store <id>`。'
-);
+const BLOCKED_STATE_HANDOFF =
+  '展示缺失的制品以及 CLI `instruction` 字段中的恢复步骤。后续任何命令都要保留已选中的 store（`--store <id>`）。';
 
 /** The archive handoff shown once every task is done. */
-const ARCHIVE_HANDOFF = optionalWorkflow(
-  'archive',
-  '你可以使用 `/opsx:archive` 归档此变更。',
-  '你可以运行 `openspec-cn archive "<name>"` 来归档此变更。'
-);
+const ARCHIVE_HANDOFF =
+  '审查已完成的工作，然后询问是否归档此变更。';
 
 /**
  * The apply workflow instructions, authored once and rendered by both the

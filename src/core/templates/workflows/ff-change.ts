@@ -5,29 +5,14 @@
  * templates file into workflow-focused modules.
  */
 import type { SkillTemplate, CommandTemplate } from '../types.js';
-import { optionalWorkflow } from '../optional-workflow.js';
 import { STORE_SELECTION_GUIDANCE } from './store-selection.js';
 import { PROJECT_ROOT_GUARD } from './project-root.js';
 
-/**
- * The implementation handoff, resolved at generation time so a profile
- * without `apply` is not told to run it (see optional-workflow.ts).
- *
- * The two surfaces word this differently on purpose (#258): a command-only
- * tool has no conversational agent to ask, so its prompt names a command or
- * the CLI and never invites "ask me to implement".
- */
-const SKILL_APPLY_HANDOFF = optionalWorkflow(
-  'apply',
-  '运行 `/opsx:apply`，或者让我来实现，即可开始处理这些任务。',
-  '让我来实现，即可开始处理这些任务。'
-);
+const SKILL_APPLY_HANDOFF =
+  '计划已就绪，待审核。准备好后，让我来应用它。';
 
-const COMMAND_APPLY_HANDOFF = optionalWorkflow(
-  'apply',
-  '运行 `/opsx:apply` 开始实现。',
-  '运行 `openspec-cn instructions apply --change "<name>" --json` 获取任务列表并开始实现。'
-);
+const COMMAND_APPLY_HANDOFF =
+  '审核计划。要开始实现，请运行 `openspec-cn instructions apply --change "<name>" --json`。';
 
 export function getFfChangeSkillTemplate(): SkillTemplate {
   return {

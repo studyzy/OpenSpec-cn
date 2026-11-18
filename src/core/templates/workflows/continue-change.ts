@@ -5,24 +5,11 @@
  * templates file into workflow-focused modules.
  */
 import type { SkillTemplate, CommandTemplate } from '../types.js';
-import { optionalWorkflow } from '../optional-workflow.js';
 import { STORE_SELECTION_GUIDANCE } from './store-selection.js';
 import { PROJECT_ROOT_GUARD } from './project-root.js';
 
-/**
- * The planning-complete handoff. Neither `apply` nor `archive` is guaranteed
- * to be installed, so each half is resolved at generation time (see
- * optional-workflow.ts).
- */
-const PLANNING_COMPLETE_HANDOFF = optionalWorkflow(
-  'apply',
-  '现在可以用 `/opsx:apply` 实现这个变更。',
-  '现在可以实现这个变更 —— `openspec-cn instructions apply --change "<name>" --json` 会返回任务列表以及如何执行它们。'
-) + ' ' + optionalWorkflow(
-  'archive',
-  '当实现以及所有被追踪的工作都完成后，用 `/opsx:archive` 归档它。',
-  '当实现以及所有被追踪的工作都完成后，用 `openspec-cn archive "<name>"` 归档它。'
-);
+const PLANNING_COMPLETE_HANDOFF =
+  '计划已就绪，待审核。准备好后，让我来应用它。';
 
 /**
  * A glob artifact reads `done` once one matching file exists, so a run
@@ -85,7 +72,7 @@ ${PROJECT_ROOT_GUARD}
    **若所有规划制品已完成（\`isPlanningComplete: true\`，或旧版 \`isComplete: true\`）**：
    - 祝贺用户
    - 展示最终状态，包括使用的 schema
-   - 建议："规划完成！现在可以实现此变更。实现及所有跟踪的工作完成后，归档它。"
+   - 建议："规划完成！开始实现前请先审核计划。"
    - 停止
 
    ---

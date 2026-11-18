@@ -39,7 +39,7 @@ metadata:
    若可用，包含每个变更使用的 schema。
    将有未完成任务的变更标记为 "(进行中)"。
 
-   始终宣告："使用变更：<name>"，以及如何覆盖（例如 `/openspec-verify-change <other>`）。
+   始终宣告："使用变更：<name>"，以及如何覆盖（例如 `openspec-verify-change <other>`）。
 
 2. **检查状态以了解 schema**
    ```bash

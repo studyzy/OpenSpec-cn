@@ -24,7 +24,7 @@ metadata:
 
 无论走哪个分支，都绝不能把创建根目录当作副作用：在用户要求之前不要运行 `openspec-cn init`，不要手工创建 `openspec/` 文件，也不要让任何命令创建它。
 
-**Input**: 可选地指定变更名称（例如 `/openspec-apply-change add-auth`）。若省略，检查能否从对话上下文推断。若模糊或歧义，你必须提示用户从可用变更中选择。
+**Input**: 可选地指定变更名称（例如 `openspec-apply-change add-auth`）。若省略，检查能否从对话上下文推断。若模糊或歧义，你必须提示用户从可用变更中选择。
 
 **步骤**
 
@@ -35,7 +35,7 @@ metadata:
    - 若仅有一个活跃变更则自动选择
    - 若存在歧义，运行 `openspec-cn list --json` 获取可用变更并让用户选择
 
-   始终宣告："使用变更：<name>"，以及如何覆盖（例如 `/openspec-apply-change <other>`）。
+   始终宣告："使用变更：<name>"，以及如何覆盖（例如 `openspec-apply-change <other>`）。
 
 2. **检查状态以理解 schema**
    ```bash
@@ -63,7 +63,7 @@ metadata:
 
    **处理状态：**
    - 若 `state: "blocked"`：显示消息并暂停实现。
-     - 若 `missingArtifacts` 非空：建议使用 `/openspec-continue-change` 来创建它们。
+     - 若 `missingArtifacts` 非空：展示缺失的制品以及 CLI `instruction` 字段中的恢复步骤。后续任何命令都要保留已选中的 store（`--store <id>`）。
      - 否则，遵循 CLI 指令从现有规划制品创建或修复 schema 配置的跟踪文件。在受阻时不要假设另一个制品已就绪，也不要开始实现。
    - 若 `state: "all_done"`：报告所有跟踪的任务已完成，并建议在归档前根据情况进行审查或验证
    - 否则：继续实现
@@ -143,7 +143,7 @@ metadata:
 - [x] 任务 2
 ...
 
-所有跟踪的任务已完成。归档前请根据情况审查或验证该变更。 你可以使用 `/openspec-archive-change` 归档此变更。
+所有跟踪的任务已完成。归档前请根据情况审查或验证该变更。 审查已完成的工作，然后询问是否归档此变更。
 ```
 
 **暂停时输出（遇到问题）**

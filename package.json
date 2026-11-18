@@ -1,6 +1,6 @@
 {
   "name": "@studyzy/openspec-cn",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "description": "面向AI编程助手的规范驱动开发框架OpenSpec的简体中文汉化版本",
   "keywords": [
     "openspec",
@@ -17,7 +17,7 @@
     "url": "https://github.com/studyzy/OpenSpec-cn"
   },
   "license": "MIT",
-  "author": "OpenSpec Contributors",
+  "author": "FISSION AI INC",
   "type": "module",
   "packageManager": "pnpm@10.34.5",
   "publishConfig": {
@@ -59,7 +59,7 @@
     "changeset": "changeset"
   },
   "engines": {
-    "node": ">=22.12.0"
+    "node": ">=22.20.0"
   },
   "devDependencies": {
     "@changesets/changelog-github": "^1.0.0",
@@ -78,12 +78,13 @@
     "@inquirer/core": "^12.0.0",
     "@inquirer/prompts": "^8.5.2",
     "brace-expansion": "^5.0.12",
-    "chalk": "^5.6.2",
+    "chalk": "^6.0.1",
     "commander": "^14.0.0",
     "cross-spawn": "7.0.6",
     "diff": "^9.0.0",
     "ora": "^9.4.1",
     "picomatch": "^4.0.4",
+    "skills": "1.8.1",
     "tinyglobby": "^0.2.17",
     "yaml": "^2.8.3",
     "zod": "^4.4.3"

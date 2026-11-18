@@ -5,7 +5,7 @@
  * templates file into workflow-focused modules.
  */
 import type { SkillTemplate, CommandTemplate } from '../types.js';
-import { optionalWorkflow } from '../optional-workflow.js';
+import { SYNC_FALLBACK_SAFEGUARDS } from './archive-change.js';
 import { STORE_SELECTION_GUIDANCE } from './store-selection.js';
 import { PROJECT_ROOT_GUARD } from './project-root.js';
 
@@ -14,19 +14,14 @@ import { PROJECT_ROOT_GUARD } from './project-root.js';
  * how it normally does that. A profile that selects `archive` gets `sync`
  * injected (see getProfileWorkflows), but an install whose workflow set was
  * read back off disk can still be missing it — in which case the merge has to
- * happen inline rather than be handed to a workflow that is not there.
+ * happen inline rather than be handed to a workflow that is not there. The
+ * text is the same for every profile, so it states both paths.
  */
-const SYNC_INLINE_HANDOFF = optionalWorkflow(
-  'sync',
-  '内联运行 `/opsx:sync` 工作流（由 agent 驱动的智能合并）',
-  '自行内联执行 delta 到主 spec 的合并（由 agent 驱动的智能合并）'
-);
+const SYNC_INLINE_HANDOFF =
+  '内联运行 `/opsx:sync` 工作流（若已安装该 skill），否则自行内联执行 delta 到主 spec 的合并（两者都是由 agent 驱动的智能合并）';
 
-const SYNC_GUARDRAIL = optionalWorkflow(
-  'sync',
-  '内联运行 `/opsx:sync` 工作流（由 agent 驱动）',
-  '自行内联执行 delta 到主 spec 的合并（由 agent 驱动）'
-);
+const SYNC_GUARDRAIL =
+  '内联运行 `/opsx:sync` 工作流（若已安装该 skill），否则自行内联执行 delta 到主 spec 的合并（两者都是由 agent 驱动）';
 
 export function getBulkArchiveChangeSkillTemplate(): SkillTemplate {
   return {
@@ -200,7 +195,7 @@ ${PROJECT_ROOT_GUARD}
    按确定的顺序处理各变更（遵循冲突解决方案）：
 
    a. **同步包含的增量 spec**：
-      - 仅为有条目在 \`includedDeltas\` 中的变更${optionalWorkflow('sync', '内联运行 `openspec-sync-specs` 工作流（agent 驱动的智能合并）', '自行内联执行 delta 到主 spec 的合并（agent 驱动的智能合并）')}，仅传递包含的 delta 路径，并明确指示忽略该变更的 \`excludedDeltas\`。等待其完成。
+      - 仅为有条目在 \`includedDeltas\` 中的变更内联运行 \`openspec-sync-specs\` 工作流（若已安装该 skill），否则自行内联执行 delta 到主 spec 的合并（两者都是由 agent 驱动的智能合并），仅传递包含的 delta 路径，并明确指示忽略该变更的 \`excludedDeltas\`。等待其完成。
       - 若同步报告任何停止或受阻条件，视为同步失败。立即停止处理该变更。在继续下一个变更之前，在批次结果中把该变更的结果记为失败，并附上同步的受阻/错误条件。
       - 不要执行同步后的内容比较，也不要移动其 \`changeRoot\`；保持该变更原样。
       - 对冲突，按已解析的顺序应用。
@@ -352,7 +347,8 @@ Spec 同步汇总：
 - 归档目录目标使用当前日期，在步骤 3d 中计算一次并在移动时复用：YYYY-MM-DD-<name>；已以 \`YYYY-MM-DD-\` 前缀开头的名称保持原样（绝不叠加第二个日期）
 - 若归档目标已存在，使该变更失败但继续处理其他变更
 - 在步骤 3 中检查每个归档目标（在第一次主 spec 写入之前）；目标已存在的变更绝不被同步或移动
-- 若请求同步，为每个包含增量 spec 的变更${optionalWorkflow('sync', '内联运行 `openspec-sync-specs` 工作流（agent 驱动）', '内联执行 delta 到主 spec 的合并（agent 驱动）')}
+- 若请求同步，为每个包含增量 spec 的变更内联运行 \`openspec-sync-specs\` 工作流（若已安装该 skill），否则自行内联执行 delta 到主 spec 的合并（两者都是由 agent 驱动）
+${SYNC_FALLBACK_SAFEGUARDS}
 - 将每个 delta 的 \`includedDeltas\` 和 \`excludedDeltas\` 决策带入执行；仅同步和验证包含的 delta
 - 将每个被排除的增量报告为 \`sync skipped\`，但不把归档本身视为跳过
 - 绝不在 spec 同步仍在进行时归档某个变更 —— 内联运行同步，并在移动 \`changeRoot\` 之前验证 \`<planningHome.root>/openspec/specs/<capability-path>/spec.md\` 处的主 specs
@@ -698,6 +694,7 @@ Spec 同步汇总：
 - 若归档目标已存在，使该变更失败但继续处理其他变更
 - 在步骤 3 中检查每个归档目标（在第一次主 spec 写入之前）；目标已存在的变更绝不被同步或移动
 - 若请求同步，为每个包含增量 spec 的变更${SYNC_GUARDRAIL}
+${SYNC_FALLBACK_SAFEGUARDS}
 - 将每个 delta 的 \`includedDeltas\` 和 \`excludedDeltas\` 决策带入执行；仅同步和验证包含的 delta
 - 将每个被排除的增量报告为 \`sync skipped\`，但不把归档本身视为跳过
 - 绝不在 spec 同步仍在进行时归档某个变更 —— 内联运行同步，并在移动 \`changeRoot\` 之前验证 \`<planningHome.root>/openspec/specs/<capability-path>/spec.md\` 处的主 specs

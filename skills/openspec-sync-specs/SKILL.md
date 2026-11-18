@@ -41,7 +41,7 @@ metadata:
 
    提示时，显示有增量 spec（位于 `specs/` 目录下）的变更。
 
-   始终宣告："使用变更：<name>"，以及如何覆盖（例如 `/openspec-sync-specs <other>`）。
+   始终宣告："使用变更：<name>"，以及如何覆盖（例如 `openspec-sync-specs <other>`）。
 
 2. **解析变更上下文**
 

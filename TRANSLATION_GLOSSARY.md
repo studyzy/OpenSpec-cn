@@ -146,6 +146,14 @@
 | NUL byte | NUL 字节 | 路径中的 `\0` |
 | stack overflow | 栈溢出 | — |
 | out-of-memory | 内存耗尽 | — |
+| `--global` | 保持英文（CLI 标志） | 2.1 机器级安装 skills |
+| `--scope project` / `--scope global` | 保持英文（CLI 标志） | 2.1 指定 skills 安装在项目还是本机 |
+| `skills: global` / `skills: project` | 保持英文（YAML 配置） | `openspec/config.yaml` 中的配置值 |
+| machine-wide skills / global skills | 机器级 skills / 全局 skills | 装在本机、所有项目共用的一份 skills |
+| project skills | 项目 skills | 提交在仓库里的那份 skills |
+| home skills folder | 主目录 skills 文件夹 | 各工具在用户主目录下读取 skills 的目录 |
+| skills 安装器（`skills` 包） | skills 安装器 | 2.1 起依赖的 Vercel skills CLI，负责安装与链接 |
+| release tag | release 标签 | 发布版本对应的 Git tag |
 
 ## 锚点链接处理约定
 

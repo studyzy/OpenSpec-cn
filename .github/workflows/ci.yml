@@ -71,7 +71,7 @@ jobs:
   test_matrix:
     name: Test (${{ matrix.label }})
     runs-on: ${{ matrix.os }}
-    timeout-minutes: 15
+    timeout-minutes: ${{ matrix.timeout_minutes || 15 }}
     needs: changes
     if: needs.changes.outputs.code == 'true'
     strategy:
@@ -83,17 +83,18 @@ jobs:
           - os: ubuntu-latest
             shell: bash
             label: linux-bash
-            node: '22.12.0'
+            node: '22.20.0'
             vitest_workers: 4
           - os: macos-latest
             shell: bash
             label: macos-bash
-            node: '22.12.0'
+            node: '22.20.0'
             vitest_workers: 4
           - os: windows-latest
             shell: pwsh
             label: windows-pwsh
-            node: '22.12.0'
+            timeout_minutes: 25
+            node: '22.20.0'
             vitest_workers: 2
           - os: ubuntu-latest
             shell: bash
@@ -118,7 +119,7 @@ jobs:
           persist-credentials: false
 
       - name: Setup pnpm
-        uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
+        uses: pnpm/action-setup@73e46992e05b19abd31f2f3c20e0e7370d762115 # v6.1.1
 
       - name: Setup Node.js
         uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
@@ -142,7 +143,7 @@ jobs:
         run: pnpm test
 
       - name: Upload test coverage
-        if: matrix.os == 'ubuntu-latest' && matrix.node == '22.12.0'
+        if: matrix.os == 'ubuntu-latest' && matrix.node == '22.20.0'
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: coverage-report-${{ github.event_name }}
@@ -165,12 +166,12 @@ jobs:
           persist-credentials: false
 
       - name: Setup pnpm
-        uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
+        uses: pnpm/action-setup@73e46992e05b19abd31f2f3c20e0e7370d762115 # v6.1.1
 
       - name: Setup Node.js
         uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
-          node-version: '22.12.0'
+          node-version: '22.20.0'
           cache: 'pnpm'
 
       - name: Install dependencies
@@ -233,12 +234,12 @@ jobs:
           persist-credentials: false
 
       - name: Setup pnpm
-        uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
+        uses: pnpm/action-setup@73e46992e05b19abd31f2f3c20e0e7370d762115 # v6.1.1
 
       - name: Setup Node.js
         uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
-          node-version: '22.12.0'
+          node-version: '22.20.0'
           cache: 'pnpm'
 
       - name: Install dependencies
@@ -283,12 +284,12 @@ jobs:
           persist-credentials: false
 
       - name: Setup pnpm
-        uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
+        uses: pnpm/action-setup@73e46992e05b19abd31f2f3c20e0e7370d762115 # v6.1.1
 
       - name: Setup Node.js
         uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
-          node-version: '22.12.0'
+          node-version: '22.20.0'
           cache: 'pnpm'
 
       - name: Install dependencies
@@ -457,7 +458,7 @@ jobs:
 
       - name: Setup pnpm
         if: steps.changed-changesets.outputs.has_changesets == 'true'
-        uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
+        uses: pnpm/action-setup@73e46992e05b19abd31f2f3c20e0e7370d762115 # v6.1.1
 
       - name: Setup Node.js
         if: steps.changed-changesets.outputs.has_changesets == 'true'

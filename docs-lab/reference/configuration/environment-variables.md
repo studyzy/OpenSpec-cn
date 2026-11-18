@@ -12,3 +12,15 @@ its network-permission flag. XDG vars move the config/data directories. -->
 ## DO_NOT_TRACK
 
 ## XDG_CONFIG_HOME and XDG_DATA_HOME
+
+## OPENSPEC_SKILLS_SCOPE
+
+设置为 `global` 或 `project`，用于决定 `openspec-cn init` 为新仓库把 skills 安装到哪里。显式的 `--scope` 优先。仓库中已有的 skills 保持原位。
+
+对于需要在检出目录中使用 agent skills 的 CI 任务：
+
+```bash
+OPENSPEC_SKILLS_SCOPE=project openspec-cn init --tools claude
+```
+
+只做校验的任务可以直接运行 `openspec-cn validate --all`。

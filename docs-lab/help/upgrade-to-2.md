@@ -2,10 +2,12 @@
 
 > OpenSpec 2.0 有哪些变化，以及如何迁移项目。
 
-要升级，先更新 CLI，然后在每个项目中运行 `openspec-cn update`。你的 skills 会移到一个共享文件夹，旧的命令文件会被移除。你编辑过的旧命令文件和旧 skill 副本会被保留。
+已在 2.0？[升级到 2.1](upgrade-to-2-1.md) 就是你要的简短页面。
+
+要从 1.x 升级，先更新 CLI，然后在每个项目中运行 `openspec-cn update`。你的 skills 会移到一个共享文件夹，旧的命令文件会被移除。你编辑过的旧命令文件和旧 skill 副本会被保留。
 
 > [!WARNING]
-> `update` 会替换你在 OpenSpec 安装于 `.agents/skills/` 的 skill 中所做的修改，且不保留副本。请先保存这些修改：[你自定义过的 skills](#skills-you-customized)。
+> `update` 会整体替换 OpenSpec 安装于 `.agents/skills/` 的每个内置 skill 文件夹，且不保留副本。你在其中所做的修改以及添加进去的任何文件，都会在不给出提示的情况下被移除。请先保存它们：[你自定义过的 skills](#skills-you-customized)。`openspec-cn update --dry-run` 会显示将要发生的变化。
 
 ## 有哪些变化
 
@@ -30,19 +32,21 @@
 openspec-cn update
 ```
 
+在终端中，它会询问把 skills 放在哪里。[升级到 2.1](upgrade-to-2-1.md) 涵盖了两种答案。
+
 **3. 提交结果。** 链接和其他文件一样被提交。
 
 再次运行 `update` 不会产生任何变化。
 
 ## update 会做什么
 
-- **Skills**：写入一次到 `.agents/skills/`，并在工具需要时从工具自己的文件夹建立链接（例如 `.claude/skills/`）。
+- **Skills**：写入一次到 `.agents/skills/`，并在工具需要时从工具自己的文件夹建立链接（例如 `.claude/skills/`）。在 Windows 上使用副本。
 - **旧 skill 副本**：早期版本写入各工具文件夹的副本会被移除。
 - **命令文件**：早期版本生成的命令文件会被移除。
 - **你编辑过的旧文件**：被编辑过的命令文件，或工具自己文件夹中被编辑过的 skill 副本，会被保留并列出。后续章节说明如何处理它们。
 - **OpenSpec 安装的 skills**：像每个 1.x update 一样原地刷新。其中的修改会被替换。`update` 会点名每个发生这种情况的 skill。
 - **链接**：绝不会跟随到项目之外。
-- **项目之外**：`update` 只改动你的全局配置、MiniMax Code 的 `~/.minimax/skills/`，以及 `~/.codex/prompts/` 中的旧 OpenSpec 提示词。它只会在使用 `--force` 或经你确认后移除这些提示词。
+- **项目之外**：`update` 只改动你的全局配置、OpenSpec 在这台机器上记录的项目列表、MiniMax Code 的 `~/.minimax/skills/`，以及 `~/.codex/prompts/` 中的旧 OpenSpec 提示词。从 2.1 起，如果你安装了全局 skills，它还会刷新它们。它只会在使用 `--force` 或经你确认后移除这些提示词。
 
 ## 旧命令及其对应的 skills
 
@@ -85,9 +89,11 @@ openspec-cn update
 
 MiniMax Code 把 skills 保存在 `~/.minimax/skills/`。当 `update` 刷新你在那里编辑过的 skill 时，会先把你的副本另存为同目录下的 `SKILL.md.bak`。
 
+<a id="skills-you-customized"></a>
+
 ## 你自定义过的 skills
 
-`update` 会重写 OpenSpec 安装于 `.agents/skills/` 的每个 skill，例如 `.agents/skills/openspec-propose/SKILL.md`。1.x 中也是这样。如果你编辑过其中一个，你的修改会被替换，且不会备份。`update` 会告诉你哪些 skills 发生了这种情况：
+`update` 会重写 OpenSpec 安装于 `.agents/skills/` 的每个 skill，例如 `.agents/skills/openspec-propose/SKILL.md`。1.x 中也是这样。如果你编辑过其中一个，你的修改会被替换，且不会备份。OpenSpec 会用你 CLI 的 GitHub release tag 中的指令替换这些文件夹。`update` 会告诉你哪些 skills 发生了这种情况：
 
 ```
 已替换你对 1 个 OpenSpec 安装的 skill 所做的修改：.agents/skills/openspec-propose/SKILL.md。OpenSpec 每次更新都会刷新这些 skill，且不保留副本。请从 git 恢复你的内容，长期改动请放到另起名字的自有 skill 中。
@@ -98,7 +104,7 @@ MiniMax Code 把 skills 保存在 `~/.minimax/skills/`。当 `update` 刷新你�
 要让自定义内容在多次更新后保留，请把它放在 `update` 不会写入的位置：
 
 - **项目指令**：`openspec/config.yaml` 中的 `context` 和 `rules` 可以把你给的指令交给 Agent，而无需编辑 skill（[项目配置](../customize/project-config.md)）。
-- **你自己的 skill**：名称不以 `openspec-` 开头的 skill，例如 `.agents/skills/team-propose/`。`update` 绝不会改动它。
+- **你自己的 skill**：名称与任何内置 skill 都不同的 skill，例如 `.agents/skills/team-propose/`。`update` 绝不会改动它。
 
 ## 让 Windows 支持已提交的链接
 
@@ -119,6 +125,16 @@ git config --global core.symlinks true
 ## 链接 OpenSpec 未支持的工具
 
 大多数工具直接读取 `.agents/skills/`。如果你的工具只读取自己的文件夹，[链接其他工具](../reference/supported-tools.md#link-another-tool) 展示了把它指向共享副本的那一条命令。
+
+## 混用版本的团队
+
+在把某个仓库切换到全局 skills 之前，先升级团队的 CLI。较早的 CLI 只理解项目级 skills。如果队友用不同的发行版本对着同一份已安装的 skills 运行，每次 update 都会用该 CLI 自己版本的指令把它们还原。
+
+## 已全局安装的 skills
+
+**用 `npx skills add` 安装过官方 skills？** 保留那次安装并运行 `openspec-cn update`。它会刷新你 profile 的内置工作流。
+
+**手动设置过全局 skills？** 先保存任何改动，并把自定义 skills 改成自己的名字。在切换之前，移除你从仓库建到主目录的任何链接。用 `openspec-cn init --scope global --tools <id>` 设置该工具支持的路径。
 
 ## 继续使用 1.x
 

@@ -237,10 +237,10 @@ No active changes. Create one with: openspec-cn new change <name> --store team-p
 
 ```bash
 # inside web-app，位于仓库根目录
-openspec init --tools claude
+openspec-cn init --scope project --tools claude
 ```
 
-- **集成文件**：写入代码仓库。
+- **集成文件**：写入代码仓库。未加 `--scope project` 时，新的设置会把 skills 放到你的机器上，仓库里一份也没有。
 - **`openspec/config.yaml`**：逐字节保留，包括 `store:` 行。
 - **`openspec/specs/` 和 `openspec/changes/`**：不会在代码仓库中创建。
 

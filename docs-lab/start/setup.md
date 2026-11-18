@@ -18,11 +18,27 @@ openspec-cn init
 
 init 会询问你使用哪些 AI 工具，为你选中的工具写入工作流文件，并报告你得到了什么：
 
+选择你使用的工具。在新项目中，skills 会全局安装。运行 `openspec-cn init --scope project` 可让它们留在你的项目仓库里。
+
+**设置脚本的破坏性变更。** 在 2.0 中，`openspec-cn init --tools claude` 会把 skill 文件写进一个新仓库。现在它默认把它们安装到机器上。如果你的脚本会为队友或 CI 提交 skills，请使用 `openspec-cn init --scope project --tools claude`。
+
+skills 在这台机器上（默认）时：
+
 ```
 OpenSpec Setup Complete
 
 Created: Claude Code
-6 skills in .agents/skills/ (linked from .claude/skills/)
+6 skills in ~/.agents/skills/ for every project on this machine
+Config: openspec/config.yaml (schema: spec-driven)
+```
+
+skills 在这个项目中时：
+
+```
+OpenSpec Setup Complete
+
+Created: Claude Code
+6 skills in .agents/skills/ (also in .claude/skills/)
 Config: openspec/config.yaml (schema: spec-driven)
 ```
 
@@ -30,7 +46,7 @@ Config: openspec/config.yaml (schema: spec-driven)
 
 重复运行 init 是安全的：
 
-- 已经设置过的工具会打印 `Refreshed` 而不是 `Created`。
+- 当 skills 保留在项目中时，已经设置过的工具会打印 `Refreshed` 而不是 `Created`。
 - 再次运行 init 并选中新工具，会添加该工具。
 - `--tools` 标志跳过选择器（[CLI 参考](../reference/cli.md)）。
 
@@ -59,6 +75,18 @@ Leave out generic, outdated, or verbose material. Do not delete project.md.
 
 把所有这些像源代码一样提交。
 
+每个项目都会在仓库根目录获得一个 `openspec/` 文件夹。skills 放在哪里取决于你所做的选择：
+
+| | 在这台机器上 | 在这个项目中 |
+|---|---|---|
+| Skills | 主目录下的 `~/.agents/skills/` | 项目中的 `.agents/skills/` |
+| 读取自身文件夹的工具所用的链接 | 例如 `~/.claude/skills/` | 例如 `.claude/skills/` |
+| 要提交的内容 | `openspec/` | `openspec/`，以及 skills 和工具条目 |
+
+本节其余部分描述项目级安装。[一次为所有项目安装 skills](#install-the-skills-once-for-every-project) 介绍机器级的那一种。
+
+Vercel 的安装器会从 `studyzy/OpenSpec-cn` 仓库中与你的 CLI 版本对应的 GitHub tag 获取 skills。安装或刷新 skills 需要 Git，并能访问 GitHub。项目级安装不会改动 `skills-lock.json`。
+
 Init 还会删除早期版本生成的命令文件，并保留你编辑过的那些。在 1.0 之前配置的项目还有更早的遗留物：`.claude/commands/openspec/` 之类的文件夹，以及 `CLAUDE.md` 和 `AGENTS.md` 等文件中的 OpenSpec 标记块。交互式 init 会在删除前询问。使用 `--force`、使用 `--tools`，或在非交互式运行中，init 会不经询问直接删除，包括这些块中的任何编辑内容，请先备份。
 
 ### `openspec/` 文件夹
@@ -74,6 +102,8 @@ openspec/
 ```
 
 [项目配置](../customize/project-config.md) 覆盖了 `config.yaml`。
+
+<a id="the-workflow-files-skills"></a>
 
 ### 工作流文件（skills）
 
@@ -93,7 +123,7 @@ openspec/
 
 这是默认集合加上两个可选工作流。[Profiles](../customize/profiles.md) 列出了全部十二个。
 
-无论你配置了多少个工具，每个 skill 只在这里写一次。不读取 `.agents/skills/` 的工具（Claude Code、Kiro 等）会在自己的文件夹中获得指向每个 skill 的链接，例如 `.claude/skills/openspec-propose`。MiniMax Code 是唯一的例外：它的 skills 放在你主目录下的 `~/.minimax/skills/`。[支持的工具](../reference/supported-tools.md#where-skills-go) 展示了目录布局以及哪些工具会获得链接。
+无论你配置了多少个工具，每个 skill 只在这里写一次。不读取 `.agents/skills/` 的工具（Claude Code、Kiro 等）会在自己的文件夹中获得指向每个 skill 的链接，例如 `.claude/skills/openspec-propose`。Windows 上的项目级安装使用 Git 可以带到另一份检出的副本。MiniMax Code 是唯一的例外：它的 skills 放在你主目录下的 `~/.minimax/skills/`。[支持的工具](../reference/supported-tools.md#where-skills-go) 展示了目录布局以及哪些工具会获得链接。
 
 每个工作流都是一个 **skill**：当你请求某项工作时，你的 Agent 会自动捡起的指令；你也可以按名字调用它（Claude Code 中是 `/openspec-apply-change`，Codex 中是 `$openspec-apply-change`）。[支持的工具](../reference/supported-tools.md#support-matrix) 展示了每种工具的拼写。
 
@@ -118,5 +148,27 @@ openspec-cn update
 ```
 
 重启 Claude Code，然后在它的聊天中运行 `/openspec-propose`。若只缺少部分工作流，[更改你的 profile](../customize/profiles.md#expanding-the-set-optional-workflows)。
+
+<a id="install-the-skills-once-for-every-project"></a>
+
+### 一次为所有项目安装 skills
+
+新项目使用你机器上的 skills。要稍后添加工具，运行：
+
+```bash
+openspec-cn init --scope global --tools claude
+```
+
+运行 `openspec-cn update` 可刷新你 [工作流 profile](../customize/profiles.md) 的 skills。如果你降级了 CLI，update 会安装该版本的指令。
+
+<a id="move-an-existing-project-to-the-global-skills"></a>
+
+#### 把已有项目迁移到全局 skills
+
+1. 保存对内置 skills 的任何改动，并把你添加进内置 skill 文件夹的任何文件移出去：update 会整体替换这些文件夹。把团队指引放到 `openspec/config.yaml` 的 `rules` 或 `context` 下，或者给自定义 skill 另起一个名字。
+2. 在终端中运行 `openspec-cn update`。选择 **Switch to global** 把 skills 安装到你的机器上并移除仓库里的副本。要让 skills 留在项目仓库里，在 **Keep in this project** 上按 Enter，并提交更新后的 `openspec/config.yaml`——OpenSpec 会把这个选择记为 `skillsScope: project`。其他检出会记住这个选择。之后可以用 `openspec-cn init --scope global` 切换。
+3. 如果你切换到了全局，提交这些移除。拉取该提交后，每位队友在终端中运行 `openspec-cn update`，对"是否在他们的机器上设置 skills"回答 **Yes**，并选择他们的工具。在脚本中或由 agent 调用时，他们改为运行 `openspec-cn init --tools <ids>`。
+
+为 GitHub 托管的 Copilot agent 保留项目级 skills。它能读取已提交的文件，但读不到你的主目录。只运行 `openspec-cn validate` 的 CI 任务不需要 skills。对于会安装它们的任务，参见 [OPENSPEC_SKILLS_SCOPE](../reference/configuration/environment-variables.md#openspec_skills_scope)。
 
 设置完成。[快速入门](quickstart.md) 从这里带你走完第一个变更。

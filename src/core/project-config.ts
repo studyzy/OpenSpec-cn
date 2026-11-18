@@ -85,6 +85,14 @@ export const ProjectConfigSchema = z.object({
     })
     .optional()
     .describe('GitHub Copilot 集成偏好设置'),
+
+  // Optional: `project` records that the team chose to keep OpenSpec's skills
+  // in this repository, so `openspec update` stops offering the move to the
+  // skills installed on each machine.
+  skillsScope: z
+    .enum(['project', 'global'])
+    .optional()
+    .describe('本项目保存其 OpenSpec skills 的位置'),
 });
 
 /** Normalized in-memory shape of a referenced store declaration. */
@@ -441,6 +449,15 @@ export function readProjectConfig(projectRoot: string): ProjectConfig | null {
         }
       } else {
         console.warn(`配置中的 'githubCopilot' 字段无效（必须是对象）`);
+      }
+    }
+
+    // Parse skillsScope: the team's choice of where this project's skills live.
+    if (raw.skillsScope !== undefined) {
+      if (raw.skillsScope === 'project' || raw.skillsScope === 'global') {
+        config.skillsScope = raw.skillsScope;
+      } else {
+        console.warn(`配置中的 'skillsScope' 字段无效（必须是 "project" 或 "global"）`);
       }
     }
 

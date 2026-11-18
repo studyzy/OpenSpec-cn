@@ -19,38 +19,24 @@ import {
 } from '../../../src/core/command-generation/invocation.js';
 import { getCommandContents } from '../../../src/core/shared/skill-generation.js';
 import { MAX_CONTEXT_SIZE } from '../../../src/core/project-config.js';
-import { resolveOptionalWorkflows } from '../../../src/core/templates/optional-workflow.js';
 import { ALL_WORKFLOWS } from '../../../src/core/profiles.js';
 import { parseTaskLines } from '../../../src/utils/task-progress.js';
 
-// Templates carry optional-workflow conditionals; a body only means anything
-// once resolved against a workflow set. Unless a test says otherwise, these are
-// the bodies a profile with every workflow installed receives.
-const withAll = (body: string) =>
-  resolveOptionalWorkflows(body, new Set<string>(ALL_WORKFLOWS));
-const withoutApply = (body: string) =>
-  resolveOptionalWorkflows(
-    body,
-    new Set<string>(ALL_WORKFLOWS.filter((id) => id !== 'apply'))
-  );
-
-const proposeSkillBody = withAll(getOpsxProposeSkillTemplate().instructions);
-const proposeCommandBody = withAll(getOpsxProposeCommandTemplate().content);
-const asDeployed = <T extends { instructions: string }>(template: T): T => ({
-  ...template,
-  instructions: withAll(template.instructions),
-});
+// The bodies every workflow profile receives: the text does not vary with the
+// profile.
+const proposeSkillBody = getOpsxProposeSkillTemplate().instructions;
+const proposeCommandBody = getOpsxProposeCommandTemplate().content;
 
 const proposeBodies: Array<[string, string]> = [
-  ['propose skill', generateSkillContent(asDeployed(getOpsxProposeSkillTemplate()), 'TEST')],
+  ['propose skill', generateSkillContent(getOpsxProposeSkillTemplate(), 'TEST')],
   ['propose command', proposeCommandBody],
 ];
 
 // ff runs the byte-identical artifact loop, so it carries the identical guards.
 const loopBodies: Array<[string, string]> = [
   ...proposeBodies,
-  ['ff skill', withAll(getFfChangeSkillTemplate().instructions)],
-  ['ff command', withAll(getOpsxFfCommandTemplate().content)],
+  ['ff skill', getFfChangeSkillTemplate().instructions],
+  ['ff command', getOpsxFfCommandTemplate().content],
 ];
 
 const repoRoot = path.resolve(fileURLToPath(new URL('.', import.meta.url)), '../../..');
@@ -382,41 +368,11 @@ describe('propose implementation boundary', () => {
     }
   });
 
-  it('hands command-only tools to apply instead of advertising direct coding (#258)', () => {
-    expect(proposeCommandBody).toContain('当你准备就绪时，运行 `/opsx:apply`。');
-    expect(proposeCommandBody).not.toContain('ask me to implement');
-    expect(proposeCommandBody).not.toContain('ask me to apply this change');
-
-    expect(proposeSkillBody).toContain(
-      '运行 `/opsx:apply`，或者让我来应用这个变更'
-    );
-    expect(proposeSkillBody).not.toContain('ask me to implement');
-  });
-
-  // The same boundary has to hold when `apply` is not installed: the command
-  // surface may name the CLI, never a conversational handoff (#1734).
-  it('keeps command-only tools off direct coding when apply is not installed', () => {
-    const command = withoutApply(getOpsxProposeCommandTemplate().content);
-    const skill = withoutApply(getOpsxProposeSkillTemplate().instructions);
-    const ffCommand = withoutApply(getOpsxFfCommandTemplate().content);
-
-    for (const body of [command, skill, ffCommand]) {
-      expect(body).not.toContain('/opsx:apply');
+  it('stops for review and gives a next step that works without optional skills', () => {
+    expect(proposeSkillBody).toContain('计划已就绪，待审核。当你准备就绪时，让我来应用它。');
+    for (const command of [proposeCommandBody, getOpsxFfCommandTemplate().content]) {
+      expect(command).toContain('openspec-cn instructions apply --change "<name>" --json');
     }
-
-    expect(command).toContain(
-      '运行 `openspec-cn instructions apply --change "<name>" --json` 获取任务列表'
-    );
-    expect(command).not.toContain('ask me to implement');
-    expect(command).not.toContain('ask me to apply this change');
-
-    expect(ffCommand).toContain(
-      '运行 `openspec-cn instructions apply --change "<name>" --json` 获取任务列表'
-    );
-    expect(ffCommand).not.toContain('ask me to implement');
-
-    expect(skill).toContain('让我来应用这个变更');
-    expect(skill).not.toContain('ask me to implement');
   });
 
   it('preserves planning and initialization boundaries through every command adapter', () => {
@@ -427,10 +383,6 @@ describe('propose implementation boundary', () => {
 
     for (const adapter of CommandAdapterRegistry.getAll()) {
       const generated = generateCommand(propose, adapter).fileContent;
-      const applyInvocation = formatCommandInvocation(
-        getInvocationForAdapter(adapter),
-        'apply'
-      );
       expect(generated, adapter.toolId).toContain(
         '选择或触发此工作流的用户请求仅授权规划'
       );
@@ -444,9 +396,7 @@ describe('propose implementation boundary', () => {
       expect(generated, adapter.toolId).toContain(
         '等待新用户请求以启动 apply 工作流'
       );
-      expect(generated, adapter.toolId).toContain(
-        `当你准备就绪时，运行 \`${applyInvocation}\`。`
-      );
+      expect(generated, adapter.toolId).toContain('openspec-cn instructions apply');
       expect(generated, adapter.toolId).not.toContain('ask me to implement');
       expect(generated, adapter.toolId).toContain('请停止，不要创建或修改任何文件');
       expect(generated, adapter.toolId).toContain('仅针对明确的 OpenSpec 请求才提议 `openspec-cn init`');

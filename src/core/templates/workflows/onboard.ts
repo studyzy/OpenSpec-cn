@@ -5,70 +5,23 @@
  * templates file into workflow-focused modules.
  */
 import type { SkillTemplate, CommandTemplate } from '../types.js';
-import { onlyWithWorkflow, optionalWorkflow } from '../optional-workflow.js';
 import { STORE_SELECTION_GUIDANCE } from './store-selection.js';
 import { PROJECT_ROOT_GUARD } from './project-root.js';
 
 /**
  * The tutorial names other workflows throughout. Which of them exist depends
- * on the profile, so each mention is resolved at generation time (see
- * optional-workflow.ts) instead of being listed with an "if installed" caveat
- * the reader has to check for themselves.
+ * on the profile, but the text is the same for every profile, so each mention
+ * says what to do when that skill is not installed.
  */
-const EXPLORE_MODE_NOTE = optionalWorkflow(
-  'explore',
-  '探索模式（`/opsx:explore`）正是为这类思考准备的 —— 在实现之前先调研。任何时候需要把事情想清楚，都可以使用它。',
-  '在实现之前先做调研，只要一个问题需要想透，就值得这么做。'
-);
-
-/**
- * The skill-reference tables. Every row is dropped along with its line when
- * the profile does not install that workflow, so the table lists exactly the
- * skills the reader can use — and stays a valid table either way.
- */
-const COMMAND_REFERENCE_ROWS = [
-  onlyWithWorkflow('propose', ' | `/opsx:propose` | 创建一个变更并生成全部制品 |'),
-  onlyWithWorkflow('explore', ' | `/opsx:explore` | 在动手前/动手过程中想清楚问题  |'),
-  onlyWithWorkflow('apply', ' | `/opsx:apply`   | 实现变更中的任务              |'),
-  onlyWithWorkflow('archive', ' | `/opsx:archive` | 归档已完成的变更                 |'),
-  onlyWithWorkflow('new', ' | `/opsx:new`     | 启动新变更，一次一个制品 |'),
-  onlyWithWorkflow('continue', ' | `/opsx:continue` | 继续处理一个已有的变更    |'),
-  onlyWithWorkflow('ff', ' | `/opsx:ff`      | 快进：一次性创建全部制品 |'),
-  onlyWithWorkflow('verify', ' | `/opsx:verify`  | 验证实现是否与制品一致    |'),
-].join('\n');
-
-const QUICK_REFERENCE_ROWS = [
-  onlyWithWorkflow('propose', ' | `/opsx:propose <idea>`  | 创建一个变更并生成全部制品 |'),
-  onlyWithWorkflow('explore', ' | `/opsx:explore`         | 想清楚问题（不改动代码）   |'),
-  onlyWithWorkflow('apply', ' | `/opsx:apply <name>`    | 实现任务                            |'),
-  onlyWithWorkflow('archive', ' | `/opsx:archive <name>`  | 完成后归档                          |'),
-  onlyWithWorkflow('new', ' | `/opsx:new <name>`      | 启动新变更，逐步推进           |'),
-  onlyWithWorkflow('continue', ' | `/opsx:continue <name>` | 继续一个已有的变更                |'),
-  onlyWithWorkflow('ff', ' | `/opsx:ff <name>`       | 快进：一次性创建全部制品        |'),
-  onlyWithWorkflow('verify', ' | `/opsx:verify <name>`   | 验证实现                      |'),
-].join('\n');
-
-/**
- * Resume hints for a user stopping mid-tutorial. Both are optional, so the
- * sentence that introduces them stands on its own without either.
- */
-const RESUME_HINTS = [
-  onlyWithWorkflow('continue', '- `/opsx:continue <name>` - 恢复制品创建'),
-  onlyWithWorkflow('apply', '- `/opsx:apply <name>` - 跳转到实现（若任务已存在）'),
-].join('\n');
+const EXPLORE_MODE_NOTE =
+  '在实现变更之前，用探索把问题想透。';
 
 /** Where the tutorial points once it is over. */
-const NEXT_STEP_INVITE = optionalWorkflow(
-  'propose',
-  '在你真正想构建的东西上试试 `/opsx:propose`。你现在已经找到节奏了！',
-  '在你真正想构建的东西上试试看。你现在已经找到节奏了！'
-);
+const NEXT_STEP_INVITE =
+  '让我为你想构建的东西启动一个变更。';
 
-const QUICK_REFERENCE_INVITE = optionalWorkflow(
-  'propose',
-  '运行 `/opsx:propose` 开始你的第一个变更。',
-  '准备好了就让我来启动你的第一个变更。'
-);
+const QUICK_REFERENCE_INVITE =
+  '让我来启动你的第一个变更。';
 
 export function getOnboardSkillTemplate(): SkillTemplate {
   return {
@@ -557,11 +510,7 @@ openspec-cn archive "<name>" --yes
 
 ## Skill 参考
 
-**你已安装的 skills：**
-
- | Skill             | 作用                               |
- |-------------------|--------------------------------------------|
-${COMMAND_REFERENCE_ROWS}
+列出本会话中你可以使用的 OpenSpec 工作流，每个用一行说明。省略你无法调用的工作流。
 
 ---
 
@@ -582,7 +531,7 @@ ${NEXT_STEP_INVITE}
 没问题！你的变更保存在 \`openspec-cn status --change "<name>" --json\` 报告的 \`changeRoot\`。
 
 稍后从我们停下的地方继续：\`openspec-cn status --change "<name>" --json\` 精确显示变更的当前状态。
-${RESUME_HINTS}
+从你可用的工作流中提供一个下一步。
 
 工作不会丢失。随时回来。
 \`\`\`
@@ -596,11 +545,7 @@ ${RESUME_HINTS}
 \`\`\`
 ## OpenSpec 快速参考
 
-**你已安装的 skills：**
-
- | Skill                    | 作用                               |
- |--------------------------|--------------------------------------------|
-${QUICK_REFERENCE_ROWS}
+列出本会话中你可以使用的 OpenSpec 工作流，每个用一行说明。省略你无法调用的工作流。
 
 ${QUICK_REFERENCE_INVITE}
 \`\`\`

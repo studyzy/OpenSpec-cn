@@ -5,73 +5,35 @@
  * templates file into workflow-focused modules.
  */
 import type { SkillTemplate, CommandTemplate } from '../types.js';
-import { optionalWorkflow } from '../optional-workflow.js';
 import { STORE_SELECTION_GUIDANCE } from './store-selection.js';
 import { PROJECT_ROOT_GUARD } from './project-root.js';
 
-/**
- * Passages that hand off to `/opsx:continue` or `/opsx:new`. Neither workflow
- * is in the `core` profile, so each is authored with a CLI fallback and
- * resolved at generation time (see optional-workflow.ts). Shared by both
- * surfaces below so the skill and the command cannot drift apart.
- */
-const CONTINUE_SCOPE_NOTE = optionalWorkflow(
-  'continue',
-  '本工作流仅修订已存在的制品；`/opsx:continue` 负责创建不存在的制品。',
-  '本工作流仅修订已存在的制品；它绝不创建缺失的制品。制品缺失时，`openspec-cn status --change "<name>" --json` 指出下一个制品，`openspec-cn instructions "<artifact-id>" --change "<name>" --json` 解释如何撰写它。'
-);
+const CONTINUE_SCOPE_NOTE =
+  '仅修订已存在的制品。若某个制品缺失，指出它并用 `openspec-cn status --change "<name>" --json` 展示下一个 `ready` 制品。';
 
-const CONTINUE_CREATE_THEM = optionalWorkflow(
-  'continue',
-  '引导用户使用 `/opsx:continue` 来创建它们',
-  '引导用户使用 `openspec-cn instructions "<artifact-id>" --change "<name>" --json` 来创建它们'
-);
+const CONTINUE_CREATE_THEM =
+  '展示如何用 `openspec-cn instructions "<artifact-id>" --change "<name>" --json` 创建下一个 `ready` 制品';
 
-const CONTINUE_NEXT_STEP = optionalWorkflow(
-  'continue',
-  '建议 `/opsx:continue` 创建它们',
-  '运行 `openspec-cn status --change "<name>" --json` 获取下一个制品，并引导用户使用 `openspec-cn instructions "<artifact-id>" --change "<name>" --json` 来创建它'
-);
+const CONTINUE_NEXT_STEP =
+  '给出下一个 `ready` 制品的 CLI 命令';
 
-const CONTINUE_DEFERRED = optionalWorkflow(
-  'continue',
-  '推迟到 `/opsx:continue` 的任何内容（尚无文件的制品且状态为 `ready` 或 `blocked`，绝不包括 `skipped` 制品）',
-  '因尚不存在而推迟的任何内容（尚无文件的制品且状态为 `ready` 或 `blocked`，绝不包括 `skipped` 制品）'
-);
+const CONTINUE_DEFERRED =
+  '推迟到独立步骤处理的缺失制品（含 `ready` 或 `blocked`，不含 `skipped` 制品）';
 
-const CONTINUE_FRONTIER = optionalWorkflow(
-  'continue',
-  '那是 `/opsx:continue` 的职责',
-  '创建它们是本工作流之外的独立步骤'
-);
+const CONTINUE_FRONTIER =
+  '在独立步骤中创建缺失制品';
 
-/**
- * `apply` and `archive` are in the `core` profile but not guaranteed in a
- * custom one, so their handoffs are resolved the same way.
- */
-const APPLY_DELTA_HANDOFF = optionalWorkflow(
-  'apply',
-  '建议 `/opsx:apply` 将增量带入代码',
-  '说明代码可能需要更新，并提议将增量带入其中'
-);
+const APPLY_DELTA_HANDOFF =
+  '告诉用户哪些实现任务需要重新审视';
 
-const APPLY_GUARDRAIL = optionalWorkflow(
-  'apply',
-  '停止并指向 `/opsx:apply`',
-  '停止并说明修订后的计划现在暗示代码更改；实现它们是本工作流之外的独立步骤'
-);
+const APPLY_GUARDRAIL =
+  '在修订计划后停止，并指出它要求的任何代码更改';
 
-const ARCHIVE_HANDOFF = optionalWorkflow(
-  'archive',
-  '建议 `/opsx:archive`',
-  '建议用 `openspec-cn archive "<name>"` 归档'
-);
+const ARCHIVE_HANDOFF =
+  '建议用 `openspec-cn archive "<name>"` 归档';
 
-const INTENT_CHANGE_GUARDRAIL = optionalWorkflow(
-  'new',
-  '建议用 `/opsx:new` 重新开始（"更新 vs 重新开始" 启发式）',
-  '请求一个不同的未使用变更名称，并建议改用 `openspec-cn new change "<new-change-name>"`（"更新 vs 重新开始" 启发式）'
-);
+const INTENT_CHANGE_GUARDRAIL =
+  '请求一个不同的未使用名称，并建议改用 `openspec-cn new change "<new-change-name>"`';
 
 export function getUpdateChangeSkillTemplate(): SkillTemplate {
   return {

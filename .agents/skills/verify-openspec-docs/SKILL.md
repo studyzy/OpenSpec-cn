@@ -2,6 +2,8 @@
 name: verify-openspec-docs
 description: 用全新上下文的子代理对 OpenSpec 用户文档做事实核查，子代理重新运行命令并对照源码检查断言。手动触发；不是起草循环的一部分。在用户要求验证、事实核查或准确性检查一个文档页面、章节或一组改动的断言时使用。
 argument-hint: page or section
+metadata:
+  internal: true
 ---
 
 # 验证 OpenSpec 文档

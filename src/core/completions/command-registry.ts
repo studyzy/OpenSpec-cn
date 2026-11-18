@@ -40,6 +40,12 @@ export const COMMAND_REGISTRY: CommandDefinition[] = [
         name: 'no-copilot-cloud',
         description: '跳过生成 GitHub Copilot 云端 coding-agent 文件',
       },
+      {
+        name: 'scope',
+        description: 'skills 的存放位置：global（本机，供所有项目使用）或 project',
+        takesValue: true,
+        values: ['global', 'project'],
+      },
     ],
   },
   {

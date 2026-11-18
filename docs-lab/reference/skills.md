@@ -61,7 +61,7 @@ profile values are core and custom, so "expanded" reads as a third profile). -->
 | [openspec-bulk-archive-change](#openspec-bulk-archive-change) | 一次归档多个变更提案 | Optional |
 | [openspec-onboard](#openspec-onboard) | 通过完整走完一个真实变更提案来学习工作流 | Optional |
 
-Each entry below names the skill that owns the next step. When your profile leaves that skill out, the installed files never name it: the handoff becomes the equivalent `openspec` command, or a plain request to you, and a line that exists only to point at a missing skill is not written at all. So the skills you have always hand off to skills you have. Which set you get is [Profiles](../customize/profiles.md).
+下面每个条目都点名负责下一步的 skill。无论你的 profile 是什么，skill 读到的内容都一样，因此它不能假定下一个 skill 一定存在。当某一步属于另一个 skill 时，它要么在运行时检查（"如果该 skill 已安装，否则……"），要么照 CLI 打印的恢复步骤执行。你会拿到哪一组，由 [Profiles](../customize/profiles.md) 决定。
 
 ## openspec-explore
 
@@ -91,7 +91,7 @@ Each entry below names the skill that owns the next step. When your profile leav
 |---|---|
 | **Arguments** | 变更提案名称（如 `add-auth`），可选。若目标不明确，会列出活跃的变更提案并请你选择。 |
 | **Creates** | 代码：在项目文件中完成每个任务所需的最小更改。在变更提案中，它在由 `sourcePath` 和从 1 开始的 `line` 定位的被追踪文件中勾选每个已完成的任务（`- [ ]` 改为 `- [x]`）。schema 可以跨多个文件追踪任务。 |
-| **Response** | 每个任务的进度，然后是总体计数（N/M 个任务完成）。全部完成：建议 `openspec-archive-change`。因缺失制品而受阻：指向 `openspec-continue-change`，当该 skill 未安装时（core profile 不含它）则指向 `openspec status` 和 `openspec instructions`。任务不清晰或出错：暂停并询问。 |
+| **Response** | 每个任务的进度，然后是总体计数（N/M 个任务完成）。全部完成：建议 `openspec-archive-change`。因缺失制品而受阻：展示它们，以及来自 CLI `instruction` 字段的恢复步骤。任务不清晰或出错：暂停并询问。 |
 
 ## openspec-update-change
 
@@ -100,7 +100,7 @@ Each entry below names the skill that owns the next step. When your profile leav
 | 契约 | 说明 |
 |---|---|
 | **Arguments** | 变更提案名称（可选），加上你想要的修订。未说明修订时，它执行一致性审查：制品之间相互检查矛盾、缺口和重复。 |
-| **Creates** | 只编辑已存在的制品文件。一个例外：对于以 glob 形式书写（如 `specs/**/*.md`）且已有至少一个文件的制品，在你确认路径后可以补充一个缺失的伴生文件。尚无文件的制品是 `openspec-continue-change` 的职责。若没有该 skill（core profile 不含它），则改为指向 `openspec status` 和 `openspec instructions`。绝不写代码。 |
+| **Creates** | 只编辑已存在的制品文件。一个例外：对于以 glob 形式书写（如 `specs/**/*.md`）且已有至少一个文件的制品，在你确认路径后可以补充一个缺失的伴生文件。对于尚无文件的制品，它会展示如何用 `openspec-cn instructions` 创建下一个就绪的制品。绝不写代码。 |
 | **Response** | 展示每个提议的修订，仅在你确认后写入，一次一个制品。以修订了什么和下一步收尾；实现等待 `openspec-apply-change`。 |
 
 ## openspec-sync-specs

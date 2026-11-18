@@ -16,6 +16,7 @@
 | `operations` | map: operation → guidance list | No | 针对 apply 与 archive 工作的建议性指引 |
 | `store` | string | No | 当此 openspec/ 仅为纯配置时的回退 OpenSpec 根目录 |
 | `references` | list | No | 其 specs 被编入指令索引的 store |
+| `skillsScope` | string: `project` | No | 团队把 OpenSpec 的 skills 保留在这个仓库里 |
 
 无效字段永远不会让命令失败。每个字段单独校验，坏值会以警告方式丢弃。无法读取或不是合法 YAML 的文件会以警告方式忽略，但 `openspec-cn validate` 例外：它会以退出码 1 结束，好让 CI 捕获到问题。
 
@@ -68,6 +69,10 @@ references:
   - id: billing-specs
     remote: git@github.com:acme/billing-specs.git
 ```
+
+### skillsScope
+
+`skillsScope: project` 记录你的团队把 OpenSpec 的 skills 保留在这个仓库里。当你选择 **Keep in this project** 时，`openspec-cn update` 会写入它；文件被提交并被拉取后，它就不会再询问。若之后要把该仓库切换到[全局 skills](../../start/setup.md#move-an-existing-project-to-the-global-skills)，运行 `openspec-cn init --scope global`，它也会移除这一行。手动删除这一行不会移动任何东西：update 会再次询问。
 
 ## 示例
 

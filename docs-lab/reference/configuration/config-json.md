@@ -13,6 +13,11 @@ CLI 将机器级设置存放在 macOS 与 Linux 的 `~/.config/openspec/config.j
 | `profile` | string: `core` 或 `custom` | No | 选择 `openspec-cn init` 安装的工作流集合 |
 | `delivery` | string: `both`、`skills` 或 `commands` | No | 2.0 中已弃用：仍会被读取，但不再影响任何行为 |
 | `workflows` | list of strings | No | `custom` profile 安装的工作流列表 |
+| `featureFlags` | map: flag → boolean | No | 布尔功能开关 |
+| `defaultStore` | string | No | 根目录解析的机器级回退 store |
+| `skillsScope` | string: `global` 或 `project` | No | 在没有 skills 的项目中 `openspec-cn init` 把 skills 放在哪里 |
+| `openers` | map: tool id → settings | No | workset 在哪些工具中打开，以及每个工具如何启动 |
+| `telemetry` | map | No | 遥测退出开关、匿名 id 与提示已展示状态 |
 
 ### profile
 
@@ -33,6 +38,10 @@ CLI 将机器级设置存放在 macOS 与 Linux 的 `~/.config/openspec/config.j
 ### defaultStore
 
 根目录解析的机器级回退 store id，仅在无 `--store` 标志、本地 `openspec/` 或项目 `store:` 指针可解析时才会用到。完整的解析阶梯参见 [根目录解析](../../multi-repo/stores.md#where-artifacts-get-created-when-using-stores)。
+
+### skillsScope
+
+设置 `openspec-cn config set skillsScope project` 可让这台机器上新建仓库的 skills 保留在仓库内。默认值为 `global`。已经有 skills 的项目会保留它们。参见[设置你的项目](../../start/setup.md#install-the-skills-once-for-every-project)来切换某个仓库。
 
 ### openers
 

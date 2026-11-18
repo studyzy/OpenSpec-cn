@@ -20,6 +20,8 @@ cp "$1" "$bin"
 # Keep the run off the user's real config and data, and offline.
 export XDG_CONFIG_HOME="$work/config ü" XDG_DATA_HOME="$work/data ü"
 export OPENSPEC_TELEMETRY=0 OPENSPEC_NO_UPDATE_CHECK=1 NO_COLOR=1
+node "$(dirname "$0")/../../test/helpers/skill-release.mjs" "$work/release"
+export GH_HOST=skills.example.invalid GIT_CONFIG_GLOBAL="$work/release/gitconfig"
 mkdir "$work/project" && cd "$work/project"
 
 fail() { echo "FAIL: $*" >&2; exit 1; }
@@ -28,7 +30,8 @@ version=$("$bin" --version)
 [ "$version" = "$expected" ] || fail "--version 输出 '$version'，期望 '$expected'"
 
 "$bin" schemas --json | grep -q '"source": "package"' || fail "未找到内置 Schema"
-"$bin" init --tools claude > /dev/null
+"$bin" init --scope project --tools claude > /dev/null
+[ -f .claude/skills/openspec-propose/SKILL.md ] || fail "Claude 无法读取带标签的 propose skill"
 [ -f openspec/config.yaml ] || fail "init 未写入 openspec/config.yaml"
 "$bin" new change demo > /dev/null
 "$bin" status --change demo --json | grep -q '"schemaName": "spec-driven"' || fail "status 未解析到 Schema"

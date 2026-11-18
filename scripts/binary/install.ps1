@@ -46,7 +46,7 @@
   $releases = if ($env:OPENSPEC_RELEASES_URL) { $env:OPENSPEC_RELEASES_URL.TrimEnd('/') } else { 'https://github.com/studyzy/OpenSpec-cn/releases' }
   Assert-Source 'OPENSPEC_RELEASES_URL' $releases
   if ($env:OPENSPEC_DOWNLOAD_URL) { Assert-Source 'OPENSPEC_DOWNLOAD_URL' $env:OPENSPEC_DOWNLOAD_URL }
-  $npmHint = '或改用 npm 安装（Node.js 22.12+）：npm install -g @studyzy/openspec-cn'
+  $npmHint = '或改用 npm 安装（Node.js 22.20.0+）：npm install -g @studyzy/openspec-cn'
   $dir = if ($env:OPENSPEC_INSTALL_DIR) { $env:OPENSPEC_INSTALL_DIR } else { Join-Path $env:LOCALAPPDATA 'Programs\openspec-cn' }
   # Absolute, so the user PATH entry works from any directory.
   $dir = $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($dir)
@@ -131,7 +131,12 @@
     # A binary that cannot start at all throws instead of setting an exit code.
     try { $installed = & $exe --version } catch { Write-Verbose "openspec-cn --version 失败：$_" }
     if ($LASTEXITCODE -ne 0 -or -not $installed) {
-      throw "openspec-cn install: 下载的 $asset 无法在本机运行（需要 Windows 10 或更高版本）"
+      # Antivirus that distrusts the file deletes it or stops it from starting
+      # (#2243), which is not a Windows version problem and should not read as one.
+      if (-not (Test-Path -LiteralPath $exe)) {
+        throw "openspec-cn install: 下载的 $asset 在运行前被移除，很可能是杀毒软件拦截了。$npmHint"
+      }
+      throw "openspec-cn install: 下载的 $asset 无法在本机运行（需要 Windows 10 或更高版本；也可能被杀毒软件拦截）。$npmHint"
     }
 
     $target = Join-Path $dir $name

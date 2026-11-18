@@ -95,6 +95,7 @@ docs-lab 中的每个页面都从头手工编写。旧的 `docs/` 目录树只�
 |---|---|
 | [FAQ](help/faq.md) | 对不需要一个页面的问题给出简短回答。 |
 | [Troubleshooting](help/troubleshooting.md) | 当 OpenSpec 没有按你预期工作时：症状及其修复。 |
+| [Upgrade to 2.1: global skills](help/upgrade-to-2-1.md)（现已发布，位于 Start 下，排在 Help 其余页面之前） | OpenSpec 2.1 支持面向编程 Agent 的全局 skills。有哪些变化，以及该如何应对。 |
 | [Upgrade to 2.0](help/upgrade-to-2.md)（现已发布，位于 Start 下，排在 Help 其余页面之前） | 2.0 有哪些变化，以及如何迁移项目。 |
 
 ### Legacy：安全落地旧工作流（起草完成前从站点撤下，见 Open TODOs）

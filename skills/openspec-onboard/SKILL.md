@@ -38,7 +38,7 @@ openspec-cn --version 2>&1 || echo "CLI_NOT_INSTALLED"
 ```
 
 **若 CLI 未安装：**
-> OpenSpec CLI 未安装。先安装它，然后回到 `/openspec-onboard`。
+> OpenSpec CLI 未安装。先安装它，然后回到 `openspec-onboard`。
 
 若未安装则在此停止。
 
@@ -165,7 +165,7 @@ git log --oneline -10 2>/dev/null || echo "No git history"
 │   [可选：有帮助的 ASCII 图]            │
 └─────────────────────────────────────────┘
 
-探索模式（`/openspec-explore`）正是为这类思考准备的 —— 在实现之前先调研。任何时候需要把事情想清楚，都可以使用它。
+在实现变更之前，用探索把问题想透。
 
 现在让我们创建一个变更来承载我们的工作。
 ```
@@ -493,24 +493,13 @@ openspec-cn archive "<name>" --yes
 
 ## Skill 参考
 
-**你已安装的 skills：**
-
- | Skill             | 作用                               |
- |-------------------|--------------------------------------------|
- | `/openspec-propose` | 创建一个变更并生成全部制品 |
- | `/openspec-explore` | 在动手前/动手过程中想清楚问题  |
- | `/openspec-apply-change`   | 实现变更中的任务              |
- | `/openspec-archive-change` | 归档已完成的变更                 |
- | `/openspec-new-change`     | 启动新变更，一次一个制品 |
- | `/openspec-continue-change` | 继续处理一个已有的变更    |
- | `/openspec-ff-change`      | 快进：一次性创建全部制品 |
- | `/openspec-verify-change`  | 验证实现是否与制品一致    |
+列出本会话中你可以使用的 OpenSpec 工作流，每个用一行说明。省略你无法调用的工作流。
 
 ---
 
 ## 接下来？
 
-在你真正想构建的东西上试试 `/openspec-propose`。你现在已经找到节奏了！
+让我为你想构建的东西启动一个变更。
 ```
 
 ---
@@ -525,8 +514,7 @@ openspec-cn archive "<name>" --yes
 没问题！你的变更保存在 `openspec-cn status --change "<name>" --json` 报告的 `changeRoot`。
 
 稍后从我们停下的地方继续：`openspec-cn status --change "<name>" --json` 精确显示变更的当前状态。
-- `/openspec-continue-change <name>` - 恢复制品创建
-- `/openspec-apply-change <name>` - 跳转到实现（若任务已存在）
+从你可用的工作流中提供一个下一步。
 
 工作不会丢失。随时回来。
 ```
@@ -540,20 +528,9 @@ openspec-cn archive "<name>" --yes
 ```
 ## OpenSpec 快速参考
 
-**你已安装的 skills：**
+列出本会话中你可以使用的 OpenSpec 工作流，每个用一行说明。省略你无法调用的工作流。
 
- | Skill                    | 作用                               |
- |--------------------------|--------------------------------------------|
- | `/openspec-propose <idea>`  | 创建一个变更并生成全部制品 |
- | `/openspec-explore`         | 想清楚问题（不改动代码）   |
- | `/openspec-apply-change <name>`    | 实现任务                            |
- | `/openspec-archive-change <name>`  | 完成后归档                          |
- | `/openspec-new-change <name>`      | 启动新变更，逐步推进           |
- | `/openspec-continue-change <name>` | 继续一个已有的变更                |
- | `/openspec-ff-change <name>`       | 快进：一次性创建全部制品        |
- | `/openspec-verify-change <name>`   | 验证实现                      |
-
-运行 `/openspec-propose` 开始你的第一个变更。
+让我来启动你的第一个变更。
 ```
 
 优雅退出。

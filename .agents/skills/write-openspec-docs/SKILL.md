@@ -2,6 +2,8 @@
 name: write-openspec-docs
 description: 切换到 OpenSpec 文档写作模式；加载 house style 指南，并以其语气（动作优先、无开场白、可扫读）起草或修订页面。在编写或编辑 OpenSpec 文档树中的页面时使用。
 argument-hint: page or section
+metadata:
+  internal: true
 ---
 
 # 编写 OpenSpec 文档

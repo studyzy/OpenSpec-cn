@@ -40,7 +40,7 @@ curl -fsSL https://raw.githubusercontent.com/studyzy/openspec-cn/main/install.md
 这会获取[仓库根目录下的 install.md](https://github.com/studyzy/openspec-cn/blob/main/install.md)，这是一段为任何能执行 shell 命令的 Agent 编写的提示词（少数 IDE 集成做不到）。你的助手应当会：
 
 1. 如果 CLI 已经在你机器上，跳过安装，并按它当初的安装方式提供更新。如果当初是 npm 或 Homebrew，顺带提一次 `openspec-cn install` 可以切换到独立安装，但不要推销。否则，展示上面的安装命令，等你确认后再执行。
-2. 只有在你主动要求、或安装器失败时才改用 npm；如果你的 Node 低于 22.12.0 就停下。
+2. 只有在你主动要求、或安装器失败时才改用 npm；如果你的 Node 低于 22.20.0 就停下。
 3. 验证 `openspec-cn` 在 PATH 上。
 4. 说出它认为你说的那个文件夹，建议你正在对话的这个 AI 工具，并询问你还用哪些工具，然后在那里运行 `openspec-cn init`（即[项目设置](setup.md)这一步）。
 5. 报告 init 创建了什么，以及在你的工具中调用 OpenSpec 的确切拼写。
@@ -53,13 +53,13 @@ curl -fsSL https://raw.githubusercontent.com/studyzy/openspec-cn/main/install.md
 
 ## 包管理器
 
-这些方式把 OpenSpec 作为 Node.js 包安装，所以需要 Node.js 22.12.0 或更高版本（Homebrew 和 Nix 自带运行时）。在终端中执行：
+这些方式把 OpenSpec 作为 Node.js 包安装，所以需要 Node.js 22.20.0 或更高版本（Homebrew 和 Nix 自带运行时）。在终端中执行：
 
 ```bash
 node --version
 ```
 
-如果输出 `v22.12.0` 或更高，就用 npm 安装：
+如果输出 `v22.20.0` 或更高，就用 npm 安装：
 
 ```npm
 npm install -g @studyzy/openspec-cn@latest
@@ -217,13 +217,13 @@ openspec-cn version
 
 ## 更新
 
-在终端中，在每个你运行过 init 的项目里：
+在终端中执行：
 
 ```bash
 openspec-cn update
 ```
 
-当有更新的 CLI 发布时，[`openspec-cn update`](../reference/cli.md#openspec-update) 会提示你，并且可以替你安装；那次升级每台机器只发生一次。每次运行都会刷新项目生成的 skills，它们不会自行更新。一个最新的项目会打印 `✓ All 2 tool(s) up to date (v1.7.0)`。
+当有更新的 CLI 发布时，[`openspec-cn update`](../reference/cli.md#openspec-update) 会提示你，并且可以替你安装；那次升级每台机器只发生一次。每次运行都会刷新你的 skills，它们不会自行更新。使用全局 skills 时，从任意目录运行一次就够了，它会打印 `✓ The 6 skills for this machine are up to date (v2.1.0)`。skills 保留在项目中时，请在每个项目里运行；一个最新的项目会打印 `✓ All 2 tool(s) up to date (v2.1.0)`。
 
 
 > [!WARNING]
@@ -252,6 +252,7 @@ npm uninstall -g @studyzy/openspec-cn
 
 **3. 删除剩下的部分，或者保留。**
 
+- 为这台机器安装的 skills：用 `npx skills remove --global` 移除它们，选择 `openspec-` 开头的那些；或者删除 `~/.agents/skills/` 中的 `openspec-*` 文件夹，以及 `~/.claude/skills/` 之类工具文件夹中的 `openspec-*` 链接。
 - 生成的项目内 Agent 文件：`.agents/skills/` 中的 `openspec-*` skills 和 `.openspec-target`，以及 `.claude/skills/` 之类的工具文件夹中的 `openspec-*` 链接。[支持的工具](../reference/supported-tools.md) 列出了哪些工具会获得链接；MiniMax Code 把 skills 放在 `~/.minimax/skills`。
 - 旧版本的遗留物：`CLAUDE.md` 或 `AGENTS.md` 中的标记块（删除该块，保留文件）以及 `~/.codex/prompts` 下的 `opsx-*.md` 提示词。
 - `openspec/` 文件夹：先停一下。`specs/` 和 `changes/archive/` 是系统的记录，是即使没有 OpenSpec 也能正常阅读的纯 Markdown。

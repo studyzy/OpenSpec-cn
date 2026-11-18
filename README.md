@@ -135,7 +135,7 @@ curl -fsSL https://raw.githubusercontent.com/studyzy/OpenSpec-cn/main/scripts/bi
 irm https://raw.githubusercontent.com/studyzy/OpenSpec-cn/main/scripts/binary/install.ps1 | iex
 ```
 
-偏好包管理器？使用 `npm install -g @studyzy/openspec-cn@latest`（需要 Node.js 22.12.0 或更高版本）。
+偏好包管理器？使用 `npm install -g @studyzy/openspec-cn@latest`（需要 Node.js 22.20.0 或更高版本）。
 
 然后进入你的项目目录并初始化：
 
@@ -207,7 +207,7 @@ npm install -g @studyzy/openspec-cn@latest
 
 **刷新代理指令（agent instructions）**
 
-在每个项目里运行一次，用于重新生成 AI 指引并刷新已安装的 skills：
+只需运行一次即可刷新安装在你机器上的 skills；如果你的团队把 skills 纳入 Git 管理，请在每个提交了它们的项目里各运行一次：
 
 ```bash
 openspec-cn update

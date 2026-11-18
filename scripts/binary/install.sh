@@ -108,7 +108,7 @@ main() {
     fi
   }
 
-  npm_hint="或改用 npm 安装（Node.js 22.12+）：npm install -g @studyzy/openspec-cn"
+  npm_hint="或改用 npm 安装（Node.js 22.20.0+）：npm install -g @studyzy/openspec-cn"
   if [ -n "${OPENSPEC_DOWNLOAD_URL:-}" ]; then
     base=${OPENSPEC_DOWNLOAD_URL%/}
   elif [ "$version" != latest ]; then

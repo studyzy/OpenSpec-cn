@@ -77,7 +77,7 @@ openspec-cn init --tools claude,cursor  # 设置特定工具，无提示
 openspec-cn init --tools none           # 仅 openspec/ 结构，不生成工具文件
 ```
 
-没有 `--tools` 时，init 会在交互式终端中提示你选择工具。在非交互终端中，它会设置项目里检测到的工具。若一个都未检测到，则退出 1 并列出有效的 id。
+没有 `--tools` 时，init 会在交互式终端中提示你选择工具。在非交互终端中，它会设置项目里检测到的工具。若一个都未检测到，则退出 1 并列出有效的 id——除非已安装[全局 skills](../start/setup.md#install-the-skills-once-for-every-project)：此时项目会使用它们。
 
 **仅有 store 的仓库**
 
@@ -85,7 +85,7 @@ openspec-cn init --tools none           # 仅 openspec/ 结构，不生成工具
 
 ```bash
 # 在代码仓库中安装 Claude Code 集成文件
-openspec init --tools claude
+openspec-cn init --scope project --tools claude
 ```
 
 - **集成文件**：写入代码仓库。
@@ -109,10 +109,14 @@ openspec init --tools claude
 | `--force` | 不询问就删除旧版 OpenSpec 布局中的文件。交互式运行否则会先确认清理。 |
 | `--profile <profile>` | 覆盖本次运行的全局配置 profile：`core`（标准工作流集合）或 `custom`（全局配置中保存的工作流）。 |
 | `--no-animation` | 显示静态欢迎屏而不是动画版。 |
+| `--copilot-cloud`, `--no-copilot-cloud` | 写入或不写入 GitHub 托管的 Copilot agent 所需的文件。它们要求 skills 放在项目中。参见 [GitHub Copilot](supported-tools.md#github-copilot)。 |
+| `--scope <scope>` | 为这台机器（`global`）安装 skills，或把它们随仓库提交（`project`）。 |
+
+不指定 `--scope` 时，仓库中已有的 skills 会留在项目里。在这样的仓库中使用 `--scope global`，会把 skills 安装到你的机器上并不经询问地移除仓库副本。对于新设置，`--scope` 优先于 `OPENSPEC_SKILLS_SCOPE`，其次是机器的 `skillsScope` 设置。默认值为 `global`，除非所请求的工具需要项目范围，或你请求了托管的 Copilot。
 
 **输出**
 
-OpenSpec 只把 skills 写一份到 `.agents/skills/`；需要它们的工具会在自己的文件夹中得到链接。MiniMax Code 例外，它会在 `~/.minimax/skills/` 中拥有自己的副本：
+在项目中使用 skills 时（`--scope project`），OpenSpec 只把 skills 写一份到 `.agents/skills/`；需要它们的工具会在自己的文件夹中得到链接。Windows 使用副本。MiniMax Code 例外，它会在 `~/.minimax/skills/` 中拥有自己的副本：
 
 ```
 ▌ OpenSpec 结构已创建
@@ -121,19 +125,21 @@ OpenSpec 只把 skills 写一份到 `.agents/skills/`；需要它们的工具会
 OpenSpec 设置完成
 
 已创建：Claude Code
-.agents/skills/ 中共有 6 个 skills（链接自 .claude/skills/）
+.agents/skills/ 中共有 6 个 skills（也在 .claude/skills/）
 配置：openspec/config.yaml（schema: spec-driven）
 
 开始使用：
   发起第一个变更：/openspec-propose "你的想法"
 ```
 
-`--tools none` 只创建 `openspec/config.yaml`。在已初始化的项目上，init 会在原地重写已安装的文件，摘要显示 `已刷新：Claude Code`，并有 `配置：openspec/config.yaml（已存在）`。
+skills 在这台机器上时，摘要行显示 `6 skills in ~/.agents/skills/ for every project on this machine`，项目里只保留 `openspec/`。
+
+`--tools none` 只创建 `openspec/` 文件夹，不设置任何工具。在已初始化的项目上，init 会在原地重写已安装的文件，摘要显示 `已刷新：Claude Code`，并有 `配置：openspec/config.yaml（已存在）`。
 
 **退出码**
 
 - `0`：设置完成。
-- `1`：`--tools` 或 `--profile` 值无效；非交互运行且未检测到任何工具、也没有 `--tools`；或 store-only 调用无效。
+- `1`：无效的 `--tools`、`--profile` 或 `--scope` 值（或 `OPENSPEC_SKILLS_SCOPE`）；非交互运行且未检测到任何工具、也没有 `--tools`；全局安装失败、或所选工具没有一个能使用它；或 store-only 调用无效。
 
 <a id="openspec-update"></a>
 
@@ -147,7 +153,9 @@ openspec-cn update --force   # 即使文件是最新的也重写
 openspec-cn update --dry-run # 列出更新会改动什么，但不做任何改动
 ```
 
-update 会找到 init 配置的工具，并把它们生成的文件与 CLI 的版本比较。当存在更新的 OpenSpec 版本时，它会先提议升级 CLI，然后用升级后的版本重新运行。设置 `OPENSPEC_NO_UPDATE_CHECK=1` 可跳过该检查。
+在终端中运行 update，可以把已有项目切换到全局 skills。按 Enter 保留项目级 skills。维护者提交移除后，队友在各自的检出中运行 update 以设置他们的工具。无终端的运行保持当前范围。
+
+update 会找到 init 配置的工具，并把它们生成的文件与 CLI 的版本比较。它从当前运行的 CLI 刷新已安装的指令，降级后也是如此；待处理的全局刷新会在 dry-run 计划中作为一条提示出现。当存在更新的 OpenSpec 版本时，它会先提议升级 CLI，然后用升级后的版本重新运行。设置 `OPENSPEC_NO_UPDATE_CHECK=1` 可跳过该检查。
 
 **参数**
 

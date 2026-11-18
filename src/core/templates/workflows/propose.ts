@@ -5,30 +5,14 @@
  * templates file into workflow-focused modules.
  */
 import type { SkillTemplate, CommandTemplate } from '../types.js';
-import { optionalWorkflow } from '../optional-workflow.js';
 import { STORE_SELECTION_GUIDANCE } from './store-selection.js';
 import { PROJECT_ROOT_GUARD } from './project-root.js';
 
-/**
- * The implementation handoff. `apply` is not guaranteed to be installed, so
- * the prompt is resolved at generation time (see optional-workflow.ts) rather
- * than naming a workflow that may not exist.
- *
- * The two surfaces word this differently on purpose (#258): a command-only
- * tool has no conversational agent to ask, so its prompt names a command or
- * the CLI and never invites "ask me to implement".
- */
-const SKILL_APPLY_HANDOFF = optionalWorkflow(
-  'apply',
-  '运行 `/opsx:apply`，或者让我来应用这个变更',
-  '让我来应用这个变更'
-);
+const SKILL_APPLY_HANDOFF =
+  '让我来应用它';
 
-const COMMAND_APPLY_HANDOFF = optionalWorkflow(
-  'apply',
-  '运行 `/opsx:apply`',
-  '运行 `openspec-cn instructions apply --change "<name>" --json` 获取任务列表'
-);
+const COMMAND_APPLY_HANDOFF =
+  '运行 `openspec-cn instructions apply --change "<name>" --json` 获取任务列表';
 
 export function getOpsxProposeSkillTemplate(): SkillTemplate {
   return {
@@ -168,7 +152,7 @@ ${PROJECT_ROOT_GUARD}
 - 变更名称和位置
 - 已创建产出物列表及简要描述，加上跳过的任何条件性产出物及原因
 - 就绪状态："实现所需的所有产出物已就绪。"
-- 提示："产出物已就绪，待审核。当你准备就绪时，${SKILL_APPLY_HANDOFF}。"
+- 提示："计划已就绪，待审核。当你准备就绪时，${SKILL_APPLY_HANDOFF}。"
 
 **产出物创建指南**
 

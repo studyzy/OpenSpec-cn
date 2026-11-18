@@ -6,26 +6,18 @@ import {
 } from '../../../src/core/templates/skill-templates.js';
 import { STORE_SELECTION_GUIDANCE } from '../../../src/core/templates/workflows/store-selection.js';
 import { PROJECT_ROOT_GUARD } from '../../../src/core/templates/workflows/project-root.js';
-import { resolveOptionalWorkflows } from '../../../src/core/templates/optional-workflow.js';
-import { ALL_WORKFLOWS, CORE_WORKFLOWS } from '../../../src/core/profiles.js';
 
 const skill = getUpdateChangeSkillTemplate();
 const command = getOpsxUpdateCommandTemplate();
 
-const render = (workflows: readonly string[]): Array<[string, string]> => {
-  const installed = new Set<string>(workflows);
-  return [
-    ['skill', resolveOptionalWorkflows(skill.instructions, installed)],
-    ['command', resolveOptionalWorkflows(command.content, installed)],
-  ];
-};
-
 // Both delivery surfaces must carry the same contract; every behavioral
-// assertion below runs against each body. Templates carry optional-workflow
-// conditionals, so a body is only meaningful once resolved against a workflow
-// set — these are the bodies a profile with every workflow installed receives.
-const bodies = render(ALL_WORKFLOWS);
-const coreBodies = render(CORE_WORKFLOWS);
+// assertion below runs against each body. The text is the same for every
+// workflow profile: each handoff names the skill "if installed" and gives the
+// CLI path otherwise.
+const bodies: Array<[string, string]> = [
+  ['skill', skill.instructions],
+  ['command', command.content],
+];
 
 // The load-bearing sentence of step 4 and the whole of step 5 are pinned
 // verbatim. #1836 happened because a single verb ("Apply") in step 4 silently
@@ -242,14 +234,8 @@ describe('update-change templates', () => {
     for (const [label, body] of bodies) {
       expect(body, label).toContain('绝不要编辑代码');
       expect(body, label).toContain('绝不要编辑实现代码');
-      expect(body, label).toContain('停止并指向 `/opsx:apply`');
+      expect(body, label).toContain('在修订计划后停止');
       expect(body, label).toContain('不要推进构建边界');
-      expect(body, label).toContain(
-        '没有现有输出文件且状态为 `ready` 或 `blocked`，指出它并'
-      );
-      expect(body, label).toContain(
-        '`existingOutputPaths` 为空且状态为 `ready` 或 `blocked` 的制品'
-      );
       expect(body, label).toContain('保持 `skipped` 制品不动');
       expect(body, label).toContain('不要把它们当作缺失，也不要把它们推迟到 continue 工作流');
     }
@@ -343,44 +329,15 @@ describe('update-change templates', () => {
   it('ends with next-step guidance and never acts on it (3.5)', () => {
     for (const [label, body] of bodies) {
       expect(body, label).toContain('仅供参考 - 绝不要执行');
-      expect(body, label).toContain(
-        '`existingOutputPaths` 为空且状态为 `ready` 或 `blocked` 的制品 -> 建议 `/opsx:continue`'
-      );
-      expect(body, label).toContain('建议 `/opsx:continue`');
-      expect(body, label).toContain('建议 `/opsx:apply`');
-      expect(body, label).toContain('建议 `/opsx:archive`');
+      expect(body, label).toContain('openspec-cn archive "<name>"');
       expect(body, label).toContain('代码可能不再匹配修订后的计划');
     }
   });
 
-  it('hands off to /opsx:continue when that workflow is installed', () => {
+  it('shows the next ready artifact and how to get its instructions', () => {
     for (const [label, body] of bodies) {
-      expect(body, label).toContain(
-        '`/opsx:continue` 负责创建不存在的制品'
-      );
-      expect(body, label).toContain('建议 `/opsx:continue` 创建它们');
-      expect(body, label).toContain('那是 `/opsx:continue` 的职责');
-      // The handoff is stated outright, not deferred to a runtime availability
-      // check the model has to perform (#1734).
-      expect(body, label).not.toContain('may not be installed');
-      expect(body, label).not.toContain('verify that it is available');
-    }
-  });
-
-  it('never names /opsx:continue on a profile that does not install it', () => {
-    for (const [label, body] of coreBodies) {
-      expect(body, label).not.toContain('/opsx:continue');
-      expect(body, label).toContain('它绝不创建缺失的制品');
-      expect(body, label).toContain(
-        '运行 `openspec-cn status --change "<name>" --json` 获取下一个制品'
-      );
-      expect(body, label).toContain(
-        '`openspec-cn instructions "<artifact-id>" --change "<name>" --json` 来创建它们'
-      );
-      expect(body, label).toContain(
-        '因尚不存在而推迟的任何内容'
-      );
-      expect(body, label).toContain('创建它们是本工作流之外的独立步骤');
+      expect(body, label).toContain('openspec-cn status --change "<name>" --json');
+      expect(body, label).toContain('openspec-cn instructions "<artifact-id>" --change "<name>" --json');
     }
   });
 
@@ -391,19 +348,18 @@ describe('update-change templates', () => {
       expect(reconciliation, label).not.toContain('应用请求的编辑');
       expect(body, label).toContain('仅在用户确认后写入');
       expect(body, label).toContain('若用户拒绝修订，不要写入');
-      expect(body, label).toContain('建议用 `/opsx:new` 重新开始');
-      expect(body, label).toContain('更新 vs 重新开始');
+      expect(body, label).toContain('请求一个不同的未使用名称');
       expect(body, label).not.toContain('首先验证可选');
     }
   });
 
   it('routes intent changes to the CLI when /opsx:new is not installed', () => {
-    for (const [label, body] of coreBodies) {
-      expect(body, label).not.toContain('/opsx:new');
-      expect(body, label).toContain('请求一个不同的未使用变更名称');
+    for (const [label, body] of bodies) {
+      expect(body, label).toContain(
+        '请求一个不同的未使用名称'
+      );
       expect(body, label).toContain('openspec-cn new change "<new-change-name>"');
       expect(body, label).not.toContain('openspec-cn new change "<name>"');
-      expect(body, label).toContain('更新 vs 重新开始');
     }
   });
 });

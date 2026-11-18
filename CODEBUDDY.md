@@ -15,7 +15,7 @@
 ## 技术栈
 
 - TypeScript, ESM 模块 (`"type": "module"`)
-- Node.js ≥ 22.12.0
+- Node.js ≥ 22.20.0
 - pnpm 包管理
 - CLI 框架: Commander.js
 - 测试: Vitest
@@ -68,9 +68,14 @@ src/
 │   ├── store/            # Store 系统（注册、注销、Git 操作、诊断）
 │   │   └── operations.ts # ~1200行，Store 完整生命周期管理
 │   ├── shared/           # 共享工具：Agent Skills 模板生成、工具检测
-│   │   ├── shared-skill-install.ts # 2.0 唯一入口：向 .agents/skills/ 安装共享 skills 并建链接
+│   │   ├── shared-skill-install.ts # 项目级安装：向 .agents/skills/ 安装共享 skills 并建链接
 │   │   ├── skill-links.ts          # 链接的创建/识别/分类
-│   │   └── own-skill-texts.ts      # 判断 .agents/skills/ 中哪些是用户自有 skill
+│   │   └── skill-paths.ts          # 各工具的 skills 目录与链接路径
+│   ├── global-skills.ts  # 2.1 机器级安装：~/.agents/skills/ 与各工具主目录
+│   ├── skill-installer.ts # 2.1 通过 skills 安装器从 release 安装/移除 skills
+│   ├── project-skills-scope.ts # 2.1 skills: global/project 与 --scope 解析
+│   ├── known-projects.ts # 2.1 记录使用全局 skills 的项目
+│   ├── project-dir.ts    # OPENSPEC_DIR_NAME 常量
 │   ├── config.ts         # AI_TOOLS 常量（30+ 种工具）、RETIRED_TOOLS、OpenSpec 可用性检测
 │   ├── retired-tools.ts  # 已退役工具（Amazon Q）的清理与提示
 │   ├── config-prompts.ts # 交互式配置提示
@@ -105,7 +110,7 @@ src/
 
 6. **汉化范围**: 界面文字、文档、模板已汉化。代码标识符、CLI 参数名保持英文。`src/` 中中文字符串用 `// 中文注释` 标注。
 
-7. **2.0 只安装 skills**: 项目 skills 只写一份到 `.agents/skills/`；不读该目录的工具（Claude Code、Kiro、CodeBuddy 等，见 `SKILL_LINKED_TOOL_IDS`）从其自身文件夹建立链接。MiniMax Code 例外，写全局 `~/.minimax/skills/`。原本由 `delivery` 设置的 skills/commands 二选一已退役：值仍会被读取，但不再影响安装内容；`command-generation/adapters` 仅保留用于识别并清理旧版生成的文件。
+7. **2.0 只安装 skills**: 项目 skills 只写一份到 `.agents/skills/`；不读该目录的工具（Claude Code、Kiro、CodeBuddy 等，见 `SKILL_LINKED_TOOL_IDS`）从其自身文件夹建立链接。MiniMax Code 例外，写全局 `~/.minimax/skills/`。原本由 `delivery` 设置的 skills/commands 二选一已退役：值仍会被读取，但不再影响安装内容；`command-generation/adapters` 仅保留用于识别并清理旧版生成的文件。2.1 起新增机器级（global）安装：`openspec-cn init --global` / `update --global` 通过 `skills` 安装器把 skills 装到 `~/.agents/skills/`，`--scope project|global` 与 `skills: global` 配置决定项目使用哪一份。
 
 ## OpenSpec 开发工作流
 

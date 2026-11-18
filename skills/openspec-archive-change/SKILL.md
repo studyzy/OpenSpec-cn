@@ -40,7 +40,7 @@ metadata:
    提示时，仅显示活跃变更（非已归档）。
    若可用，包含每个变更使用的 schema。
 
-   始终宣告："使用变更：<name>"，以及如何覆盖（例如 `/openspec-archive-change <other>`）。
+   始终宣告："使用变更：<name>"，以及如何覆盖（例如 `openspec-archive-change <other>`）。
 
    **在执行既有归档检查之前，先加载当前归档输入：**
 
@@ -121,7 +121,7 @@ metadata:
 
    在所选同步写入任何主 spec 之前，用相同的已选根目录标志运行一次 `openspec-cn instructions specs --change "<name>" --json`。要求退出状态为零且返回有效的制品指令 JSON。若查询失败或返回无效 JSON，报告错误并在写入任何主 spec 或移动变更之前停止。省略 `rules` 的有效响应表示未配置制品规则 — 这是无规则情况。仅将返回的 `rules` 应用于此合并生成的主 spec 的内容和形式；不要将其用于归档指导、更改 CLI 行为，或将规则文本复制到任何输出文件中。
 
-   然后为变更 '<name>' 内联运行 `openspec-sync-specs` 工作流（agent 驱动的智能合并），传入上面的 delta spec 分析和已获取的 specs 规则快照，并等待它完成。内联同步必须复用该快照，不要再次获取 `specs` 指令。不要把它委托给后台任务 —— 步骤 5 会把 `changeRoot` 从一个仍在读取它的同步下方移走，导致变更已归档而主 specs 从未更新。若你的 agent 只能通过委托运行它，请同步委托并等待结果。
+   然后为变更 '<name>' 内联运行 `openspec-sync-specs` 工作流（若已安装该 skill），否则自行内联执行 delta 到主 spec 的合并（两者都是由 agent 驱动的智能合并），传入上面的 delta spec 分析和已获取的 specs 规则快照，并等待它完成。内联同步必须复用该快照，不要再次获取 `specs` 指令。不要把它委托给后台任务 —— 步骤 5 会把 `changeRoot` 从一个仍在读取它的同步下方移走，导致变更已归档而主 specs 从未更新。若你的 agent 只能通过委托运行它，请同步委托并等待结果。
 
    若同步报告任何停止或受阻条件，视为同步失败。
    立即停止归档。不要执行同步后的内容比较，也不要移动其 `changeRoot`。
@@ -187,7 +187,8 @@ metadata:
 - 不要因警告阻塞归档 - 仅告知并确认
 - 移动到归档时保留 .openspec.yaml（它随目录一起移动）
 - 展示清晰的所发生事情的汇总
-- 若请求同步，内联运行 `openspec-sync-specs` 工作流（agent 驱动）
+- 若请求同步，内联运行 `openspec-sync-specs` 工作流（若已安装该 skill），否则自行内联执行 delta 到主 spec 的合并（两者都是由 agent 驱动）
+- 若因未安装同步 skill 而需内联合并，请保留其保障措施。仅当变更的 `.openspec.yaml` 声明 `retire_capabilities: true`、该 spec 没有其他撰写章节、且其路径解析到真实 specs 根目录之内时，才删除其最后一条需求被 delta 移除的 spec；否则在写入前停止。合并后，用相同的已选根目录标志运行 `openspec-cn validate --specs`，并将失败视为同步失败：停止并保持 `changeRoot` 原位不动
 - 绝不在 spec 同步仍在进行时归档 —— 内联运行同步并在移动 `changeRoot` 前验证主 specs
 - 若存在 delta specs，始终运行同步评估并在提示前展示合并摘要
 - 应用相关的运行时 context 并报告冲突；operation guidance 保持建议性质

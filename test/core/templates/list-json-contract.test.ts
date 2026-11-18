@@ -66,6 +66,8 @@ describe('workflow list --json field usage', () => {
     }
   });
 
+  // One text for every profile: it names the sync workflow "if installed"
+  // and the inline merge otherwise, whether or not sync sits beside it.
   it('keeps bulk archive sync available with and without the sync workflow', () => {
     const variants = [
       [
@@ -86,12 +88,15 @@ describe('workflow list --json field usage', () => {
         text.indexOf('b. **在移动 changeRoot 之前验证包含的增量 spec')
       );
 
-      expect(syncStep(withSync)).toContain(workflow);
-      expect(syncStep(withoutSync)).not.toContain(workflow);
-      expect(syncStep(withoutSync)).toContain('自行内联执行 delta 到主 spec 的合并');
-      expect(syncStep(withoutSync)).toContain('`includedDeltas`');
-      expect(syncStep(withoutSync)).toContain('`excludedDeltas`');
-      expect(withoutSync).toContain('内联执行 delta 到主 spec 的合并');
+      expect(withoutSync).toBe(withSync);
+      expect(syncStep(withSync)).toContain(
+        `内联运行 \`${workflow}\` 工作流（若已安装该 skill），否则自行内联执行 delta 到主 spec 的合并`
+      );
+      expect(syncStep(withSync)).toContain('`includedDeltas`');
+      expect(syncStep(withSync)).toContain('`excludedDeltas`');
+      expect(withSync).toContain(
+        `内联运行 \`${workflow}\` 工作流（若已安装该 skill），否则自行内联执行 delta 到主 spec 的合并`
+      );
     }
   });
 
@@ -115,10 +120,13 @@ describe('workflow list --json field usage', () => {
         text.indexOf('5. **执行归档**')
       );
 
-      expect(syncStep(withSync)).toContain(workflow);
-      expect(withoutSync).not.toContain(workflow);
-      expect(syncStep(withoutSync)).toContain('自行内联执行 delta 到主 spec 的合并');
-      expect(withoutSync).toContain('若请求同步，自行内联执行 delta 到主 spec 的合并');
+      expect(withoutSync).toBe(withSync);
+      expect(syncStep(withSync)).toContain(
+        `内联运行 \`${workflow}\` 工作流（若已安装该 skill），否则自行内联执行 delta 到主 spec 的合并`
+      );
+      expect(withSync).toContain(
+        `内联运行 \`${workflow}\` 工作流（若已安装该 skill），否则自行内联执行 delta 到主 spec 的合并`
+      );
     }
   });
 });

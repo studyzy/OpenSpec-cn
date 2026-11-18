@@ -26,7 +26,7 @@ metadata:
 
 **Input**: 可选地指定变更名称。若省略，检查能否从对话上下文推断。若模糊或歧义，你必须提示用户从可用变更中选择。
 
-本工作流仅修订已存在的制品；`/openspec-continue-change` 负责创建不存在的制品。
+仅修订已存在的制品。若某个制品缺失，指出它并用 `openspec-cn status --change "<name>" --json` 展示下一个 `ready` 制品。
 
 **步骤**
 
@@ -44,7 +44,7 @@ metadata:
 
    将最近修改的变更标记为 "(推荐)"，因为这很可能是用户想更新的。
 
-   始终宣告："使用变更：<name>"，以及如何覆盖（例如 `/openspec-update-change <other>`）。
+   始终宣告："使用变更：<name>"，以及如何覆盖（例如 `openspec-update-change <other>`）。
 
 2. **获取变更的制品**
    ```bash
@@ -68,7 +68,7 @@ metadata:
    - 读取请求涉及的制品以及变更的其他现有制品。
    - 在对话中起草请求的编辑，而非在文件中。明确它究竟改变了什么；步骤 5 负责所有写入。然后对照起草的编辑检查每个其他现有制品 — 在任何方向上：对后续制品的编辑可能需要修订前面的制品，而不仅仅是反过来。构建顺序是方便的阅读顺序，而非对哪些制品可被修订的约束。
    - 记录所有现在不一致、缺失或矛盾的内容。
-   - 对已存在的文件（`existingOutputPaths`）提出修订。若制品没有现有输出文件且状态为 `ready` 或 `blocked`，指出它并引导用户使用 `/openspec-continue-change` 来创建它们。保持 `skipped` 制品不动；不要把它们当作缺失，也不要把它们推迟到 continue 工作流。
+   - 对已存在的文件（`existingOutputPaths`）提出修订。若制品没有现有输出文件且状态为 `ready` 或 `blocked`，指出它并展示如何用 `openspec-cn instructions "<artifact-id>" --change "<name>" --json` 创建下一个 `ready` 制品。保持 `skipped` 制品不动；不要把它们当作缺失，也不要把它们推迟到 continue 工作流。
    - glob 制品（例如 `specs/**/*.md`）在至少一个文件匹配后即标记为 `done`，而 continue 工作流只处理 `ready` 制品。当调和发现一个 `existingOutputPaths` 非空的 glob 制品缺少文件时：
      1. 运行 `openspec-cn instructions "<artifact-id>" --change "<name>" --json` 并使用其 `instruction` 和 `template`。将 `context` 和 `rules` 视为约束；不要把它们复制进文件。若 instructions 报告 `skipped: true`，不要创建文件。从磁盘读取当前依赖文件；若所需的非 skipped 依赖缺失，停止并请用户先恢复它。
      2. 在 `changeRoot` 内选择一个符合 `artifactPaths.<id>.outputPath` 且尚不存在的具体路径。解析符号链接的父目录后，验证它仍在 `changeRoot` 内。glob 的 `resolvedOutputPath` 不是有效目标。
@@ -87,22 +87,22 @@ metadata:
      ```
 
 6. **指出下一步（仅供参考 - 绝不要执行）**
-   - `existingOutputPaths` 为空且状态为 `ready` 或 `blocked` 的制品 -> 建议 `/openspec-continue-change` 创建它们。
-   - 变更已实现（任务已勾选 / 已 apply） -> 代码可能不再匹配修订后的计划；建议 `/openspec-apply-change` 将增量带入代码。
-   - 一切完成且已实现 -> 建议 `/openspec-archive-change`。
+   - `existingOutputPaths` 为空且状态为 `ready` 或 `blocked` 的制品 -> 给出下一个 `ready` 制品的 CLI 命令。
+   - 变更已实现（任务已勾选 / 已 apply） -> 代码可能不再匹配修订后的计划；告诉用户哪些实现任务需要重新审视。
+   - 一切完成且已实现 -> 建议用 `openspec-cn archive "<name>"` 归档。
 
 **输出**
 
 每次调用后，展示：
 - 修订了哪些制品（以及哪些提议的修订被拒绝）
 - 在已部分填充的 glob 制品下创建的任何文件
-- 推迟到 `/openspec-continue-change` 的任何内容（尚无文件的制品且状态为 `ready` 或 `blocked`，绝不包括 `skipped` 制品）
+- 推迟到独立步骤处理的缺失制品（含 `ready` 或 `blocked`，不含 `skipped` 制品）
 - 变更的当前状态及推荐的下一步 skill
 
 **护栏**
-- 仅规划制品 — 绝不要编辑实现代码。若修订后的计划暗示代码更改，停止并指向 `/openspec-apply-change`。
+- 仅规划制品 — 绝不要编辑实现代码。若修订后的计划暗示代码更改，在修订计划后停止，并指出它要求的任何代码更改。
 - 使用 `openspec-cn status` 报告的制品 ID 和路径；绝不要基于硬编码的制品名称分支。
 - 仅编辑 `existingOutputPaths` 中的具体文件，外加部分填充的 glob 制品（第 4 步）下允许的、已确认的具体路径；绝不要写入 glob `resolvedOutputPath`。
-- 不要推进构建边界：若制品的 `existingOutputPaths` 为空且状态为 `ready` 或 `blocked`，那是 `/openspec-continue-change` 的职责。保持 `skipped` 制品不动。新文件的唯一允许范围是 `existingOutputPaths` 非空的 glob 制品下一个已确认的具体路径。
+- 不要推进构建边界：若制品的 `existingOutputPaths` 为空且状态为 `ready` 或 `blocked`，在独立步骤中创建缺失制品。保持 `skipped` 制品不动。新文件的唯一允许范围是 `existingOutputPaths` 非空的 glob 制品下一个已确认的具体路径。
 - 在写入前与用户确认每个编辑。
-- 若请求更改的是变更的*意图*而非细化，建议用 `/openspec-new-change` 重新开始（"更新 vs 重新开始" 启发式）。
+- 若请求更改的是变更的*意图*而非细化，请求一个不同的未使用名称，并建议改用 `openspec-cn new change "<new-change-name>"`。

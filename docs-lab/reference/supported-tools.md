@@ -6,7 +6,7 @@
 
 ## skills 放在哪里
 
-每个工具的 skills 只写一次，写到 `.agents/skills/`。不读取该文件夹的工具会在自己的 `skills/` 文件夹中为每个 skill 放一个链接，指回共享副本。
+新项目默认使用机器级 skills。使用 `--scope project` 时，安装器写入 `.agents/skills/`，并为需要自己文件夹的工具提供每个 skill 的链接或副本。每个工具的 skills 只写一次；不读取该文件夹的工具会在自己的 `skills/` 文件夹中为每个 skill 放一个链接，指回共享副本。
 
 一个为 Claude Code、Cursor 和 Codex 配置的项目：
 
@@ -21,7 +21,9 @@ my-project/
 
 Cursor 和 Codex 自己读取 `.agents/skills/`，因此无需其他内容。
 
-`.openspec-target` 让 `openspec update` 知道哪些内容属于 OpenSpec。每一行是以下之一：
+项目级安装不会改动 `skills-lock.json`。
+
+`.openspec-target` 让 `openspec-cn update` 知道哪些工具已设置、哪些内容属于 OpenSpec。每一行是以下之一：
 
 | 行 | 含义 |
 |---|---|
@@ -31,7 +33,13 @@ Cursor 和 Codex 自己读取 `.agents/skills/`，因此无需其他内容。
 
 - **链接**：Claude Code、Continue、ForgeCode、Kiro、CodeBuddy、EasyCode、iFlow、CodeArts、Lingma、GigaCode、Veai、Rovo Dev、Code Studio 和 Hermes Agent。
 - **无链接**：其他所有工具都直接读取 `.agents/skills/`，因此绝不会重复加载某个 skill。
-- **无法建立链接时**：OpenSpec 改为写入普通副本，并在 `openspec update` 时刷新。
+- **无法建立链接时**：OpenSpec 改为写入普通副本，并在 `openspec-cn update` 时刷新。
+
+Vercel 的 `skills` 包会把 skills 放进每个 agent 读取的文件夹。Windows 上的项目级安装使用副本。运行 `openspec-cn init --help` 查看完整列表，包括 AiderDesk（`aider-desk`）之类的工具。现有的 OpenSpec ID 仍然有效：Claude Code 用 `claude`，Devin Desktop 用 `windsurf`。
+
+在全局范围内，各工具共享 `~/.agents/skills/`，或从各自的全局 skills 文件夹读取。Eve 和 PromptScript 需要项目范围。
+
+对于不在安装器列表中的工具，使用 `--tools agents` 或该工具现有的 OpenSpec ID。Veai 在两种范围内都读取通用文件夹。GigaCode 的文档指向项目文件夹。对于 EasyCode，保留有效的逐个 skill 链接，或用[链接其他工具](#link-another-tool)把 skills 链接到它自己的文件夹。
 
 要添加未列出的工具，见[链接其他工具](#link-another-tool)。
 
@@ -44,48 +52,48 @@ Cursor 和 Codex 自己读取 `.agents/skills/`，因此无需其他内容。
 | Amp | `amp` | `.agents/skills/` | `/openspec-apply-change` |
 | Antigravity | `antigravity` | `.agents/skills/` | `/openspec-apply-change` |
 | AtomCode | `atomcode` | `.agents/skills/` | `/openspec-apply-change` |
-| Auggie (Augment CLI) | `auggie` | `.agents/skills/` | `/openspec-apply-change` |
-| IBM Bob | `bob` | `.agents/skills/` | `/openspec-apply-change` |
-| Claude Code | `claude` | `.agents/skills/`（链接在 `.claude/skills/`） | `/openspec-apply-change` |
+| Auggie (Augment CLI) | `auggie` | `.agents/skills/`（也在 `.augment/skills/`） | `/openspec-apply-change` |
+| IBM Bob | `bob` | `.agents/skills/`（也在 `.bob/skills/`） | `/openspec-apply-change` |
+| Claude Code | `claude` | `.agents/skills/`（也在 `.claude/skills/`） | `/openspec-apply-change` |
 | Cline | `cline` | `.agents/skills/` | `/openspec-apply-change` |
-| CodeArts | `codeartsagent` | `.agents/skills/`（链接在 `.codeartsdoer/skills/`） | `/openspec-apply-change` |
-| CodeBuddy Code (CLI) | `codebuddy` | `.agents/skills/`（链接在 `.codebuddy/skills/`） | `/openspec-apply-change` |
-| Code Studio | `codestudio` | `.agents/skills/`（链接在 `.codestudio/skills/`） | `/openspec-apply-change` |
+| CodeArts | `codeartsagent` | `.agents/skills/`（也在 `.codeartsdoer/skills/`） | `/openspec-apply-change` |
+| CodeBuddy Code (CLI) | `codebuddy` | `.agents/skills/`（也在 `.codebuddy/skills/`） | `/openspec-apply-change` |
+| Code Studio | `codestudio` | `.agents/skills/`（也在 `.codestudio/skills/`） | `/openspec-apply-change` |
 | Codex | `codex` | `.agents/skills/` | `$openspec-apply-change` |
-| Continue | `continue` | `.agents/skills/`（链接在 `.continue/skills/`） | `/openspec-apply-change` |
+| Continue | `continue` | `.agents/skills/`（也在 `.continue/skills/`） | `/openspec-apply-change` |
 | CoStrict | `costrict` | `.agents/skills/` | `/openspec-apply-change` |
-| Crush | `crush` | `.agents/skills/` | `/openspec-apply-change` |
+| Crush | `crush` | `.agents/skills/`（也在 `.crush/skills/`） | `/openspec-apply-change` |
 | Cursor | `cursor` | `.agents/skills/` | `/openspec-apply-change` |
 | DeepSeek Harness | `dsh` | `.agents/skills/` | `/openspec-apply-change` |
-| Devin Desktop（原 Windsurf） | `devin` | `.agents/skills/` | `/openspec-apply-change` |
-| EasyCode | `easycode` | `.agents/skills/`（链接在 `.easycode/skills/`） | `/openspec-apply-change` |
+| Devin Desktop（原 Windsurf） | `devin` | `.agents/skills/`（也在 `.devin/skills/`） | `/openspec-apply-change` |
+| EasyCode | `easycode` | `.agents/skills/` | `/openspec-apply-change` |
 | Factory Droid | `factory` | `.agents/skills/` | `/openspec-apply-change` |
-| ForgeCode | `forgecode` | `.agents/skills/`（链接在 `.forge/skills/`） | `/openspec-apply-change` |
+| ForgeCode | `forgecode` | `.agents/skills/`（也在 `.forge/skills/`） | `/openspec-apply-change` |
 | Gemini CLI | `gemini` | `.agents/skills/` | `/openspec-apply-change` |
-| GigaCode | `gigacode` | `.agents/skills/`（链接在 `.gigacode/skills/`） | `/openspec-apply-change` |
+| GigaCode | `gigacode` | `.agents/skills/` | `/openspec-apply-change` |
 | GitHub Copilot | `github-copilot` | `.agents/skills/` | `/openspec-apply-change` |
-| Grok Build | `grok` | `.agents/skills/` | `/openspec-apply-change` |
+| Grok Build | `grok` | `.agents/skills/`（也在 `.grok/skills/`） | `/openspec-apply-change` |
 | GSD | `gsd` | `.agents/skills/` | 请求使用 `openspec-apply-change` |
-| Hermes Agent | `hermes` | `.agents/skills/`（链接在 `.hermes/skills/`） | `/openspec-apply-change` |
-| iFlow | `iflow` | `.agents/skills/`（链接在 `.iflow/skills/`） | `/openspec-apply-change` |
-| Junie | `junie` | `.agents/skills/` | `/openspec-apply-change` |
+| Hermes Agent | `hermes` | `.agents/skills/`（也在 `.hermes/skills/`） | `/openspec-apply-change` |
+| iFlow | `iflow` | `.agents/skills/`（也在 `.iflow/skills/`） | `/openspec-apply-change` |
+| Junie | `junie` | `.agents/skills/`（也在 `.junie/skills/`） | `/openspec-apply-change` |
 | Kilo Code | `kilocode` | `.agents/skills/` | `/openspec-apply-change` |
 | Kimi Code | `kimi` | `.agents/skills/` | `/skill:openspec-apply-change` |
-| Kiro | `kiro` | `.agents/skills/`（链接在 `.kiro/skills/`） | `/openspec-apply-change` |
-| Lingma | `lingma` | `.agents/skills/`（链接在 `.lingma/skills/`） | `/openspec-apply-change` |
-| MiniMax Code | `minimax-code` | `~/.minimax/skills/`（全局） | `/openspec-apply-change` |
-| Mistral Vibe | `vibe` | `.agents/skills/` | `/openspec-apply-change` |
+| Kiro | `kiro` | `.agents/skills/`（也在 `.kiro/skills/`） | `/openspec-apply-change` |
+| Lingma | `lingma` | `.agents/skills/`（也在 `.lingma/skills/`） | `/openspec-apply-change` |
+| MiniMax Code | `minimax-code` | `.agents/skills/`（也在 `.minimax/skills/`） | `/openspec-apply-change` |
+| Mistral Vibe | `vibe` | `.agents/skills/`（也在 `.vibe/skills/`） | `/openspec-apply-change` |
 | Oh My Pi | `oh-my-pi` | `.agents/skills/` | `/openspec-apply-change` |
 | OpenCode | `opencode` | `.agents/skills/` | `/openspec-apply-change` |
 | Pi | `pi` | `.agents/skills/` | `/openspec-apply-change` |
-| Qoder | `qoder` | `.agents/skills/` | `/openspec-apply-change` |
-| Qwen Code | `qwen` | `.agents/skills/` | `/openspec-apply-change` |
-| Rovo Dev CLI | `rovodev` | `.agents/skills/`（链接在 `.rovodev/skills/`） | 请求使用 `openspec-apply-change` |
-| Trae | `trae` | `.agents/skills/` | `/openspec-apply-change` |
-| [Veai](https://veai.ru/docs/veai/download) | `veai` | `.agents/skills/`（链接在 `.veai/skills/`） | `/openspec-apply-change` |
+| Qoder | `qoder` | `.agents/skills/`（也在 `.qoder/skills/`） | `/openspec-apply-change` |
+| Qwen Code | `qwen` | `.agents/skills/`（也在 `.qwen/skills/`） | `/openspec-apply-change` |
+| Rovo Dev CLI | `rovodev` | `.agents/skills/`（也在 `.rovodev/skills/`） | 请求使用 `openspec-apply-change` |
+| Trae | `trae` | `.agents/skills/`（也在 `.trae/skills/`） | `/openspec-apply-change` |
+| [Veai](https://veai.ru/docs/veai/download) | `veai` | `.agents/skills/` | `/openspec-apply-change` |
 | Warp | `warp` | `.agents/skills/` | `/openspec-apply-change` |
-| ZCode | `zcode` | `.agents/skills/` | `/openspec-apply-change` |
-| Zoo Code | `roocode` | `.agents/skills/` | `/openspec-apply-change` |
+| ZCode | `zcode` | `.agents/skills/`（也在 `.zcode/skills/`） | `/openspec-apply-change` |
+| Zoo Code | `roocode` | `.agents/skills/`（也在 `.roo/skills/`） | `/openspec-apply-change` |
 | Other / Universal | `agents` | `.agents/skills/` | `/openspec-apply-change` |
 
 - **技能调用**：工具是否把 skills 注册为可键入的条目由工具自身决定。该列展示的是 OpenSpec 在生成文件中使用的拼写，以及 init 打印的提示中的拼写。如果键入后没有反应，请查阅你的工具文档。
@@ -106,6 +114,8 @@ mkdir .mytool
 mklink /J .mytool\skills .agents\skills
 ```
 
+使用全局 skills 时，改为在主目录中建立链接：`ln -s ~/.agents/skills ~/.mytool/skills`。
+
 把 `.mytool` 换成你的工具文件夹。如果该工具已有自己的 `skills/` 文件夹，则改为逐个链接 skill：`ln -s ../../.agents/skills/openspec-propose .mytool/skills/openspec-propose`。
 
 **提交链接**：Git 会把链接存为链接。Windows 上的协作者应当运行 `git config --global core.symlinks true`（或用 `git clone -c core.symlinks=true <url>` 克隆）并开启开发者模式，以便创建链接。否则每个链接都会检出为一个小文本文件，`openspec update` 会用普通副本替换它。用 `mklink /J` 创建的联接（junction）不会被作为链接提交；需在每台机器上重新创建。
@@ -123,6 +133,7 @@ OpenSpec 2.0 不再支持 Amazon Q Developer：它无法加载 skills，且 AWS 
 - **当前文件夹**：Antigravity v1.20.5 及更高版本从 `.agents/` 读取工作区 skills 和工作流。
 - **旧文件夹**：OpenSpec 写入替换文件后，会移除 `.agent/` 中等价的生成文件。自定义文件和被修改过的生成文件会留在 `.agent/` 中供你查看。
 - **共享 skills**：Antigravity 与其他所有工具读取的是 `.agents/skills/` 中的同一份副本。2.0 之前 OpenSpec 写入 `.agents/workflows/` 的工作流会在 update 时被移除。
+- **全局 skills**：进行[机器级安装](../start/setup.md#install-the-skills-once-for-every-project)时，`skills` 包会把 Antigravity 的 skills 放在 `~/.gemini/config/skills/`，以指向共享副本的链接或副本形式存在。`openspec-cn update` 会让它们保持最新。
 
 ### Cline
 
@@ -162,7 +173,7 @@ OpenSpec 会把每个 skill 链接到项目的 `.hermes/skills/` 文件夹。Her
 
 ### MiniMax Code
 
-- **仅全局**：skills 写入 `~/.minimax/skills/`。仓库内不写入任何内容。
+- **位置取决于范围**：项目级安装把 skills 写入 `.minimax/skills/`，全局安装写入 `~/.minimax/skills/`。
 
 ### Warp
 
@@ -172,6 +183,6 @@ OpenSpec 会把每个 skill 链接到项目的 `.hermes/skills/` 文件夹。Her
 
 - **适用场景**：任何读取共享 `.agents/skills/` 文件夹的工具，包括矩阵中没有行的工具。当你的助手未被列出时，就选这一项。init 选择器的搜索框可以用 `universal`、`other`、`generic`、`custom`、`proprietary`、`unlisted`、`unsupported`、`vendor-neutral` 或 `agents.md` 找到它。
 - **与其他工具共存**：所有工具读取同一棵 skill 树。`.openspec-target` 列出了项目中配置的工具。要移除某个工具，删除它的文件夹（对于没有自己文件夹的工具，则删除它在 `.openspec-target` 中的行）。
-- **你自己的 `openspec-*` skills**：在 OpenSpec 使用该文件夹之前就已存在于 `.agents/skills/` 中的 skill 会被保留，绝不会被覆盖，并在 `.openspec-target` 中记录为 `keep <skill>`。删除该 skill 可让 OpenSpec 写入自己的版本。
+- **你自己的 `openspec-*` skills**：在 OpenSpec 使用该文件夹之前就已存在于 `.agents/skills/` 中的 skill 会被保留，绝不会被覆盖，并在 `.openspec-target` 中记录为 `keep <skill>`。删除该 skill 可让 OpenSpec 写入自己的版本。给你的自定义 skill 起一个与 OpenSpec 内置 skills 不同的名字：update 会用当前 CLI 的 GitHub release tag 中的指令替换内置 skills，而不会动另行命名的 skills。
 - **OpenSpec 声明的内容**：只有 `openspec-*` 文件夹和 `.openspec-target` 列表。`.agents/` 下的其他内容不受影响。
 - **`AGENTS.md`**：不创建也不编辑。目标是 `.agents/` 文件夹，而不是该文件。

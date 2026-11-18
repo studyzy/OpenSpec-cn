@@ -33,7 +33,13 @@ export interface UpdatePlanChange {
  * about, which the plan lists as a non-interactive run makes it. Stable
  * identifiers, for a caller that branches on them.
  */
-export type UpdatePlanNoteCode = 'legacy-tool-directories' | 'legacy-artifacts' | 'edited-skills';
+export type UpdatePlanNoteCode =
+  | 'legacy-tool-directories'
+  | 'legacy-artifacts'
+  | 'edited-skills'
+  | 'global-skills'
+  | 'removed-skills'
+  | 'left-alone-skills';
 
 export interface UpdatePlanNote {
   code: UpdatePlanNoteCode;
@@ -190,6 +196,10 @@ export class UpdatePlanRecorder implements UpdateFileOps {
     // Otherwise every file under it goes - on disk, and any the plan put there.
     // Each is cleared on its own: a file's own entry outranks its directory's.
     for (const filePath of this.filesUnder(target)) this.stage(filePath, null, tool);
+    // A prior move can have staged a directory where the installer now writes SKILL.md.
+    for (const [file, entry] of this.staged) {
+      if (entry === STAGED_DIRECTORY && file.startsWith(target + path.sep)) this.staged.set(file, null);
+    }
     this.staged.set(target, null);
   }
 
@@ -512,7 +522,9 @@ function listFilesRecursively(dirPath: string): string[] {
 export function formatUpdatePlan(plan: UpdatePlan): string {
   const lines: string[] = [];
   if (plan.changes.length === 0) {
-    lines.push('无变更：skills 已是最新。');
+    // The notes below say what else the update does, outside this project's files.
+    const elsewhere = plan.notes.some((note) => note.code === 'global-skills');
+    lines.push(elsewhere ? '此文件夹中的文件不会变更。' : '无变更：skills 已是最新。');
   } else {
     lines.push(`将变更 ${plan.changes.length} 个文件：`);
     const width = Math.max(...plan.changes.map((change) => change.action.length));

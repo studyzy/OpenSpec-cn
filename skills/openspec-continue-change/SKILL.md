@@ -42,7 +42,7 @@ metadata:
 
    将最近修改的变更标记为 "(推荐)"，因为这很可能是用户想继续的。
 
-   始终宣告："使用变更：<name>"，以及如何覆盖（例如 `/openspec-continue-change <other>`）。
+   始终宣告："使用变更：<name>"，以及如何覆盖（例如 `openspec-continue-change <other>`）。
 
 2. **检查当前状态**
    ```bash
@@ -68,7 +68,7 @@ metadata:
    **若所有规划制品已完成（`isPlanningComplete: true`，或旧版 `isComplete: true`）**：
    - 祝贺用户
    - 展示最终状态，包括使用的 schema
-   - 建议："规划完成！现在可以实现此变更。实现及所有跟踪的工作完成后，归档它。"
+   - 建议："规划完成！开始实现前请先审核计划。"
    - 停止
 
    ---

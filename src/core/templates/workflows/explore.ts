@@ -5,7 +5,6 @@
  * templates file into workflow-focused modules.
  */
 import type { SkillTemplate, CommandTemplate } from '../types.js';
-import { optionalWorkflow } from '../optional-workflow.js';
 import { STORE_SELECTION_GUIDANCE } from './store-selection.js';
 import { PROJECT_ROOT_GUARD } from './project-root.js';
 
@@ -31,47 +30,23 @@ CLI 已经使用 SQLite 且没有远程服务。跨设备共享状态是否在�
 共享状态则需要单独的同步设计。
 \`\`\``;
 
-/**
- * Explore's handoffs. A custom profile can install explore without propose or
- * apply, so each reference is resolved at generation time (see
- * optional-workflow.ts) instead of naming a workflow that may not exist. The
- * fallbacks point at explore's own capture path and the always-present CLI.
- */
-const IMPLEMENT_REQUEST_HANDOFF = optionalWorkflow(
-  'propose',
-  '指引他们使用 `/opsx:propose`，它会把讨论转变成一个变更',
-  '提议把这次讨论捕获为一个变更，具体如下文所述'
-);
+const IMPLEMENT_REQUEST_HANDOFF =
+  '提议把这次讨论捕获为一个变更';
 
-const CAPTURE_PLANNING_HANDOFF = optionalWorkflow(
-  'propose',
-  '`/opsx:propose` 会撰写其余规划制品',
-  '其余规划制品也可以用同样的方式在此捕获'
-);
+const CAPTURE_PLANNING_HANDOFF =
+  '要完成规划，请在该变更中补齐其余规划制品';
 
-const CAPTURE_APPLY_HANDOFF = optionalWorkflow(
-  'apply',
-  '任务就绪后由 `/opsx:apply` 实现该变更',
-  '实现工作基于该变更的任务（`openspec-cn instructions apply --change "<name>" --json`），在探索模式之外进行'
-);
+const CAPTURE_APPLY_HANDOFF =
+  '要实现，请在离开探索模式后从任务开始';
 
-const DISCOVERY_END_HANDOFF = optionalWorkflow(
-  'propose',
-  '准备开始了吗？使用 `/opsx:propose` skill，它就会变成一个变更。',
-  '准备开始了吗？我可以把它捕获为一个变更。'
-);
+const DISCOVERY_END_HANDOFF =
+  '要我把它捕获为一个变更吗？';
 
-const SUMMARY_NEXT_STEP = optionalWorkflow(
-  'propose',
-  '- 把它变成一个变更：`/opsx:propose`',
-  '- 把它捕获为一个变更：让我来做'
-);
+const SUMMARY_NEXT_STEP =
+  '- 让我把这次讨论捕获为一个变更';
 
-const GUARDRAIL_HANDOFF = optionalWorkflow(
-  'propose',
-  '`/opsx:propose` 会把讨论转变成一个变更，工作在那个变更里进行',
-  '提议把讨论捕获为一个变更，工作从那个变更开始进行'
-);
+const GUARDRAIL_HANDOFF =
+  '先提议把讨论捕获为一个变更';
 
 export function getExploreSkillTemplate(): SkillTemplate {
   return {
@@ -198,7 +173,7 @@ openspec-cn list --specs
 3. 遵循返回的 \`template\` 和 \`instruction\` 字段。读取 \`dependencies\` 中列出的已完成依赖文件，并应用 \`context\` 和 \`rules\` 作为约束而不复制到制品中。在创建任何内容之前先选定输出路径：当 \`resolvedOutputPath\` 是 glob 时，使用指令在 \`changeRoot\` 内选择具体路径，并验证它在解析符号链接后仍位于 \`changeRoot\` 之内 —— 无论是其父目录，还是文件本身（若它已存在）；若不是，停止并告知用户。否则输出路径即为 \`resolvedOutputPath\`。若指令将创建委托给特定 skill 或命令，则仅当它能把制品写入该输出路径时才调用它；否则停止并告知用户。若并非委托创建，则将制品写入该输出路径。验证选定的具体输出存在于该输出路径。
 4. 创建每个制品后，重新运行 \`openspec-cn status --change "<name>" --json\`（仅对注册的独立存储追加确认的 \`--store "<id>"\`）并持续到每个请求的制品为 \`done\`、\`skipped\`，或因自身 \`instruction\` 声明的条件不适用而被有意跳过。告知用户关于有意的条件性跳过，记住它且不要重新考虑。依赖项是使能因素而非关卡：若请求的制品仍 \`blocked\` 仅因为你故意跳过了条件性前置制品，尽管被阻塞也运行 \`openspec-cn instructions "<artifact-id>" --change "<name>" --json\`（仅对注册的独立存储追加确认的 \`--store "<id>"\`），然后仅当这些记录的条件性跳过是其唯一缺失的依赖项时使用步骤 3 创建它。若请求的制品被用户未要求捕获的前置制品阻塞且无法条件性跳过，解释该依赖项并在扩展捕获范围前询问。
 
-捕获用户请求的制品，无需让他们调用另一个工作流命令。若他们只要求开始一个变更，则在搭建脚手架后停止并显示其状态。请求的捕获完成后就停在那里，并指明工作在哪里继续：${CAPTURE_PLANNING_HANDOFF}，以及 ${CAPTURE_APPLY_HANDOFF}。捕获制品绝不等于开始实现它们。
+捕获用户请求的制品，无需让他们调用另一个工作流命令。若他们只要求开始一个变更，则在搭建脚手架后停止并显示其状态。请求的捕获完成后就停在那里，并指明工作在哪里继续。${CAPTURE_PLANNING_HANDOFF}。${CAPTURE_APPLY_HANDOFF}。捕获制品绝不等于开始实现它们。
 
 ### 当存在变更时
 
@@ -534,7 +509,7 @@ openspec-cn list --specs
 3. 遵循返回的 \`template\` 和 \`instruction\` 字段。读取 \`dependencies\` 中列出的已完成依赖文件，并应用 \`context\` 和 \`rules\` 作为约束而不复制到制品中。在创建任何内容之前先选定输出路径：当 \`resolvedOutputPath\` 是 glob 时，使用指令在 \`changeRoot\` 内选择具体路径，并验证它在解析符号链接后仍位于 \`changeRoot\` 之内 —— 无论是其父目录，还是文件本身（若它已存在）；若不是，停止并告知用户。否则输出路径即为 \`resolvedOutputPath\`。若指令将创建委托给特定 skill 或命令，则仅当它能把制品写入该输出路径时才调用它；否则停止并告知用户。若并非委托创建，则将制品写入该输出路径。验证选定的具体输出存在于该输出路径。
 4. 创建每个制品后，重新运行 \`openspec-cn status --change "<name>" --json\`（仅对注册的独立存储追加确认的 \`--store "<id>"\`）并持续到每个请求的制品为 \`done\`、\`skipped\`，或因自身 \`instruction\` 声明的条件不适用而被有意跳过。告知用户关于有意的条件性跳过，记住它且不要重新考虑。依赖项是使能因素而非关卡：若请求的制品仍 \`blocked\` 仅因为你故意跳过了条件性前置制品，尽管被阻塞也运行 \`openspec-cn instructions "<artifact-id>" --change "<name>" --json\`（仅对注册的独立存储追加确认的 \`--store "<id>"\`），然后仅当这些记录的条件性跳过是其唯一缺失的依赖项时使用步骤 3 创建它。若请求的制品被用户未要求捕获的前置制品阻塞且无法条件性跳过，解释该依赖项并在扩展捕获范围前询问。
 
-捕获用户请求的制品，无需让他们调用另一个工作流命令。若他们只要求开始一个变更，则在搭建脚手架后停止并显示其状态。请求的捕获完成后就停在那里，并指明工作在哪里继续：${CAPTURE_PLANNING_HANDOFF}，以及 ${CAPTURE_APPLY_HANDOFF}。捕获制品绝不等于开始实现它们。
+捕获用户请求的制品，无需让他们调用另一个工作流命令。若他们只要求开始一个变更，则在搭建脚手架后停止并显示其状态。请求的捕获完成后就停在那里，并指明工作在哪里继续。${CAPTURE_PLANNING_HANDOFF}。${CAPTURE_APPLY_HANDOFF}。捕获制品绝不等于开始实现它们。
 
 ### 当存在变更时
 
