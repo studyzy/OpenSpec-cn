@@ -183,6 +183,6 @@ OpenSpec 会把每个 skill 链接到项目的 `.hermes/skills/` 文件夹。Her
 
 - **适用场景**：任何读取共享 `.agents/skills/` 文件夹的工具，包括矩阵中没有行的工具。当你的助手未被列出时，就选这一项。init 选择器的搜索框可以用 `universal`、`other`、`generic`、`custom`、`proprietary`、`unlisted`、`unsupported`、`vendor-neutral` 或 `agents.md` 找到它。
 - **与其他工具共存**：所有工具读取同一棵 skill 树。`.openspec-target` 列出了项目中配置的工具。要移除某个工具，删除它的文件夹（对于没有自己文件夹的工具，则删除它在 `.openspec-target` 中的行）。
-- **你自己的 `openspec-*` skills**：在 OpenSpec 使用该文件夹之前就已存在于 `.agents/skills/` 中的 skill 会被保留，绝不会被覆盖，并在 `.openspec-target` 中记录为 `keep <skill>`。删除该 skill 可让 OpenSpec 写入自己的版本。给你的自定义 skill 起一个与 OpenSpec 内置 skills 不同的名字：update 会用当前 CLI 的 GitHub release tag 中的指令替换内置 skills，而不会动另行命名的 skills。
+- **自定义 skills**：选一个与 OpenSpec 内置 skills 不同的名字。update 会用当前 CLI 对应版本的指令替换内置 skills，而不会动另行命名的 skills。
 - **OpenSpec 声明的内容**：只有 `openspec-*` 文件夹和 `.openspec-target` 列表。`.agents/` 下的其他内容不受影响。
 - **`AGENTS.md`**：不创建也不编辑。目标是 `.agents/` 文件夹，而不是该文件。

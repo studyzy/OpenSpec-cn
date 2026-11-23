@@ -189,6 +189,14 @@ grep -rhoP '(docs/)?<文件名>\.md#[a-z0-9-]+' docs/ *.md | sort -u
   - `## ADDED/MODIFIED/REMOVED/RENAMED Requirements`(虽有中文别名,但项目内到处引用英文名,统一保持英文)
   - `## Purpose`:`src/core/specs-apply.ts` 中 `/^##\s+Purpose\s*$/i` **没有**中文别名,译成中文会导致归档时 Purpose 无法沿用到主 spec。
   - `## Why` / `## What Changes`:parser 有中文别名,但 validator 报错文案引用英文名,保持英文更一致。
+  - delta spec 开头的 **frontmatter 块**(`---` 包围的 YAML):块内容原样保留,不翻译;归档时它留在变更里,不会被并入主 spec。
+  - 归档目标名中的 `YYYY-MM-DD-` 日期前缀:保持原样,绝不叠加第二个日期。
+
+## 包管理器与安装来源
+
+- 包管理器名(`npm`、`pnpm`、`yarn`、`bun`、`volta`、`Homebrew`、`Nix`)与它们各自的命令(`brew upgrade openspec-cn` 等)保持原样,不翻译也不改写。
+- 本仓库身份统一为 `@studyzy/openspec-cn`(npm 包)、`openspec-cn`(命令与独立二进制)、`studyzy/OpenSpec-cn`(仓库、`npx skills add` 与 skills 锁文件来源)。上游名 `@fission-ai/openspec`、`Fission-AI/OpenSpec` 不得出现在本仓库的源码、测试与文档中。
+- `skills-lock.json` 与 `~/.agents/.skill-lock.json` 是 `skills` 包的文件名,保持英文。
 
 ## 翻译风格
 

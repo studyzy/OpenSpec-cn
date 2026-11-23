@@ -1,4 +1,4 @@
-# 升级到 2.1：全局 skills
+# 升级到 2.1
 
 > OpenSpec 2.1 支持面向编程 Agent 的全局 skills。有哪些变化，以及该如何应对。
 
@@ -51,7 +51,6 @@ openspec-cn init --scope project --tools claude
 ## 更新之前
 
 - **改过内置 skill？** update 会替换内置 skill 文件夹。先保存你的改动，以及你在其中添加过的任何文件。`openspec-cn update --dry-run` 会显示将要发生的变化。
-- **Git。** 安装或刷新 skills 需要 Git，并能访问 GitHub。
 - **已经运行过 `npx skills add`？** 保留那次安装，然后运行 `openspec-cn update`。
 
 从 1.x 升级过来？[升级到 2.0](upgrade-to-2.md) 涵盖了其余内容。

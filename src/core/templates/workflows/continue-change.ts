@@ -72,7 +72,7 @@ ${PROJECT_ROOT_GUARD}
    **若所有规划制品已完成（\`isPlanningComplete: true\`，或旧版 \`isComplete: true\`）**：
    - 祝贺用户
    - 展示最终状态，包括使用的 schema
-   - 建议："规划完成！开始实现前请先审核计划。"
+   - 建议："规划完成！${PLANNING_COMPLETE_HANDOFF}"
    - 停止
 
    ---

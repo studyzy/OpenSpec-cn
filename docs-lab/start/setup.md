@@ -85,8 +85,6 @@ Leave out generic, outdated, or verbose material. Do not delete project.md.
 
 本节其余部分描述项目级安装。[一次为所有项目安装 skills](#install-the-skills-once-for-every-project) 介绍机器级的那一种。
 
-Vercel 的安装器会从 `studyzy/OpenSpec-cn` 仓库中与你的 CLI 版本对应的 GitHub tag 获取 skills。安装或刷新 skills 需要 Git，并能访问 GitHub。项目级安装不会改动 `skills-lock.json`。
-
 Init 还会删除早期版本生成的命令文件，并保留你编辑过的那些。在 1.0 之前配置的项目还有更早的遗留物：`.claude/commands/openspec/` 之类的文件夹，以及 `CLAUDE.md` 和 `AGENTS.md` 等文件中的 OpenSpec 标记块。交互式 init 会在删除前询问。使用 `--force`、使用 `--tools`，或在非交互式运行中，init 会不经询问直接删除，包括这些块中的任何编辑内容，请先备份。
 
 ### `openspec/` 文件夹

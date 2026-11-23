@@ -62,7 +62,7 @@ function specDrivenTitles(): Record<string, string> {
 const EXPECTED_FUNCTION_HASHES: Record<string, string> = {
   getExploreSkillTemplate: '51b3447d2bfd04fe16b33ab8eb47d4f06a4631f345a8439358fce1b19c40ee0c',
   getNewChangeSkillTemplate: 'b8d990b7cf71573415d3bd535f364a6403df5c1d95f83503a071ad806be8a99d',
-  getContinueChangeSkillTemplate: '90cb00323cfca1012116a35ca8b4eac3d5b8b730e4db3fde2d6b2886c186a1d9',
+  getContinueChangeSkillTemplate: 'e3eff627e5141f9de64f8573da0f6b55d6fa2485eedbc79d72cab7a0ea77adbb',
   getApplyChangeSkillTemplate: '119efaba8a572dfde0e93027b3e2e16bebf4788515c1688efa06e1d8543e3129',
   getFfChangeSkillTemplate: 'd03ee1a9ab30ba2d4870bc81b67a2d370bbaf7e8d44a3106078836b8540335a2',
   getSyncSpecsSkillTemplate: 'a5cb37e0d7601bed9c52942fb2de2b5de3e92c4b8dc0eb2cc9faf9edee67b147',
@@ -72,11 +72,11 @@ const EXPECTED_FUNCTION_HASHES: Record<string, string> = {
   getOpsxContinueCommandTemplate: '9b97c3812cb612e635acbd5141b9c47809bec7b08676515274aecb8d843d82db',
   getOpsxApplyCommandTemplate: 'a94c018ad10fe4c4da9588e2c5a5bd9504ffa49a737d8188f776d0796cd4285d',
   getOpsxFfCommandTemplate: 'f3ad957072cbb7019641da1743b893f2c9d06ca5fbd913f7d249231af02214cd',
-  getArchiveChangeSkillTemplate: '3e08b0996dc3161cc26c2b724b46b36cdc5601111e940edcd6e4da3fcf1c2d74',
+  getArchiveChangeSkillTemplate: 'fe568c86288b0621816e22f7cd8330681f165fbbccf5074da41fcb376ea069d2',
   getBulkArchiveChangeSkillTemplate: '91e38ef2fe46803dbea820e2758e4623517bd088bd0722e8a182efd195437f97',
   getOpsxSyncCommandTemplate: '7bfc1a12abe60769ef2e8001f38bcb3924a6930a037bca36a535ea301ff75b6d',
   getVerifyChangeSkillTemplate: '29f2f15fc11744a49909620ab84d0495e8442eb81edef9058db6b23651386903',
-  getOpsxArchiveCommandTemplate: 'd340c77241fcafac91292264cf1816f4a17dc1fbe6da8d002762218298a8fc2a',
+  getOpsxArchiveCommandTemplate: 'b588c1595a3b0c5e8fb0454220e296b0d5084c6e5403df9179ce1e63ca67aca7',
   getOpsxOnboardCommandTemplate: '6631746bb98cd48aed36466e0dd2d7134fdf252aed1bfbf896f9709ad18bc37c',
   getOpsxBulkArchiveCommandTemplate: '300cd1a0bfb10377b15219f6f751ec1814d6684d4294a0e17745f115a67fbfd0',
   getOpsxVerifyCommandTemplate: '14b7ff69e319cbaadeff024223683220d0a7bd313650c34fe423f3d304432e9e',
@@ -90,11 +90,11 @@ const EXPECTED_FUNCTION_HASHES: Record<string, string> = {
 const EXPECTED_GENERATED_SKILL_CONTENT_HASHES: Record<string, string> = {
   'openspec-explore': 'f949258a98245f611e1f60ad71db2c0d2ea4573f5d7c07a9c16ab286e6fdd99a',
   'openspec-new-change': 'f0c7fed6c6aec1cf34cc7ef4dd288656a985ad8790c19d8395314f656744a6a8',
-  'openspec-continue-change': 'b812fd7a736a1645cf85828200affc9e67504222397327dbcede8d626d631dc4',
+  'openspec-continue-change': 'c91d294db165b5079de94962d5690e9443d7f6484647d920ba959360694c3a88',
   'openspec-apply-change': '49c93bca69460374d48443fdc9ba4090dfbc9ceb12937ca6350b6fc767085ee8',
   'openspec-ff-change': 'dd57e2c06343319a71d26fca8b7a068eefe05894175bc306dab3d2efcac59037',
   'openspec-sync-specs': '3a705ebf7d76b0f6b20ac5bf43c43ff666f3c0fc7eb6750006fcc2d1ab245168',
-  'openspec-archive-change': 'cafb4840533e4880ab3e90628f9a6c4aff191247edbfec9bea8b3974c0459568',
+  'openspec-archive-change': '21a7a82d01522582a1001855f5477c39f0b56cf003f804b5d749a29e0f0348de',
   'openspec-bulk-archive-change': '060a363f26cf2fd52f0810c4b7260742287bfe4082b52cea95928cdb52d0cb5b',
   'openspec-verify-change': '2de53b8cca22e259ccd00f1186cd4a694f79c0ecb15d520f6aa1213e9a830569',
   'openspec-onboard': 'c46deb9c1ff8c36dcf132d016457bac43b2158823847b53cad90b1ad2e526915',
@@ -516,6 +516,13 @@ describe('skill templates split parity', () => {
       expect(content, dirName).not.toContain('workspace-planning');
       expect(content, dirName).not.toContain('Workspace guard');
     }
+  });
+
+  it('hands off to apply when continue completes planning, in the skill and the command (#2271)', () => {
+    const handoff =
+      '规划完成！计划已就绪，待审核。准备好后，让我来应用它。';
+    expect(generateSkillContent(getContinueChangeSkillTemplate(), 'PARITY-BASELINE')).toContain(handoff);
+    expect(getOpsxContinueCommandTemplate().content).toContain(handoff);
   });
 
   it('does not suggest archiving when only planning is complete', () => {

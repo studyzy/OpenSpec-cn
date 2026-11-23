@@ -85,6 +85,8 @@ openspec-cn update
 
 ## 你编辑过的 skill 文件夹
 
+更新前请先保存对内置 skill 的修改，以及你在内置 skill 文件夹中添加过的任何文件。OpenSpec 会用你 CLI 对应版本的指令替换其中每个文件夹。
+
 `update` 还会保留你在工具自己文件夹中编辑过的旧 skill 副本。同时读取自己文件夹和 `.agents/skills/` 的工具可能会重复加载该 skill。把需要的内容移走后，请删除被保留的文件夹。
 
 MiniMax Code 把 skills 保存在 `~/.minimax/skills/`。当 `update` 刷新你在那里编辑过的 skill 时，会先把你的副本另存为同目录下的 `SKILL.md.bak`。
@@ -93,7 +95,7 @@ MiniMax Code 把 skills 保存在 `~/.minimax/skills/`。当 `update` 刷新你�
 
 ## 你自定义过的 skills
 
-`update` 会重写 OpenSpec 安装于 `.agents/skills/` 的每个 skill，例如 `.agents/skills/openspec-propose/SKILL.md`。1.x 中也是这样。如果你编辑过其中一个，你的修改会被替换，且不会备份。OpenSpec 会用你 CLI 的 GitHub release tag 中的指令替换这些文件夹。`update` 会告诉你哪些 skills 发生了这种情况：
+`update` 会重写 OpenSpec 安装于 `.agents/skills/` 的每个 skill，例如 `.agents/skills/openspec-propose/SKILL.md`。1.x 中也是这样。如果你编辑过其中一个，你的修改会被替换，且不会备份。OpenSpec 会用你 CLI 对应版本的指令替换这些文件夹。`update` 会告诉你哪些 skills 发生了这种情况：
 
 ```
 已替换你对 1 个 OpenSpec 安装的 skill 所做的修改：.agents/skills/openspec-propose/SKILL.md。OpenSpec 每次更新都会刷新这些 skill，且不保留副本。请从 git 恢复你的内容，长期改动请放到另起名字的自有 skill 中。

@@ -678,6 +678,52 @@ describe('getCliInstallInfo', () => {
     }
   });
 
+  it('reports a Homebrew install as brew-owned, not as an npm global (#2186)', () => {
+    // The formula runs `npm install` into libexec, so the copy sits in npm's
+    // own layout with a bin dir beside lib - exactly what npm-global detection
+    // accepts. Built on disk so that check really runs against it.
+    const brewRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'openspec-brew-'));
+    try {
+      const libexec = path.join(brewRoot, 'Cellar', 'openspec-cn', '2.1.1', 'libexec');
+      const installed = path.join(libexec, 'lib', 'node_modules', '@studyzy', 'openspec-cn');
+      fs.mkdirSync(installed, { recursive: true });
+      fs.mkdirSync(path.join(libexec, 'bin'), { recursive: true });
+
+      const install = getCliInstallInfo(installed, PROJECT_ROOT);
+      expect(install).toEqual({ location: installed, packageManager: 'homebrew', scope: 'global' });
+      expect(getCliUpdateCommand(install)).toBe('brew upgrade openspec-cn');
+      expect(isNpmGlobalInstall(installed, [])).toBe(false);
+      expect(canSelfUpgrade(installed, PROJECT_ROOT)).toBe(false);
+      expect(buildUpgradeCommandLines(installed, PROJECT_ROOT)[0]).toBe('  brew upgrade openspec-cn');
+    } finally {
+      fs.rmSync(brewRoot, { recursive: true, force: true, maxRetries: 5, retryDelay: 100 });
+    }
+  });
+
+  it('reports a Nix store install without an npm update command (#2186)', () => {
+    const installed = '/nix/store/abc123-openspec-cn-2.1.1/lib/node_modules/@studyzy/openspec-cn';
+
+    const install = getCliInstallInfo(installed, PROJECT_ROOT);
+    expect(install).toEqual({ location: installed, packageManager: 'nix', scope: 'global' });
+    expect(getCliUpdateCommand(install)).toBeNull();
+    expect(canSelfUpgrade(installed, PROJECT_ROOT)).toBe(false);
+    expect(buildUpgradeCommandLines(installed, PROJECT_ROOT)[0]).toBe(
+      '  请通过你安装 OpenSpec 时的 Nix 方式来更新。'
+    );
+  });
+
+  it('keeps an npm global under a Homebrew-installed node an npm install (#2186)', () => {
+    // `npm install -g` with Homebrew's node writes to the brew prefix, not to a
+    // Cellar/openspec-cn keg, and npm does own that copy.
+    expect(
+      getCliInstallInfo('/opt/homebrew/lib/node_modules/@studyzy/openspec-cn', PROJECT_ROOT).packageManager
+    ).not.toBe('homebrew');
+    expect(
+      getCliInstallInfo(path.join(HOME_ROOT, 'nix', 'store', '@studyzy', 'openspec-cn'), PROJECT_ROOT)
+        .packageManager
+    ).not.toBe('nix');
+  });
+
   it('does not infer global ownership from unrelated path segments', () => {
     const unrelated = path.join(
       HOME_ROOT,

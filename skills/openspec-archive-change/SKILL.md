@@ -96,6 +96,10 @@ metadata:
 
 4. **评估 delta spec 同步状态**
 
+   **先检查归档目标：** 记录目标名 `<target-name>`：若变更名已以 `YYYY-MM-DD-` 前缀开头则保持原样；否则将当前日期前置为 `YYYY-MM-DD-<change-name>`。绝不叠加第二个日期（与 `openspec-cn archive` 相同的规则）。
+
+   若 `<planningHome.changesDir>/archive/<target-name>` 已存在，在写入任何主 spec 之前停止。报告冲突，列出本次运行已同步的主 spec，保持 `changeRoot` 原位不动，并建议重命名现有归档或此变更。
+
    使用 status JSON 中的 `artifactPaths.specs.existingOutputPaths` 作为唯一的 delta spec 来源。若 `specs` 条目缺失或 `existingOutputPaths` 为空，则在不提示同步的情况下继续，也不要从其他产出物推断 delta specs。
 
    **若存在 delta specs：**
@@ -118,6 +122,8 @@ metadata:
    - "不同步归档" 或 "立即归档" — 继续归档
    - "立即同步" 或 "仍同步" — 先同步，然后（按下文）验证。在任何能力同步受阻时不要开始同步；解释阻碍并重复可用选项。
    - 其他任何回答 — 再次询问，而不是归档
+
+   现在再次检查归档目标。若 `<planningHome.changesDir>/archive/<target-name>` 已存在，在写入任何主 spec 之前停止，保持 `changeRoot` 原位不动，并建议重命名现有归档或此变更。
 
    在所选同步写入任何主 spec 之前，用相同的已选根目录标志运行一次 `openspec-cn instructions specs --change "<name>" --json`。要求退出状态为零且返回有效的制品指令 JSON。若查询失败或返回无效 JSON，报告错误并在写入任何主 spec 或移动变更之前停止。省略 `rules` 的有效响应表示未配置制品规则 — 这是无规则情况。仅将返回的 `rules` 应用于此合并生成的主 spec 的内容和形式；不要将其用于归档指导、更改 CLI 行为，或将规则文本复制到任何输出文件中。
 
@@ -149,11 +155,11 @@ metadata:
    mkdir -p "<planningHome.changesDir>/archive"
    ```
 
-   生成目标名称：若变更名已以 `YYYY-MM-DD-` 前缀开头则保持原样；否则将当前日期前置为 `YYYY-MM-DD-<change-name>`。绝不叠加第二个日期（与 `openspec-cn archive` 相同的规则）。
+   使用步骤 4 中记录的 `<target-name>`，保持不变。
 
-   **检查目标是否已存在：**
-   - 是：报错失败，建议重命名现有归档或使用不同日期
-   - 否：移动 `changeRoot` 到归档目录
+   **在移动前立即再次检查：**
+   - 若目标此时已存在：报错失败，保持 `changeRoot` 原位不动，报告步骤 4 中已同步的主 spec，并建议重命名现有归档或此变更
+   - 若不存在：将 `changeRoot` 移动到归档目录
 
    ```bash
    mv "<changeRoot>" "<planningHome.changesDir>/archive/<target-name>"

@@ -72,7 +72,7 @@ src/
 │   │   ├── skill-links.ts          # 链接的创建/识别/分类
 │   │   └── skill-paths.ts          # 各工具的 skills 目录与链接路径
 │   ├── global-skills.ts  # 2.1 机器级安装：~/.agents/skills/ 与各工具主目录
-│   ├── skill-installer.ts # 2.1 通过 skills 安装器从 release 安装/移除 skills
+│   ├── skill-installer.ts # 2.1 从已安装的 npm 包把 skills 交给 skills 安装器安装/移除
 │   ├── project-skills-scope.ts # 2.1 skills: global/project 与 --scope 解析
 │   ├── known-projects.ts # 2.1 记录使用全局 skills 的项目
 │   ├── project-dir.ts    # OPENSPEC_DIR_NAME 常量
@@ -110,7 +110,7 @@ src/
 
 6. **汉化范围**: 界面文字、文档、模板已汉化。代码标识符、CLI 参数名保持英文。`src/` 中中文字符串用 `// 中文注释` 标注。
 
-7. **2.0 只安装 skills**: 项目 skills 只写一份到 `.agents/skills/`；不读该目录的工具（Claude Code、Kiro、CodeBuddy 等，见 `SKILL_LINKED_TOOL_IDS`）从其自身文件夹建立链接。MiniMax Code 例外，写全局 `~/.minimax/skills/`。原本由 `delivery` 设置的 skills/commands 二选一已退役：值仍会被读取，但不再影响安装内容；`command-generation/adapters` 仅保留用于识别并清理旧版生成的文件。2.1 起新增机器级（global）安装：`openspec-cn init --global` / `update --global` 通过 `skills` 安装器把 skills 装到 `~/.agents/skills/`，`--scope project|global` 与 `skills: global` 配置决定项目使用哪一份。
+7. **2.0 只安装 skills**: 项目 skills 只写一份到 `.agents/skills/`；不读该目录的工具（Claude Code、Kiro、CodeBuddy 等，见 `SKILL_LINKED_TOOL_IDS`）从其自身文件夹建立链接。MiniMax Code 例外，写全局 `~/.minimax/skills/`。原本由 `delivery` 设置的 skills/commands 二选一已退役：值仍会被读取，但不再影响安装内容；`command-generation/adapters` 仅保留用于识别并清理旧版生成的文件。2.1 起新增机器级（global）安装：`openspec-cn init --global` / `update --global` 通过 `skills` 安装器把 skills 装到 `~/.agents/skills/`，`--scope project|global` 与 `skills: global` 配置决定项目使用哪一份。2.1.1 起 skills 由包内 `src/core/templates/` 生成到临时目录再交给安装器，不再克隆 GitHub tag——离线可用、不需要 Git，且 text 始终与所装版本一致；全局安装会把来源记进 `skills` 包的锁文件（`studyzy/OpenSpec-cn`），项目安装则通过 `skills-lock.json` 的来源字段识别 `npx skills add` 装入的 skills。
 
 ## OpenSpec 开发工作流
 

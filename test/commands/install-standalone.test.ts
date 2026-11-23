@@ -54,7 +54,12 @@ describe('openspec-cn install', () => {
 
     it('sends the Homebrew formula to brew', () => {
       const cellar = '/opt/homebrew/Cellar/openspec-cn/1.14.3/libexec/lib/node_modules/@studyzy/openspec-cn';
-      expect(removeCommandFor(global('npm', cellar))).toBe('brew uninstall openspec-cn');
+      expect(removeCommandFor(global('homebrew', cellar))).toBe('brew uninstall openspec-cn');
+    });
+
+    it('suggests no npm command for a Nix store copy (#2186)', () => {
+      const store = '/nix/store/abc123-openspec-cn-2.1.1/lib/node_modules/@studyzy/openspec-cn';
+      expect(removeCommandFor(global('nix', store))).toBeNull();
     });
 
     it('suggests nothing for copies that are not a global install', () => {
