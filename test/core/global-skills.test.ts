@@ -27,10 +27,14 @@ describe("the repository's own maintainer skills", () => {
   // `npx skills add studyzy/OpenSpec-cn` scans the whole repository. The skills
   // in .agents/skills are for working on OpenSpec, so each is marked internal,
   // which is how the skills package knows to leave it out.
+  //
+  // .agents/ is gitignored, so a CI checkout has none of them: there is nothing
+  // to scan and nothing to leak. A working copy that does have them is checked.
   it('are hidden from anyone installing the published skills', async () => {
     const root = path.join(cliProjectRoot, '.agents', 'skills');
+    const exists = await fs.access(root).then(() => true, () => false);
+    if (!exists) return;
     const names = (await fs.readdir(root, { withFileTypes: true })).filter((entry) => entry.isDirectory());
-    expect(names.length).toBeGreaterThan(0);
     for (const { name } of names) {
       const text = (await fs.readFile(path.join(root, name, 'SKILL.md'), 'utf8')).replace(/\r\n/g, '\n');
       const header = text.slice(0, text.indexOf('\n---\n', 4));
