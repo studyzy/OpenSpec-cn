@@ -107,6 +107,8 @@
 | skills-only | 仅 skills | 2.0 起唯一的安装方式 |
 | shared skills | 共享 skills | 指 `.agents/skills/` 中的唯一副本 |
 | skill link | skill 链接 | 工具自身文件夹中指向共享副本的符号链接/junction |
+| router (skill) / `openspec` | 路由 skill | 2.2 起随每个 profile 安装的统一入口，不属于任何工作流集合 |
+| `references/` (folder) | `references/` 文件夹 | skill 文件夹内存放补充细节的子目录，Agent 按需读取 |
 | `.openspec-target` | （不译） | 记录项目中 OpenSpec 管理内容的清单文件 |
 | retired tool | 退役工具 | 如 Amazon Q Developer，不再支持并清理其文件 |
 | keep / kept | 保留 | 用户编辑过、OpenSpec 不会覆盖的文件 |

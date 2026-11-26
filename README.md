@@ -148,6 +148,7 @@ openspec-cn init
 
 现在与你的 AI 对话：
 
+- **不知道该用哪个 skill？** 用 `/openspec` 路由 skill，问它任何问题，它会回答或把请求交给合适的 skill。
 - **还不确定要构建什么？** 先用 `/openspec-explore`，一个无风险的思考伙伴，它会阅读你的代码、权衡方案、在写任何代码之前帮你理清思路。（[快速入门](https://openspec.dev/docs/quickstart)）
 - **已经知道自己想要什么？** 直接用 `/openspec-propose <你想要构建的内容>`。
 

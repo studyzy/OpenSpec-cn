@@ -29,6 +29,26 @@ flowchart LR
 
 下面的每个提示词都输入到你的 AI 聊天框中，也就是你让 AI 写代码的那个输入框。示例使用普通语言，因此可在各种工具中通用。你也可以直接调用 skill；语法因工具而异（[支持的工具](../reference/supported-tools.md)）。
 
+## 不知道该问什么？从 `openspec` 开始
+
+`openspec` 是路由 skill，是任何 OpenSpec 问题的唯一入口。你不需要记住 skill 列表。调用它，说出你想做什么。它会检查项目当前的实际状态，然后回答你，或把工作交给专门负责的 skill。可以一次提出多件事，它会按顺序完成，并在某一步需要你确认时停下。
+
+不确定该怎么做、想知道某个变更进展如何、或想一次完成几个步骤时，就用它。已经知道要用哪个 skill 时，直接调用那个 skill。
+
+| 工具 | 调用方式 |
+|---|---|
+| Claude Code、Cursor、Gemini CLI、GitHub Copilot 及大多数工具 | `/openspec` |
+| Codex | `$openspec` |
+| Kimi Code | `/skill:openspec` |
+
+```text
+/openspec what should I do next on add-rate-limiting?
+/openspec how do I make proposals always list what's out of scope?
+/openspec verify add-rate-limiting, then archive it
+```
+
+它随每个 [profile](../customize/profiles.md) 一起安装。如果请求需要的 skill 尚未安装，它会改用 CLI 完成那一步，并告诉你如何添加该 skill。
+
 ## 第 1 步：探索
 
 在要计划之前，先和你的 Agent 一起把想法想清楚。在 AI 聊天框中输入：

@@ -783,7 +783,7 @@ describe('InitCommand', () => {
         .map(String);
       const summary = logCalls.find((entry) => /^共 \d+ 个 skills/.test(entry));
       expect(summary).toBe(
-        '共 6 个 skills，位于 .agents/skills/（还位于 .claude/skills/, .minimax/skills/）'
+        '共 7 个 skills，位于 .agents/skills/（还位于 .claude/skills/, .minimax/skills/）'
       );
     });
 
@@ -1040,6 +1040,7 @@ describe('InitCommand', () => {
       // Grok reads the one shared copy of the skills.
       const skillsDir = path.join(testDir, '.agents', 'skills');
       const skillNames = [
+        'openspec',
         'openspec-apply-change',
         'openspec-archive-change',
         'openspec-explore',

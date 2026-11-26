@@ -28,7 +28,7 @@ skills 在这台机器上（默认）时：
 OpenSpec Setup Complete
 
 Created: Claude Code
-6 skills in ~/.agents/skills/ for every project on this machine
+7 skills in ~/.agents/skills/ for every project on this machine
 Config: openspec/config.yaml (schema: spec-driven)
 ```
 
@@ -38,7 +38,7 @@ skills 在这个项目中时：
 OpenSpec Setup Complete
 
 Created: Claude Code
-6 skills in .agents/skills/ (also in .claude/skills/)
+7 skills in .agents/skills/ (also in .claude/skills/)
 Config: openspec/config.yaml (schema: spec-driven)
 ```
 
@@ -109,6 +109,7 @@ openspec/
 
 ```
 .agents/skills/
+├── openspec/                      ask for anything; it picks the skill
 ├── openspec-explore/              think through an idea first
 ├── openspec-propose/              propose a change
 ├── openspec-apply-change/         implement a change's tasks
@@ -119,7 +120,7 @@ openspec/
 └── openspec-bulk-archive-change/  archive several changes at once (not included by default)
 ```
 
-这是默认集合加上两个可选工作流。[Profiles](../customize/profiles.md) 列出了全部十二个。
+这是默认集合加上两个可选工作流，以及随每个 profile 一起提供的 `openspec` 路由 skill。[Profiles](../customize/profiles.md) 列出了全部十二个工作流。
 
 无论你配置了多少个工具，每个 skill 只在这里写一次。不读取 `.agents/skills/` 的工具（Claude Code、Kiro 等）会在自己的文件夹中获得指向每个 skill 的链接，例如 `.claude/skills/openspec-propose`。Windows 上的项目级安装使用 Git 可以带到另一份检出的副本。MiniMax Code 是唯一的例外：它的 skills 放在你主目录下的 `~/.minimax/skills/`。[支持的工具](../reference/supported-tools.md#where-skills-go) 展示了目录布局以及哪些工具会获得链接。
 

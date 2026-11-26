@@ -223,7 +223,7 @@ openspec-cn version
 openspec-cn update
 ```
 
-当有更新的 CLI 发布时，[`openspec-cn update`](../reference/cli.md#openspec-update) 会提示你，并且可以替你安装；那次升级每台机器只发生一次。每次运行都会刷新你的 skills，它们不会自行更新。使用全局 skills 时，从任意目录运行一次就够了，它会打印 `✓ The 6 skills for this machine are up to date (v2.1.0)`。skills 保留在项目中时，请在每个项目里运行；一个最新的项目会打印 `✓ All 2 tool(s) up to date (v2.1.0)`。
+当有更新的 CLI 发布时，[`openspec-cn update`](../reference/cli.md#openspec-update) 会提示你，并且可以替你安装；那次升级每台机器只发生一次。每次运行都会刷新你的 skills，它们不会自行更新。使用全局 skills 时，从任意目录运行一次就够了，它会打印 `✓ The 7 skills for this machine are up to date (v2.1.0)`。skills 保留在项目中时，请在每个项目里运行；一个最新的项目会打印 `✓ All 2 tool(s) up to date (v2.1.0)`。
 
 
 > [!WARNING]

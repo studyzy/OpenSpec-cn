@@ -125,14 +125,14 @@ openspec-cn init --scope project --tools claude
 OpenSpec 设置完成
 
 已创建：Claude Code
-.agents/skills/ 中共有 6 个 skills（也在 .claude/skills/）
+.agents/skills/ 中共有 7 个 skills（也在 .claude/skills/）
 配置：openspec/config.yaml（schema: spec-driven）
 
 开始使用：
   发起第一个变更：/openspec-propose "你的想法"
 ```
 
-skills 在这台机器上时，摘要行显示 `6 skills in ~/.agents/skills/ for every project on this machine`，项目里只保留 `openspec/`。
+skills 在这台机器上时，摘要行显示 `7 skills in ~/.agents/skills/ for every project on this machine`，项目里只保留 `openspec/`。
 
 `--tools none` 只创建 `openspec/` 文件夹，不设置任何工具。在已初始化的项目上，init 会在原地重写已安装的文件，摘要显示 `已刷新：Claude Code`，并有 `配置：openspec/config.yaml（已存在）`。
 

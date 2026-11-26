@@ -34,10 +34,14 @@ templates in src/core/templates/workflows/; core set src/core/profiles.ts:14. "O
 is the docs' set label (was "Expanded"; renamed 2026-08-12: the product's only stored
 profile values are core and custom, so "expanded" reads as a third profile). -->
 
+每个 skill 都是一个文件夹。你的 Agent 先读它的 `SKILL.md`。有些 skill 还带有 `references/` 文件夹，存放补充细节。Agent 只在任务需要时打开某个引用文件，这样 skill 可以说得更多，又不会挤占 Agent 的上下文。`openspec-cn update` 会让文件夹里的每个文件保持最新。
+
 这些技能分为两组：
 
 - **Core**：默认安装，是主要的规划循环。
 - **Optional**：只有当你通过 [Profiles](../customize/profiles.md) 添加时才安装。
+
+`openspec` 路由 skill 不属于这两组中的任何一组。它随每个 profile 一起提供。
 
 每个 skill 都期望项目已经使用了 OpenSpec。在它第一个会写入任何东西的步骤之前，skill 会检查根目录是否可解析。当根目录不存在时会发生什么，取决于该 skill 是如何被触达的：
 
@@ -48,6 +52,7 @@ profile values are core and custom, so "expanded" reads as a third profile). -->
 
 | Skill | 职责 | 类型 |
 |---|---|---|
+| [openspec](#openspec) | 路由 skill。问它任何问题，它会回答，或把请求交给负责该工作的 skill | 始终安装 |
 | [openspec-explore](#openspec-explore) | 在想法变成变更提案之前，先把它想清楚 | Core |
 | [openspec-propose](#openspec-propose) | 一步创建带有全部规划制品的变更提案 | Core |
 | [openspec-apply-change](#openspec-apply-change) | 实现变更提案的任务 | Core |
@@ -62,6 +67,16 @@ profile values are core and custom, so "expanded" reads as a third profile). -->
 | [openspec-onboard](#openspec-onboard) | 通过完整走完一个真实变更提案来学习工作流 | Optional |
 
 下面每个条目都点名负责下一步的 skill。无论你的 profile 是什么，skill 读到的内容都一样，因此它不能假定下一个 skill 一定存在。当某一步属于另一个 skill 时，它要么在运行时检查（"如果该 skill 已安装，否则……"），要么照 CLI 打印的恢复步骤执行。你会拿到哪一组，由 [Profiles](../customize/profiles.md) 决定。
+
+## openspec
+
+路由 skill，是任何 OpenSpec 问题的唯一入口。不知道该用哪个 skill 时从这里开始。问它任何问题。它会检查项目的状态，然后回答，或把请求交给负责该工作的 skill。模型单靠自己只能猜测 OpenSpec 的文件夹和命令。路由 skill 给了它这张地图。
+
+| 契约 | 说明 |
+|---|---|
+| **Arguments** | 任何内容：一个问题（"add-auth 进展如何？"、"怎样新增一个 schema？"）、一个步骤，或按顺序排列的几个步骤（"验证 add-auth，然后归档它"）。 |
+| **Creates** | 自身不创建任何内容。每个请求都交给负责该工作的 skill（见上表），并适用该 skill 的契约。如果该 skill 未安装，路由 skill 会用 CLI 完成这一步，并告诉你如何添加该 skill。 |
+| **Response** | 提问会得到当前进展、下一步，以及在你同意后执行它的提议。工作请求会得到对应 skill 的报告。多个步骤一次运行一个 skill，并在某个 skill 需要等待你时停下。 |
 
 ## openspec-explore
 

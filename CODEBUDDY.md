@@ -110,7 +110,7 @@ src/
 
 6. **汉化范围**: 界面文字、文档、模板已汉化。代码标识符、CLI 参数名保持英文。`src/` 中中文字符串用 `// 中文注释` 标注。
 
-7. **2.0 只安装 skills**: 项目 skills 只写一份到 `.agents/skills/`；不读该目录的工具（Claude Code、Kiro、CodeBuddy 等，见 `SKILL_LINKED_TOOL_IDS`）从其自身文件夹建立链接。MiniMax Code 例外，写全局 `~/.minimax/skills/`。原本由 `delivery` 设置的 skills/commands 二选一已退役：值仍会被读取，但不再影响安装内容；`command-generation/adapters` 仅保留用于识别并清理旧版生成的文件。2.1 起新增机器级（global）安装：`openspec-cn init --global` / `update --global` 通过 `skills` 安装器把 skills 装到 `~/.agents/skills/`，`--scope project|global` 与 `skills: global` 配置决定项目使用哪一份。2.1.1 起 skills 由包内 `src/core/templates/` 生成到临时目录再交给安装器，不再克隆 GitHub tag——离线可用、不需要 Git，且 text 始终与所装版本一致；全局安装会把来源记进 `skills` 包的锁文件（`studyzy/OpenSpec-cn`），项目安装则通过 `skills-lock.json` 的来源字段识别 `npx skills add` 装入的 skills。
+7. **2.0 只安装 skills**: 项目 skills 只写一份到 `.agents/skills/`；不读该目录的工具（Claude Code、Kiro、CodeBuddy 等，见 `SKILL_LINKED_TOOL_IDS`）从其自身文件夹建立链接。MiniMax Code 例外，写全局 `~/.minimax/skills/`。原本由 `delivery` 设置的 skills/commands 二选一已退役：值仍会被读取，但不再影响安装内容；`command-generation/adapters` 仅保留用于识别并清理旧版生成的文件。2.1 起新增机器级（global）安装：`openspec-cn init --global` / `update --global` 通过 `skills` 安装器把 skills 装到 `~/.agents/skills/`，`--scope project|global` 与 `skills: global` 配置决定项目使用哪一份。2.1.1 起 skills 由包内 `src/core/templates/` 生成到临时目录再交给安装器，不再克隆 GitHub tag——离线可用、不需要 Git，且 text 始终与所装版本一致；全局安装会把来源记进 `skills` 包的锁文件（`studyzy/OpenSpec-cn`），项目安装则通过 `skills-lock.json` 的来源字段识别 `npx skills add` 装入的 skills。2.2 起新增 `openspec` 路由 skill（统一入口，随每个 profile 安装，不计入 12 个工作流），skills 可带 `references/` 子目录存放补充细节，安装、更新、移除都按整个文件夹处理。
 
 ## OpenSpec 开发工作流
 
